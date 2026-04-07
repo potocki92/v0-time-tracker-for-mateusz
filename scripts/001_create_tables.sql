@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 );
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_insert_own" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_delete_own" ON public.profiles;
 CREATE POLICY "profiles_select_own" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "profiles_insert_own" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "profiles_update_own" ON public.profiles FOR UPDATE USING (auth.uid() = id);
@@ -44,6 +48,10 @@ CREATE TABLE IF NOT EXISTS public.clients (
 );
 
 ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "clients_select_own" ON public.clients;
+DROP POLICY IF EXISTS "clients_insert_own" ON public.clients;
+DROP POLICY IF EXISTS "clients_update_own" ON public.clients;
+DROP POLICY IF EXISTS "clients_delete_own" ON public.clients;
 CREATE POLICY "clients_select_own" ON public.clients FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "clients_insert_own" ON public.clients FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "clients_update_own" ON public.clients FOR UPDATE USING (auth.uid() = user_id);
@@ -68,6 +76,10 @@ CREATE TABLE IF NOT EXISTS public.projects (
 );
 
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "projects_select_own" ON public.projects;
+DROP POLICY IF EXISTS "projects_insert_own" ON public.projects;
+DROP POLICY IF EXISTS "projects_update_own" ON public.projects;
+DROP POLICY IF EXISTS "projects_delete_own" ON public.projects;
 CREATE POLICY "projects_select_own" ON public.projects FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "projects_insert_own" ON public.projects FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "projects_update_own" ON public.projects FOR UPDATE USING (auth.uid() = user_id);
@@ -94,6 +106,10 @@ CREATE TABLE IF NOT EXISTS public.work_entries (
 );
 
 ALTER TABLE public.work_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "work_entries_select_own" ON public.work_entries;
+DROP POLICY IF EXISTS "work_entries_insert_own" ON public.work_entries;
+DROP POLICY IF EXISTS "work_entries_update_own" ON public.work_entries;
+DROP POLICY IF EXISTS "work_entries_delete_own" ON public.work_entries;
 CREATE POLICY "work_entries_select_own" ON public.work_entries FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "work_entries_insert_own" ON public.work_entries FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "work_entries_update_own" ON public.work_entries FOR UPDATE USING (auth.uid() = user_id);
@@ -118,6 +134,10 @@ CREATE TABLE IF NOT EXISTS public.invoices (
 );
 
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "invoices_select_own" ON public.invoices;
+DROP POLICY IF EXISTS "invoices_insert_own" ON public.invoices;
+DROP POLICY IF EXISTS "invoices_update_own" ON public.invoices;
+DROP POLICY IF EXISTS "invoices_delete_own" ON public.invoices;
 CREATE POLICY "invoices_select_own" ON public.invoices FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "invoices_insert_own" ON public.invoices FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "invoices_update_own" ON public.invoices FOR UPDATE USING (auth.uid() = user_id);
