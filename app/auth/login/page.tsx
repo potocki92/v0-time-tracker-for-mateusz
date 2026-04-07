@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -12,7 +11,6 @@ import { Clock, Loader2, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -23,7 +21,7 @@ export default function LoginPage() {
     setIsLoading(true)
 
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
@@ -34,9 +32,16 @@ export default function LoginPage() {
       return
     }
 
+    if (!data.session) {
+      toast.error('Nie udalo sie utworzyc sesji. Sprobuj ponownie.')
+      setIsLoading(false)
+      return
+    }
+
     toast.success('Zalogowano pomyslnie!')
-    router.push('/dashboard')
-    router.refresh()
+
+    // Full page navigation ensures middleware receives fresh auth cookies
+    window.location.assign('/dashboard')
   }
 
   return (
