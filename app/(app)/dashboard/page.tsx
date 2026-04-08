@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -19,6 +20,7 @@ import { MONTH_NAMES } from '@/lib/types'
 import { calculateMonthlyTotals, formatCurrency } from '@/lib/helpers'
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [clients, setClients] = useState<Client[]>([])
   const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
@@ -32,28 +34,38 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadData() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) return
 
-      // Load all data in parallel
-      const [profileRes, clientsRes, entriesRes, invoicesRes] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', user.id).single(),
-        supabase.from('clients').select('*').eq('user_id', user.id),
-        supabase.from('work_entries').select('*').eq('user_id', user.id),
-        supabase.from('invoices').select('*').eq('user_id', user.id),
-      ])
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
 
-      if (profileRes.data) setProfile(profileRes.data)
-      if (clientsRes.data) setClients(clientsRes.data)
-      if (entriesRes.data) setWorkEntries(entriesRes.data)
-      if (invoicesRes.data) setInvoices(invoicesRes.data)
-      
-      setIsLoading(false)
+        if (!user) {
+          router.replace('/auth/login')
+          return
+        }
+
+        // Load all data in parallel
+        const [profileRes, clientsRes, entriesRes, invoicesRes] = await Promise.all([
+          supabase.from('profiles').select('*').eq('id', user.id).single(),
+          supabase.from('clients').select('*').eq('user_id', user.id),
+          supabase.from('work_entries').select('*').eq('user_id', user.id),
+          supabase.from('invoices').select('*').eq('user_id', user.id),
+        ])
+
+        if (profileRes.data) setProfile(profileRes.data)
+        if (clientsRes.data) setClients(clientsRes.data)
+        if (entriesRes.data) setWorkEntries(entriesRes.data)
+        if (invoicesRes.data) setInvoices(invoicesRes.data)
+      } catch (error) {
+        console.error('Blad podczas ladowania dashboardu:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     loadData()
-  }, [])
+  }, [router])
 
   // Calculate current month entries
   const currentMonthEntries = useMemo(() => {

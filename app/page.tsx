@@ -1,5 +1,5 @@
-import Component from "../work-tracker"
+import { redirect } from 'next/navigation'
 
 export default function Page() {
-  return <Component />
+  redirect('/dashboard')
 }
