@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
+import { fetchCurrentEurRate } from '@/lib/nbp'
 import { Area, Bar, CartesianGrid, ComposedChart, XAxis, YAxis } from 'recharts'
 
 import { createClient } from '@/lib/supabase/client'
@@ -47,6 +48,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { lightFormat } from 'date-fns'
 
 type TimeRange =
   | 'current_week'
@@ -292,12 +294,14 @@ export default function DashboardPage() {
           setEurToPlnRate(userEurRate)
         }
 
-        const [clientsRes, entriesRes, invoicesRes] = await Promise.all([
+        const [liveRate, clientsRes, entriesRes, invoicesRes] = await Promise.all([
+            fetchCurrentEurRate(),
           supabase.from('clients').select('*').eq('user_id', user.id),
           supabase.from('work_entries').select('*').eq('user_id', user.id),
           supabase.from('invoices').select('*').eq('user_id', user.id),
         ])
 
+        if (liveRate) { setEurToPlnRate(liveRate)}
         if (clientsRes.data) setClients(clientsRes.data)
         if (entriesRes.data) setWorkEntries(entriesRes.data)
         if (invoicesRes.data) setInvoices(invoicesRes.data)
