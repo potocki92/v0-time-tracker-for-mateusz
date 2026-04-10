@@ -1,58 +1,21 @@
 'use client'
 
 import { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { AlertCircle, FileText, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  FileText,
-  Plus,
-  Upload,
-  Eye,
-  Pencil,
-  Trash2,
-  CheckCircle2,
-  AlertCircle,
-  Clock3,
-} from 'lucide-react'
-import { toast } from 'sonner'
 import type { Client, Invoice } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
-
-const INVOICES_BUCKET = 'invoices'
-
-interface InvoiceFormState {
-  name: string
-  invoice_number: string
-  recipient: string
-  description: string
-  billing_period: string
-  invoice_date: string
-  due_date: string
-  amount: number
-  currency: 'PLN' | 'EUR'
-  is_paid: boolean
-  notes: string
-  client_id: string
-  file: File | null
-}
-
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message
-  if (typeof error === 'string') return error
-  try {
-    return JSON.stringify(error)
-  } catch {
-    return 'Nieznany blad'
-  }
-}
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { toast } from 'sonner'
+import { InvoiceCard } from '@/components/invoices/invoice-card'
+import { InvoiceFormDialog, type InvoiceFormState } from '@/components/invoices/invoice-form-dialog'
+import { InvoiceStats } from '@/components/invoices/invoice-stats'
+import { uploadInvoicePdf } from '@/services/invoices'
 
 const initialForm: InvoiceFormState = {
   name: '',
@@ -70,18 +33,32 @@ const initialForm: InvoiceFormState = {
   file: null,
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  try {
+    return JSON.stringify(error)
+  } catch {
+    return 'Nieznany błąd'
+  }
+}
+
 export default function InvoicesPage() {
   const supabase = createClient()
 
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [clients, setClients] = useState<Client[]>([])
+
   const [isLoading, setIsLoading] = useState(true)
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
   const [deleteCandidate, setDeleteCandidate] = useState<Invoice | null>(null)
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [formData, setFormData] = useState<InvoiceFormState>(initialForm)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'paid' | 'unpaid'>('all')
 
   useEffect(() => {
     loadData()
@@ -111,37 +88,28 @@ export default function InvoicesPage() {
       setInvoices((invoicesRes.data ?? []) as Invoice[])
       setClients((clientsRes.data ?? []) as Client[])
     } catch (error) {
-      console.error('Blad ladowania faktur:', error)
-      toast.error('Nie udalo sie zaladowac faktur')
+      console.error('Błąd ładowania faktur:', error)
+      toast.error('Nie udało się załadować faktur')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const stats = useMemo(() => {
-    const unpaid = invoices.filter((invoice) => !invoice.is_paid)
-    const paid = invoices.filter((invoice) => invoice.is_paid)
-
-    const unpaidAmount = unpaid.reduce((sum, invoice) => sum + Number(invoice.amount ?? 0), 0)
-    const paidAmount = paid.reduce((sum, invoice) => sum + Number(invoice.amount ?? 0), 0)
-
-    return {
-      total: invoices.length,
-      unpaidCount: unpaid.length,
-      unpaidAmount,
-      paidAmount,
-    }
-  }, [invoices])
-
-  function openCreateModal() {
-    setEditingInvoice(null)
-    setFormData({ ...initialForm, client_id: 'none', invoice_date: new Date().toISOString().slice(0, 10) })
-    setPreviewUrl(null)
-    setIsModalOpen(true)
+  function getClientName(clientId: string | null) {
+    if (!clientId) return 'Bez klienta'
+    return clients.find((client) => client.id === clientId)?.name ?? 'Nieznany klient'
   }
 
-  function openEditModal(invoice: Invoice) {
+  function openCreateDialog() {
+    setEditingInvoice(null)
+    setPreviewUrl(null)
+    setFormData({ ...initialForm, invoice_date: new Date().toISOString().slice(0, 10), client_id: 'none' })
+    setIsFormDialogOpen(true)
+  }
+
+  function openEditDialog(invoice: Invoice) {
     setEditingInvoice(invoice)
+    setPreviewUrl(invoice.file_url)
     setFormData({
       name: invoice.name ?? '',
       invoice_number: invoice.invoice_number ?? '',
@@ -157,15 +125,14 @@ export default function InvoicesPage() {
       client_id: invoice.client_id ?? 'none',
       file: null,
     })
-    setPreviewUrl(invoice.file_url)
-    setIsModalOpen(true)
+    setIsFormDialogOpen(true)
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const selectedFile = event.target.files?.[0] ?? null
 
     if (selectedFile && selectedFile.type !== 'application/pdf') {
-      toast.error('Mozesz dodac tylko plik PDF')
+      toast.error('Możesz dodać tylko plik PDF')
       return
     }
 
@@ -175,25 +142,6 @@ export default function InvoicesPage() {
       const objectUrl = URL.createObjectURL(selectedFile)
       setPreviewUrl(objectUrl)
     }
-  }
-
-  async function uploadInvoicePdf(userId: string) {
-    if (!formData.file) return editingInvoice?.file_url ?? null
-
-    const safeName = formData.file.name.replace(/[^a-zA-Z0-9_.-]/g, '_')
-    const filePath = `${userId}/${Date.now()}_${safeName}`
-
-    const { error: uploadError } = await supabase.storage.from(INVOICES_BUCKET).upload(filePath, formData.file, {
-      contentType: 'application/pdf',
-      upsert: false,
-    })
-
-    if (uploadError) {
-      throw uploadError
-    }
-
-    const { data: publicData } = supabase.storage.from(INVOICES_BUCKET).getPublicUrl(filePath)
-    return publicData.publicUrl
   }
 
   async function saveInvoice() {
@@ -208,7 +156,7 @@ export default function InvoicesPage() {
     }
 
     if (!formData.amount || formData.amount <= 0) {
-      toast.error('Kwota musi byc wieksza od 0')
+      toast.error('Kwota musi być większa od 0')
       return
     }
 
@@ -224,14 +172,24 @@ export default function InvoicesPage() {
         return
       }
 
-      const pdfUrl = await uploadInvoicePdf(user.id)
+      const pdfUrl = formData.file
+        ? await uploadInvoicePdf({
+            supabase,
+            userId: user.id,
+            file: formData.file,
+          })
+        : editingInvoice?.file_url ?? null
 
       const payload = {
         user_id: user.id,
         client_id: formData.client_id === 'none' ? null : formData.client_id,
         name: formData.name.trim(),
+        invoice_number: formData.invoice_number.trim() || null,
+        recipient: formData.recipient.trim() || null,
+        description: formData.description.trim() || null,
         billing_period: formData.billing_period.trim() || null,
         issue_date: formData.invoice_date,
+        due_date: formData.due_date || null,
         amount: formData.amount,
         currency: formData.currency,
         is_paid: formData.is_paid,
@@ -242,18 +200,18 @@ export default function InvoicesPage() {
       if (editingInvoice) {
         const { error } = await supabase.from('invoices').update(payload).eq('id', editingInvoice.id)
         if (error) throw error
-        toast.success('Faktura zostala zaktualizowana')
+        toast.success('Faktura została zaktualizowana')
       } else {
         const { error } = await supabase.from('invoices').insert(payload)
         if (error) throw error
-        toast.success('Faktura zostala dodana')
+        toast.success('Faktura została dodana')
       }
 
-      setIsModalOpen(false)
+      setIsFormDialogOpen(false)
       await loadData()
     } catch (error) {
-      console.error('Blad zapisu faktury:', error)
-      toast.error(`Nie udalo sie zapisac faktury: ${getErrorMessage(error)}`)
+      console.error('Błąd zapisu faktury:', error)
+      toast.error(`Nie udało się zapisać faktury: ${getErrorMessage(error)}`)
     } finally {
       setIsSaving(false)
     }
@@ -266,76 +224,65 @@ export default function InvoicesPage() {
       const { error } = await supabase.from('invoices').delete().eq('id', deleteCandidate.id)
       if (error) throw error
 
-      toast.success('Faktura zostala usunieta')
+      toast.success('Faktura została usunięta')
       setDeleteCandidate(null)
       await loadData()
     } catch (error) {
-      console.error('Blad usuwania faktury:', error)
-      toast.error('Nie udalo sie usunac faktury')
+      console.error('Błąd usuwania faktury:', error)
+      toast.error('Nie udało się usunąć faktury')
     }
-  }
-
-  function getClientName(clientId: string | null) {
-    if (!clientId) return 'Bez klienta'
-    return clients.find((client) => client.id === clientId)?.name ?? 'Nieznany klient'
   }
 
   const unpaidInvoices = useMemo(() => invoices.filter((invoice) => !invoice.is_paid), [invoices])
 
+  const filteredInvoices = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+
+    return invoices.filter((invoice) => {
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'paid' && invoice.is_paid) ||
+        (statusFilter === 'unpaid' && !invoice.is_paid)
+
+      if (!matchesStatus) return false
+
+      if (!query) return true
+
+      return [invoice.name, invoice.invoice_number, invoice.recipient]
+        .filter(Boolean)
+        .some((value) => value?.toLowerCase().includes(query))
+    })
+  }, [invoices, searchQuery, statusFilter])
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-pulse text-muted-foreground">Ladowanie faktur...</div>
+        <div className="animate-pulse text-muted-foreground">Ładowanie faktur...</div>
       </div>
     )
   }
 
   return (
-    <div className="container px-4 py-6 space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Faktury</h1>
-          <p className="text-muted-foreground">Nowoczesny panel do zarzadzania fakturami PDF i opisowymi.</p>
+    <div className="container px-4 py-8 space-y-6">
+      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">Faktury</h1>
+          <p className="text-muted-foreground">Zarządzaj fakturami, płatnościami oraz załącznikami PDF.</p>
         </div>
-        <Button onClick={openCreateModal}>
+        <Button onClick={openCreateDialog}>
           <Plus className="w-4 h-4 mr-2" />
-          Dodaj fakture
+          Dodaj fakturę
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Wszystkie faktury</p>
-            <p className="text-2xl font-semibold mt-1">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Nieoplacone</p>
-            <p className="text-2xl font-semibold mt-1 text-amber-600">{stats.unpaidCount}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Kwota nieoplacona</p>
-            <p className="text-xl font-semibold mt-1">{formatCurrency(stats.unpaidAmount, 'PLN')}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Kwota oplacona</p>
-            <p className="text-xl font-semibold mt-1 text-emerald-600">{formatCurrency(stats.paidAmount, 'PLN')}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <InvoiceStats invoices={invoices} />
 
       {unpaidInvoices.length > 0 && (
         <Card className="border-amber-500/30 bg-amber-500/5">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-amber-600" />
-              Faktury oczekujace na platnosc
+              Faktury oczekujące na płatność
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -355,265 +302,87 @@ export default function InvoicesPage() {
         </Card>
       )}
 
-      {invoices.length === 0 ? (
-        <Card className="py-14">
-          <CardContent className="text-center space-y-3">
-            <div className="mx-auto h-12 w-12 rounded-2xl bg-muted flex items-center justify-center">
-              <FileText className="w-6 h-6 text-muted-foreground" />
-            </div>
-            <h2 className="text-lg font-semibold">Nie masz jeszcze faktur</h2>
-            <p className="text-sm text-muted-foreground">Dodaj pierwsza fakture, zalacz PDF i kontroluj platnosci.</p>
-            <Button onClick={openCreateModal}>Dodaj pierwsza fakture</Button>
-          </CardContent>
-        </Card>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="grid gap-3 md:grid-cols-[1fr_220px]">
+            <Input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Szukaj po nazwie, numerze lub odbiorcy..."
+            />
+            <Select value={statusFilter} onValueChange={(value: 'all' | 'paid' | 'unpaid') => setStatusFilter(value)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Wszystkie statusy</SelectItem>
+                <SelectItem value="paid">Opłacone</SelectItem>
+                <SelectItem value="unpaid">Nieopłacone</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {filteredInvoices.length === 0 ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FileText className="size-5" />
+            </EmptyMedia>
+            <EmptyTitle>{invoices.length === 0 ? 'Nie masz jeszcze faktur' : 'Brak wyników wyszukiwania'}</EmptyTitle>
+            <EmptyDescription>
+              {invoices.length === 0
+                ? 'Dodaj pierwszą fakturę, załącz PDF i kontroluj płatności.'
+                : 'Zmień frazę wyszukiwania albo filtr statusu i spróbuj ponownie.'}
+            </EmptyDescription>
+          </EmptyHeader>
+          {invoices.length === 0 && <Button onClick={openCreateDialog}>Dodaj pierwszą fakturę</Button>}
+        </Empty>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
-          {invoices.map((invoice) => (
-            <Card key={invoice.id}>
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <CardTitle className="text-base">{invoice.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">Do: {invoice.recipient || 'Nie podano'}</p>
-                  </div>
-                  <Badge variant={invoice.is_paid ? 'secondary' : 'outline'} className={invoice.is_paid ? 'text-emerald-700' : 'text-amber-700'}>
-                    {invoice.is_paid ? 'Oplacona' : 'Nieoplacona'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Kwota</p>
-                    <p className="font-semibold">{formatCurrency(invoice.amount, invoice.currency)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Klient</p>
-                    <p className="font-medium">{getClientName(invoice.client_id)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Data wystawienia</p>
-                    <p className="font-medium">{invoice.invoice_date || invoice.issue_date || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Termin platnosci</p>
-                    <p className="font-medium">{invoice.due_date || '-'}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {invoice.file_url && (
-                    <Button asChild size="sm" variant="outline">
-                      <a href={invoice.file_url} target="_blank" rel="noreferrer">
-                        <Eye className="w-4 h-4 mr-1" /> Podglad PDF
-                      </a>
-                    </Button>
-                  )}
-                  <Button size="sm" variant="ghost" onClick={() => openEditModal(invoice)}>
-                    <Pencil className="w-4 h-4 mr-1" /> Edytuj
-                  </Button>
-                  <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setDeleteCandidate(invoice)}>
-                    <Trash2 className="w-4 h-4 mr-1" /> Usun
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          {filteredInvoices.map((invoice) => (
+            <InvoiceCard
+              key={invoice.id}
+              invoice={invoice}
+              clientName={getClientName(invoice.client_id)}
+              onEdit={openEditDialog}
+              onDelete={setDeleteCandidate}
+            />
           ))}
         </div>
       )}
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingInvoice ? 'Edytuj fakture' : 'Nowa faktura'}</DialogTitle>
-          </DialogHeader>
-
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="invoice-name">Nazwa faktury *</Label>
-              <Input
-                id="invoice-name"
-                value={formData.name}
-                onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
-                placeholder="np. Faktura za marzec 2026"
-              />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="grid gap-2">
-                <Label htmlFor="recipient">Do kogo *</Label>
-                <Input
-                  id="recipient"
-                  value={formData.recipient}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, recipient: event.target.value }))}
-                  placeholder="Nazwa firmy / odbiorca"
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="invoice-number">Numer faktury</Label>
-                <Input
-                  id="invoice-number"
-                  value={formData.invoice_number}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, invoice_number: event.target.value }))}
-                  placeholder="np. FV/04/2026/01"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="description">Za co / opis faktury</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(event) => setFormData((prev) => ({ ...prev, description: event.target.value }))}
-                rows={3}
-                placeholder="Zakres prac, produkty, uslugi..."
-              />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="grid gap-2">
-                <Label htmlFor="amount">Kwota *</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  value={formData.amount || ''}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, amount: Number(event.target.value || 0) }))}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label>Waluta</Label>
-                <Select
-                  value={formData.currency}
-                  onValueChange={(value: 'PLN' | 'EUR') => setFormData((prev) => ({ ...prev, currency: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PLN">PLN</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="invoice-date">Data wystawienia *</Label>
-                <Input
-                  id="invoice-date"
-                  type="date"
-                  value={formData.invoice_date}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, invoice_date: event.target.value }))}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="due-date">Termin platnosci</Label>
-                <Input
-                  id="due-date"
-                  type="date"
-                  value={formData.due_date}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, due_date: event.target.value }))}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="grid gap-2">
-                <Label>Powiazany klient</Label>
-                <Select value={formData.client_id} onValueChange={(value) => setFormData((prev) => ({ ...prev, client_id: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Bez klienta</SelectItem>
-                    {clients.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="billing-period">Okres rozliczeniowy</Label>
-                <Input
-                  id="billing-period"
-                  value={formData.billing_period}
-                  onChange={(event) => setFormData((prev) => ({ ...prev, billing_period: event.target.value }))}
-                  placeholder="np. Marzec 2026"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div>
-                <p className="font-medium text-sm">Status platnosci</p>
-                <p className="text-xs text-muted-foreground">Oznacz fakture jako oplacona lub oczekujaca.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {formData.is_paid ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Clock3 className="w-4 h-4 text-amber-600" />}
-                <Switch checked={formData.is_paid} onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, is_paid: checked }))} />
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="pdf-upload">Zalacz PDF faktury</Label>
-              <Input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} />
-              <p className="text-xs text-muted-foreground">Po zapisaniu plik zostanie wyslany do Supabase Storage (bucket: invoices).</p>
-            </div>
-
-            {previewUrl && (
-              <div className="space-y-2">
-                <Label>Podglad PDF</Label>
-                <div className="h-[360px] rounded-xl border overflow-hidden bg-muted/20">
-                  <iframe src={previewUrl} className="w-full h-full" title="Podglad PDF faktury" />
-                </div>
-              </div>
-            )}
-
-            <div className="grid gap-2">
-              <Label htmlFor="notes">Notatki</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(event) => setFormData((prev) => ({ ...prev, notes: event.target.value }))}
-                rows={2}
-                placeholder="Dodatkowe informacje..."
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-              Anuluj
-            </Button>
-            <Button onClick={saveInvoice} disabled={isSaving}>
-              <Upload className="w-4 h-4 mr-2" />
-              {isSaving ? 'Zapisywanie...' : editingInvoice ? 'Zapisz zmiany' : 'Dodaj fakture'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <InvoiceFormDialog
+        open={isFormDialogOpen}
+        onOpenChange={setIsFormDialogOpen}
+        formData={formData}
+        onFormDataChange={(updater) => setFormData(updater)}
+        onFileChange={handleFileChange}
+        onSave={saveInvoice}
+        clients={clients}
+        isSaving={isSaving}
+        editingInvoice={editingInvoice}
+        previewUrl={previewUrl}
+      />
 
       <Dialog open={!!deleteCandidate} onOpenChange={() => setDeleteCandidate(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-destructive" />
-              Usunac fakture?
+              Usunąć fakturę?
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Ta operacja jest nieodwracalna. Faktura <span className="font-medium text-foreground">{deleteCandidate?.name}</span> zostanie usunieta.
+            Ta operacja jest nieodwracalna. Faktura <span className="font-medium text-foreground">{deleteCandidate?.name}</span> zostanie usunięta.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteCandidate(null)}>
               Anuluj
             </Button>
             <Button variant="destructive" onClick={deleteInvoice}>
-              Usun
+              Usuń
             </Button>
           </DialogFooter>
         </DialogContent>
