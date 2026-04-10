@@ -15,13 +15,16 @@ import {
   Users,
   FileText
 } from 'lucide-react'
-import type { Client, WorkEntry, Invoice, Profile } from '@/lib/types'
+import type { Client, WorkEntry, Invoice } from '@/lib/types'
 import { MONTH_NAMES } from '@/lib/types'
 import { calculateMonthlyTotals, formatCurrency } from '@/lib/helpers'
 
+const DEFAULT_EUR_TO_PLN = 4.3
+
 export default function DashboardPage() {
   const router = useRouter()
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [accountName, setAccountName] = useState('Uzytkowniku')
+  const [monthlyGoal, setMonthlyGoal] = useState<{ amount: number; currency: 'PLN' | 'EUR' } | null>(null)
   const [clients, setClients] = useState<Client[]>([])
   const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
@@ -45,15 +48,34 @@ export default function DashboardPage() {
           return
         }
 
+        const metadata = user.user_metadata ?? {}
+        const fullName =
+          typeof metadata.full_name === 'string' && metadata.full_name.trim().length > 0
+            ? metadata.full_name
+            : typeof metadata.name === 'string' && metadata.name.trim().length > 0
+              ? metadata.name
+              : user.email?.split('@')[0] || 'Uzytkowniku'
+
+        setAccountName(fullName.split(' ')[0] || 'Uzytkowniku')
+
+        const goalAmountRaw = metadata.monthly_goal_amount
+        const goalAmount =
+          typeof goalAmountRaw === 'number'
+            ? goalAmountRaw
+            : typeof goalAmountRaw === 'string'
+              ? Number(goalAmountRaw)
+              : NaN
+        const goalCurrency = metadata.monthly_goal_currency === 'EUR' ? 'EUR' : 'PLN'
+
+        setMonthlyGoal(Number.isFinite(goalAmount) && goalAmount > 0 ? { amount: goalAmount, currency: goalCurrency } : null)
+
         // Load all data in parallel
-        const [profileRes, clientsRes, entriesRes, invoicesRes] = await Promise.all([
-          supabase.from('profiles').select('*').eq('id', user.id).single(),
+        const [clientsRes, entriesRes, invoicesRes] = await Promise.all([
           supabase.from('clients').select('*').eq('user_id', user.id),
           supabase.from('work_entries').select('*').eq('user_id', user.id),
           supabase.from('invoices').select('*').eq('user_id', user.id),
         ])
 
-        if (profileRes.data) setProfile(profileRes.data)
         if (clientsRes.data) setClients(clientsRes.data)
         if (entriesRes.data) setWorkEntries(entriesRes.data)
         if (invoicesRes.data) setInvoices(invoicesRes.data)
@@ -77,9 +99,8 @@ export default function DashboardPage() {
 
   // Calculate totals
   const totals = useMemo(() => {
-    const eurToPln = profile?.eur_to_pln || 4.30
-    return calculateMonthlyTotals(currentMonthEntries, clients, eurToPln)
-  }, [currentMonthEntries, clients, profile])
+    return calculateMonthlyTotals(currentMonthEntries, clients, DEFAULT_EUR_TO_PLN)
+  }, [currentMonthEntries, clients])
 
   // Unpaid invoices
   const unpaidInvoices = useMemo(() => {
@@ -88,13 +109,13 @@ export default function DashboardPage() {
 
   // Goal progress
   const goalProgress = useMemo(() => {
-    if (!profile?.monthly_goal_amount) return 0
-    const target = profile.monthly_goal_amount
-    const current = profile.monthly_goal_currency === 'EUR' 
+    if (!monthlyGoal?.amount) return 0
+    const target = monthlyGoal.amount
+    const current = monthlyGoal.currency === 'EUR' 
       ? totals.earningsEUR 
       : totals.totalEarningsAllPLN
     return Math.min(100, (current / target) * 100)
-  }, [profile, totals])
+  }, [monthlyGoal, totals])
 
   if (isLoading) {
     return (
@@ -109,7 +130,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">
-          Witaj, {profile?.full_name?.split(' ')[0] || 'Uzytkowniku'}!
+          Witaj, {accountName}!
         </h1>
         <p className="text-muted-foreground">
           {MONTH_NAMES[currentMonth]} {currentYear}
@@ -163,14 +184,14 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totals.earningsEUR, 'EUR')}</div>
             <p className="text-xs text-muted-foreground">
-              ~{formatCurrency(totals.earningsEUR * (profile?.eur_to_pln || 4.30), 'PLN')}
+              ~{formatCurrency(totals.earningsEUR * DEFAULT_EUR_TO_PLN, 'PLN')}
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Monthly Goal */}
-      {profile?.monthly_goal_amount && (
+      {monthlyGoal && (
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -185,7 +206,7 @@ export default function DashboardPage() {
                 {goalProgress.toFixed(0)}% celu
               </span>
               <span className="font-medium">
-                {formatCurrency(profile.monthly_goal_amount, profile.monthly_goal_currency as 'PLN' | 'EUR')}
+                {formatCurrency(monthlyGoal.amount, monthlyGoal.currency)}
               </span>
             </div>
           </CardContent>

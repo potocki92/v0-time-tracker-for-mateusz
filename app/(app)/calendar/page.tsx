@@ -15,14 +15,15 @@ import {
   Plus
 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Client, WorkEntry, Project, Profile } from '@/lib/types'
+import type { Client, WorkEntry, Project } from '@/lib/types'
 import { MONTH_NAMES, DAY_NAMES, STATUS_COLORS, STATUS_LABELS } from '@/lib/types'
 import { getDaysInMonth, getFirstDayOfMonth, getDateString, isFutureDate, calculateEarnings, formatCurrency } from '@/lib/helpers'
 
 type WorkStatus = 'worked' | 'not_worked' | 'vacation' | 'sick_leave' | 'day_off'
+const DEFAULT_HOURS = 8
+const DEFAULT_EUR_TO_PLN = 4.3
 
 export default function CalendarPage() {
-  const [profile, setProfile] = useState<Profile | null>(null)
   const [clients, setClients] = useState<Client[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
@@ -37,7 +38,7 @@ export default function CalendarPage() {
   const [formStatus, setFormStatus] = useState<WorkStatus>('worked')
   const [formClientId, setFormClientId] = useState<string>('')
   const [formProjectId, setFormProjectId] = useState<string>('')
-  const [formHours, setFormHours] = useState<number>(8)
+  const [formHours, setFormHours] = useState<number>(DEFAULT_HOURS)
   const [formQuantity, setFormQuantity] = useState<number>(0)
   const [formQuantityFrom, setFormQuantityFrom] = useState<number>(0)
   const [formQuantityTo, setFormQuantityTo] = useState<number>(0)
@@ -53,14 +54,12 @@ export default function CalendarPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [profileRes, clientsRes, projectsRes, entriesRes] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', user.id).single(),
+    const [clientsRes, projectsRes, entriesRes] = await Promise.all([
       supabase.from('clients').select('*').eq('user_id', user.id),
       supabase.from('projects').select('*').eq('user_id', user.id),
       supabase.from('work_entries').select('*').eq('user_id', user.id),
     ])
 
-    if (profileRes.data) setProfile(profileRes.data)
     if (clientsRes.data) setClients(clientsRes.data)
     if (projectsRes.data) setProjects(projectsRes.data)
     if (entriesRes.data) setWorkEntries(entriesRes.data)
@@ -102,7 +101,7 @@ export default function CalendarPage() {
       setFormStatus(existingEntry.status as WorkStatus)
       setFormClientId(existingEntry.client_id || '')
       setFormProjectId(existingEntry.project_id || '')
-      setFormHours(existingEntry.hours || profile?.default_hours || 8)
+      setFormHours(existingEntry.hours || DEFAULT_HOURS)
       setFormQuantity(existingEntry.quantity || 0)
       setFormQuantityFrom(existingEntry.quantity_from || 0)
       setFormQuantityTo(existingEntry.quantity_to || 0)
@@ -111,7 +110,7 @@ export default function CalendarPage() {
       setFormStatus('worked')
       setFormClientId(defaultClient?.id || '')
       setFormProjectId('')
-      setFormHours(profile?.default_hours || 8)
+      setFormHours(DEFAULT_HOURS)
       setFormQuantity(0)
       setFormQuantityFrom(0)
       setFormQuantityTo(0)
@@ -273,7 +272,7 @@ export default function CalendarPage() {
               const isToday = dateStr === getDateString(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
 
               const client = entry?.client_id ? clients.find(c => c.id === entry.client_id) : undefined
-              const earnings = entry && client ? calculateEarnings(entry, client, profile?.eur_to_pln || 4.30) : null
+              const earnings = entry && client ? calculateEarnings(entry, client, DEFAULT_EUR_TO_PLN) : null
 
               return (
                 <button
