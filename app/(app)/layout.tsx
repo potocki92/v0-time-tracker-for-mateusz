@@ -48,7 +48,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true)
     const supabase = createClient()
-    
+
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
     })
