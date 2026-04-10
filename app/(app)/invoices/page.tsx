@@ -1,15 +1,23 @@
 'use client'
 
 import { ChangeEvent, useEffect, useMemo, useState } from 'react'
-import { AlertCircle, FileText, Plus } from 'lucide-react'
+import { AlertCircle, Eye, FileText, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Client, Invoice } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { toast } from 'sonner'
 import { InvoiceCard } from '@/components/invoices/invoice-card'
@@ -98,6 +106,18 @@ export default function InvoicesPage() {
   function getClientName(clientId: string | null) {
     if (!clientId) return 'Bez klienta'
     return clients.find((client) => client.id === clientId)?.name ?? 'Nieznany klient'
+  }
+
+  function formatInvoiceDate(date: string | null | undefined) {
+    if (!date) return '-'
+    const parsed = new Date(date)
+    if (Number.isNaN(parsed.getTime())) return '-'
+
+    return new Intl.DateTimeFormat('pl-PL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(parsed)
   }
 
   function openCreateDialog() {
@@ -340,16 +360,101 @@ export default function InvoicesPage() {
           {invoices.length === 0 && <Button onClick={openCreateDialog}>Dodaj pierwszą fakturę</Button>}
         </Empty>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {filteredInvoices.map((invoice) => (
-            <InvoiceCard
-              key={invoice.id}
-              invoice={invoice}
-              clientName={getClientName(invoice.client_id)}
-              onEdit={openEditDialog}
-              onDelete={setDeleteCandidate}
-            />
-          ))}
+        <div className="space-y-4">
+          <Card className="hidden md:block">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nazwa</TableHead>
+                    <TableHead>Klient</TableHead>
+                    <TableHead>Kwota</TableHead>
+                    <TableHead>Data wystawienia</TableHead>
+                    <TableHead>Termin</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Akcje</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredInvoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium max-w-[260px]">
+                        {invoice.file_url ? (
+                          <a
+                            href={invoice.file_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="truncate text-primary hover:underline"
+                            title={invoice.name || 'Podgląd faktury PDF'}
+                          >
+                            {invoice.name || 'Faktura'}
+                          </a>
+                        ) : (
+                          <span className="truncate">{invoice.name || 'Faktura'}</span>
+                        )}
+                      </TableCell>
+                      <TableCell>{getClientName(invoice.client_id)}</TableCell>
+                      <TableCell>{formatCurrency(invoice.amount, invoice.currency)}</TableCell>
+                      <TableCell>{formatInvoiceDate(invoice.invoice_date || invoice.issue_date)}</TableCell>
+                      <TableCell>{formatInvoiceDate(invoice.due_date)}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={invoice.is_paid ? 'secondary' : 'outline'}
+                          className={invoice.is_paid ? 'text-emerald-700' : 'text-amber-700'}
+                        >
+                          {invoice.is_paid ? 'Opłacona' : 'Nieopłacona'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" aria-label="Akcje faktury">
+                              <MoreHorizontal className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {invoice.file_url ? (
+                              <DropdownMenuItem asChild>
+                                <a href={invoice.file_url} target="_blank" rel="noreferrer">
+                                  <Eye className="size-4" />
+                                  Podgląd PDF
+                                </a>
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem disabled>
+                                <Eye className="size-4" />
+                                Brak PDF
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => openEditDialog(invoice)}>
+                              <Pencil className="size-4" />
+                              Edycja
+                            </DropdownMenuItem>
+                            <DropdownMenuItem variant="destructive" onClick={() => setDeleteCandidate(invoice)}>
+                              <Trash2 className="size-4" />
+                              Usuwanie
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 md:hidden">
+            {filteredInvoices.map((invoice) => (
+              <InvoiceCard
+                key={invoice.id}
+                invoice={invoice}
+                clientName={getClientName(invoice.client_id)}
+                onEdit={openEditDialog}
+                onDelete={setDeleteCandidate}
+              />
+            ))}
+          </div>
         </div>
       )}
 
