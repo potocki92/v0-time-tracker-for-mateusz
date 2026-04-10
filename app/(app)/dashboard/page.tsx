@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -19,6 +20,7 @@ import { MONTH_NAMES } from '@/lib/types'
 import { calculateMonthlyTotals, formatCurrency } from '@/lib/helpers'
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [clients, setClients] = useState<Client[]>([])
   const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
@@ -38,7 +40,10 @@ export default function DashboardPage() {
           data: { user },
         } = await supabase.auth.getUser()
 
-        if (!user) return
+        if (!user) {
+          router.replace('/auth/login')
+          return
+        }
 
         // Load all data in parallel
         const [profileRes, clientsRes, entriesRes, invoicesRes] = await Promise.all([
@@ -60,7 +65,7 @@ export default function DashboardPage() {
     }
 
     loadData()
-  }, [])
+  }, [router])
 
   // Calculate current month entries
   const currentMonthEntries = useMemo(() => {
