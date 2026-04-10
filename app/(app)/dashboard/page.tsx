@@ -609,7 +609,7 @@ export default function DashboardPage() {
                   PLN
                 </div>
                 <div className="inline-flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-[var(--color-hours)]" />
+                  <Clock className="h-3.5 w-3.5 text-[hsl(var(--chart-2))]" />
                   Godziny
                 </div>
               </div>
@@ -617,18 +617,19 @@ export default function DashboardPage() {
                 <ComposedChart data={chartData} margin={{ left: 12, right: 14, top: 20, bottom: 8 }}>
                   <defs>
                     <linearGradient id="earningsGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--color-earningsPLN)" stopOpacity={0.4} />
-                      <stop offset="100%" stopColor="var(--color-earningsPLN)" stopOpacity={0} />
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="hoursGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--color-hours)" stopOpacity={0.45} />
-                      <stop offset="100%" stopColor="var(--color-hours)" stopOpacity={0.18} />
+                      <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0.18} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     vertical={false}
                     strokeDasharray="3 3"
-                    stroke="hsl(var(--muted-foreground) / 0.16)"
+                    stroke="hsl(var(--border))"
+                    strokeOpacity={0.35}
                   />
                   <XAxis
                     dataKey="label"
@@ -701,18 +702,18 @@ export default function DashboardPage() {
                     yAxisId="earnings"
                     type="monotone"
                     dataKey="earningsPLN"
-                    stroke="var(--color-earningsPLN)"
+                    stroke="hsl(var(--primary))"
                     strokeWidth={2.5}
                     fill="url(#earningsGradient)"
                     fillOpacity={1}
                     dot={false}
-                    activeDot={{ r: 4, strokeWidth: 0, fill: 'var(--color-earningsPLN)' }}
+                    activeDot={{ r: 4, strokeWidth: 0, fill: 'hsl(var(--primary))' }}
                   />
                   <Bar
                     yAxisId="hours"
                     dataKey="hours"
                     fill="url(#hoursGradient)"
-                    stroke="var(--color-hours)"
+                    stroke="hsl(var(--chart-2))"
                     strokeOpacity={0.35}
                     radius={[4, 4, 0, 0]}
                     barSize={18}
