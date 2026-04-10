@@ -44,6 +44,16 @@ interface InvoiceFormState {
   file: File | null
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  try {
+    return JSON.stringify(error)
+  } catch {
+    return 'Nieznany blad'
+  }
+}
+
 const initialForm: InvoiceFormState = {
   name: '',
   invoice_number: '',
@@ -143,7 +153,7 @@ export default function InvoicesPage() {
       amount: Number(invoice.amount ?? 0),
       currency: invoice.currency,
       is_paid: invoice.is_paid,
-      notes: invoice.notes ?? '',
+      notes: invoice.notes ?? invoice.note ?? '',
       client_id: invoice.client_id ?? 'none',
       file: null,
     })
@@ -235,7 +245,7 @@ export default function InvoicesPage() {
         currency: formData.currency,
         is_paid: formData.is_paid,
         file_url: pdfUrl,
-        notes: formData.notes.trim() || null,
+        note: formData.notes.trim() || null,
       }
 
       if (editingInvoice) {
@@ -252,7 +262,7 @@ export default function InvoicesPage() {
       await loadData()
     } catch (error) {
       console.error('Blad zapisu faktury:', error)
-      toast.error('Nie udalo sie zapisac faktury (sprawdz bucket storage "invoices")')
+      toast.error(`Nie udalo sie zapisac faktury: ${getErrorMessage(error)}`)
     } finally {
       setIsSaving(false)
     }
