@@ -73,15 +73,20 @@ export interface Invoice {
   user_id: string
   client_id: string | null
   name: string
-  issue_date: string
+  issue_date?: string
+  invoice_date: string
+  due_date: string | null
+  invoice_number: string | null
+  recipient: string | null
+  description: string | null
   billing_period: string | null
   amount: number
   currency: 'PLN' | 'EUR'
   is_paid: boolean
   file_url: string | null
   notes: string | null
-  month: number
-  year: number
+  month?: number
+  year?: number
   created_at: string
 }
 
@@ -135,7 +140,12 @@ export interface WorkEntryFormData {
 export interface InvoiceFormData {
   client_id?: string
   name: string
-  issue_date: string
+  issue_date?: string
+  invoice_date: string
+  due_date?: string
+  invoice_number?: string
+  recipient?: string
+  description?: string
   billing_period?: string
   amount: number
   currency: 'PLN' | 'EUR'

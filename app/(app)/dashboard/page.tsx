@@ -15,6 +15,7 @@ import {
   Users,
   FileText
 } from 'lucide-react'
+import Link from 'next/link'
 import type { Client, WorkEntry, Invoice } from '@/lib/types'
 import { MONTH_NAMES } from '@/lib/types'
 import { calculateMonthlyTotals, formatCurrency } from '@/lib/helpers'
@@ -257,13 +258,16 @@ export default function DashboardPage() {
               >
                 <div>
                   <p className="font-medium text-sm">{invoice.name}</p>
-                  <p className="text-xs text-muted-foreground">{invoice.billing_period}</p>
+                  <p className="text-xs text-muted-foreground">{invoice.billing_period || invoice.invoice_date || '-'}</p>
                 </div>
                 <span className="font-semibold">
                   {formatCurrency(invoice.amount, invoice.currency)}
                 </span>
               </div>
             ))}
+            <Link href="/invoices" className="block text-sm text-primary hover:underline pt-1">
+              Zobacz wszystkie faktury
+            </Link>
           </CardContent>
         </Card>
       )}
