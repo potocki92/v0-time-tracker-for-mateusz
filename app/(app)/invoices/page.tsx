@@ -44,6 +44,16 @@ interface InvoiceFormState {
   file: File | null
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  try {
+    return JSON.stringify(error)
+  } catch {
+    return 'Nieznany blad'
+  }
+}
+
 const initialForm: InvoiceFormState = {
   name: '',
   invoice_number: '',
@@ -192,11 +202,6 @@ export default function InvoicesPage() {
       return
     }
 
-    if (!formData.recipient.trim()) {
-      toast.error('Pole "Do kogo" jest wymagane')
-      return
-    }
-
     if (!formData.invoice_date) {
       toast.error('Data wystawienia jest wymagana')
       return
@@ -225,12 +230,8 @@ export default function InvoicesPage() {
         user_id: user.id,
         client_id: formData.client_id === 'none' ? null : formData.client_id,
         name: formData.name.trim(),
-        invoice_number: formData.invoice_number.trim() || null,
-        recipient: formData.recipient.trim(),
-        description: formData.description.trim() || null,
         billing_period: formData.billing_period.trim() || null,
-        invoice_date: formData.invoice_date,
-        due_date: formData.due_date || null,
+        issue_date: formData.invoice_date,
         amount: formData.amount,
         currency: formData.currency,
         is_paid: formData.is_paid,
@@ -252,7 +253,7 @@ export default function InvoicesPage() {
       await loadData()
     } catch (error) {
       console.error('Blad zapisu faktury:', error)
-      toast.error('Nie udalo sie zapisac faktury (sprawdz bucket storage "invoices")')
+      toast.error(`Nie udalo sie zapisac faktury: ${getErrorMessage(error)}`)
     } finally {
       setIsSaving(false)
     }

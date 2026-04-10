@@ -73,8 +73,8 @@ export interface Invoice {
   user_id: string
   client_id: string | null
   name: string
-  issue_date?: string
-  invoice_date: string
+  issue_date?: string | null
+  invoice_date?: string | null
   due_date: string | null
   invoice_number: string | null
   recipient: string | null
@@ -85,6 +85,7 @@ export interface Invoice {
   is_paid: boolean
   file_url: string | null
   notes: string | null
+  date?: string | null
   month?: number
   year?: number
   created_at: string
