@@ -71,8 +71,8 @@ const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
 ]
 
 const chartConfig = {
-  earningsPLN: { label: 'Zarobki (PLN)', color: 'hsl(var(--primary))' },
-  hours: { label: 'Godziny', color: 'hsl(var(--chart-2))' },
+  earningsPLN: { label: 'Zarobki (PLN)', color: 'var(--primary)' },
+  hours: { label: 'Godziny', color: 'var(--chart-2)' },
 } as const
 
 function getWeekStart(date: Date): Date {
@@ -609,7 +609,7 @@ export default function DashboardPage() {
                   PLN
                 </div>
                 <div className="inline-flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5 text-[hsl(var(--chart-2))]" />
+                  <Clock className="h-3.5 w-3.5 text-[var(--chart-2)]" />
                   Godziny
                 </div>
               </div>
@@ -617,18 +617,18 @@ export default function DashboardPage() {
                 <ComposedChart data={chartData} margin={{ left: 12, right: 14, top: 20, bottom: 8 }}>
                   <defs>
                     <linearGradient id="earningsGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="hoursGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.45} />
-                      <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0.18} />
+                      <stop offset="0%" stopColor="var(--chart-2)" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="var(--chart-2)" stopOpacity={0.18} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     vertical={false}
                     strokeDasharray="3 3"
-                    stroke="hsl(var(--border))"
+                    stroke="var(--border)"
                     strokeOpacity={0.35}
                   />
                   <XAxis
@@ -658,7 +658,7 @@ export default function DashboardPage() {
                     tick={{ fontSize: 12 }}
                   />
                   <ChartTooltip
-                    cursor={{ stroke: 'hsl(var(--primary) / 0.22)', strokeDasharray: '4 4' }}
+                    cursor={{ stroke: 'var(--primary)', strokeOpacity: 0.22, strokeDasharray: '4 4' }}
                     content={
                       <ChartTooltipContent
                         className="min-w-[220px] border-white/20 bg-background/80 px-3 py-2 shadow-2xl backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
@@ -702,18 +702,18 @@ export default function DashboardPage() {
                     yAxisId="earnings"
                     type="monotone"
                     dataKey="earningsPLN"
-                    stroke="hsl(var(--primary))"
+                    stroke="var(--primary)"
                     strokeWidth={2.5}
                     fill="url(#earningsGradient)"
                     fillOpacity={1}
                     dot={false}
-                    activeDot={{ r: 4, strokeWidth: 0, fill: 'hsl(var(--primary))' }}
+                    activeDot={{ r: 4, strokeWidth: 0, fill: 'var(--primary)' }}
                   />
                   <Bar
                     yAxisId="hours"
                     dataKey="hours"
                     fill="url(#hoursGradient)"
-                    stroke="hsl(var(--chart-2))"
+                    stroke="var(--chart-2)"
                     strokeOpacity={0.35}
                     radius={[4, 4, 0, 0]}
                     barSize={18}
