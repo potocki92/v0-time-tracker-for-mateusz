@@ -153,7 +153,7 @@ export default function InvoicesPage() {
       amount: Number(invoice.amount ?? 0),
       currency: invoice.currency,
       is_paid: invoice.is_paid,
-      notes: invoice.notes ?? '',
+      notes: invoice.notes ?? invoice.note ?? '',
       client_id: invoice.client_id ?? 'none',
       file: null,
     })
@@ -236,7 +236,7 @@ export default function InvoicesPage() {
         currency: formData.currency,
         is_paid: formData.is_paid,
         file_url: pdfUrl,
-        notes: formData.notes.trim() || null,
+        note: formData.notes.trim() || null,
       }
 
       if (editingInvoice) {

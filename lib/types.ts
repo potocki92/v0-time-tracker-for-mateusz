@@ -85,7 +85,7 @@ export interface Invoice {
   is_paid: boolean
   file_url: string | null
   notes: string | null
-  date?: string | null
+  note?: string | null
   month?: number
   year?: number
   created_at: string
