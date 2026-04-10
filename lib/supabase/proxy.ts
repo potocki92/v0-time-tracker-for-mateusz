@@ -56,10 +56,11 @@ export async function updateSession(request: NextRequest) {
     return response
   }
 
-  // Redirect authenticated users away from auth pages
-  if (user && isAuthRoute) {
-    return redirectWithSessionCookies('/dashboard')
-  }
+  // NOTE:
+  // We intentionally do not force unauthenticated redirects here for app routes.
+  // In some environments `signInWithPassword` session propagation to middleware cookies
+  // can lag behind the client state (local/session storage), causing redirect loops
+  // right after successful login. Protected screens perform their own user checks.
 
   // NOTE:
   // We intentionally do not force unauthenticated redirects here for app routes.
