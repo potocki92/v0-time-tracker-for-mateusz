@@ -5,20 +5,20 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger 
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { 
-  Clock, 
-  LayoutDashboard, 
-  Calendar, 
-  FolderKanban, 
-  Users, 
-  FileText, 
+import {
+  Clock,
+  LayoutDashboard,
+  Calendar,
+  FolderKanban,
+  Users,
+  FileText,
   Settings,
   LogOut,
   User,
@@ -55,7 +55,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       setAuthChecked(true)
 
       if (!user) {
-        router.replace('/auth/login')
+        // router.replace('/auth/login')
       }
     })
 
@@ -63,7 +63,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null)
 
       if (event === 'SIGNED_OUT' || !session?.user) {
-        router.replace('/auth/login')
+        // router.replace('/auth/login')
       }
     })
 
@@ -188,7 +188,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
               {mounted && <ThemeIcon className="h-4 w-4" />}
             </Button>
-            
+
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -226,11 +226,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors ${
-                  isActive 
-                    ? 'text-primary' 
+                className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors ${isActive
+                    ? 'text-primary'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 <item.icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : ''}`} />
                 <span className={`text-[10px] ${isActive ? 'font-medium' : ''}`}>

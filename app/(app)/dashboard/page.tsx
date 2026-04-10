@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { 
-  Clock, 
-  Euro, 
-  Banknote, 
-  TrendingUp, 
+import {
+  Clock,
+  Euro,
+  Banknote,
+  TrendingUp,
   Calendar,
   Target,
   Users,
@@ -41,7 +41,7 @@ export default function DashboardPage() {
         } = await supabase.auth.getUser()
 
         if (!user) {
-          router.replace('/auth/login')
+          //  router.replace('/auth/login')
           return
         }
 
@@ -90,8 +90,8 @@ export default function DashboardPage() {
   const goalProgress = useMemo(() => {
     if (!profile?.monthly_goal_amount) return 0
     const target = profile.monthly_goal_amount
-    const current = profile.monthly_goal_currency === 'EUR' 
-      ? totals.earningsEUR 
+    const current = profile.monthly_goal_currency === 'EUR'
+      ? totals.earningsEUR
       : totals.totalEarningsAllPLN
     return Math.min(100, (current / target) * 100)
   }, [profile, totals])
@@ -230,8 +230,8 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {unpaidInvoices.slice(0, 5).map((invoice) => (
-              <div 
-                key={invoice.id} 
+              <div
+                key={invoice.id}
                 className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
               >
                 <div>
