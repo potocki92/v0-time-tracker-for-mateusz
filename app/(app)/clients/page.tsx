@@ -175,14 +175,6 @@ export default function ClientsPage() {
     setDeleteConfirm(null)
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-pulse text-muted-foreground">Ladowanie...</div>
-      </div>
-    )
-  }
-
   return (
     <div className="container px-4 py-6 space-y-6">
       {/* Header */}

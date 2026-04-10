@@ -236,14 +236,6 @@ export default function ProjectsPage() {
     return clients.find((client) => client.id === clientId)?.name ?? 'Nieznany klient'
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Ladowanie projektow...</div>
-      </div>
-    )
-  }
-
   return (
     <div className="container space-y-6 px-4 py-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

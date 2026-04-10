@@ -49,14 +49,6 @@ export default function CalendarPage() {
     [monthEntries],
   )
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Ładowanie...</div>
-      </div>
-    )
-  }
-
   return (
     <div className="container space-y-6 px-4 py-6">
       <div className="flex items-center justify-between">

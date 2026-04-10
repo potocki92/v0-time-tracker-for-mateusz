@@ -274,14 +274,6 @@ export default function InvoicesPage() {
     })
   }, [invoices, searchQuery, statusFilter])
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-pulse text-muted-foreground">Ładowanie faktur...</div>
-      </div>
-    )
-  }
-
   return (
     <div className="container px-4 py-8 space-y-6">
       <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
