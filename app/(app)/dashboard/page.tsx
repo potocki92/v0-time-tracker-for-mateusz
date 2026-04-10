@@ -1,26 +1,166 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { 
-  Clock, 
-  Euro, 
-  Banknote, 
-  TrendingUp, 
-  Calendar,
-  Target,
-  Users,
-  FileText
-} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import type { Client, WorkEntry, Invoice } from '@/lib/types'
-import { MONTH_NAMES } from '@/lib/types'
+import { useRouter } from 'next/navigation'
+import {
+  ArrowUpRight,
+  Banknote,
+  Calendar,
+  Clock,
+  Euro,
+  FileText,
+  Settings,
+  Target,
+  TrendingUp,
+  Users,
+} from 'lucide-react'
+
+import { createClient } from '@/lib/supabase/client'
 import { calculateMonthlyTotals, formatCurrency } from '@/lib/helpers'
+import type { Client, Invoice, WorkEntry } from '@/lib/types'
+import { MONTH_NAMES } from '@/lib/types'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+
+type TimeRange = 'current_month' | 'previous_month' | 'current_quarter' | 'current_year' | 'all'
 
 const DEFAULT_EUR_TO_PLN = 4.3
+
+const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
+  { value: 'current_month', label: 'Obecny miesiąc' },
+  { value: 'previous_month', label: 'Poprzedni miesiąc' },
+  { value: 'current_quarter', label: 'Obecny kwartał' },
+  { value: 'current_year', label: 'Obecny rok' },
+  { value: 'all', label: 'Wszystko' },
+]
+
+function DashboardLoadingSkeleton() {
+  return (
+    <div className="container space-y-6 px-4 py-6">
+      <div className="sticky top-0 z-20 -mx-4 space-y-3 border-b bg-background/95 px-4 pb-4 pt-2 backdrop-blur">
+        <Skeleton className="h-8 w-44" />
+        <Skeleton className="h-10 w-full sm:w-72" />
+      </div>
+
+      <div className="space-y-4">
+        <Skeleton className="h-36 w-full" />
+        <div className="grid grid-cols-2 gap-4">
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <Skeleton className="h-28 w-full" />
+        <Skeleton className="h-28 w-full" />
+        <Skeleton className="h-28 w-full" />
+      </div>
+    </div>
+  )
+}
+
+function getDateRange(range: TimeRange, baseDate = new Date()): { from: Date | null; to: Date | null } {
+  const year = baseDate.getFullYear()
+  const month = baseDate.getMonth()
+
+  switch (range) {
+    case 'current_month': {
+      return { from: new Date(year, month, 1), to: new Date(year, month + 1, 0) }
+    }
+    case 'previous_month': {
+      return { from: new Date(year, month - 1, 1), to: new Date(year, month, 0) }
+    }
+    case 'current_quarter': {
+      const quarterStartMonth = Math.floor(month / 3) * 3
+      return { from: new Date(year, quarterStartMonth, 1), to: new Date(year, quarterStartMonth + 3, 0) }
+    }
+    case 'current_year': {
+      return { from: new Date(year, 0, 1), to: new Date(year, 11, 31) }
+    }
+    case 'all':
+    default:
+      return { from: null, to: null }
+  }
+}
+
+function getPreviousDateRange(range: TimeRange, baseDate = new Date()): { from: Date | null; to: Date | null } {
+  const year = baseDate.getFullYear()
+  const month = baseDate.getMonth()
+
+  switch (range) {
+    case 'current_month':
+      return getDateRange('previous_month', baseDate)
+    case 'previous_month': {
+      return { from: new Date(year, month - 2, 1), to: new Date(year, month - 1, 0) }
+    }
+    case 'current_quarter': {
+      const quarterStartMonth = Math.floor(month / 3) * 3
+      return { from: new Date(year, quarterStartMonth - 3, 1), to: new Date(year, quarterStartMonth, 0) }
+    }
+    case 'current_year': {
+      return { from: new Date(year - 1, 0, 1), to: new Date(year - 1, 11, 31) }
+    }
+    case 'all':
+    default:
+      return { from: null, to: null }
+  }
+}
+
+function formatRangeLabel(range: TimeRange, baseDate = new Date()): string {
+  const year = baseDate.getFullYear()
+  const month = baseDate.getMonth()
+
+  switch (range) {
+    case 'current_month':
+      return `${MONTH_NAMES[month]} ${year}`
+    case 'previous_month': {
+      const prevMonthDate = new Date(year, month - 1, 1)
+      return `${MONTH_NAMES[prevMonthDate.getMonth()]} ${prevMonthDate.getFullYear()}`
+    }
+    case 'current_quarter': {
+      const quarter = Math.floor(month / 3) + 1
+      return `Q${quarter} ${year}`
+    }
+    case 'current_year':
+      return `${year}`
+    case 'all':
+    default:
+      return 'Cały okres'
+  }
+}
+
+function inRange(dateValue: string, range: { from: Date | null; to: Date | null }) {
+  if (!range.from || !range.to) return true
+  const date = new Date(dateValue)
+  date.setHours(0, 0, 0, 0)
+
+  const from = new Date(range.from)
+  from.setHours(0, 0, 0, 0)
+
+  const to = new Date(range.to)
+  to.setHours(0, 0, 0, 0)
+
+  return date >= from && date <= to
+}
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -30,10 +170,8 @@ export default function DashboardPage() {
   const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
-  const currentDate = new Date()
-  const currentMonth = currentDate.getMonth()
-  const currentYear = currentDate.getFullYear()
+  const [selectedRange, setSelectedRange] = useState<TimeRange>('current_month')
+  const [eurToPlnRate, setEurToPlnRate] = useState(DEFAULT_EUR_TO_PLN)
 
   useEffect(() => {
     async function loadData() {
@@ -70,7 +208,12 @@ export default function DashboardPage() {
 
         setMonthlyGoal(Number.isFinite(goalAmount) && goalAmount > 0 ? { amount: goalAmount, currency: goalCurrency } : null)
 
-        // Load all data in parallel
+        const userEurRateRaw = metadata.eur_to_pln
+        const userEurRate = typeof userEurRateRaw === 'number' ? userEurRateRaw : Number(userEurRateRaw)
+        if (Number.isFinite(userEurRate) && userEurRate > 0) {
+          setEurToPlnRate(userEurRate)
+        }
+
         const [clientsRes, entriesRes, invoicesRes] = await Promise.all([
           supabase.from('clients').select('*').eq('user_id', user.id),
           supabase.from('work_entries').select('*').eq('user_id', user.id),
@@ -90,196 +233,236 @@ export default function DashboardPage() {
     loadData()
   }, [router])
 
-  // Calculate current month entries
-  const currentMonthEntries = useMemo(() => {
-    return workEntries.filter(entry => {
-      const date = new Date(entry.date)
-      return date.getMonth() === currentMonth && date.getFullYear() === currentYear
-    })
-  }, [workEntries, currentMonth, currentYear])
+  const periodLabel = useMemo(() => formatRangeLabel(selectedRange), [selectedRange])
 
-  // Calculate totals
+  const filteredEntries = useMemo(() => {
+    const range = getDateRange(selectedRange)
+    return workEntries.filter((entry) => inRange(entry.date, range))
+  }, [workEntries, selectedRange])
+
+  const previousPeriodEntries = useMemo(() => {
+    const range = getPreviousDateRange(selectedRange)
+    return workEntries.filter((entry) => inRange(entry.date, range))
+  }, [workEntries, selectedRange])
+
   const totals = useMemo(() => {
-    return calculateMonthlyTotals(currentMonthEntries, clients, DEFAULT_EUR_TO_PLN)
-  }, [currentMonthEntries, clients])
+    return calculateMonthlyTotals(filteredEntries, clients, eurToPlnRate)
+  }, [filteredEntries, clients, eurToPlnRate])
 
-  // Unpaid invoices
-  const unpaidInvoices = useMemo(() => {
-    return invoices.filter(inv => !inv.is_paid)
-  }, [invoices])
+  const previousTotals = useMemo(() => {
+    return calculateMonthlyTotals(previousPeriodEntries, clients, eurToPlnRate)
+  }, [previousPeriodEntries, clients, eurToPlnRate])
 
-  // Goal progress
+  const earningsTrend = useMemo(() => {
+    if (selectedRange === 'all' || previousTotals.totalEarningsAllPLN <= 0) {
+      return null
+    }
+
+    const change =
+      ((totals.totalEarningsAllPLN - previousTotals.totalEarningsAllPLN) /
+        previousTotals.totalEarningsAllPLN) *
+      100
+
+    return Number.isFinite(change) ? change : null
+  }, [selectedRange, totals.totalEarningsAllPLN, previousTotals.totalEarningsAllPLN])
+
+  const unpaidInvoices = useMemo(() => invoices.filter((inv) => !inv.is_paid), [invoices])
+
   const goalProgress = useMemo(() => {
     if (!monthlyGoal?.amount) return 0
     const target = monthlyGoal.amount
-    const current = monthlyGoal.currency === 'EUR' 
-      ? totals.earningsEUR 
-      : totals.totalEarningsAllPLN
+    const current = monthlyGoal.currency === 'EUR' ? totals.earningsEUR : totals.totalEarningsAllPLN
     return Math.min(100, (current / target) * 100)
   }, [monthlyGoal, totals])
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-pulse text-muted-foreground">Ladowanie...</div>
-      </div>
-    )
+    return <DashboardLoadingSkeleton />
   }
 
   return (
-    <div className="container px-4 py-6 space-y-6">
-      {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">
-          Witaj, {accountName}!
-        </h1>
-        <p className="text-muted-foreground">
-          {MONTH_NAMES[currentMonth]} {currentYear}
-        </p>
+    <div className="container space-y-6 px-4 py-6">
+      <div className="sticky top-0 z-20 -mx-4 border-b bg-background/95 px-4 pb-4 pt-2 backdrop-blur">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Witaj, {accountName}!</h1>
+            <p className="text-sm text-muted-foreground">{periodLabel}</p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Select value={selectedRange} onValueChange={(value) => setSelectedRange(value as TimeRange)}>
+              <SelectTrigger className="w-full min-w-52 bg-background sm:w-64">
+                <SelectValue placeholder="Wybierz okres" />
+              </SelectTrigger>
+              <SelectContent>
+                {TIME_RANGE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Ustaw kurs EUR">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Kurs EUR → PLN</DialogTitle>
+                  <DialogDescription>
+                    To miejsce pod przyszłe ustawienia kursu dla wybranego okresu.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Aktualnie używany kurs</p>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={eurToPlnRate}
+                    onChange={(e) => {
+                      const parsed = Number(e.target.value)
+                      if (Number.isFinite(parsed) && parsed > 0) {
+                        setEurToPlnRate(parsed)
+                      }
+                    }}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
       </div>
 
-      {/* Main Stats */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        {/* Total Earnings PLN */}
-        <Card className="col-span-2 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20">
+      <div className="space-y-4">
+        <Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Zarobki w tym miesiacu
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <TrendingUp className="h-4 w-4" />
+              Zarobki
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {formatCurrency(totals.totalEarningsAllPLN, 'PLN')}
-            </div>
+          <CardContent className="space-y-2">
+            <div className="text-3xl font-bold">{formatCurrency(totals.totalEarningsAllPLN, 'PLN')}</div>
             {totals.earningsEUR > 0 && (
-              <p className="text-sm text-muted-foreground mt-1">
-                w tym {formatCurrency(totals.earningsEUR, 'EUR')}
+              <p className="text-sm text-muted-foreground">w tym {formatCurrency(totals.earningsEUR, 'EUR')}</p>
+            )}
+            {earningsTrend !== null && (
+              <p className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-600">
+                <ArrowUpRight className="h-3.5 w-3.5" />
+                {`${earningsTrend >= 0 ? '+' : ''}${earningsTrend.toFixed(1)}% vs poprzedni okres`}
               </p>
             )}
           </CardContent>
         </Card>
 
-        {/* Hours */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Godziny
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totals.totalHours}h</div>
-            <p className="text-xs text-muted-foreground">{totals.totalDays} dni</p>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-2 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                Godziny
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totals.totalHours}h</div>
+              <p className="text-xs text-muted-foreground">{totals.totalDays} dni pracy</p>
+            </CardContent>
+          </Card>
 
-        {/* EUR Earnings */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Euro className="w-4 h-4" />
-              EUR
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totals.earningsEUR, 'EUR')}</div>
-            <p className="text-xs text-muted-foreground">
-              ~{formatCurrency(totals.earningsEUR * DEFAULT_EUR_TO_PLN, 'PLN')}
-            </p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Euro className="h-4 w-4" />
+                EUR
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(totals.earningsEUR, 'EUR')}</div>
+              <p className="text-xs text-muted-foreground">~{formatCurrency(totals.earningsEUR * eurToPlnRate, 'PLN')}</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      {/* Monthly Goal */}
       {monthlyGoal && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Target className="w-4 h-4 text-primary" />
-              Cel miesieczny
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
+              <Target className="h-4 w-4 text-primary" />
+              Cel miesięczny
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Progress value={goalProgress} className="h-2" />
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                {goalProgress.toFixed(0)}% celu
-              </span>
-              <span className="font-medium">
-                {formatCurrency(monthlyGoal.amount, monthlyGoal.currency)}
-              </span>
+              <span className="text-muted-foreground">{goalProgress.toFixed(0)}% celu</span>
+              <span className="font-medium">{formatCurrency(monthlyGoal.amount, monthlyGoal.currency)}</span>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Quick Stats */}
-      <div className="grid gap-4 grid-cols-3">
+      <div className="grid grid-cols-3 gap-4">
         <Card className="text-center">
           <CardContent className="pt-6">
-            <Users className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+            <Users className="mx-auto mb-2 h-6 w-6 text-muted-foreground" />
             <div className="text-2xl font-bold">{clients.length}</div>
-            <p className="text-xs text-muted-foreground">Klientow</p>
+            <p className="text-xs text-muted-foreground">Klientów</p>
           </CardContent>
         </Card>
 
         <Card className="text-center">
           <CardContent className="pt-6">
-            <Calendar className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+            <Calendar className="mx-auto mb-2 h-6 w-6 text-muted-foreground" />
             <div className="text-2xl font-bold">{totals.vacationDays + totals.sickDays}</div>
-            <p className="text-xs text-muted-foreground">Nieobecnosci</p>
+            <p className="text-xs text-muted-foreground">Nieobecności</p>
           </CardContent>
         </Card>
 
         <Card className="text-center">
           <CardContent className="pt-6">
-            <FileText className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+            <FileText className="mx-auto mb-2 h-6 w-6 text-muted-foreground" />
             <div className="text-2xl font-bold">{unpaidInvoices.length}</div>
-            <p className="text-xs text-muted-foreground">Nieoplacone</p>
+            <p className="text-xs text-muted-foreground">Nieopłacone</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Unpaid Invoices */}
       {unpaidInvoices.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Banknote className="w-4 h-4 text-amber-500" />
-              Faktury do oplacenia
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Banknote className="h-4 w-4 text-amber-500" />
+              Faktury do opłacenia
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {unpaidInvoices.slice(0, 5).map((invoice) => (
-              <div 
-                key={invoice.id} 
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-              >
+              <div key={invoice.id} className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
                 <div>
-                  <p className="font-medium text-sm">{invoice.name}</p>
+                  <p className="text-sm font-medium">{invoice.name}</p>
                   <p className="text-xs text-muted-foreground">{invoice.billing_period || invoice.invoice_date || '-'}</p>
                 </div>
-                <span className="font-semibold">
-                  {formatCurrency(invoice.amount, invoice.currency)}
-                </span>
+                <span className="font-semibold">{formatCurrency(invoice.amount, invoice.currency)}</span>
               </div>
             ))}
-            <Link href="/invoices" className="block text-sm text-primary hover:underline pt-1">
+            <Link href="/invoices" className="block pt-1 text-sm text-primary hover:underline">
               Zobacz wszystkie faktury
             </Link>
           </CardContent>
         </Card>
       )}
 
-      {/* Empty State */}
       {workEntries.length === 0 && clients.length === 0 && (
-        <Card className="text-center py-12">
+        <Card className="py-12 text-center">
           <CardContent>
-            <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-            <h3 className="text-lg font-medium mb-2">Zacznij sledzic swoj czas pracy</h3>
-            <p className="text-muted-foreground text-sm max-w-md mx-auto">
-              Dodaj klientow i zacznij rejestrowac przepracowane godziny w kalendarzu.
+            <Clock className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+            <h3 className="mb-2 text-lg font-medium">Zacznij śledzić swój czas pracy</h3>
+            <p className="mx-auto max-w-md text-sm text-muted-foreground">
+              Dodaj klientów i zacznij rejestrować przepracowane godziny w kalendarzu.
             </p>
           </CardContent>
         </Card>
