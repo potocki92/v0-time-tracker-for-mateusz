@@ -43,12 +43,24 @@ export async function updateSession(request: NextRequest) {
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
 
-  // Redirect authenticated users away from auth pages
-  if (user && isAuthRoute) {
+  const redirectWithSessionCookies = (pathname: string) => {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+    url.pathname = pathname
+
+    const response = NextResponse.redirect(url)
+
+    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
+      response.cookies.set(name, value)
+    })
+
+    return response
   }
+
+  // NOTE:
+  // We intentionally do not force unauthenticated redirects here for app routes.
+  // In some environments `signInWithPassword` session propagation to middleware cookies
+  // can lag behind the client state (local/session storage), causing redirect loops
+  // right after successful login. Protected screens perform their own user checks.
 
   // NOTE:
   // We intentionally do not force unauthenticated redirects here for app routes.
@@ -58,9 +70,7 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect root to dashboard if logged in, login if not
   if (request.nextUrl.pathname === '/') {
-    const url = request.nextUrl.clone()
-    url.pathname = user ? '/dashboard' : '/auth/login'
-    return NextResponse.redirect(url)
+    return redirectWithSessionCookies(user ? '/dashboard' : '/auth/login')
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
