@@ -86,7 +86,6 @@ export interface Invoice {
   file_url: string | null
   notes: string | null
   note?: string | null
-  date?: string | null
   month?: number
   year?: number
   created_at: string

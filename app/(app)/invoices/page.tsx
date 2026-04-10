@@ -236,7 +236,7 @@ export default function InvoicesPage() {
         currency: formData.currency,
         is_paid: formData.is_paid,
         file_url: pdfUrl,
-        notes: formData.notes.trim() || null,
+        note: formData.notes.trim() || null,
       }
 
       if (editingInvoice) {
