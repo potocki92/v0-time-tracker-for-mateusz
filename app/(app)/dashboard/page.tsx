@@ -15,9 +15,10 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
+import { Bar, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 
 import { createClient } from '@/lib/supabase/client'
-import { calculateMonthlyTotals, formatCurrency } from '@/lib/helpers'
+import { calculateEarnings, calculateMonthlyTotals, formatCurrency } from '@/lib/helpers'
 import type { Client, Invoice, WorkEntry } from '@/lib/types'
 import { MONTH_NAMES } from '@/lib/types'
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -40,18 +46,57 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-type TimeRange = 'current_month' | 'previous_month' | 'current_quarter' | 'current_year' | 'all'
+type TimeRange =
+  | 'current_week'
+  | 'previous_week'
+  | 'current_month'
+  | 'previous_month'
+  | 'current_quarter'
+  | 'current_year'
+  | 'all'
+type ChartGrouping = 'daily' | 'weekly' | 'monthly'
 
 const DEFAULT_EUR_TO_PLN = 4.3
 
 const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
+  { value: 'current_week', label: 'Obecny tydzień' },
+  { value: 'previous_week', label: 'Poprzedni tydzień' },
   { value: 'current_month', label: 'Obecny miesiąc' },
   { value: 'previous_month', label: 'Poprzedni miesiąc' },
   { value: 'current_quarter', label: 'Obecny kwartał' },
   { value: 'current_year', label: 'Obecny rok' },
   { value: 'all', label: 'Wszystko' },
 ]
+
+const chartConfig = {
+  earningsPLN: { label: 'Zarobki (PLN)', color: 'hsl(var(--primary))' },
+  hours: { label: 'Godziny', color: 'hsl(var(--chart-2))' },
+} as const
+
+function getWeekStart(date: Date): Date {
+  const clone = new Date(date)
+  const day = clone.getDay()
+  const mondayOffset = day === 0 ? -6 : 1 - day
+  clone.setDate(clone.getDate() + mondayOffset)
+  clone.setHours(0, 0, 0, 0)
+  return clone
+}
+
+function formatCompactNumber(value: number): string {
+  if (value >= 1000) {
+    return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}k`
+  }
+  return `${value}`
+}
+
+function getWeekLabel(date: Date): string {
+  const weekStart = getWeekStart(date)
+  const weekEnd = new Date(weekStart)
+  weekEnd.setDate(weekStart.getDate() + 6)
+  return `${weekStart.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}–${weekEnd.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}`
+}
 
 function DashboardLoadingSkeleton() {
   return (
@@ -83,6 +128,20 @@ function getDateRange(range: TimeRange, baseDate = new Date()): { from: Date | n
   const month = baseDate.getMonth()
 
   switch (range) {
+    case 'current_week': {
+      const from = getWeekStart(baseDate)
+      const to = new Date(from)
+      to.setDate(from.getDate() + 6)
+      return { from, to }
+    }
+    case 'previous_week': {
+      const currentWeekStart = getWeekStart(baseDate)
+      const from = new Date(currentWeekStart)
+      from.setDate(currentWeekStart.getDate() - 7)
+      const to = new Date(from)
+      to.setDate(from.getDate() + 6)
+      return { from, to }
+    }
     case 'current_month': {
       return { from: new Date(year, month, 1), to: new Date(year, month + 1, 0) }
     }
@@ -107,6 +166,16 @@ function getPreviousDateRange(range: TimeRange, baseDate = new Date()): { from: 
   const month = baseDate.getMonth()
 
   switch (range) {
+    case 'current_week':
+      return getDateRange('previous_week', baseDate)
+    case 'previous_week': {
+      const currentWeekStart = getWeekStart(baseDate)
+      const from = new Date(currentWeekStart)
+      from.setDate(currentWeekStart.getDate() - 14)
+      const to = new Date(from)
+      to.setDate(from.getDate() + 6)
+      return { from, to }
+    }
     case 'current_month':
       return getDateRange('previous_month', baseDate)
     case 'previous_month': {
@@ -130,6 +199,14 @@ function formatRangeLabel(range: TimeRange, baseDate = new Date()): string {
   const month = baseDate.getMonth()
 
   switch (range) {
+    case 'current_week': {
+      const weekRange = getDateRange('current_week', baseDate)
+      return `${weekRange.from?.toLocaleDateString('pl-PL')} - ${weekRange.to?.toLocaleDateString('pl-PL')}`
+    }
+    case 'previous_week': {
+      const weekRange = getDateRange('previous_week', baseDate)
+      return `${weekRange.from?.toLocaleDateString('pl-PL')} - ${weekRange.to?.toLocaleDateString('pl-PL')}`
+    }
     case 'current_month':
       return `${MONTH_NAMES[month]} ${year}`
     case 'previous_month': {
@@ -172,6 +249,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedRange, setSelectedRange] = useState<TimeRange>('current_month')
   const [eurToPlnRate, setEurToPlnRate] = useState(DEFAULT_EUR_TO_PLN)
+  const [chartGrouping, setChartGrouping] = useState<ChartGrouping>('daily')
 
   useEffect(() => {
     async function loadData() {
@@ -267,6 +345,99 @@ export default function DashboardPage() {
   }, [selectedRange, totals.totalEarningsAllPLN, previousTotals.totalEarningsAllPLN])
 
   const unpaidInvoices = useMemo(() => invoices.filter((inv) => !inv.is_paid), [invoices])
+
+  const chartData = useMemo(() => {
+    if (!filteredEntries.length) return []
+
+    const clientMap = new Map(clients.map((client) => [client.id, client]))
+    const grouped = new Map<
+      string,
+      { label: string; earningsPLN: number; earningsEUR: number; hours: number; sortDate: Date }
+    >()
+
+    const selectedRangeDates = getDateRange(selectedRange)
+    if (selectedRangeDates.from && selectedRangeDates.to) {
+      const cursor = new Date(selectedRangeDates.from)
+      cursor.setHours(0, 0, 0, 0)
+      const end = new Date(selectedRangeDates.to)
+      end.setHours(0, 0, 0, 0)
+
+      while (cursor <= end) {
+        let key = ''
+        let label = ''
+        let sortDate = new Date(cursor)
+
+        if (chartGrouping === 'daily') {
+          key = cursor.toISOString().slice(0, 10)
+          label = cursor.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })
+          cursor.setDate(cursor.getDate() + 1)
+        } else if (chartGrouping === 'weekly') {
+          const weekStart = getWeekStart(cursor)
+          key = weekStart.toISOString().slice(0, 10)
+          label = getWeekLabel(weekStart)
+          sortDate = weekStart
+          cursor.setDate(cursor.getDate() + 7)
+        } else {
+          const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
+          key = `${monthStart.getFullYear()}-${String(monthStart.getMonth() + 1).padStart(2, '0')}`
+          label = `${MONTH_NAMES[monthStart.getMonth()].slice(0, 3)} ${monthStart.getFullYear()}`
+          sortDate = monthStart
+          cursor.setMonth(cursor.getMonth() + 1, 1)
+        }
+
+        if (!grouped.has(key)) {
+          grouped.set(key, { label, earningsPLN: 0, earningsEUR: 0, hours: 0, sortDate })
+        }
+      }
+    }
+
+    for (const entry of filteredEntries) {
+      const entryDate = new Date(entry.date)
+      let key = ''
+      let label = ''
+      let sortDate = new Date(entryDate)
+
+      if (chartGrouping === 'daily') {
+        key = entryDate.toISOString().slice(0, 10)
+        label = entryDate.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })
+      } else if (chartGrouping === 'weekly') {
+        const weekStart = getWeekStart(entryDate)
+        key = weekStart.toISOString().slice(0, 10)
+        label = getWeekLabel(weekStart)
+        sortDate = weekStart
+      } else {
+        key = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`
+        label = `${MONTH_NAMES[entryDate.getMonth()].slice(0, 3)} ${entryDate.getFullYear()}`
+        sortDate = new Date(entryDate.getFullYear(), entryDate.getMonth(), 1)
+      }
+
+      if (!grouped.has(key)) {
+        grouped.set(key, { label, earningsPLN: 0, earningsEUR: 0, hours: 0, sortDate })
+      }
+
+      const bucket = grouped.get(key)
+      if (!bucket) continue
+
+      if (entry.status === 'worked') {
+        bucket.hours += entry.hours || 0
+      }
+      const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
+      const earnings = calculateEarnings(entry, client, eurToPlnRate)
+      bucket.earningsPLN += earnings.amountInPLN
+      if (earnings.currency === 'EUR') {
+        bucket.earningsEUR += earnings.amount
+      }
+    }
+
+    return Array.from(grouped.values())
+      .sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime())
+      .map((bucket) => ({
+        label: bucket.label,
+        earningsPLN: Number(bucket.earningsPLN.toFixed(2)),
+        earningsEUR: Number(bucket.earningsEUR.toFixed(2)),
+        hours: Number(bucket.hours.toFixed(1)),
+      }))
+  }, [filteredEntries, clients, chartGrouping, eurToPlnRate])
 
   const goalProgress = useMemo(() => {
     if (!monthlyGoal?.amount) return 0
@@ -404,6 +575,95 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader className="space-y-3 pb-2">
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle className="text-base">Analiza zarobków i czasu</CardTitle>
+            <Tabs value={chartGrouping} onValueChange={(value) => setChartGrouping(value as ChartGrouping)}>
+              <TabsList className="h-8">
+                <TabsTrigger value="daily" className="px-2 text-xs">
+                  Dziennie
+                </TabsTrigger>
+                <TabsTrigger value="weekly" className="px-2 text-xs">
+                  Tygodniowo
+                </TabsTrigger>
+                <TabsTrigger value="monthly" className="px-2 text-xs">
+                  Miesięcznie
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+          <p className="text-xs text-muted-foreground">Zarobki (PLN) oraz godziny dla wybranego zakresu czasu.</p>
+        </CardHeader>
+        <CardContent>
+          {chartData.length === 0 ? (
+            <div className="flex h-64 items-center justify-center rounded-md border border-dashed text-sm text-muted-foreground">
+              Brak danych do wyświetlenia
+            </div>
+          ) : (
+            <ChartContainer config={chartConfig} className="h-64 w-full">
+              <LineChart data={chartData} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} minTickGap={24} />
+                <YAxis
+                  yAxisId="earnings"
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => formatCompactNumber(Number(value))}
+                />
+                <YAxis yAxisId="hours" orientation="right" tickLine={false} axisLine={false} />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value, _, item) => {
+                        if (item.dataKey === 'earningsPLN') {
+                          return (
+                            <div className="flex w-full items-center justify-between gap-2">
+                              <span>Zarobki (PLN)</span>
+                              <span className="font-medium">{formatCurrency(Number(value), 'PLN')}</span>
+                            </div>
+                          )
+                        }
+                        if (item.dataKey === 'hours') {
+                          return (
+                            <div className="flex w-full items-center justify-between gap-2">
+                              <span>Godziny</span>
+                              <span className="font-medium">{Number(value).toFixed(1)}h</span>
+                            </div>
+                          )
+                        }
+                        return null
+                      }}
+                      labelFormatter={(_, payload) => {
+                        const point = payload?.[0]?.payload as { label: string; earningsEUR: number } | undefined
+                        if (!point) return ''
+                        return (
+                          <div className="space-y-1">
+                            <p>{point.label}</p>
+                            {point.earningsEUR > 0 && (
+                              <p className="text-muted-foreground">EUR: {formatCurrency(point.earningsEUR, 'EUR')}</p>
+                            )}
+                          </div>
+                        )
+                      }}
+                    />
+                  }
+                />
+                <Line
+                  yAxisId="earnings"
+                  type="monotone"
+                  dataKey="earningsPLN"
+                  stroke="var(--color-earningsPLN)"
+                  strokeWidth={2.5}
+                  dot={false}
+                />
+                <Bar yAxisId="hours" dataKey="hours" fill="var(--color-hours)" radius={[4, 4, 0, 0]} barSize={18} />
+              </LineChart>
+            </ChartContainer>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-3 gap-4">
         <Card className="text-center">
