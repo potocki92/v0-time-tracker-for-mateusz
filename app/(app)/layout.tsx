@@ -44,6 +44,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme()
   const [user, setUser] = useState<SupabaseUser | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -51,14 +52,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
+      setAuthChecked(true)
+
+      if (!user) {
+        router.replace('/auth/login')
+      }
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
+
+      if (event === 'SIGNED_OUT' || !session?.user) {
+        router.replace('/auth/login')
+      }
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [router])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -68,6 +78,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor
+
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">Ladowanie...</div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">

@@ -42,7 +42,6 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
-  const isPublicRoute = request.nextUrl.pathname === '/' || isAuthRoute
 
   // Redirect authenticated users away from auth pages
   if (user && isAuthRoute) {
@@ -51,12 +50,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect unauthenticated users to login
-  if (!user && !isPublicRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
-  }
+  // NOTE:
+  // We intentionally do not force unauthenticated redirects here for app routes.
+  // In some environments `signInWithPassword` session propagation to middleware cookies
+  // can lag behind the client state (local/session storage), causing redirect loops
+  // right after successful login. Protected screens perform their own user checks.
 
   // Redirect root to dashboard if logged in, login if not
   if (request.nextUrl.pathname === '/') {
