@@ -15,7 +15,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
-import { Bar, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
+import { Area, Bar, CartesianGrid, ComposedChart, XAxis, YAxis } from 'recharts'
 
 import { createClient } from '@/lib/supabase/client'
 import { calculateEarnings, calculateMonthlyTotals, formatCurrency } from '@/lib/helpers'
@@ -602,65 +602,125 @@ export default function DashboardPage() {
               Brak danych do wyświetlenia
             </div>
           ) : (
-            <ChartContainer config={chartConfig} className="h-64 w-full">
-              <LineChart data={chartData} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} minTickGap={24} />
-                <YAxis
-                  yAxisId="earnings"
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => formatCompactNumber(Number(value))}
-                />
-                <YAxis yAxisId="hours" orientation="right" tickLine={false} axisLine={false} />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value, _, item) => {
-                        if (item.dataKey === 'earningsPLN') {
+            <div className="space-y-3">
+              <div className="flex items-center justify-between px-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                <div className="inline-flex items-center gap-1.5">
+                  <Banknote className="h-3.5 w-3.5 text-primary/80" />
+                  PLN
+                </div>
+                <div className="inline-flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-[hsl(var(--chart-2))]" />
+                  Godziny
+                </div>
+              </div>
+              <ChartContainer config={chartConfig} className="h-80 min-h-[350px] w-full">
+                <ComposedChart data={chartData} margin={{ left: 12, right: 14, top: 20, bottom: 8 }}>
+                  <defs>
+                    <linearGradient id="earningsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="hoursGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--chart-2))" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="hsl(var(--chart-2))" stopOpacity={0.18} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    vertical={false}
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                    strokeOpacity={0.35}
+                  />
+                  <XAxis
+                    dataKey="label"
+                    tickLine={false}
+                    axisLine={false}
+                    minTickGap={24}
+                    tickMargin={10}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    yAxisId="earnings"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    width={54}
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => formatCompactNumber(Number(value))}
+                  />
+                  <YAxis
+                    yAxisId="hours"
+                    orientation="right"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    width={44}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <ChartTooltip
+                    cursor={{ stroke: 'hsl(var(--primary) / 0.22)', strokeDasharray: '4 4' }}
+                    content={
+                      <ChartTooltipContent
+                        className="min-w-[220px] border-white/20 bg-background/80 px-3 py-2 shadow-2xl backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
+                        formatter={(value, _, item) => {
+                          if (item.dataKey === 'earningsPLN') {
+                            return (
+                              <div className="flex w-full items-center justify-between gap-4">
+                                <span className="text-muted-foreground">Zarobki (PLN)</span>
+                                <span className="font-semibold tabular-nums">{formatCurrency(Number(value), 'PLN')}</span>
+                              </div>
+                            )
+                          }
+                          if (item.dataKey === 'hours') {
+                            return (
+                              <div className="flex w-full items-center justify-between gap-4">
+                                <span className="text-muted-foreground">Godziny</span>
+                                <span className="font-semibold tabular-nums">{Number(value).toFixed(1)}h</span>
+                              </div>
+                            )
+                          }
+                          return null
+                        }}
+                        labelFormatter={(_, payload) => {
+                          const point = payload?.[0]?.payload as { label: string; earningsEUR: number } | undefined
+                          if (!point) return ''
                           return (
-                            <div className="flex w-full items-center justify-between gap-2">
-                              <span>Zarobki (PLN)</span>
-                              <span className="font-medium">{formatCurrency(Number(value), 'PLN')}</span>
+                            <div className="space-y-1 border-b border-border/60 pb-1.5">
+                              <p className="font-medium text-foreground">{point.label}</p>
+                              {point.earningsEUR > 0 && (
+                                <p className="text-right text-[11px] text-muted-foreground">
+                                  EUR: {formatCurrency(point.earningsEUR, 'EUR')}
+                                </p>
+                              )}
                             </div>
                           )
-                        }
-                        if (item.dataKey === 'hours') {
-                          return (
-                            <div className="flex w-full items-center justify-between gap-2">
-                              <span>Godziny</span>
-                              <span className="font-medium">{Number(value).toFixed(1)}h</span>
-                            </div>
-                          )
-                        }
-                        return null
-                      }}
-                      labelFormatter={(_, payload) => {
-                        const point = payload?.[0]?.payload as { label: string; earningsEUR: number } | undefined
-                        if (!point) return ''
-                        return (
-                          <div className="space-y-1">
-                            <p>{point.label}</p>
-                            {point.earningsEUR > 0 && (
-                              <p className="text-muted-foreground">EUR: {formatCurrency(point.earningsEUR, 'EUR')}</p>
-                            )}
-                          </div>
-                        )
-                      }}
-                    />
-                  }
-                />
-                <Line
-                  yAxisId="earnings"
-                  type="monotone"
-                  dataKey="earningsPLN"
-                  stroke="var(--color-earningsPLN)"
-                  strokeWidth={2.5}
-                  dot={false}
-                />
-                <Bar yAxisId="hours" dataKey="hours" fill="var(--color-hours)" radius={[4, 4, 0, 0]} barSize={18} />
-              </LineChart>
-            </ChartContainer>
+                        }}
+                      />
+                    }
+                  />
+                  <Area
+                    yAxisId="earnings"
+                    type="monotone"
+                    dataKey="earningsPLN"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2.5}
+                    fill="url(#earningsGradient)"
+                    fillOpacity={1}
+                    dot={false}
+                    activeDot={{ r: 4, strokeWidth: 0, fill: 'hsl(var(--primary))' }}
+                  />
+                  <Bar
+                    yAxisId="hours"
+                    dataKey="hours"
+                    fill="url(#hoursGradient)"
+                    stroke="hsl(var(--chart-2))"
+                    strokeOpacity={0.35}
+                    radius={[4, 4, 0, 0]}
+                    barSize={18}
+                  />
+                </ComposedChart>
+              </ChartContainer>
+            </div>
           )}
         </CardContent>
       </Card>
