@@ -1,9 +1,16 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+
+// Logika i Helperzy
+
+// Hooki (Zgodnie z Twoim drzewem plików: _hooks)
 import { useDashboardData } from './_hooks/useDashboardData'
 import { useFilteredEntries } from './_hooks/useFilteredEntries'
+import { useEarningsTrend } from './_hooks/useEarningsTrend'
+import { useChartData } from './_hooks/useChartData'
 
+// Komponenty (Zgodnie z Twoim drzewem plików: _components)
 import { DashboardHeader } from './_components/DashboardHeader'
 import { EarningsCard } from './_components/EarningsCard'
 import { StatsCards } from './_components/StatsCards'
@@ -12,76 +19,95 @@ import { DashboardSkeleton } from './_components/DashboardSkeleton'
 import { GoalCard } from './_components/GoalCard'
 import { InvoicesList } from './_components/InvoicesList'
 
+// Typy
+import { TimeRange } from './_domain/dashboard.types'
+import { calculateTotals } from '@/lib/finance/totals'
+
 export default function DashboardPage() {
-  const { loading, data } = useDashboardData()
-  const [range, setRange] = useState('current_month')
+  const { data, isLoading, isError } = useDashboardData()
+  const [range, setRange] = useState<TimeRange>('current_month')
 
-  // Filtrujemy wpisy na podstawie wybranego zakresu
-  const filteredEntries = useFilteredEntries(data?.workEntries ?? [], range)
+  // --- PRZYGOTOWANIE BEZPIECZNYCH DANYCH ---
+  // To zapobiega błędom "Object.entries" i ".map is not a function"
+  const rawEntries = data?.workEntries ?? []
+  const rawClients = data?.clients ?? []
+  const rawInvoices = data?.invoices ?? []
+  const eurRate = data?.eurToPlnRate ?? 4.3
+  const userName = data?.userName ?? 'Użytkowniku'
 
-  // Obliczamy statystyki potrzebne dla komponentów
-  const stats = useMemo(() => {
-    if (!filteredEntries.length) return null
+  // --- LOGIKA BIZNESOWA (Zabezpieczona) ---
+  const filteredEntries = useFilteredEntries(rawEntries, range)
+  
+  const totals = useMemo(() => {
+    // Nie puszczamy nulli do calculateTotals
+    return calculateTotals(filteredEntries, rawClients, eurRate)
+  }, [filteredEntries, rawClients, eurRate])
 
-    const totalPLN = filteredEntries.reduce((sum, entry) => sum + (entry.amountPLN || 0), 0)
-    const totalEUR = filteredEntries.reduce((sum, entry) => sum + (entry.amountEUR || 0), 0)
-    const totalHours = filteredEntries.reduce((sum, entry) => sum + (entry.hours || 0), 0)
-    
-    // Unikalni klienci w przefiltrowanych wpisach
-    const uniqueClients = new Set(filteredEntries.map(e => e.clientId)).size
+  const trend = useEarningsTrend(rawEntries, rawClients, eurRate, range)
+  
+  const chartData = useChartData(filteredEntries, rawClients, 'daily', eurRate)
 
-    return {
-      totalPLN,
-      totalEUR,
-      totalHours,
-      clientsCount: uniqueClients,
-      // Tutaj możesz dodać logikę obliczania dni i nieobecności zależnie od Twoich danych
-      totalDays: Math.ceil(totalHours / 8), 
-      absences: 0 
-    }
-  }, [filteredEntries])
+  // --- WARUNKI RENDEROWANIA ---
+  if (isLoading) {
+    return (
+      <div className="container px-4 py-6">
+        <DashboardSkeleton />
+      </div>
+    )
+  }
 
-  if (loading || !data) return <DashboardSkeleton />
+  if (isError || !data) {
+    return (
+      <div className="container flex h-[50vh] items-center justify-center px-4">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">Coś poszło nie tak...</h2>
+          <p className="text-muted-foreground">Nie udało się pobrać danych z Supabase.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container space-y-6 px-4 py-6">
       <DashboardHeader 
         range={range} 
-        onChangeRange={setRange} 
-        userName={data.user?.name}
-        periodLabel="Podsumowanie Twojej aktywności"
+        onChangeRange={(val) => setRange(val as TimeRange)} 
+        userName={userName}
+        periodLabel="Podsumowanie finansowe"
       />
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <EarningsCard 
-          totalPLN={stats?.totalPLN ?? 0} 
-          totalEUR={stats?.totalEUR ?? 0}
-          trend={2.5} // Przykładowy trend, docelowo obliczany z porównania okresów
+          // W totals.ts totalEarningsAllPLN zawiera już przeliczone EUR
+          totalPLN={totals.totalEarningsAllPLN} 
+          totalEUR={totals.earningsEUR} 
+          trend={trend} 
         />
         
-        {/* Przykład użycia GoalCard, jeśli masz zdefiniowany cel w danych */}
         <GoalCard 
-          progress={((stats?.totalPLN ?? 0) / 15000) * 100} 
+          // Przykładowy cel 15k, możesz go wyciągnąć z metadanych usera
+          progress={totals.totalEarningsAllPLN > 0 ? (totals.totalEarningsAllPLN / 15000) * 100 : 0} 
           target={15000} 
           currency="PLN" 
         />
       </div>
 
       <StatsCards 
-        totalHours={stats?.totalHours ?? 0}
-        totalDays={stats?.totalDays ?? 0}
-        clientsCount={stats?.clientsCount ?? 0}
-        absences={stats?.absences ?? 0}
+        totalHours={totals.totalHours}
+        totalDays={totals.totalDays}
+        clientsCount={new Set(filteredEntries.map(e => e.client_id).filter(Boolean)).size}
+        absences={totals.vacationDays + totals.sickDays}
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          {/* Mapowanie danych pod wykres EarningsChart */}
-          <EarningsChart data={data.chartData ?? []} />
+          {/* Chart dostaje sformatowaną tablicę z useChartData */}
+          <EarningsChart data={chartData} /> 
         </div>
         
         <div>
-          <InvoicesList invoices={data.pendingInvoices ?? []} />
+          {/* Lista faktur z fallbackiem na pustą tablicę */}
+          <InvoicesList invoices={rawInvoices} />
         </div>
       </div>
     </div>
