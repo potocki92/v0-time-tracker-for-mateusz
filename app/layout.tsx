@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
+import { Providers } from './providers'
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: '--font-inter' });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: '--font-geist-mono' });
@@ -57,7 +58,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Providers>
           {children}
+          </Providers>
           <Toaster richColors position="top-center" />
         </ThemeProvider>
         <Analytics />

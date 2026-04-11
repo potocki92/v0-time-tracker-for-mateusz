@@ -1,27 +1,45 @@
-import { fetchCurrentEurRate } from '@/lib/api/eurRate'
 import { createClient } from '@/lib/supabase/client'
+import { fetchCurrentEurRate } from '@/lib/api/eurRate'
+import { DEFAULT_EUR_TO_PLN } from '../_domain/dashboard.constants'
+import { DashboardData } from '../_domain/dashboard.types'
 
-export async function fetchDashboardData() {
+export async function getDashboardData(): Promise<DashboardData> {
   const supabase = createClient()
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) throw new Error('Unauthorized')
+  if (!user) {
+    throw new Error('User not authenticated')
+  }
 
-  const [clients, entries, invoices, eurRate] = await Promise.all([
-    supabase.from('clients').select('*').eq('user_id', user.id),
-    supabase.from('work_entries').select('*').eq('user_id', user.id),
-    supabase.from('invoices').select('*').eq('user_id', user.id),
-    fetchCurrentEurRate(),
-  ])
+  const metadata = user.user_metadata ?? {}
+
+  const name =
+    metadata.full_name ||
+    metadata.name ||
+    user.email?.split('@')[0] ||
+    'Użytkowniku'
+
+  const eurRateFromUser = Number(metadata.eur_to_pln)
+
+  const [eurRateLive, clientsRes, entriesRes, invoicesRes] =
+    await Promise.all([
+      fetchCurrentEurRate(),
+      supabase.from('clients').select('*').eq('user_id', user.id),
+      supabase.from('work_entries').select('*').eq('user_id', user.id),
+      supabase.from('invoices').select('*').eq('user_id', user.id),
+    ])
 
   return {
-    user,
-    clients: clients.data ?? [],
-    workEntries: entries.data ?? [],
-    invoices: invoices.data ?? [],
-    eurRate,
+    userName: name,
+    eurToPlnRate:
+      eurRateFromUser > 0
+        ? eurRateFromUser
+        : eurRateLive ?? DEFAULT_EUR_TO_PLN,
+    clients: clientsRes.data ?? [],
+    workEntries: entriesRes.data ?? [],
+    invoices: invoicesRes.data ?? [],
   }
 }
