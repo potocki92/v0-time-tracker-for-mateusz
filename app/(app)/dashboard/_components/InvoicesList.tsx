@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/helpers'
+import { Currency } from '../_domain/dashboard.types'
 
 type Invoice = {
   id: string
   name: string
   amount: number
-  currency: string
+  currency: Currency
 }
 
 export function InvoicesList({ invoices }: { invoices: Invoice[] }) {

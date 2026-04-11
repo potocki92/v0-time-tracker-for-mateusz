@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { TrendingUp, ArrowUpRight } from 'lucide-react'
+import { TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { formatCurrency } from '@/lib/helpers'
 
 type Props = {
@@ -9,6 +9,8 @@ type Props = {
 }
 
 export function EarningsCard({ totalPLN, totalEUR, trend }: Props) {
+  const isPositive = trend !== null && trend !== undefined && trend >= 0
+
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
       <CardHeader className="pb-2">
@@ -30,10 +32,16 @@ export function EarningsCard({ totalPLN, totalEUR, trend }: Props) {
         )}
 
         {trend !== null && trend !== undefined && (
-          <p className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs text-emerald-600">
-            <ArrowUpRight className="h-3.5 w-3.5" />
-            {trend >= 0 ? '+' : ''}
-            {trend.toFixed(1)}%
+          <p className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs ${
+            isPositive
+              ? 'bg-emerald-500/10 text-emerald-600'
+              : 'bg-red-500/10 text-red-500'
+          }`}>
+            {isPositive
+              ? <ArrowUpRight className="h-3.5 w-3.5" />
+              : <ArrowDownRight className="h-3.5 w-3.5" />
+            }
+            {isPositive ? '+' : ''}{trend.toFixed(1)}%
           </p>
         )}
       </CardContent>

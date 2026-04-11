@@ -1,15 +1,14 @@
 import { useMemo } from 'react'
-import { getDateRange } from '@/lib/date/dateRange'
 import { WorkEntry } from '@/lib/types'
-import { TimeRange } from '../_domain/dashboard.types'
 
-export function useFilteredEntries(entries: WorkEntry[], range: TimeRange): WorkEntry[]{
+type DateRange = { from: Date | null; to: Date | null }
+
+export function useFilteredEntries(entries: WorkEntry[], dateRange: DateRange): WorkEntry[] {
   return useMemo(() => {
-    const r = getDateRange(range)
     return entries.filter((e) => {
-      if (!r.from || !r.to) return true
+      if (!dateRange.from || !dateRange.to) return true
       const d = new Date(e.date)
-      return d >= r.from && d <= r.to
+      return d >= dateRange.from! && d <= dateRange.to!
     })
-  }, [entries, range])
+  }, [entries, dateRange])
 }

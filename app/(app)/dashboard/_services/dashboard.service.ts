@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 import { fetchCurrentEurRate } from '@/lib/api/eurRate'
 import { DEFAULT_EUR_TO_PLN } from '../_domain/dashboard.constants'
 import { DashboardData } from '../_domain/dashboard.types'
 
 export async function getDashboardData(): Promise<DashboardData> {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },

@@ -30,7 +30,8 @@ export type ChartDataItem = {
   hours: number
 }
 
+export type Currency = 'PLN' | 'EUR'
 export type Goal = {
   amount: number | null
-  currency: 'PLN' | 'EUR'
+  currency: Currency
 }
