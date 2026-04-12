@@ -9,7 +9,8 @@ type Props = {
 }
 
 export function EarningsCard({ totalPLN, totalEUR, trend }: Props) {
-  const isPositive = trend !== null && trend !== undefined && trend >= 0
+  const hasTrend = trend !== null && trend !== undefined
+  const isPositive = hasTrend && trend >= 0
 
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
@@ -19,19 +20,16 @@ export function EarningsCard({ totalPLN, totalEUR, trend }: Props) {
           Zarobki
         </CardTitle>
       </CardHeader>
-
       <CardContent className="space-y-2">
         <div className="text-3xl font-bold">
           {formatCurrency(totalPLN, 'PLN')}
         </div>
-
         {totalEUR > 0 && (
           <p className="text-sm text-muted-foreground">
             w tym {formatCurrency(totalEUR, 'EUR')}
           </p>
         )}
-
-        {trend !== null && trend !== undefined && (
+        {hasTrend && (
           <p className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs ${
             isPositive
               ? 'bg-emerald-500/10 text-emerald-600'
@@ -39,8 +37,7 @@ export function EarningsCard({ totalPLN, totalEUR, trend }: Props) {
           }`}>
             {isPositive
               ? <ArrowUpRight className="h-3.5 w-3.5" />
-              : <ArrowDownRight className="h-3.5 w-3.5" />
-            }
+              : <ArrowDownRight className="h-3.5 w-3.5" />}
             {isPositive ? '+' : ''}{trend.toFixed(1)}%
           </p>
         )}

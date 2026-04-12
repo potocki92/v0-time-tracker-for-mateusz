@@ -10,6 +10,8 @@ type Props = {
 }
 
 export function GoalCard({ progress, target, currency }: Props) {
+  const clamped = Math.min(100, Math.max(0, progress))
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -18,12 +20,12 @@ export function GoalCard({ progress, target, currency }: Props) {
           Cel miesięczny
         </CardTitle>
       </CardHeader>
-
       <CardContent className="space-y-3">
-        <Progress value={progress} className="h-2" />
-
+        <Progress value={clamped} className="h-2" />
         <div className="flex justify-between text-sm">
-          <span>{progress.toFixed(0)}%</span>
+          <span className={clamped >= 100 ? 'font-semibold text-[var(--chart-1)]' : ''}>
+            {clamped.toFixed(0)}%
+          </span>
           <span className="font-medium">
             {formatCurrency(target, currency)}
           </span>

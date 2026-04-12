@@ -2,10 +2,11 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TIME_RANGE_OPTIONS } from '../_domain/dashboard.constants'
+import type { TimeRange } from '../_domain/dashboard.types'
 
 type Props = {
-  range: string
-  onChangeRange: (value: string) => void
+  range: TimeRange
+  onChangeRange: (value: TimeRange) => void
   userName?: string
   periodLabel?: string
 }
@@ -18,17 +19,18 @@ export function DashboardHeader({ range, onChangeRange, userName, periodLabel }:
           <h1 className="text-2xl font-bold tracking-tight">
             Witaj, {userName ?? 'Użytkowniku'}!
           </h1>
-          <p className="text-sm text-muted-foreground">{periodLabel}</p>
+          {periodLabel && (
+            <p className="text-sm text-muted-foreground">{periodLabel}</p>
+          )}
         </div>
-
-        <Select value={range} onValueChange={onChangeRange}>
+        <Select value={range} onValueChange={(v) => onChangeRange(v as TimeRange)}>
           <SelectTrigger className="w-full min-w-52 sm:w-64">
             <SelectValue placeholder="Wybierz okres" />
           </SelectTrigger>
           <SelectContent>
-            {TIME_RANGE_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
+            {TIME_RANGE_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
               </SelectItem>
             ))}
           </SelectContent>

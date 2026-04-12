@@ -1,31 +1,12 @@
-// useChartData.ts — pełna poprawiona wersja z timezone fixem
 import { useMemo } from 'react'
 import { calculateEarnings } from '@/lib/helpers'
 import { Client, WorkEntry, MONTH_NAMES } from '@/lib/types'
 import { ChartDataItem, ChartGrouping } from '../_domain/dashboard.types'
-
-// Fix timezone — używamy lokalnej daty zamiast UTC
-const toDateKey = (date: Date): string =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-
-function getWeekStart(date: Date): Date {
-  const clone = new Date(date)
-  const day = clone.getDay()
-  const mondayOffset = day === 0 ? -6 : 1 - day
-  clone.setDate(clone.getDate() + mondayOffset)
-  clone.setHours(0, 0, 0, 0)
-  return clone
-}
-
-function getWeekLabel(date: Date): string {
-  const weekStart = getWeekStart(date)
-  const weekEnd = new Date(weekStart)
-  weekEnd.setDate(weekStart.getDate() + 6)
-  return `${weekStart.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}–${weekEnd.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}`
-}
+import { toDateKey } from '@/lib/date/format'           // ← z @/lib
+import { getWeekStart, getWeekLabel } from '@/lib/date/week' // ← z @/lib
 
 type DateRange = { from: Date | null; to: Date | null }
-type ChartDataItemExtended = ChartDataItem & { earningsEUR: number }
+export type ChartDataItemExtended = ChartDataItem & { earningsEUR: number }
 
 export function useChartData(
   entries: WorkEntry[],
@@ -38,7 +19,7 @@ export function useChartData(
     if (!entries.length || !dateRange.from || !dateRange.to) return []
 
     const clientMap = new Map(clients.map((c) => [c.id, c]))
-    const grouped = new Map<string, ChartDataItemExtended & { sortDate: Date }>()
+    const grouped   = new Map<string, ChartDataItemExtended & { sortDate: Date }>()
 
     const cursor = new Date(dateRange.from)
     cursor.setHours(0, 0, 0, 0)
@@ -46,24 +27,22 @@ export function useChartData(
     end.setHours(0, 0, 0, 0)
 
     while (cursor <= end) {
-      let key = ''
-      let label = ''
-      let sortDate = new Date(cursor)
+      let key = '', label = '', sortDate = new Date(cursor)
 
       if (grouping === 'daily') {
-        key = toDateKey(cursor)  // ✅ lokalny klucz
+        key   = toDateKey(cursor)
         label = cursor.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })
         cursor.setDate(cursor.getDate() + 1)
       } else if (grouping === 'weekly') {
         const ws = getWeekStart(cursor)
-        key = toDateKey(ws)  // ✅ lokalny klucz
-        label = getWeekLabel(ws)
+        key      = toDateKey(ws)
+        label    = getWeekLabel(ws)
         sortDate = ws
         cursor.setDate(cursor.getDate() + 7)
       } else {
         const ms = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
-        key = `${ms.getFullYear()}-${String(ms.getMonth() + 1).padStart(2, '0')}`
-        label = `${MONTH_NAMES[ms.getMonth()].slice(0, 3)}`
+        key      = `${ms.getFullYear()}-${String(ms.getMonth() + 1).padStart(2, '0')}`
+        label    = MONTH_NAMES[ms.getMonth()].slice(0, 3)
         sortDate = ms
         cursor.setMonth(cursor.getMonth() + 1, 1)
       }
@@ -74,30 +53,19 @@ export function useChartData(
     }
 
     for (const entry of entries) {
-      const entryDate = new Date(entry.date)
-      let key = ''
-
-      if (grouping === 'daily') {
-        key = toDateKey(entryDate)  // ✅ lokalny klucz
-      } else if (grouping === 'weekly') {
-        key = toDateKey(getWeekStart(entryDate))  // ✅ lokalny klucz
-      } else {
-        key = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`
-      }
+      const d   = new Date(entry.date)
+      const key = grouping === 'daily'   ? toDateKey(d)
+                : grouping === 'weekly'  ? toDateKey(getWeekStart(d))
+                : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 
       const bucket = grouped.get(key)
       if (!bucket) continue
 
-      if (entry.status === 'worked') {
-        bucket.hours += entry.hours ?? 0
-      }
-
-      const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
+      if (entry.status === 'worked') bucket.hours += entry.hours ?? 0
+      const client   = entry.client_id ? clientMap.get(entry.client_id) : undefined
       const earnings = calculateEarnings(entry, client, eurRate)
       bucket.earningsPLN += earnings.amountInPLN
-      if (earnings.currency === 'EUR') {
-        bucket.earningsEUR += earnings.amount
-      }
+      if (earnings.currency === 'EUR') bucket.earningsEUR += earnings.amount
     }
 
     return Array.from(grouped.values())
@@ -106,7 +74,7 @@ export function useChartData(
         label,
         earningsPLN: Number(earningsPLN.toFixed(2)),
         earningsEUR: Number(earningsEUR.toFixed(2)),
-        hours: Number(hours.toFixed(1)),
+        hours:       Number(hours.toFixed(1)),
       }))
   }, [entries, clients, grouping, eurRate, dateRange])
 }

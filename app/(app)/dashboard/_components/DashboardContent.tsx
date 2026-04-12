@@ -1,90 +1,59 @@
-// _components/DashboardContent.tsx
 'use client'
 
-import { useMemo, useState } from 'react'
-import { useDashboardData } from '../_hooks/useDashboardData'
-import { TimeRange } from '../_domain/dashboard.types'
+import { useState, useMemo } from 'react'
+import { useDashboardData, useFilteredEntries, useEarningsTrend, useDashboardTotals, usePeriodLabel, useUnpaidInvoices }  from '../_hooks'
+import { getDateRange, getPrevRange } from '@/lib/date/dateRange'
+import type { TimeRange } from '../_domain/'
 import { DashboardHeader } from './DashboardHeader'
-import { EarningsCard } from './EarningsCard'
-import { GoalCard } from './GoalCard'
-import { StatsCards } from './StatsCards'
-import { InvoicesList } from './InvoicesList'
-import { EarningsChart } from './EarningsChart'
-import { calculateTotals } from '@/lib/finance/totals'
-import { useFilteredEntries } from '../_hooks/useFilteredEntries'
-import { useEarningsTrend } from '../_hooks/useEarningsTrend'
-import { getDateRange } from '@/lib/date/dateRange'
+import { EarningsCard, GoalCard, StatsCards } from './card'
+import { InvoicesList } from './invoices/InvoicesList'
+import { EarningsChart } from './chart'
+
 
 export function DashboardContent() {
   const { data } = useDashboardData()
   const [range, setRange] = useState<TimeRange>('current_week')
 
-  const eurRate = data.eurToPlnRate
-  const userName = data.userName
+  const { eurToPlnRate: eurRate, userName, workEntries, clients, invoices } = data
 
   const dateRange = useMemo(() => getDateRange(range), [range])
+  const prevRange = useMemo(() => getPrevRange(dateRange), [dateRange])  // ← z @/lib
 
-  const filteredEntries = useFilteredEntries(data.workEntries, dateRange)
-
-  const totals = useMemo(
-    () => calculateTotals(filteredEntries, data.clients, eurRate),
-    [filteredEntries, data.clients, eurRate]
-  )
+  const filtered       = useFilteredEntries(workEntries, dateRange)
+  const prevFiltered   = useFilteredEntries(workEntries, prevRange)
+  const totals         = useDashboardTotals(filtered, clients, eurRate)
+  const trend          = useEarningsTrend(filtered, prevFiltered, clients, eurRate)
+  const unpaidInvoices = useUnpaidInvoices(invoices)
+  const periodLabel    = usePeriodLabel(range)
 
   const clientsCount = useMemo(
-    () => new Set(filteredEntries.map((e) => e.client_id).filter(Boolean)).size,
-    [filteredEntries]
+    () => new Set(filtered.map((e) => e.client_id).filter(Boolean)).size,
+    [filtered]
   )
-
-  const unpaidInvoices = useMemo(
-    () => data.invoices.filter((inv) => !inv.is_paid),
-    [data.invoices]
-  )
-
-  const trend = useEarningsTrend(data.workEntries, data.clients, eurRate, range)
 
   return (
     <div className="container space-y-6 px-4 py-6">
       <DashboardHeader
         range={range}
-        onChangeRange={(val) => setRange(val as TimeRange)}
+        onChangeRange={setRange}
         userName={userName}
-        periodLabel="Podsumowanie finansowe"
+        periodLabel={periodLabel}
       />
-
       <div className="grid gap-4 md:grid-cols-2">
-        <EarningsCard
-          totalPLN={totals.totalEarningsAllPLN}
-          totalEUR={totals.earningsEUR}
-          trend={trend}
-        />
-        <GoalCard
-          progress={totals.totalEarningsAllPLN > 0
-            ? (totals.totalEarningsAllPLN / 15000) * 100
-            : 0}
-          target={15000}
-          currency="PLN"
-        />
+        <EarningsCard totalPLN={totals.totalEarningsAllPLN} totalEUR={totals.earningsEUR} trend={trend} />
+        <GoalCard progress={(totals.totalEarningsAllPLN / 15000) * 100} target={15000} currency="PLN" />
       </div>
-
       <StatsCards
         totalHours={totals.totalHours}
         totalDays={totals.totalDays}
         clientsCount={clientsCount}
         absences={totals.vacationDays + totals.sickDays}
       />
-
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <EarningsChart
-            workEntries={data.workEntries}
-            clients={data.clients}
-            eurToPlnRate={eurRate}
-          />
+          <EarningsChart workEntries={workEntries} clients={clients} eurToPlnRate={eurRate} />
         </div>
-        <div>
-          <InvoicesList invoices={unpaidInvoices} />
-        </div>
+        <InvoicesList invoices={unpaidInvoices} />
       </div>
     </div>
   )
