@@ -1,8 +1,12 @@
-// useChartData.ts
+// useChartData.ts — pełna poprawiona wersja z timezone fixem
 import { useMemo } from 'react'
 import { calculateEarnings } from '@/lib/helpers'
 import { Client, WorkEntry, MONTH_NAMES } from '@/lib/types'
 import { ChartDataItem, ChartGrouping } from '../_domain/dashboard.types'
+
+// Fix timezone — używamy lokalnej daty zamiast UTC
+const toDateKey = (date: Date): string =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
 function getWeekStart(date: Date): Date {
   const clone = new Date(date)
@@ -21,8 +25,6 @@ function getWeekLabel(date: Date): string {
 }
 
 type DateRange = { from: Date | null; to: Date | null }
-
-// Dodajemy earningsEUR do typu
 type ChartDataItemExtended = ChartDataItem & { earningsEUR: number }
 
 export function useChartData(
@@ -49,19 +51,19 @@ export function useChartData(
       let sortDate = new Date(cursor)
 
       if (grouping === 'daily') {
-        key = cursor.toISOString().slice(0, 10)
+        key = toDateKey(cursor)  // ✅ lokalny klucz
         label = cursor.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })
         cursor.setDate(cursor.getDate() + 1)
       } else if (grouping === 'weekly') {
         const ws = getWeekStart(cursor)
-        key = ws.toISOString().slice(0, 10)
+        key = toDateKey(ws)  // ✅ lokalny klucz
         label = getWeekLabel(ws)
         sortDate = ws
         cursor.setDate(cursor.getDate() + 7)
       } else {
         const ms = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
         key = `${ms.getFullYear()}-${String(ms.getMonth() + 1).padStart(2, '0')}`
-        label = `${MONTH_NAMES[ms.getMonth()].slice(0, 3)} ${ms.getFullYear()}`
+        label = `${MONTH_NAMES[ms.getMonth()].slice(0, 3)}`
         sortDate = ms
         cursor.setMonth(cursor.getMonth() + 1, 1)
       }
@@ -76,9 +78,9 @@ export function useChartData(
       let key = ''
 
       if (grouping === 'daily') {
-        key = entryDate.toISOString().slice(0, 10)
+        key = toDateKey(entryDate)  // ✅ lokalny klucz
       } else if (grouping === 'weekly') {
-        key = getWeekStart(entryDate).toISOString().slice(0, 10)
+        key = toDateKey(getWeekStart(entryDate))  // ✅ lokalny klucz
       } else {
         key = `${entryDate.getFullYear()}-${String(entryDate.getMonth() + 1).padStart(2, '0')}`
       }

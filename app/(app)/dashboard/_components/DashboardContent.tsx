@@ -1,48 +1,47 @@
-// DashboardContent.tsx — Client Component
+// _components/DashboardContent.tsx
 'use client'
 
 import { useMemo, useState } from 'react'
-import { DashboardData, TimeRange } from '../_domain/dashboard.types'
-import { selectUnpaidInvoices } from '../_domain/dashboard.selectors'
-import { calculateTotals } from '@/lib/finance/totals'
-import { getDateRange } from '@/lib/date/dateRange'
-import { useFilteredEntries } from '../_hooks/useFilteredEntries'
-import { useEarningsTrend } from '../_hooks/useEarningsTrend'
+import { useDashboardData } from '../_hooks/useDashboardData'
+import { TimeRange } from '../_domain/dashboard.types'
 import { DashboardHeader } from './DashboardHeader'
 import { EarningsCard } from './EarningsCard'
 import { GoalCard } from './GoalCard'
 import { StatsCards } from './StatsCards'
 import { InvoicesList } from './InvoicesList'
 import { EarningsChart } from './EarningsChart'
+import { calculateTotals } from '@/lib/finance/totals'
+import { useFilteredEntries } from '../_hooks/useFilteredEntries'
+import { useEarningsTrend } from '../_hooks/useEarningsTrend'
+import { getDateRange } from '@/lib/date/dateRange'
 
-type Props = {
-  data: DashboardData
-}
-
-export function DashboardContent({ data }: Props) {
+export function DashboardContent() {
+  const { data } = useDashboardData()
   const [range, setRange] = useState<TimeRange>('current_week')
 
-  const { workEntries, clients, invoices, eurToPlnRate, userName } = data
+  const eurRate = data.eurToPlnRate
+  const userName = data.userName
 
-  const parsedDateRange = useMemo(() => getDateRange(range), [range])
-  const filteredEntries = useFilteredEntries(workEntries, parsedDateRange)
+  const dateRange = useMemo(() => getDateRange(range), [range])
+
+  const filteredEntries = useFilteredEntries(data.workEntries, dateRange)
 
   const totals = useMemo(
-    () => calculateTotals(filteredEntries, clients, eurToPlnRate),
-    [filteredEntries, clients, eurToPlnRate]
-  )
-
-  const trend = useEarningsTrend(workEntries, clients, eurToPlnRate, range)
-
-  const unpaidInvoices = useMemo(
-    () => selectUnpaidInvoices(data),
-    [data]
+    () => calculateTotals(filteredEntries, data.clients, eurRate),
+    [filteredEntries, data.clients, eurRate]
   )
 
   const clientsCount = useMemo(
-    () => new Set(filteredEntries.map(e => e.client_id).filter(Boolean)).size,
+    () => new Set(filteredEntries.map((e) => e.client_id).filter(Boolean)).size,
     [filteredEntries]
   )
+
+  const unpaidInvoices = useMemo(
+    () => data.invoices.filter((inv) => !inv.is_paid),
+    [data.invoices]
+  )
+
+  const trend = useEarningsTrend(data.workEntries, data.clients, eurRate, range)
 
   return (
     <div className="container space-y-6 px-4 py-6">
@@ -52,6 +51,7 @@ export function DashboardContent({ data }: Props) {
         userName={userName}
         periodLabel="Podsumowanie finansowe"
       />
+
       <div className="grid gap-4 md:grid-cols-2">
         <EarningsCard
           totalPLN={totals.totalEarningsAllPLN}
@@ -66,19 +66,20 @@ export function DashboardContent({ data }: Props) {
           currency="PLN"
         />
       </div>
+
       <StatsCards
         totalHours={totals.totalHours}
         totalDays={totals.totalDays}
         clientsCount={clientsCount}
         absences={totals.vacationDays + totals.sickDays}
       />
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <EarningsChart
-            workEntries={filteredEntries}
-            clients={clients}
-            eurToPlnRate={eurToPlnRate}
-            dateRange={parsedDateRange}
+            workEntries={data.workEntries}
+            clients={data.clients}
+            eurToPlnRate={eurRate}
           />
         </div>
         <div>

@@ -1,20 +1,16 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { getDashboardData } from '../_services/dashboard.service'
 import { DashboardData } from '../_domain/dashboard.types'
 
 export function useDashboardData() {
-  return useQuery<DashboardData>({
+  return useSuspenseQuery<DashboardData>({
     queryKey: ['dashboard'],
     queryFn: getDashboardData,
-
-    // 🔥 kluczowe ustawienia
-    staleTime: 1000 * 60 * 5, // 5 minut → brak refetch
-    gcTime: 1000 * 60 * 30,   // cache trzymany 30 min
-
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
     retry: 1,
-
     refetchOnWindowFocus: false,
   })
 }
