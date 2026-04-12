@@ -1,45 +1,56 @@
-import { createClient } from '@/lib/supabase/client'
-import { fetchCurrentEurRate } from '@/lib/api/eurRate'
-import { DEFAULT_EUR_TO_PLN } from '../_domain/dashboard.constants'
-import { DashboardData } from '../_domain/dashboard.types'
+import { DEFAULT_EUR_TO_PLN } from '@/app/(app)/dashboard/_domain/dashboard.constants'
+import {
+  fetchCurrentUser,
+  fetchClients,
+  fetchWorkEntries,
+  fetchInvoices,
+  fetchEurRate,
+} from './dashboard.fetchers'
+import type { DashboardData } from '@/app/(app)/dashboard/_domain/dashboard.types'
 
-export async function getDashboardData(): Promise<DashboardData> {
-  const supabase = createClient()
+// ── User meta helper ──────────────────────────────────────────────────────────
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    throw new Error('User not authenticated')
-  }
-
-  const metadata = user.user_metadata ?? {}
-
-  const name =
-    metadata.full_name ||
-    metadata.name ||
-    user.email?.split('@')[0] ||
+function resolveUserName(metadata: Record<string, unknown>, email?: string): string {
+  return (
+    (typeof metadata.full_name === 'string' && metadata.full_name.trim()
+      ? metadata.full_name
+      : null) ??
+    (typeof metadata.name === 'string' && metadata.name.trim()
+      ? metadata.name
+      : null) ??
+    email?.split('@')[0] ??
     'Użytkowniku'
+  )
+}
 
-  const eurRateFromUser = Number(metadata.eur_to_pln)
+function resolveEurRate(metadata: Record<string, unknown>, liverate: number | null): number {
+  const fromUser = Number(metadata.eur_to_pln)
+  if (Number.isFinite(fromUser) && fromUser > 0) return fromUser
+  return liverate ?? DEFAULT_EUR_TO_PLN
+}
 
-  const [eurRateLive, clientsRes, entriesRes, invoicesRes] =
-    await Promise.all([
-      fetchCurrentEurRate(),
-      supabase.from('clients').select('*').eq('user_id', user.id),
-      supabase.from('work_entries').select('*').eq('user_id', user.id),
-      supabase.from('invoices').select('*').eq('user_id', user.id),
-    ])
+// ── Service ───────────────────────────────────────────────────────────────────
+
+/**
+ * Składa pełny obiekt DashboardData z równoległych requestów.
+ * To jedyna funkcja którą wolają hooki TanStack Query.
+ */
+export async function getDashboardData(): Promise<DashboardData> {
+  const user     = await fetchCurrentUser()
+  const metadata = (user.user_metadata ?? {}) as Record<string, unknown>
+
+  const [eurRateLive, clients, workEntries, invoices] = await Promise.all([
+    fetchEurRate(),
+    fetchClients(user.id),
+    fetchWorkEntries(user.id),
+    fetchInvoices(user.id),
+  ])
 
   return {
-    userName: name,
-    eurToPlnRate:
-      eurRateFromUser > 0
-        ? eurRateFromUser
-        : eurRateLive ?? DEFAULT_EUR_TO_PLN,
-    clients: clientsRes.data ?? [],
-    workEntries: entriesRes.data ?? [],
-    invoices: invoicesRes.data ?? [],
+    userName:    resolveUserName(metadata, user.email),
+    eurToPlnRate: resolveEurRate(metadata, eurRateLive),
+    clients,
+    workEntries,
+    invoices,
   }
 }

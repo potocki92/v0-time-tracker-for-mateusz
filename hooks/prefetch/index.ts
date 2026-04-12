@@ -1,0 +1,1 @@
+export { usePrefetchDashboard } from './usePrefetchDashboard'

@@ -2,15 +2,18 @@
 
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getDashboardData } from '../_services/dashboard.service'
-import { DashboardData } from '../_domain/dashboard.types'
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
+import type { DashboardData } from '../_domain/dashboard.types'
 
+/**
+ * Główny hook dashboardu — używa useSuspenseQuery.
+ * `data` jest zawsze zdefiniowane — brak sprawdzania undefined w komponentach.
+ * Suspense obsługuje loading w page.tsx przez <Suspense fallback={<DashboardSkeleton />}>.
+ */
 export function useDashboardData() {
   return useSuspenseQuery<DashboardData>({
-    queryKey: ['dashboard'],
-    queryFn: getDashboardData,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
-    retry: 1,
-    refetchOnWindowFocus: false,
+    queryKey: QUERY_KEYS.dashboard(),
+    queryFn:  getDashboardData,
+    ...QUERY_CONFIG.dashboard,
   })
 }
