@@ -1,6 +1,7 @@
 import type { Client, WorkEntry } from '@/lib/types'
 import { getDateString } from '@/lib/helpers'
 import { DayCell } from './DayCell'
+import { cn } from '@/lib/utils'
 
 interface CalendarGridProps {
   daysInMonth: number
@@ -24,11 +25,23 @@ export function CalendarGrid({
   eurToPln,
 }: CalendarGridProps) {
   return (
-    <div className="grid grid-cols-7 gap-1">
-      {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-        <div key={`empty-${i}`} className="h-20 sm:h-24" />
-      ))}
+    <div className="grid grid-cols-7 gap-1.5">
+      {/* Empty leading cells */}
+      {Array.from({ length: firstDayOfMonth }).map((_, i) => {
+        const colIndex = i
+        const isWeekend = colIndex >= 5
+        return (
+          <div
+            key={`empty-${i}`}
+            className={cn(
+              'h-20 sm:h-24 rounded-lg',
+              isWeekend ? 'bg-muted/20' : '',
+            )}
+          />
+        )
+      })}
 
+      {/* Day cells */}
       {Array.from({ length: daysInMonth }).map((_, i) => {
         const day = i + 1
         const dateStr = getDateString(currentYear, currentMonth, day)
@@ -37,7 +50,10 @@ export function CalendarGrid({
         const isWeekend = dayOfWeek >= 5
 
         return (
-          <div key={day} className={isWeekend ? 'rounded-lg bg-muted/20 p-[1px]' : ''}>
+          <div
+            key={day}
+            className={cn(isWeekend ? 'rounded-lg bg-muted/15 p-px' : '')}
+          >
             <DayCell
               day={day}
               month={currentMonth}

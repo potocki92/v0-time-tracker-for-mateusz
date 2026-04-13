@@ -1,9 +1,16 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Client, Project, WorkEntry } from '@/lib/types'
-import { calculateEarnings, formatCurrency, getDateString, getDaysInMonth, getFirstDayOfMonth, isFutureDate } from '@/lib/helpers'
+import {
+  calculateEarnings,
+  formatCurrency,
+  getDateString,
+  getDaysInMonth,
+  getFirstDayOfMonth,
+  isFutureDate,
+} from '@/lib/helpers'
 import { toast } from 'sonner'
 
 export type WorkStatus = 'worked' | 'not_worked' | 'vacation' | 'sick_leave' | 'day_off'
@@ -12,52 +19,69 @@ const DEFAULT_HOURS = 8
 const DEFAULT_EUR_TO_PLN = 4.3
 const MONTHLY_BASELINE_HOURS = 160
 
+// ─── Initial form state ────────────────────────────────────────────────────
+const defaultFormState = {
+  formStatus: 'worked' as WorkStatus,
+  formClientId: '',
+  formProjectId: '',
+  formHours: DEFAULT_HOURS,
+  formQuantityFrom: 0,
+  formQuantityTo: 0,
+  formNotes: '',
+}
+
 export function useCalendarData() {
   const supabase = createClient()
 
+  // ── Data state ─────────────────────────────────────────────────────────
   const [clients, setClients] = useState<Client[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
-  const [selectedDay, setSelectedDay] = useState<number | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
 
-  const [formStatus, setFormStatus] = useState<WorkStatus>('worked')
-  const [formClientId, setFormClientId] = useState<string>('')
-  const [formProjectId, setFormProjectId] = useState<string>('')
-  const [formHours, setFormHours] = useState<number>(DEFAULT_HOURS)
-  const [formQuantityFrom, setFormQuantityFrom] = useState<number>(0)
-  const [formQuantityTo, setFormQuantityTo] = useState<number>(0)
-  const [formNotes, setFormNotes] = useState<string>('')
+  // ── Navigation state ───────────────────────────────────────────────────
+  const today = new Date()
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth())
+  const [currentYear, setCurrentYear] = useState(today.getFullYear())
 
-  useEffect(() => {
-    loadData()
-  }, [])
+  // ── Modal state ────────────────────────────────────────────────────────
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  async function loadData() {
+  // ── Form state ─────────────────────────────────────────────────────────
+  const [formStatus, setFormStatus] = useState<WorkStatus>(defaultFormState.formStatus)
+  const [formClientId, setFormClientId] = useState(defaultFormState.formClientId)
+  const [formProjectId, setFormProjectId] = useState(defaultFormState.formProjectId)
+  const [formHours, setFormHours] = useState(defaultFormState.formHours)
+  const [formQuantityFrom, setFormQuantityFrom] = useState(defaultFormState.formQuantityFrom)
+  const [formQuantityTo, setFormQuantityTo] = useState(defaultFormState.formQuantityTo)
+  const [formNotes, setFormNotes] = useState(defaultFormState.formNotes)
+
+  // ── Load data ──────────────────────────────────────────────────────────
+  const loadData = useCallback(async () => {
     setIsLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const [clientsRes, projectsRes, entriesRes] = await Promise.all([
+        supabase.from('clients').select('*').eq('user_id', user.id),
+        supabase.from('projects').select('*').eq('user_id', user.id),
+        supabase.from('work_entries').select('*').eq('user_id', user.id),
+      ])
+
+      if (clientsRes.data) setClients(clientsRes.data)
+      if (projectsRes.data) setProjects(projectsRes.data)
+      if (entriesRes.data) setWorkEntries(entriesRes.data)
+    } finally {
       setIsLoading(false)
-      return
     }
+  }, [supabase])
 
-    const [clientsRes, projectsRes, entriesRes] = await Promise.all([
-      supabase.from('clients').select('*').eq('user_id', user.id),
-      supabase.from('projects').select('*').eq('user_id', user.id),
-      supabase.from('work_entries').select('*').eq('user_id', user.id),
-    ])
+  useEffect(() => { loadData() }, [loadData])
 
-    if (clientsRes.data) setClients(clientsRes.data)
-    if (projectsRes.data) setProjects(projectsRes.data)
-    if (entriesRes.data) setWorkEntries(entriesRes.data)
-
-    setIsLoading(false)
-  }
-
+  // ── Derived calendar values ────────────────────────────────────────────
   const daysInMonth = getDaysInMonth(currentYear, currentMonth)
   const firstDayOfMonth = getFirstDayOfMonth(currentYear, currentMonth)
 
@@ -67,24 +91,35 @@ export function useCalendarData() {
     return map
   }, [workEntries])
 
-  const selectedClient = useMemo(() => clients.find((c) => c.id === formClientId), [clients, formClientId])
-  const clientProjects = useMemo(() => projects.filter((p) => p.client_id === formClientId), [projects, formClientId])
-  const defaultClient = useMemo(() => clients.find((c) => c.is_default), [clients])
+  const selectedClient = useMemo(
+    () => clients.find((c) => c.id === formClientId),
+    [clients, formClientId],
+  )
+
+  const clientProjects = useMemo(
+    () => projects.filter((p) => p.client_id === formClientId),
+    [projects, formClientId],
+  )
+
+  const defaultClient = useMemo(
+    () => clients.find((c) => c.is_default),
+    [clients],
+  )
 
   const monthEntries = useMemo(() => {
-    const monthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`
-    return workEntries.filter((entry) => entry.date.startsWith(monthPrefix))
+    const prefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`
+    return workEntries.filter((entry) => entry.date.startsWith(prefix))
   }, [workEntries, currentYear, currentMonth])
 
+  // ── Stats ──────────────────────────────────────────────────────────────
   const stats = useMemo(() => {
-    const workedEntries = monthEntries.filter((entry) => entry.status === 'worked')
+    const workedEntries = monthEntries.filter((e) => e.status === 'worked')
     const workDays = workedEntries.length
-    const freeDays = monthEntries.filter((entry) => entry.status !== 'worked').length
-    const totalHours = workedEntries.reduce((acc, entry) => acc + (entry.hours ?? 0), 0)
+    const freeDays = monthEntries.filter((e) => e.status !== 'worked').length
+    const totalHours = workedEntries.reduce((acc, e) => acc + (e.hours ?? 0), 0)
     const earningsPLN = workedEntries.reduce((acc, entry) => {
       const client = entry.client_id ? clients.find((c) => c.id === entry.client_id) : undefined
-      const earnings = calculateEarnings(entry, client, DEFAULT_EUR_TO_PLN)
-      return acc + earnings.amountInPLN
+      return acc + calculateEarnings(entry, client, DEFAULT_EUR_TO_PLN).amountInPLN
     }, 0)
 
     return {
@@ -97,31 +132,35 @@ export function useCalendarData() {
     }
   }, [monthEntries, clients])
 
+  // ── Form helpers ───────────────────────────────────────────────────────
+  function populateForm(entry: WorkEntry) {
+    setFormStatus(entry.status as WorkStatus)
+    setFormClientId(entry.client_id || '')
+    setFormProjectId(entry.project_id || '')
+    setFormHours(entry.hours || DEFAULT_HOURS)
+    setFormQuantityFrom(entry.quantity_from || 0)
+    setFormQuantityTo(entry.quantity_to || 0)
+    setFormNotes(entry.notes || '')
+  }
+
+  function resetForm() {
+    setFormStatus('worked')
+    setFormClientId(defaultClient?.id || '')
+    setFormProjectId('')
+    setFormHours(DEFAULT_HOURS)
+    setFormQuantityFrom(0)
+    setFormQuantityTo(0)
+    setFormNotes('')
+  }
+
+  // ── Actions ────────────────────────────────────────────────────────────
   function openDayModal(day: number) {
     const dateStr = getDateString(currentYear, currentMonth, day)
     if (isFutureDate(dateStr)) return
 
     setSelectedDay(day)
-    const existingEntry = entriesByDate.get(dateStr)
-
-    if (existingEntry) {
-      setFormStatus(existingEntry.status as WorkStatus)
-      setFormClientId(existingEntry.client_id || '')
-      setFormProjectId(existingEntry.project_id || '')
-      setFormHours(existingEntry.hours || DEFAULT_HOURS)
-      setFormQuantityFrom(existingEntry.quantity_from || 0)
-      setFormQuantityTo(existingEntry.quantity_to || 0)
-      setFormNotes(existingEntry.notes || '')
-    } else {
-      setFormStatus('worked')
-      setFormClientId(defaultClient?.id || '')
-      setFormProjectId('')
-      setFormHours(DEFAULT_HOURS)
-      setFormQuantityFrom(0)
-      setFormQuantityTo(0)
-      setFormNotes('')
-    }
-
+    const existing = entriesByDate.get(dateStr)
+    existing ? populateForm(existing) : resetForm()
     setIsModalOpen(true)
   }
 
@@ -134,114 +173,113 @@ export function useCalendarData() {
     }
 
     setIsSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const existing = entriesByDate.get(dateStr)
+      const payload = {
+        user_id: user.id,
+        date: dateStr,
+        status: formStatus,
+        client_id: formStatus === 'worked' ? formClientId || null : null,
+        project_id: formStatus === 'worked' && formProjectId !== 'none' ? formProjectId || null : null,
+        hours: formStatus === 'worked' && selectedClient?.work_type === 'hourly' ? formHours : null,
+        quantity:
+          formStatus === 'worked' && selectedClient?.work_type === 'piecework'
+            ? formQuantityTo - formQuantityFrom
+            : null,
+        quantity_from:
+          formStatus === 'worked' && selectedClient?.work_type === 'piecework' ? formQuantityFrom : null,
+        quantity_to:
+          formStatus === 'worked' && selectedClient?.work_type === 'piecework' ? formQuantityTo : null,
+        notes: formNotes || null,
+      }
+
+      const result = existing
+        ? await supabase.from('work_entries').update(payload).eq('id', existing.id)
+        : await supabase.from('work_entries').insert(payload)
+
+      if (result.error) {
+        toast.error('Błąd podczas zapisywania')
+      } else {
+        toast.success(existing ? 'Zaktualizowano wpis' : 'Dodano wpis')
+        await loadData()
+        setIsModalOpen(false)
+      }
+    } finally {
       setIsSaving(false)
-      return
     }
-
-    const existingEntry = entriesByDate.get(dateStr)
-
-    const entryData = {
-      user_id: user.id,
-      date: dateStr,
-      status: formStatus,
-      client_id: formStatus === 'worked' ? formClientId || null : null,
-      project_id: formStatus === 'worked' && formProjectId !== 'none' ? formProjectId || null : null,
-      hours: formStatus === 'worked' && selectedClient?.work_type === 'hourly' ? formHours : null,
-      quantity: formStatus === 'worked' && selectedClient?.work_type === 'piecework' ? (formQuantityTo - formQuantityFrom) : null,
-      quantity_from: formStatus === 'worked' && selectedClient?.work_type === 'piecework' ? formQuantityFrom : null,
-      quantity_to: formStatus === 'worked' && selectedClient?.work_type === 'piecework' ? formQuantityTo : null,
-      notes: formNotes || null,
-    }
-
-    const result = existingEntry
-      ? await supabase.from('work_entries').update(entryData).eq('id', existingEntry.id)
-      : await supabase.from('work_entries').insert(entryData)
-
-    if (result.error) {
-      toast.error('Błąd podczas zapisywania')
-    } else {
-      toast.success('Zapisano')
-      await loadData()
-    }
-
-    setIsSaving(false)
-    setIsModalOpen(false)
-  }
-
-  async function clonePreviousDayEntry() {
-    if (!selectedDay) return
-    const currentDate = getDateString(currentYear, currentMonth, selectedDay)
-    if (isFutureDate(currentDate)) return
-
-    const prevDate = new Date(currentYear, currentMonth, selectedDay)
-    prevDate.setDate(prevDate.getDate() - 1)
-    const prevDateStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(prevDate.getDate()).padStart(2, '0')}`
-    const previousEntry = entriesByDate.get(prevDateStr)
-
-    if (!previousEntry) {
-      toast.error('Brak wpisu w poprzednim dniu')
-      return
-    }
-
-    setFormStatus(previousEntry.status as WorkStatus)
-    setFormClientId(previousEntry.client_id || '')
-    setFormProjectId(previousEntry.project_id || '')
-    setFormHours(previousEntry.hours || DEFAULT_HOURS)
-    setFormQuantityFrom(previousEntry.quantity_from || 0)
-    setFormQuantityTo(previousEntry.quantity_to || 0)
-    setFormNotes(previousEntry.notes || '')
-    toast.success('Skopiowano poprzedni dzień')
   }
 
   async function deleteEntry() {
     if (!selectedDay) return
     const dateStr = getDateString(currentYear, currentMonth, selectedDay)
-    const existingEntry = entriesByDate.get(dateStr)
-    if (!existingEntry) return
+    const existing = entriesByDate.get(dateStr)
+    if (!existing) return
 
     setIsSaving(true)
-    const { error } = await supabase.from('work_entries').delete().eq('id', existingEntry.id)
+    try {
+      const { error } = await supabase.from('work_entries').delete().eq('id', existing.id)
+      if (error) {
+        toast.error('Błąd podczas usuwania')
+      } else {
+        toast.success('Usunięto wpis')
+        await loadData()
+        setIsModalOpen(false)
+      }
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
-    if (error) {
-      toast.error('Błąd podczas usuwania')
-    } else {
-      toast.success('Usunięto')
-      await loadData()
+  function clonePreviousDayEntry() {
+    if (!selectedDay) return
+    const currentDate = getDateString(currentYear, currentMonth, selectedDay)
+    if (isFutureDate(currentDate)) return
+
+    const prevDate = new Date(currentYear, currentMonth, selectedDay - 1)
+    const prevDateStr = getDateString(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate())
+    const prev = entriesByDate.get(prevDateStr)
+
+    if (!prev) {
+      toast.error('Brak wpisu w poprzednim dniu')
+      return
     }
 
-    setIsSaving(false)
-    setIsModalOpen(false)
+    populateForm(prev)
+    toast.success('Skopiowano z poprzedniego dnia')
   }
 
   function prevMonth() {
-    if (currentMonth === 0) {
-      setCurrentMonth(11)
-      setCurrentYear((prev) => prev - 1)
-    } else {
-      setCurrentMonth((prev) => prev - 1)
-    }
+    setCurrentMonth((m) => {
+      if (m === 0) { setCurrentYear((y) => y - 1); return 11 }
+      return m - 1
+    })
   }
 
   function nextMonth() {
-    if (currentMonth === 11) {
-      setCurrentMonth(0)
-      setCurrentYear((prev) => prev + 1)
-    } else {
-      setCurrentMonth((prev) => prev + 1)
-    }
+    setCurrentMonth((m) => {
+      if (m === 11) { setCurrentYear((y) => y + 1); return 0 }
+      return m + 1
+    })
   }
 
   return {
+    // Data
     clients,
     projects,
+    workEntries,
+    // Navigation
     currentMonth,
     currentYear,
+    // Modal
     selectedDay,
     isModalOpen,
+    // Loading
     isLoading,
     isSaving,
+    // Form
     formStatus,
     formClientId,
     formProjectId,
@@ -249,6 +287,7 @@ export function useCalendarData() {
     formQuantityFrom,
     formQuantityTo,
     formNotes,
+    // Derived
     daysInMonth,
     firstDayOfMonth,
     entriesByDate,
