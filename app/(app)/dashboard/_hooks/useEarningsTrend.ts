@@ -1,13 +1,15 @@
 import { useMemo } from 'react'
 import { WorkEntry, Client } from '@/lib/types'
 import { calculateMonthlyTotals } from '@/lib/helpers'
+import { selectEurRate, usePreferencesStore } from './usePreferencesStore'
 
 export function useEarningsTrend(
   currentEntries: WorkEntry[],
   prevEntries: WorkEntry[],
   clients: Client[],
-  eurRate: number,
 ): number | null {
+  const eurRate = usePreferencesStore(selectEurRate)
+
   return useMemo(() => {
     const current = calculateMonthlyTotals(currentEntries, clients, eurRate)
     const prev    = calculateMonthlyTotals(prevEntries,   clients, eurRate)

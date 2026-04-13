@@ -15,5 +15,14 @@ export function useDashboardData() {
     queryKey: QUERY_KEYS.dashboard(),
     queryFn:  getDashboardData,
     ...QUERY_CONFIG.dashboard,
+    retry: (failureCount, error) => {
+      // Nie ponawiaj po rate limit — poczekaj na Retry-After
+      if ((error as { code?: string }).code === 'RATE_LIMIT') return false
+      return failureCount < 3
+    },
+    retryDelay: (_, error) => {
+      if ((error as { code?: string }).code === 'RATE_LIMIT') return 60_000
+      return 1_000
+    },
   })
 }
