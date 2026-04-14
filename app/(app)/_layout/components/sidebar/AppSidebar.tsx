@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/sidebar'
 import { SidebarNav }         from './SidebarNav'
 import { SidebarUserFooter }  from './SidebarUserFooter'
-import { useKeyboardSidebar } from '../../hooks/useKeyboardSidebar'
 import { Moon, Sun, Monitor } from 'lucide-react'
 import { useTheme }           from 'next-themes'
 import Image                  from 'next/image'
@@ -95,7 +94,6 @@ function ThemeItem() {
 // ── AppSidebar ────────────────────────────────────────────────────────────────
 
 export function AppSidebar({ user, onLogout, badges }: AppSidebarProps) {
-  useKeyboardSidebar()
 
   return (
     <Sidebar collapsible="icon">
