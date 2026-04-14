@@ -1,27 +1,24 @@
 'use client'
 
-import { DesktopHeader } from './_layout/components/header/DesktopHeader'
-import { MobileHeader } from './_layout/components/header/MobileHeader'
-import { MobileBottomNav } from './_layout/components/navigation/MobileBottomNav'
-import { useAuth } from './_layout/hooks/useAuth'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { AppSidebar } from './_layout/components/sidebar/AppSidebar'
+import { useAuth }    from './_layout/hooks/useAuth'
 
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth()
 
   if (loading) return null
 
   return (
-    <div className="min-h-screen pb-16">
-      <DesktopHeader user={user} onLogout={logout} />
-      <MobileHeader user={user} onLogout={logout} />
+    <SidebarProvider defaultOpen={false}>
+      <AppSidebar user={user} onLogout={logout} />
 
-      <main>{children}</main>
-
-      <MobileBottomNav />
-    </div>
+      {/* SidebarInset: wypycha content gdy sidebar rozwinięty */}
+      <SidebarInset>
+        <main className="flex-1 p-4 md:p-6">
+          {children}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
