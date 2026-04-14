@@ -16,9 +16,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* SidebarInset: wypycha content gdy sidebar rozwinięty */}
       <SidebarInset>
         <MobileHeader user={user} onLogout={logout} />
-        <main className="flex-1 p-4 md:p-6">
+        <div className="flex-1 p-4 md:p-6">
           {children}
-        </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

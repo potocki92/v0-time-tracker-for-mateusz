@@ -13,7 +13,6 @@ export interface InvoiceFormState {
   name: string
   invoice_number: string
   recipient: string
-  description: string
   billing_period: string
   invoice_date: string
   due_date: string
@@ -87,17 +86,6 @@ export function InvoiceFormDialog({
                 placeholder="np. FV/04/2026/01"
               />
             </div>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="description">Za co / opis faktury</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(event) => onFormDataChange((prev) => ({ ...prev, description: event.target.value }))}
-              rows={3}
-              placeholder="Zakres prac, produkty, usługi..."
-            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
