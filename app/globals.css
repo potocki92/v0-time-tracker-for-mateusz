@@ -123,3 +123,88 @@
     @apply bg-background text-foreground antialiased;
   }
 }
+
+/*
+ * #15 — Zsynchronizowana animacja skeleton
+ *
+ * Dodaj ten blok do src/app/globals.css
+ *
+ * Kluczowe: animation-delay: -1.5s na .skeleton
+ * Ujemny delay sprawia że wszystkie elementy startują w tej samej fazie
+ * animacji która już "trwa" (negative delay = przesuń timeline do tyłu).
+ * Efekt: wszystkie skeleton karty pulsują idealnie razem od pierwszego frame.
+ *
+ * Dlaczego to lepsze niż animate-pulse z Tailwind:
+ * - animate-pulse używa osobnej animacji per element → różne fazy
+ * - Nasza .skeleton dzieli jedną globalną oś czasu przez animation-delay: -1.5s
+ */
+
+@layer utilities {
+  /* Bazowa animacja skeleton — jedna dla całej strony */
+  @keyframes skeleton-shimmer {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  .skeleton {
+    animation: skeleton-shimmer 2s ease-in-out infinite;
+
+    /*
+     * KLUCZOWE: ujemny delay = "animacja już trwa 1.5s"
+     * Każdy nowy element skeleton który pojawi się na stronie będzie
+     * w tej samej fazie co wszystkie pozostałe.
+     * Wartość: -1.5s = pół okresu animacji 2s (faza ≈ 75% cyklu → zbliżamy się do końca).
+     * Można użyć dowolnej ujemnej wartości — ważne żeby była ta sama dla wszystkich.
+     */
+    animation-delay: -1.5s;
+  }
+
+  /*
+   * Wariant shimmer z gradientem — bardziej nowoczesny look.
+   * Użyj klasy `skeleton-shimmer-gradient` zamiast `skeleton` dla bogatszego efektu.
+   */
+  @keyframes skeleton-slide {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .skeleton-gradient {
+    background: linear-gradient(
+      90deg,
+      theme('colors.zinc.200') 25%,
+      theme('colors.zinc.100') 50%,
+      theme('colors.zinc.200') 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-slide 1.8s ease-in-out infinite;
+    animation-delay: -0.9s; /* połowa okresu = synchronizacja */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .skeleton-gradient {
+      background: linear-gradient(
+        90deg,
+        theme('colors.zinc.700') 25%,
+        theme('colors.zinc.600') 50%,
+        theme('colors.zinc.700') 75%
+      );
+      background-size: 200% 100%;
+    }
+  }
+
+  /* Wyłącz animacje gdy user preferuje reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton,
+    .skeleton-gradient {
+      animation: none;
+    }
+  }
+}

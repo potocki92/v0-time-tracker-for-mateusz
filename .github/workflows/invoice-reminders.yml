@@ -1,0 +1,53 @@
+# .github/workflows/invoice-reminders.yml
+#
+# Fallback dla Supabase Free tier który nie ma pg_cron.
+# GitHub Actions schedule woła Edge Function codziennie o 9:00 UTC.
+#
+# Na Supabase Pro: wyłącz ten workflow i użyj pg_cron z migracji SQL.
+
+name: Invoice Reminders
+
+on:
+  schedule:
+    # Codziennie o 9:00 UTC (10:00 lub 11:00 polskiego czasu)
+    - cron: '0 9 * * *'
+  # Możliwość ręcznego wywołania z GitHub UI
+  workflow_dispatch:
+
+jobs:
+  send-reminders:
+    name: Send Invoice Reminders
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Invoke Edge Function
+        run: |
+          RESPONSE=$(curl --silent --show-error --fail \
+            --request POST \
+            --url "${{ secrets.SUPABASE_URL }}/functions/v1/send-invoice-reminders" \
+            --header "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            --header "Content-Type: application/json" \
+            --data '{}')
+
+          echo "Response: $RESPONSE"
+
+          # Fail job jeśli serwer zwrócił błąd
+          echo "$RESPONSE" | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          if 'error' in data:
+              print(f'ERROR: {data[\"error\"]}')
+              sys.exit(1)
+          print(f'Sent: {data.get(\"sent\", 0)}, Failed: {data.get(\"failed\", 0)}')
+          "
+
+      # Opcjonalnie: wyślij raport na Slack/Discord gdy coś się nie uda
+      - name: Notify on failure
+        if: failure()
+        run: |
+          curl --silent \
+            --request POST \
+            --url "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            --header 'Content-Type: application/json' \
+            --data '{"text": "⚠️ Invoice reminders job failed! Check GitHub Actions."}'

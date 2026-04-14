@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { DefaultFallback } from './ErrorBoundary.fallback'
+import { captureError } from '@/lib/monitoring/sentry'
 import type {
   ErrorBoundaryProps,
   ErrorBoundaryState,
@@ -13,7 +14,7 @@ import type {
  * Hooki nie mogą łapać błędów renderowania.
  *
  * @example
- * <ErrorBoundary sectionName="Chart" onError={Sentry.captureException}>
+ * <ErrorBoundary sectionName="Chart" onError={customCallback}>
  *   <EarningsChart />
  * </ErrorBoundary>
  */
@@ -22,7 +23,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   constructor(props: ErrorBoundaryProps) {
     super(props)
-    this.state  = { hasError: false, error: null, componentStack: null }
+    this.state      = { hasError: false, error: null, componentStack: null }
     this.resetError = this.resetError.bind(this)
   }
 
@@ -35,13 +36,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     this.setState({ componentStack: info.componentStack ?? null })
 
-    // Podmień console.error na Sentry.captureException w produkcji
-    console.error(
-      `[ErrorBoundary${sectionName ? ` :: ${sectionName}` : ''}]`,
-      error,
-      info.componentStack,
-    )
+    // #11 — Sentry zamiast console.error.
+    // Każdy błąd jest tagowany nazwą sekcji → łatwe filtrowanie w Sentry UI.
+    // componentStack trafia do `extra` — widoczny w zakładce "Additional Data".
+    captureError(error, sectionName ?? 'unknown', {
+      extra: { componentStack: info.componentStack },
+    })
 
+    // Callback dla rodzica (np. dodatkowy custom logger) — zachowany bez zmian.
     onError?.(error, info)
   }
 
@@ -55,16 +57,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     if (!hasError || !error) return children
 
-    // Przekazany komponent jako fallback
     if (typeof fallback === 'function') {
       const Fallback = fallback as FallbackComponent
       return <Fallback error={error} resetError={this.resetError} componentStack={componentStack} />
     }
 
-    // Przekazany ReactNode jako fallback
     if (fallback !== undefined) return fallback
 
-    // Domyślny fallback
     return (
       <DefaultFallback
         error={error}

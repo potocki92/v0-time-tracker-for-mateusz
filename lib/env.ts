@@ -76,17 +76,17 @@ const serverSchema = z.object({
 // ✅  Te zmienne MOGĄ mieć prefiks NEXT_PUBLIC_ — trafiają do bundle klienta.
 // Żadnych sekretów tutaj. Zasada: jeśli nie chcesz żeby user to widział → nie tutaj.
 
-const clientSchema = z.object({
-  // Supabase — tylko anon key (ograniczone uprawnienia, bezpieczne publicznie)
+export const clientSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL:      urlSchema,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z
-    .string()
-    .min(1, 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required'),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
 
-  // Sentry publiczny DSN (frontend error tracking — inny niż server DSN)
+  // Klucz publiczny VAPID do Web Push — bezpieczny do eksponowania
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z
+    .string()
+    .min(1, 'NEXT_PUBLIC_VAPID_PUBLIC_KEY is required — wygeneruj przez: npx web-push generate-vapid-keys'),
+
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 
-  // Feature flags (można eksponować publicznie)
   NEXT_PUBLIC_ENABLE_RATE_LIMIT: z
     .enum(['true', 'false'])
     .default('true')
@@ -94,6 +94,7 @@ const clientSchema = z.object({
 
   NEXT_PUBLIC_APP_URL: urlSchema.default('http://localhost:3000'),
 })
+
 
 // ── Audit: blokada sekretów w NEXT_PUBLIC_ ────────────────────────────────────
 
