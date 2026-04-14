@@ -21,7 +21,7 @@ interface Props {
 
 export function MobileHeader({ user, onLogout }: Props) {
   return (
-    <header className="md:hidden flex h-14 items-center justify-between border-b bg-background px-4">
+    <header className="flex h-14 items-center justify-between border-b bg-background px-4">
       {/* Trigger otwierający sidebar jako sheet z lewej */}
       <SidebarTrigger className="-ml-1" />
 
