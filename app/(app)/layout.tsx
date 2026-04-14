@@ -1,8 +1,8 @@
 'use client'
 
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
-import { AppSidebar } from './_layout/components/sidebar/AppSidebar'
 import { useAuth }    from './_layout/hooks/useAuth'
+import { AppSidebar } from './_layout/components/sidebar/AppSidebar'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth()
