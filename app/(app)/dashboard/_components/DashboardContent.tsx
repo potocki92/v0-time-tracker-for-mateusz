@@ -1,12 +1,13 @@
+// app/(app)/dashboard/_components/DashboardContent.tsx
 'use client'
 
 import { useState, useMemo }          from 'react'
 import { useDashboardData }           from '../_hooks'
 import { useFilteredEntries }         from '../_hooks/useFilteredEntries'
 import { useEarningsTrend }           from '../_hooks/useEarningsTrend'
-import { useDashboardTotals }         from '../_hooks/useDashboardTotals'
 import { usePeriodLabel }             from '../_hooks/usePeriodLabel'
 import { useUnpaidInvoices }          from '../_hooks/useUnpaidInvoices'
+import { useEffectiveEurRate }        from '../_hooks/usePreferencesStore'  // ⬅ NOWE
 import { getDateRange, getPrevRange } from '@/lib/date/dateRange'
 import type { TimeRange }             from '../_domain/dashboard.types'
 import { DashboardHeader }            from './DashboardHeader'
@@ -20,26 +21,33 @@ import {
   StatsErrorBoundary,
   EarningsCardBoundary,
   GoalCardBoundary,
-}                                     from './errors'
+} from './errors'
 import { InvoicesList } from './invoices'
+import { useDashboardTotals } from '../_hooks/useDashboardTotal'
 
 export function DashboardContent() {
-  const { data }   = useDashboardData()
+  const { data } = useDashboardData()
   const [range, setRange] = useState<TimeRange>('current_week')
 
-  const { eurToPlnRate: eurRate, userName, workEntries, clients, invoices } = data
+  // ⬅ ZMIANA: eurToPlnRate nie jest już częścią data
+  const { userName, workEntries, clients, invoices } = data
+
+  // ⬅ NOWE: kurs czytany ze store (Zustand)
+  // Automatycznie rerenderuje komponent gdy dashboard.service wykona setLiveRate()
+  const eurRate = useEffectiveEurRate()
 
   const dateRange      = useMemo(() => getDateRange(range),     [range])
   const prevRange      = useMemo(() => getPrevRange(dateRange), [dateRange])
   const filtered       = useFilteredEntries(workEntries, dateRange)
   const prevFiltered   = useFilteredEntries(workEntries, prevRange)
-  const totals         = useDashboardTotals(filtered, clients, eurRate)
-  const trend          = useEarningsTrend(filtered, prevFiltered, clients, eurRate)
+
+  const totals         = useDashboardTotals(filtered, clients)
+  const trend          = useEarningsTrend(filtered, prevFiltered, clients)
   const unpaidInvoices = useUnpaidInvoices(invoices)
   const periodLabel    = usePeriodLabel(range)
   const clientsCount   = useMemo(
     () => new Set(filtered.map((e) => e.client_id).filter(Boolean)).size,
-    [filtered]
+    [filtered],
   )
 
   return (
@@ -55,7 +63,8 @@ export function DashboardContent() {
         <EarningsCardBoundary>
           <EarningsCard
             totalPLN={totals.totalEarningsAllPLN}
-            totalEUR={totals.earningsEUR}
+            earningsPLN={totals.earningsPLN}
+            earningsEUR={totals.earningsEUR}
             trend={trend}
           />
         </EarningsCardBoundary>

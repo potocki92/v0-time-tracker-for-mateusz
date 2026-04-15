@@ -1,3 +1,10 @@
+export interface WorkEntriesFilter {
+  from?: string  // ISO date
+  to?: string
+  clientId?: string
+  projectId?: string
+}
+
 /**
  * Centralne klucze zapytań TanStack Query.
  * Hierarchia umożliwia granularną inwalidację przez prefiks.
@@ -10,7 +17,8 @@ export const QUERY_KEYS = {
   all:         () => ['dashboard-module']                    as const,
   dashboard:   () => [...QUERY_KEYS.all(), 'data']           as const,
   invoices:    () => [...QUERY_KEYS.all(), 'invoices']       as const,
-  workEntries: () => [...QUERY_KEYS.all(), 'work-entries']   as const,
+  workEntries: (filter?: WorkEntriesFilter) =>
+    [...QUERY_KEYS.all(), 'work-entries', filter ?? {}] as const,
   clients:     () => [...QUERY_KEYS.all(), 'clients']        as const,
   eurRate:     () => [...QUERY_KEYS.all(), 'eur-rate']       as const,
 } as const

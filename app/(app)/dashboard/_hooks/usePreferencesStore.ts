@@ -25,6 +25,7 @@ export interface UserPreferences {
   eurToPln:         number
   /** Czy używać live rate zamiast własnego */
   useLiveRate:      boolean
+  liveEurRate:     number | null
   /** Cel miesięczny */
   goal:             Goal | null
   /** Domyślna waluta wyświetlania */
@@ -34,7 +35,8 @@ export interface UserPreferences {
 interface PreferencesActions {
   setEurToPln:        (rate: number) => void
   toggleLiveRate:     () => void
-  setGoal:            (goal: Goal | null) => void
+  setLiveRate:        (rate: number | null) => void
+  setGoal:         (goal: Goal | null) => void
   setDisplayCurrency: (currency: Currency) => void
   /** Nadpisuje cały store danymi z Supabase (wywoływane raz przy mount) */
   hydrate:            (partial: Partial<UserPreferences>) => void
@@ -49,6 +51,7 @@ export type PreferencesStore = UserPreferences & PreferencesActions
 const DEFAULTS: UserPreferences = {
   eurToPln:        DEFAULT_EUR_TO_PLN,
   useLiveRate:     true,
+  liveEurRate: null,
   goal:            null,
   displayCurrency: 'PLN',
 }
@@ -70,6 +73,9 @@ export const usePreferencesStore = create<PreferencesStore>()(
         set((s) => {
           s.useLiveRate = !s.useLiveRate
         }),
+
+      setLiveRate: (rate: number | null) =>
+          set((s) => { s.liveEurRate = rate }),
 
       setGoal: (goal) =>
         set((s) => { s.goal = goal }),
@@ -93,7 +99,7 @@ export const usePreferencesStore = create<PreferencesStore>()(
       name:    'user-preferences',           // klucz w localStorage
       storage: createJSONStorage(() => localStorage),
       // Serializujemy tylko preferencje, nie akcje
-      partialize: (state): UserPreferences => ({
+      partialize: (state) => ({
         eurToPln:        state.eurToPln,
         useLiveRate:     state.useLiveRate,
         goal:            state.goal,
@@ -103,25 +109,26 @@ export const usePreferencesStore = create<PreferencesStore>()(
   ),
 )
 
-// ── Selektory ─────────────────────────────────────────────────────────────────
-// Wyciągaj konkretne pola przez selektory — komponent rerenderuje się tylko
-// gdy TO pole się zmienia, nie gdy zmieni się cokolwiek w storze.
+import { useShallow } from 'zustand/react/shallow'
+import { usePDF } from '@react-pdf/renderer'
 
-export const selectEurRate          = (s: PreferencesStore) => s.eurToPln
-export const selectGoal             = (s: PreferencesStore) => s.goal
-export const selectDisplayCurrency  = (s: PreferencesStore) => s.displayCurrency
-export const selectUseliverate      = (s: PreferencesStore) => s.useLiveRate
-export const selectSetGoal          = (s: PreferencesStore) => s.setGoal
-export const selectSetEurToPln      = (s: PreferencesStore) => s.setEurToPln
+// ── Selektory atomowe (preferowane) ──────────────────────────────────────────
+export const useEurToPln        = () => usePreferencesStore((s) => s.eurToPln)
+export const useUseLiveRate     = () => usePreferencesStore((s) => s.useLiveRate)
+export const useLiveEurRate     = () => usePreferencesStore((s) => s.liveEurRate)
+export const useGoal            = () => usePreferencesStore((s) => s.goal)
+export const useDisplayCurrency = () => usePreferencesStore((s) => s.displayCurrency)
 
-// ── Convenience hooks ─────────────────────────────────────────────────────────
+// Akcje są stabilne (Zustand nie rerenderuje)
+export const useSetEurToPln     = () => usePreferencesStore((s) => s.setEurToPln)
+export const useSetGoal         = () => usePreferencesStore((s) => s.setGoal)
+export const useToggleLiveRate  = () => usePreferencesStore((s) => s.toggleLiveRate)
 
-/** Zwraca efektywny kurs: live (z props) albo własny z preferencji */
-export function useEffectiveEurRate(liveRate: number | null): number {
-  const { eurToPln, useLiveRate } = usePreferencesStore((s) => ({
-    eurToPln:    s.eurToPln,
-    useLiveRate: s.useLiveRate,
-  }))
-  if (useLiveRate && liveRate !== null) return liveRate
+// Convenience hook — ZAWSZE z useShallow gdy zwracasz obiekt
+export function useEffectiveEurRate(): number {
+  const { eurToPln, useLiveRate, liveEurRate } = usePreferencesStore(
+    useShallow((s) => ({ eurToPln: s.eurToPln, useLiveRate: s.useLiveRate, liveEurRate: s.liveEurRate })),
+  )
+  if (useLiveRate && liveEurRate !== null) return liveEurRate
   return eurToPln
 }

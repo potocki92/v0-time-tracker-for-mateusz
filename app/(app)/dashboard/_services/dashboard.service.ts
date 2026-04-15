@@ -41,29 +41,31 @@ function resolveUserName(metadata: Record<string, unknown>, email?: string): str
 // ── Service ───────────────────────────────────────────────────────────────────
 
 export async function getDashboardData(): Promise<DashboardData> {
-  const user     = await fetchCurrentUser()
-  const metadata = (user.user_metadata ?? {}) as Record<string, unknown>
-
-  // Pobieramy live rate równolegle z danymi — nie blokuje renderowania
-  const [eurRateLive, clients, workEntries, invoices] = await Promise.all([
+  // Krok 1: user + eurRate równolegle (eurRate nie potrzebuje <user.id>)
+  const [user, eurRateLive] = await Promise.all([
+    fetchCurrentUser(),
     fetchEurRate(),
+  ])
+
+  // Krok 2: wszystkie dane usera równolegle
+  const [clients, workEntries, invoices] = await Promise.all([
     fetchClients(user.id),
     fetchWorkEntries(user.id),
     fetchInvoices(user.id),
   ])
 
-  // Live rate trafia do store — komponent decyduje czy go używa
+  // Live rate — fire and forget update do storu
   if (eurRateLive !== null) {
-    // Aktualizujemy live rate w store bez zmiany preferencji użytkownika
-    usePreferencesStore.setState({ useLiveRate: eurRateLive })
+    // BUG w starym kodzie: wpisywałeś rate do pola useLiveRate (boolean)
+    // Powinno trafić do osobnego pola lub być przekazane przez return
+    usePreferencesStore.getState().setLiveRate(eurRateLive)
   }
 
-  // eurToPlnRate NIE jest już częścią DashboardData — czytaj z usePreferencesStore
+  const metadata = (user.user_metadata ?? {}) as Record<string, unknown>
   return {
     userName: resolveUserName(metadata, user.email),
     clients,
     workEntries,
     invoices,
-    // Usunięto: eurToPlnRate — zastąpione przez usePreferencesStore(selectEurRate)
   }
 }

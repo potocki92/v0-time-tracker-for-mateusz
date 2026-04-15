@@ -13,7 +13,6 @@ export type ChartGrouping = 'daily' | 'weekly' | 'monthly'
 
 export type DashboardData = {
   userName: string
-  eurToPlnRate: number
   clients: Client[]
   workEntries: WorkEntry[]
   invoices: Invoice[]
