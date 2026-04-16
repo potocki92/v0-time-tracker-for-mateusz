@@ -8,7 +8,6 @@ export function selectTotals(
   return calculateMonthlyTotals(
     data.workEntries,
     data.clients,
-    data.eurToPlnRate
   )
 }
 
