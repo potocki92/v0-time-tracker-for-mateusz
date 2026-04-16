@@ -1,214 +1,208 @@
-// app/(app)/dashboard/_components/card/EarningsCard.tsx
 'use client'
 
-import { memo } from 'react'
+import React, { memo } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Wallet, TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import { LineChart, Line, ResponsiveContainer, Tooltip, YAxis } from 'recharts'
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  ArrowUpRight,
+  ArrowDownRight,
+} from 'lucide-react'
 import { formatCurrency } from '@/lib/helpers'
-import { cn } from '@/lib/utils'
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip,
+  type TooltipProps,
+} from 'recharts'
+import type { EarningsTrendData } from '../../_hooks/useEarningsTrend'
 import type { SparklinePoint } from '../../_hooks/useEarningsSparkline'
 
-interface EarningsCardProps {
-  /** Suma wszystkich zarobków w PLN (EUR już przeliczone) */
-  totalPLN:       number
-  /** Tylko zarobki rozliczane pierwotnie w PLN */
-  earningsPLN:    number
-  /** Tylko zarobki rozliczane pierwotnie w EUR (przed konwersją) */
-  earningsEUR:    number
-  /** % zmiany vs poprzedni okres — null gdy brak danych porównawczych */
-  trend?:         number | null
-  /** Dane dzienne do sparkline — min. 2 punkty by coś narysować */
-  sparklineData?: SparklinePoint[]
-  /** Etykieta okresu pod nagłówkiem (np. "Ten tydzień") */
-  periodLabel?:   string
-}
+// ── Trend configuration ─────────────────────────────────────────────────────
 
-// ── Konfiguracja kolorystyczna per kierunek trendu ───────────────────────────
 const TREND_CONFIG = {
   up: {
-    Icon:       TrendingUp,
-    textColor:  'text-emerald-600 dark:text-emerald-400',
-    bgColor:    'bg-emerald-500/10',
-    ringColor:  'ring-emerald-500/20',
-    sparkStop:  '#10b981',
-    glowColor:  'rgba(16, 185, 129, 0.18)',
+    Icon: TrendingUp,
+    Arrow: ArrowUpRight,
+    badge: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+    glow: 'from-emerald-500/20 via-emerald-500/5',
+    stroke: '#10b981',
+    fill: '#10b981',
+    border: 'border-emerald-500/20',
+    diffText: 'text-emerald-600 dark:text-emerald-400',
+    label: 'więcej',
   },
   down: {
-    Icon:       TrendingDown,
-    textColor:  'text-red-600 dark:text-red-400',
-    bgColor:    'bg-red-500/10',
-    ringColor:  'ring-red-500/20',
-    sparkStop:  '#ef4444',
-    glowColor:  'rgba(239, 68, 68, 0.18)',
+    Icon: TrendingDown,
+    Arrow: ArrowDownRight,
+    badge: 'bg-red-500/15 text-red-500 dark:text-red-400',
+    glow: 'from-red-500/20 via-red-500/5',
+    stroke: '#ef4444',
+    fill: '#ef4444',
+    border: 'border-red-500/20',
+    diffText: 'text-red-500 dark:text-red-400',
+    label: 'mniej',
   },
   neutral: {
-    Icon:       Minus,
-    textColor:  'text-muted-foreground',
-    bgColor:    'bg-muted/30',
-    ringColor:  'ring-border',
-    sparkStop:  '#94a3b8',
-    glowColor:  'rgba(148, 163, 184, 0.12)',
+    Icon: Minus,
+    Arrow: Minus,
+    badge: 'bg-muted text-muted-foreground',
+    glow: 'from-primary/10 via-primary/5',
+    stroke: '#6b7280',
+    fill: '#6b7280',
+    border: 'border-primary/20',
+    diffText: 'text-muted-foreground',
+    label: 'bez zmian',
   },
 } as const
 
-function resolveTrend(trend: number | null | undefined): keyof typeof TREND_CONFIG {
-  if (trend == null) return 'neutral'
-  if (trend >   0.1) return 'up'
-  if (trend <  -0.1) return 'down'
+type TrendKey = keyof typeof TREND_CONFIG
+
+function getTrendKey(percent: number | null): TrendKey {
+  if (percent === null) return 'neutral'
+  if (percent > 0) return 'up'
+  if (percent < 0) return 'down'
   return 'neutral'
 }
 
+// ── Custom sparkline tooltip ─────────────────────────────────────────────────
+
+function SparklineTooltip({ active, payload }: TooltipProps<number, string>) {
+  if (!active || !payload?.[0]) return null
+  const { label, value } = payload[0].payload as SparklinePoint
+  return (
+    <div className="rounded-md border bg-popover px-2.5 py-1.5 text-xs shadow-md">
+      <p className="font-medium">{label}</p>
+      <p className="text-muted-foreground">{formatCurrency(value, 'PLN')}</p>
+    </div>
+  )
+}
+
+// ── Props ────────────────────────────────────────────────────────────────────
+
+type Props = {
+  totalPLN: number
+  totalEUR: number
+  trend: EarningsTrendData
+  sparklineData?: SparklinePoint[]
+  periodLabel?: string
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
-function EarningsCardImpl({
+
+export const EarningsCard = memo(function EarningsCard({
   totalPLN,
-  earningsPLN,
-  earningsEUR,
+  totalEUR,
   trend,
   sparklineData = [],
   periodLabel,
-}: EarningsCardProps) {
-  const direction = resolveTrend(trend)
-  const cfg       = TREND_CONFIG[direction]
-  const TrendIcon = cfg.Icon
-
-  const hasTrend     = trend !== null && trend !== undefined
+}: Props) {
+  const trendKey = getTrendKey(trend.percent)
+  const cfg = TREND_CONFIG[trendKey]
+  const hasTrend = trend.percent !== null
   const hasSparkline = sparklineData.length >= 2
 
   return (
-    <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
-      {/* ── Decorative animated glow ──────────────────────────────────────── */}
+    <Card className={`relative overflow-hidden ${cfg.border}`}>
+      {/* ── Gradient glow ──────────────────────────────────── */}
       <div
-        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full blur-3xl transition-colors duration-700"
-        style={{ backgroundColor: cfg.glowColor }}
-        aria-hidden
+        className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${cfg.glow} to-transparent blur-2xl`}
       />
 
-      {/* ── Background grid pattern (SVG) ─────────────────────────────────── */}
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full text-foreground opacity-[0.025]"
-        aria-hidden
-      >
-        <defs>
-          <pattern id="earnings-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" strokeWidth="0.5" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#earnings-grid)" />
-      </svg>
-
-      {/* ── Header: Wallet icon + title + trend badge ─────────────────────── */}
-      <CardHeader className="relative pb-2">
-        <div className="flex items-start justify-between gap-2">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          {/* Left: icon + title */}
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20 shadow-sm">
-              <Wallet className="h-4 w-4 text-primary" aria-hidden />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
+              <Wallet className="h-4.5 w-4.5 text-primary" />
             </div>
-            <div className="flex flex-col leading-tight">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Zarobki
-              </span>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Zarobki</p>
               {periodLabel && (
-                <span className="text-[10px] text-muted-foreground/70">
-                  {periodLabel}
-                </span>
+                <p className="text-[11px] text-muted-foreground/60">{periodLabel}</p>
               )}
             </div>
           </div>
 
+          {/* Right: trend badge */}
           {hasTrend && (
-            <div
-              className={cn(
-                'inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ring-1',
-                cfg.bgColor,
-                cfg.textColor,
-                cfg.ringColor,
-              )}
-              aria-label={`Trend: ${trend!.toFixed(1)} procent`}
-            >
-              <TrendIcon className="h-3.5 w-3.5" aria-hidden />
-              <span className="tabular-nums">
-                {trend! > 0 ? '+' : ''}
-                {trend!.toFixed(1)}%
-              </span>
+            <div className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${cfg.badge}`}>
+              <cfg.Icon className="h-3.5 w-3.5" />
+              {trend.percent! > 0 ? '+' : ''}
+              {trend.percent!.toFixed(1)}%
             </div>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="relative space-y-3">
-        {/* ── Main amount ─────────────────────────────────────────────────── */}
+      <CardContent className="space-y-3">
+        {/* ── Main amount ──────────────────────────────────── */}
         <div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-3xl font-bold tracking-tight text-transparent tabular-nums">
-              {formatCurrency(totalPLN, 'PLN')}
-            </span>
+          <div className="text-3xl font-bold tracking-tight">
+            {formatCurrency(totalPLN, 'PLN')}
           </div>
-
-          {/* Breakdown PLN / EUR */}
-          {(earningsPLN > 0 || earningsEUR > 0) && (
-            <div className="mt-1.5 flex items-center gap-2 text-xs text-muted-foreground">
-              {earningsPLN > 0 && (
-                <span className="tabular-nums">
-                  PLN {formatCurrency(earningsPLN, 'PLN')}
-                </span>
-              )}
-              {earningsPLN > 0 && earningsEUR > 0 && (
-                <span className="h-3 w-px bg-border" aria-hidden />
-              )}
-              {earningsEUR > 0 && (
-                <span className="tabular-nums">
-                  EUR {formatCurrency(earningsEUR, 'EUR')}
-                </span>
-              )}
-            </div>
+          {totalEUR > 0 && (
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              w tym {formatCurrency(totalEUR, 'EUR')}
+            </p>
           )}
         </div>
 
-        {/* ── Sparkline ───────────────────────────────────────────────────── */}
+        {/* ── Trend comparison section ─────────────────────── */}
+        {hasTrend && trend.prevTotal > 0 && (
+          <div className="flex items-center gap-3 rounded-lg bg-muted/40 px-3 py-2">
+            <div className={`flex items-center gap-1 text-sm font-medium ${cfg.diffText}`}>
+              <cfg.Arrow className="h-4 w-4" />
+              <span>{formatCurrency(Math.abs(trend.diff), 'PLN')}</span>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {cfg.label} niż poprzedni okres
+            </span>
+          </div>
+        )}
+
+        {/* ── Previous period reference ────────────────────── */}
+        {trend.prevTotal > 0 && (
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>Poprzedni okres</span>
+            <span className="font-medium tabular-nums">
+              {formatCurrency(trend.prevTotal, 'PLN')}
+            </span>
+          </div>
+        )}
+
+        {/* ── Sparkline ────────────────────────────────────── */}
         {hasSparkline && (
-          <div className="-mx-1 h-14" aria-hidden>
+          <div className="h-16 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={sparklineData} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+              <AreaChart data={sparklineData} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
                 <defs>
-                  <linearGradient id="sparkline-stroke" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%"   stopColor={cfg.sparkStop} stopOpacity={0.35} />
-                    <stop offset="100%" stopColor={cfg.sparkStop} stopOpacity={1} />
+                  <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={cfg.fill} stopOpacity={0.25} />
+                    <stop offset="100%" stopColor={cfg.fill} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <YAxis hide domain={['dataMin', 'dataMax']} />
-                <Line
+                <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="url(#sparkline-stroke)"
+                  stroke={cfg.stroke}
                   strokeWidth={2}
+                  fill="url(#sparkFill)"
                   dot={false}
-                  activeDot={{ r: 3, fill: cfg.sparkStop, strokeWidth: 0 }}
-                  isAnimationActive
-                  animationDuration={700}
+                  activeDot={{ r: 3, strokeWidth: 1.5, fill: 'var(--background)' }}
                 />
                 <Tooltip
-                  cursor={{ stroke: cfg.sparkStop, strokeOpacity: 0.3, strokeWidth: 1 }}
-                  content={({ active, payload }) => {
-                    if (!active || !payload?.length) return null
-                    const point = payload[0]
-                    return (
-                      <div className="rounded-md border bg-background/95 px-2 py-1 text-xs shadow-sm backdrop-blur">
-                        <div className="font-medium">{point.payload.label}</div>
-                        <div className="text-muted-foreground tabular-nums">
-                          {formatCurrency(Number(point.value), 'PLN')}
-                        </div>
-                      </div>
-                    )
-                  }}
+                  content={<SparklineTooltip />}
+                  cursor={false}
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         )}
       </CardContent>
     </Card>
   )
-}
-
-export const EarningsCard = memo(EarningsCardImpl)
+})

@@ -3,22 +3,36 @@ import type { WorkEntry, Client } from '@/lib/types'
 import { calculateMonthlyTotals } from '@/lib/helpers'
 import { useEffectiveEurRate } from './usePreferencesStore'
 
+export type EarningsTrendData = {
+  /** Procentowa zmiana (null jeśli brak danych z poprzedniego okresu) */
+  percent: number | null
+  /** Suma zarobków w bieżącym okresie (PLN) */
+  currentTotal: number
+  /** Suma zarobków w poprzednim okresie (PLN) */
+  prevTotal: number
+  /** Różnica bezwzględna w PLN (current - prev) */
+  diff: number
+}
+
 export function useEarningsTrend(
   currentEntries: WorkEntry[],
   prevEntries: WorkEntry[],
   clients: Client[],
-): number | null {
-  // ⬅ ZMIANA: useEffectiveEurRate zamiast selectEurRate
-  const eurRate = useEffectiveEurRate()
+): EarningsTrendData {
+  const eurRate = usePreferencesStore(selectEurRate)
 
   return useMemo(() => {
     const current = calculateMonthlyTotals(currentEntries, clients, eurRate)
-    const prev    = calculateMonthlyTotals(prevEntries,   clients, eurRate)
-    if (prev.totalEarningsAllPLN <= 0) return null
-    return (
-      ((current.totalEarningsAllPLN - prev.totalEarningsAllPLN) /
-        prev.totalEarningsAllPLN) *
-      100
-    )
+    const prev    = calculateMonthlyTotals(prevEntries,    clients, eurRate)
+
+    const currentTotal = current.totalEarningsAllPLN
+    const prevTotal    = prev.totalEarningsAllPLN
+    const diff         = currentTotal - prevTotal
+
+    const percent = prevTotal > 0
+      ? (diff / prevTotal) * 100
+      : null
+
+    return { percent, currentTotal, prevTotal, diff }
   }, [currentEntries, prevEntries, clients, eurRate])
 }
