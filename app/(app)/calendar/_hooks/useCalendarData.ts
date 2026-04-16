@@ -4,13 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Client, Project, WorkEntry } from '@/lib/types'
 import {
-  calculateEarnings,
   formatCurrency,
   getDateString,
   getDaysInMonth,
   getFirstDayOfMonth,
   isFutureDate,
 } from '@/lib/helpers'
+import { calculateEarnings } from '@/lib/finance/earnings'
 import { toast } from 'sonner'
 
 export type WorkStatus = 'worked' | 'not_worked' | 'vacation' | 'sick_leave' | 'day_off'

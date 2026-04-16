@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { calculateEarnings } from '@/lib/helpers'
+import { calculateEarnings } from '@/lib/finance/earnings'
 import { Client, WorkEntry } from '@/lib/types'
 import { useFilteredEntries } from '../../../_hooks/useFilteredEntries'
 import { useChartData } from '../../../_hooks/useChartData'
@@ -37,7 +37,7 @@ export function useChartMetrics(
       const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
       const e = calculateEarnings(entry, client, eurToPlnRate)
       pln += e.amountInPLN
-      if (e.currency === 'EUR') eur += e.amount
+      eur += e.amountInEUR
     }
     return { pln, eur }
   }, [filteredEntries, clients, eurToPlnRate])

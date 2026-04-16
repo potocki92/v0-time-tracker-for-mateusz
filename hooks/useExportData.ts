@@ -13,7 +13,7 @@
 
 import { useCallback, useState } from 'react'
 import type { WorkEntry, Client } from '@/lib/types'
-import { calculateEarnings } from '@/lib/helpers'
+import { calculateEarnings } from '@/lib/finance/earnings'
 
 // ── Typy ──────────────────────────────────────────────────────────────────────
 
@@ -62,7 +62,7 @@ function buildRows(
         project:     entry.project_id    ?? '—',
         hours:       entry.hours         ?? 0,
         earningsPLN: Number(earnings.amountInPLN.toFixed(2)),
-        earningsEUR: earnings.currency === 'EUR' ? Number(earnings.amount.toFixed(2)) : 0,
+        earningsEUR: Number(earnings.amountInEUR.toFixed(2)),
         status:      entry.status,
       }
     })

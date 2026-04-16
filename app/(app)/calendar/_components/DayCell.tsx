@@ -1,5 +1,6 @@
 import type { Client, CURRENCY, WorkEntry } from '@/lib/types'
-import { calculateEarnings, formatCurrency, getDateString, isFutureDate } from '@/lib/helpers'
+import { formatCurrency, getDateString, isFutureDate } from '@/lib/helpers'
+import { calculateEarnings } from '@/lib/finance/earnings'
 import { STATUS_LABELS } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
