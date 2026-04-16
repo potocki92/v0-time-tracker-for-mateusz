@@ -3,11 +3,13 @@ import { DashboardData } from './dashboard.types'
 import { MonthlyTotals, Invoice } from '@/lib/types'
 
 export function selectTotals(
-  data: DashboardData
+  data: DashboardData,
+  eurRate: number
 ): MonthlyTotals {
   return calculateMonthlyTotals(
     data.workEntries,
     data.clients,
+    eurRate
   )
 }
 
