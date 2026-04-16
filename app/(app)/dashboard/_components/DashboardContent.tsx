@@ -6,11 +6,10 @@ import { useDashboardData }           from '../_hooks'
 import { useFilteredEntries }         from '../_hooks/useFilteredEntries'
 import { useEarningsTrend }           from '../_hooks/useEarningsTrend'
 import { useEarningsSparkline }       from '../_hooks/useEarningsSparkline'
-import { useDashboardTotals }         from '../_hooks/useDashboardTotals'
 import { usePeriodLabel }             from '../_hooks/usePeriodLabel'
 import { useUnpaidInvoices }          from '../_hooks/useUnpaidInvoices'
-import { useEffectiveEurRate }        from '../_hooks/usePreferencesStore'  // ⬅ NOWE
-import { getDateRange } from '@/lib/date/dateRange'
+import { useEffectiveEurRate, useGoal } from '../_hooks/usePreferencesStore'
+import { getDateRange, getPrevRange } from '@/lib/date/dateRange'
 import type { TimeRange }             from '../_domain/dashboard.types'
 import { DashboardHeader }            from './DashboardHeader'
 import { EarningsCard }               from './card/EarningsCard'
@@ -31,15 +30,13 @@ export function DashboardContent() {
   const { data } = useDashboardData()
   const [range, setRange] = useState<TimeRange>('current_week')
 
-  // ⬅ ZMIANA: eurToPlnRate nie jest już częścią data
   const { userName, workEntries, clients, invoices } = data
 
-  // ⬅ NOWE: kurs czytany ze store (Zustand)
-  // Automatycznie rerenderuje komponent gdy dashboard.service wykona setLiveRate()
   const eurRate = useEffectiveEurRate()
+  const goal    = useGoal()
 
   const dateRange      = useMemo(() => getDateRange(range),     [range])
-  // const prevRange      = useMemo(() => getPrevRange(dateRange), [dateRange])
+  const prevRange      = useMemo(() => getPrevRange(dateRange), [dateRange])
   const filtered       = useFilteredEntries(workEntries, dateRange)
   const prevFiltered   = useFilteredEntries(workEntries, prevRange)
   const totals         = useDashboardTotals(filtered, clients)
@@ -74,9 +71,9 @@ export function DashboardContent() {
 
         <GoalCardBoundary>
           <GoalCard
-            progress={(totals.totalEarningsAllPLN / 15000) * 100}
-            target={15000}
-            currency="PLN"
+            progress={goal?.amount ? (totals.totalEarningsAllPLN / goal.amount) * 100 : 0}
+            target={goal?.amount ?? 0}
+            currency={goal?.currency ?? 'PLN'}
           />
         </GoalCardBoundary>
       </div>

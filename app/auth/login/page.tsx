@@ -31,25 +31,19 @@ export default function LoginPage() {
       })
 
       if (error) {
-        toast.error('Nieprawidlowy email lub haslo')
+        toast.error('Nieprawidłowy email lub hasło')
         return
       }
 
       if (!data.session) {
-        toast.error('Nie udalo sie utworzyc sesji. Sprobuj ponownie.')
+        toast.error('Nie udało się utworzyć sesji. Spróbuj ponownie.')
         return
       }
 
-      toast.success('Zalogowano pomyslnie!')
+      toast.success('Zalogowano pomyślnie!')
 
-      // Navigate through App Router first, then force refresh and fallback to full reload
-      // to ensure middleware sees fresh auth cookies in every environment.
-      router.replace('/dashboard')
-      router.refresh()
-
-      setTimeout(() => {
-        window.location.assign('/dashboard')
-      }, 150)
+      // Full page navigation ensures middleware sees fresh auth cookies.
+      window.location.assign('/dashboard')
     } finally {
       setIsLoading(false)
     }
@@ -70,9 +64,9 @@ export default function LoginPage() {
         {/* Login Card */}
         <Card className="border-0 shadow-xl shadow-black/5 dark:shadow-black/20">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl">Zaloguj sie</CardTitle>
+            <CardTitle className="text-xl">Zaloguj się</CardTitle>
             <CardDescription>
-              Wprowadz swoje dane aby kontynuowac
+              Wprowadź swoje dane aby kontynuować
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -91,7 +85,7 @@ export default function LoginPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Haslo</Label>
+                <Label htmlFor="password">Hasło</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -123,7 +117,7 @@ export default function LoginPage() {
                     Logowanie...
                   </>
                 ) : (
-                  'Zaloguj sie'
+                  'Zaloguj się'
                 )}
               </Button>
             </form>
@@ -137,7 +131,7 @@ export default function LoginPage() {
             href="/auth/sign-up"
             className="font-medium text-primary hover:underline underline-offset-4"
           >
-            Zarejestruj sie
+            Zarejestruj się
           </Link>
         </p>
 

@@ -74,7 +74,7 @@ export default function ProjectsPage() {
       setWorkEntries((entriesRes.data ?? []) as WorkEntry[])
     } catch (error) {
       console.error('Blad ladowania projektow:', error)
-      toast.error('Nie udalo sie zaladowac projektow')
+      toast.error('Nie udało się załadować projektów')
     } finally {
       setIsLoading(false)
     }
@@ -198,18 +198,18 @@ export default function ProjectsPage() {
       if (editingProject) {
         const { error } = await supabase.from('projects').update(payload).eq('id', editingProject.id)
         if (error) throw error
-        toast.success('Projekt zostal zaktualizowany')
+        toast.success('Projekt został zaktualizowany')
       } else {
         const { error } = await supabase.from('projects').insert(payload)
         if (error) throw error
-        toast.success('Projekt zostal dodany')
+        toast.success('Projekt został dodany')
       }
 
       setIsModalOpen(false)
       await loadData()
     } catch (error) {
       console.error('Blad zapisu projektu:', error)
-      toast.error('Nie udalo sie zapisac projektu')
+      toast.error('Nie udało się zapisać projektu')
     } finally {
       setIsSaving(false)
     }
@@ -222,12 +222,12 @@ export default function ProjectsPage() {
       const { error } = await supabase.from('projects').delete().eq('id', projectToDelete.id)
       if (error) throw error
 
-      toast.success('Projekt zostal usuniety')
+      toast.success('Projekt został usunięty')
       setProjectToDelete(null)
       await loadData()
     } catch (error) {
       console.error('Blad usuwania projektu:', error)
-      toast.error('Nie udalo sie usunac projektu')
+      toast.error('Nie udało się usunąć projektu')
     }
   }
 
@@ -241,7 +241,7 @@ export default function ProjectsPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Projekty</h1>
-          <p className="text-muted-foreground">Planowanie, budzety i postep prac w jednym miejscu.</p>
+          <p className="text-muted-foreground">Planowanie, budżety i postęp prac w jednym miejscu.</p>
         </div>
         <Button onClick={openCreateModal} className="bg-emerald-600 text-white hover:bg-emerald-700 md:ml-auto">
           <Plus className="mr-2 h-4 w-4" />
@@ -267,14 +267,14 @@ export default function ProjectsPage() {
             <EmptyMedia variant="icon">
               <FolderKanban className="h-5 w-5" />
             </EmptyMedia>
-            <EmptyTitle>Brak projektow</EmptyTitle>
+            <EmptyTitle>Brak projektów</EmptyTitle>
             <EmptyDescription>
-              Dodaj pierwszy projekt, aby monitorowac postep, budzet oraz przypisac zadania do klientow.
+              Dodaj pierwszy projekt, aby monitorować postęp, budżet oraz przypisać zadania do klientów.
             </EmptyDescription>
           </EmptyHeader>
           <Button onClick={openCreateModal}>
             <Plus className="mr-2 h-4 w-4" />
-            Utworz pierwszy projekt
+            Utwórz pierwszy projekt
           </Button>
         </Empty>
       ) : filteredProjects.length === 0 ? (
@@ -283,8 +283,8 @@ export default function ProjectsPage() {
             <EmptyMedia variant="icon">
               <Search className="h-5 w-5" />
             </EmptyMedia>
-            <EmptyTitle>Brak wynikow wyszukiwania</EmptyTitle>
-            <EmptyDescription>Nie znaleziono projektow pasujacych do frazy „{searchTerm}”.</EmptyDescription>
+            <EmptyTitle>Brak wyników wyszukiwania</EmptyTitle>
+            <EmptyDescription>Nie znaleziono projektów pasujących do frazy „{searchTerm}”.</EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : (
@@ -319,19 +319,19 @@ export default function ProjectsPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
-              Usunac projekt?
+              Usunąć projekt?
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
             Ta operacja jest nieodwracalna. Projekt <span className="font-medium text-foreground">{projectToDelete?.name}</span>{' '}
-            zostanie usuniety.
+            zostanie usunięty.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setProjectToDelete(null)}>
               Anuluj
             </Button>
             <Button variant="destructive" onClick={deleteProject}>
-              Usun projekt
+              Usuń projekt
             </Button>
           </DialogFooter>
         </DialogContent>

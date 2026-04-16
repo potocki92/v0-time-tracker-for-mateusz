@@ -19,7 +19,7 @@ export function useEarningsTrend(
   prevEntries: WorkEntry[],
   clients: Client[],
 ): EarningsTrendData {
-  const eurRate = usePreferencesStore(selectEurRate)
+  const eurRate = useEffectiveEurRate()
 
   return useMemo(() => {
     const current = calculateMonthlyTotals(currentEntries, clients, eurRate)
