@@ -1,23 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  reactStrictMode: true,
+  typescript: {},
   images: {
-    unoptimized: true,
+    remotePatterns: [{
+      protocol: 'https', hostname: '*.<supabase.co>'
+    }]
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    dirs: ['app','components','lib','hooks','services']
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'date-fns', 'recharts'],
   },
   webpack: (config, { dev }) => {
-    if (dev) {
-      // Avoid webpack PackFileCacheStrategy serialization warnings for large strings
-      // by using in-memory cache during local development.
-      config.cache = {
-        type: 'memory',
-      }
-    }
-
+    if (dev) config.cache = { type: 'memory' }
     return config
   },
 }

@@ -1,3 +1,5 @@
+"use client"
+
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { DefaultFallback } from './ErrorBoundary.fallback'
 import { captureError } from '@/lib/monitoring/sentry'

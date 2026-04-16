@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { WorkEntry, Client } from '@/lib/types'
+import type { WorkEntry, Client } from '@/lib/types'
 import { calculateMonthlyTotals } from '@/lib/helpers'
-import { selectEurRate, usePreferencesStore } from './usePreferencesStore'
+import { useEffectiveEurRate } from './usePreferencesStore'
 
 export type EarningsTrendData = {
   /** Procentowa zmiana (null jeśli brak danych z poprzedniego okresu) */

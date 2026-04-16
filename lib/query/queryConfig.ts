@@ -7,36 +7,34 @@ const MINUTE = 1_000 * 60
 
 export const QUERY_CONFIG = {
   dashboard: {
-    staleTime:            MINUTE * 5,
-    gcTime:               MINUTE * 30,
-    retry:                1,
-    refetchOnWindowFocus: false,
+    staleTime: MINUTE * 5,
+    gcTime:    MINUTE * 30,
+    retry:     1,
+    refetchOnWindowFocus: 'always' as const, // dane finansowe — zawsze świeże
   },
   invoices: {
-    /** Faktury bardziej wrażliwe na zmiany — krótszy staleTime */
-    staleTime:            MINUTE * 2,
-    gcTime:               MINUTE * 15,
-    retry:                1,
-    refetchOnWindowFocus: false,
+    staleTime: MINUTE * 2,
+    gcTime:    MINUTE * 15,
+    retry:     1,
+    refetchOnWindowFocus: 'always' as const,
   },
   workEntries: {
-    staleTime:            MINUTE * 5,
-    gcTime:               MINUTE * 30,
-    retry:                1,
-    refetchOnWindowFocus: false,
+    staleTime: MINUTE * 5,
+    gcTime:    MINUTE * 30,
+    retry:     1,
+    refetchOnWindowFocus: 'always' as const,
   },
   clients: {
-    /** Klienci zmieniają się rzadko */
-    staleTime:            MINUTE * 15,
-    gcTime:               MINUTE * 60,
-    retry:                1,
-    refetchOnWindowFocus: false,
+    staleTime: MINUTE * 15,
+    gcTime:    MINUTE * 60,
+    retry:     1,
+    refetchOnWindowFocus: false, // klienci się rzadko zmieniają
   },
   eurRate: {
-    /** Kurs EUR — odświeżaj co godzinę */
-    staleTime:            MINUTE * 60,
-    gcTime:               MINUTE * 120,
-    retry:                2,
+    staleTime: MINUTE * 60,
+    gcTime:    MINUTE * 120,
+    retry:     2,
+    retryDelay: (attempt: number) => Math.min(1000 * 2 ** attempt, 30_000),
     refetchOnWindowFocus: false,
   },
 } as const

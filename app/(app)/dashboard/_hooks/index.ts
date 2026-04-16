@@ -1,6 +1,5 @@
 export * from "./useChartData"
 export * from "./useDashboardData"
-export * from "./useDashboardTotals"
 export * from "./useEarningsTrend"
 export * from "./useFilteredEntries"
 export * from "./useGoalProgress"

@@ -13,10 +13,8 @@ export interface InvoiceFormState {
   name: string
   invoice_number: string
   recipient: string
-  description: string
   billing_period: string
   invoice_date: string
-  due_date: string
   amount: number
   currency: 'PLN' | 'EUR'
   is_paid: boolean
@@ -89,17 +87,6 @@ export function InvoiceFormDialog({
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="description">Za co / opis faktury</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(event) => onFormDataChange((prev) => ({ ...prev, description: event.target.value }))}
-              rows={3}
-              placeholder="Zakres prac, produkty, usługi..."
-            />
-          </div>
-
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="grid gap-2">
               <Label htmlFor="amount">Kwota *</Label>
@@ -131,15 +118,6 @@ export function InvoiceFormDialog({
                 type="date"
                 value={formData.invoice_date}
                 onChange={(event) => onFormDataChange((prev) => ({ ...prev, invoice_date: event.target.value }))}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="due-date">Termin płatności</Label>
-              <Input
-                id="due-date"
-                type="date"
-                value={formData.due_date}
-                onChange={(event) => onFormDataChange((prev) => ({ ...prev, due_date: event.target.value }))}
               />
             </div>
           </div>
