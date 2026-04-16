@@ -11,24 +11,13 @@ import {
   isFutureDate,
 } from '@/lib/helpers'
 import { calculateEarnings } from '@/lib/finance/earnings'
-import { toast } from 'sonner'
+import { useEntryForm } from './useEntryForm'
+import { useEntryMutations } from './useEntryMutations'
 
-export type WorkStatus = 'worked' | 'not_worked' | 'vacation' | 'sick_leave' | 'day_off'
+export type { WorkStatus } from './useEntryForm'
 
-const DEFAULT_HOURS = 8
 const DEFAULT_EUR_TO_PLN = 4.3
 const MONTHLY_BASELINE_HOURS = 160
-
-// ─── Initial form state ────────────────────────────────────────────────────
-const defaultFormState = {
-  formStatus: 'worked' as WorkStatus,
-  formClientId: '',
-  formProjectId: '',
-  formHours: DEFAULT_HOURS,
-  formQuantityFrom: 0,
-  formQuantityTo: 0,
-  formNotes: '',
-}
 
 export function useCalendarData() {
   const supabase = createClient()
@@ -38,7 +27,6 @@ export function useCalendarData() {
   const [projects, setProjects] = useState<Project[]>([])
   const [workEntries, setWorkEntries] = useState<WorkEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
 
   // ── Navigation state ───────────────────────────────────────────────────
   const today = new Date()
@@ -48,15 +36,6 @@ export function useCalendarData() {
   // ── Modal state ────────────────────────────────────────────────────────
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  // ── Form state ─────────────────────────────────────────────────────────
-  const [formStatus, setFormStatus] = useState<WorkStatus>(defaultFormState.formStatus)
-  const [formClientId, setFormClientId] = useState(defaultFormState.formClientId)
-  const [formProjectId, setFormProjectId] = useState(defaultFormState.formProjectId)
-  const [formHours, setFormHours] = useState(defaultFormState.formHours)
-  const [formQuantityFrom, setFormQuantityFrom] = useState(defaultFormState.formQuantityFrom)
-  const [formQuantityTo, setFormQuantityTo] = useState(defaultFormState.formQuantityTo)
-  const [formNotes, setFormNotes] = useState(defaultFormState.formNotes)
 
   // ── Load data ──────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
@@ -91,16 +70,6 @@ export function useCalendarData() {
     return map
   }, [workEntries])
 
-  const selectedClient = useMemo(
-    () => clients.find((c) => c.id === formClientId),
-    [clients, formClientId],
-  )
-
-  const clientProjects = useMemo(
-    () => projects.filter((p) => p.client_id === formClientId),
-    [projects, formClientId],
-  )
-
   const defaultClient = useMemo(
     () => clients.find((c) => c.is_default),
     [clients],
@@ -110,6 +79,9 @@ export function useCalendarData() {
     const prefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`
     return workEntries.filter((entry) => entry.date.startsWith(prefix))
   }, [workEntries, currentYear, currentMonth])
+
+  // ── Form ───────────────────────────────────────────────────────────────
+  const form = useEntryForm(clients, projects, defaultClient)
 
   // ── Stats ──────────────────────────────────────────────────────────────
   const stats = useMemo(() => {
@@ -132,26 +104,32 @@ export function useCalendarData() {
     }
   }, [monthEntries, clients])
 
-  // ── Form helpers ───────────────────────────────────────────────────────
-  function populateForm(entry: WorkEntry) {
-    setFormStatus(entry.status as WorkStatus)
-    setFormClientId(entry.client_id || '')
-    setFormProjectId(entry.project_id || '')
-    setFormHours(entry.hours || DEFAULT_HOURS)
-    setFormQuantityFrom(entry.quantity_from || 0)
-    setFormQuantityTo(entry.quantity_to || 0)
-    setFormNotes(entry.notes || '')
-  }
+  // ── Mutations ──────────────────────────────────────────────────────────
+  const getFormSnapshot = useCallback(() => ({
+    formStatus: form.formStatus,
+    formClientId: form.formClientId,
+    formProjectId: form.formProjectId,
+    formHours: form.formHours,
+    formQuantityFrom: form.formQuantityFrom,
+    formQuantityTo: form.formQuantityTo,
+    formNotes: form.formNotes,
+    selectedClient: form.selectedClient,
+  }), [
+    form.formStatus, form.formClientId, form.formProjectId,
+    form.formHours, form.formQuantityFrom, form.formQuantityTo,
+    form.formNotes, form.selectedClient,
+  ])
 
-  function resetForm() {
-    setFormStatus('worked')
-    setFormClientId(defaultClient?.id || '')
-    setFormProjectId('')
-    setFormHours(DEFAULT_HOURS)
-    setFormQuantityFrom(0)
-    setFormQuantityTo(0)
-    setFormNotes('')
-  }
+  const mutations = useEntryMutations({
+    currentYear,
+    currentMonth,
+    selectedDay,
+    entriesByDate,
+    getFormSnapshot,
+    populateForm: form.populateForm,
+    onSuccess: loadData,
+    onClose: () => setIsModalOpen(false),
+  })
 
   // ── Actions ────────────────────────────────────────────────────────────
   function openDayModal(day: number) {
@@ -160,95 +138,8 @@ export function useCalendarData() {
 
     setSelectedDay(day)
     const existing = entriesByDate.get(dateStr)
-    existing ? populateForm(existing) : resetForm()
+    existing ? form.populateForm(existing) : form.resetForm()
     setIsModalOpen(true)
-  }
-
-  async function saveEntry() {
-    if (!selectedDay) return
-    const dateStr = getDateString(currentYear, currentMonth, selectedDay)
-    if (isFutureDate(dateStr)) {
-      toast.error('Nie można zapisywać wpisów w przyszłości')
-      return
-    }
-
-    setIsSaving(true)
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      const existing = entriesByDate.get(dateStr)
-      const payload = {
-        user_id: user.id,
-        date: dateStr,
-        status: formStatus,
-        client_id: formStatus === 'worked' ? formClientId || null : null,
-        project_id: formStatus === 'worked' && formProjectId !== 'none' ? formProjectId || null : null,
-        hours: formStatus === 'worked' && selectedClient?.work_type === 'hourly' ? formHours : null,
-        quantity:
-          formStatus === 'worked' && selectedClient?.work_type === 'piecework'
-            ? formQuantityTo - formQuantityFrom
-            : null,
-        quantity_from:
-          formStatus === 'worked' && selectedClient?.work_type === 'piecework' ? formQuantityFrom : null,
-        quantity_to:
-          formStatus === 'worked' && selectedClient?.work_type === 'piecework' ? formQuantityTo : null,
-        notes: formNotes || null,
-      }
-
-      const result = existing
-        ? await supabase.from('work_entries').update(payload).eq('id', existing.id)
-        : await supabase.from('work_entries').insert(payload)
-
-      if (result.error) {
-        toast.error('Błąd podczas zapisywania')
-      } else {
-        toast.success(existing ? 'Zaktualizowano wpis' : 'Dodano wpis')
-        await loadData()
-        setIsModalOpen(false)
-      }
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  async function deleteEntry() {
-    if (!selectedDay) return
-    const dateStr = getDateString(currentYear, currentMonth, selectedDay)
-    const existing = entriesByDate.get(dateStr)
-    if (!existing) return
-
-    setIsSaving(true)
-    try {
-      const { error } = await supabase.from('work_entries').delete().eq('id', existing.id)
-      if (error) {
-        toast.error('Błąd podczas usuwania')
-      } else {
-        toast.success('Usunięto wpis')
-        await loadData()
-        setIsModalOpen(false)
-      }
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  function clonePreviousDayEntry() {
-    if (!selectedDay) return
-    const currentDate = getDateString(currentYear, currentMonth, selectedDay)
-    if (isFutureDate(currentDate)) return
-
-    const prevDate = new Date(currentYear, currentMonth, selectedDay - 1)
-    const prevDateStr = getDateString(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate())
-    const prev = entriesByDate.get(prevDateStr)
-
-    if (!prev) {
-      toast.error('Brak wpisu w poprzednim dniu')
-      return
-    }
-
-    populateForm(prev)
-    toast.success('Skopiowano z poprzedniego dnia')
   }
 
   function prevMonth() {
@@ -265,6 +156,7 @@ export function useCalendarData() {
     })
   }
 
+  // ── Zachowany identyczny interfejs zwracany ────────────────────────────
   return {
     // Data
     clients,
@@ -278,43 +170,43 @@ export function useCalendarData() {
     isModalOpen,
     // Loading
     isLoading,
-    isSaving,
+    isSaving: mutations.isSaving,
     // Form
-    formStatus,
-    formClientId,
-    formProjectId,
-    formHours,
-    formQuantityFrom,
-    formQuantityTo,
-    formNotes,
+    formStatus: form.formStatus,
+    formClientId: form.formClientId,
+    formProjectId: form.formProjectId,
+    formHours: form.formHours,
+    formQuantityFrom: form.formQuantityFrom,
+    formQuantityTo: form.formQuantityTo,
+    formNotes: form.formNotes,
     // Derived
     daysInMonth,
     firstDayOfMonth,
     entriesByDate,
-    selectedClient,
-    clientProjects,
+    selectedClient: form.selectedClient,
+    clientProjects: form.clientProjects,
     monthEntries,
     stats,
     constants: {
-      defaultHours: DEFAULT_HOURS,
+      defaultHours: form.constants.defaultHours,
       defaultEurToPln: DEFAULT_EUR_TO_PLN,
       formatCurrency,
     },
     actions: {
       setIsModalOpen,
-      setFormStatus,
-      setFormClientId,
-      setFormProjectId,
-      setFormHours,
-      setFormQuantityFrom,
-      setFormQuantityTo,
-      setFormNotes,
+      setFormStatus: form.setFormStatus,
+      setFormClientId: form.setFormClientId,
+      setFormProjectId: form.setFormProjectId,
+      setFormHours: form.setFormHours,
+      setFormQuantityFrom: form.setFormQuantityFrom,
+      setFormQuantityTo: form.setFormQuantityTo,
+      setFormNotes: form.setFormNotes,
       openDayModal,
-      saveEntry,
-      deleteEntry,
+      saveEntry: mutations.saveEntry,
+      deleteEntry: mutations.deleteEntry,
       prevMonth,
       nextMonth,
-      clonePreviousDayEntry,
+      clonePreviousDayEntry: mutations.clonePreviousDayEntry,
     },
   }
 }
