@@ -86,6 +86,7 @@ function SparklineTooltip({ active, payload }: TooltipProps<number, string>) {
 type Props = {
   totalPLN: number
   totalEUR: number
+  earningsOnlyPLN: number
   trend: EarningsTrendData
   sparklineData?: SparklinePoint[]
   periodLabel?: string
@@ -96,6 +97,7 @@ type Props = {
 export const EarningsCard = memo(function EarningsCard({
   totalPLN,
   totalEUR,
+  earningsOnlyPLN,
   trend,
   sparklineData = [],
   periodLabel,
@@ -144,10 +146,15 @@ export const EarningsCard = memo(function EarningsCard({
           <div className="text-3xl font-bold tracking-tight">
             {formatCurrency(totalPLN, 'PLN')}
           </div>
-          {totalEUR > 0 && (
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              w tym {formatCurrency(totalEUR, 'EUR')}
-            </p>
+          {(earningsOnlyPLN > 0 || totalEUR > 0) && (
+            <div className="mt-1 flex flex-wrap gap-x-3 text-sm text-muted-foreground">
+              {earningsOnlyPLN > 0 && (
+                <span>{formatCurrency(earningsOnlyPLN, 'PLN')}</span>
+              )}
+              {totalEUR > 0 && (
+                <span>{formatCurrency(totalEUR, 'EUR')}</span>
+              )}
+            </div>
           )}
         </div>
 

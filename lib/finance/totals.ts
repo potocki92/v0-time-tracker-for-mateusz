@@ -29,8 +29,12 @@ export function calculateTotals(
       if (client) {
         const earnings = calculateEarnings(entry, client, eurRate)
 
-        earningsPLN += earnings.amountInPLN
-        earningsEUR += earnings.amountInEUR
+        // Separate pure PLN and pure EUR to avoid double-counting
+        if (earnings.amountInEUR > 0) {
+          earningsEUR += earnings.amountInEUR
+        } else {
+          earningsPLN += earnings.amountInPLN
+        }
       }
     }
 
