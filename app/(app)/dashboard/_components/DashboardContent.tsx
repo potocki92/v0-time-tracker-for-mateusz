@@ -4,6 +4,7 @@ import { useState, useMemo }          from 'react'
 import { useDashboardData }           from '../_hooks'
 import { useFilteredEntries }         from '../_hooks/useFilteredEntries'
 import { useEarningsTrend }           from '../_hooks/useEarningsTrend'
+import { useEarningsSparkline }       from '../_hooks/useEarningsSparkline'
 import { useDashboardTotals }         from '../_hooks/useDashboardTotals'
 import { usePeriodLabel }             from '../_hooks/usePeriodLabel'
 import { useUnpaidInvoices }          from '../_hooks/useUnpaidInvoices'
@@ -33,8 +34,9 @@ export function DashboardContent() {
   const prevRange      = useMemo(() => getPrevRange(dateRange), [dateRange])
   const filtered       = useFilteredEntries(workEntries, dateRange)
   const prevFiltered   = useFilteredEntries(workEntries, prevRange)
-  const totals         = useDashboardTotals(filtered, clients, eurRate)
-  const trend          = useEarningsTrend(filtered, prevFiltered, clients, eurRate)
+  const totals         = useDashboardTotals(filtered, clients)
+  const trend          = useEarningsTrend(filtered, prevFiltered, clients)
+  const sparklineData  = useEarningsSparkline(filtered, clients)
   const unpaidInvoices = useUnpaidInvoices(invoices)
   const periodLabel    = usePeriodLabel(range)
   const clientsCount   = useMemo(
@@ -57,6 +59,8 @@ export function DashboardContent() {
             totalPLN={totals.totalEarningsAllPLN}
             totalEUR={totals.earningsEUR}
             trend={trend}
+            sparklineData={sparklineData}
+            periodLabel={periodLabel}
           />
         </EarningsCardBoundary>
 
