@@ -33,6 +33,28 @@ export interface Client {
   created_at: string
 }
 
+export interface ClientRate {
+  id: string
+  client_id: string
+  user_id: string
+  rate: number
+  currency: CURRENCY
+  work_type: 'hourly' | 'piecework'
+  unit: string | null
+  effective_from: string
+  note: string | null
+  created_at: string
+}
+
+export interface ClientRateFormData {
+  rate: number
+  currency: CURRENCY
+  work_type: 'hourly' | 'piecework'
+  unit?: string
+  effective_from: string
+  note?: string
+}
+
 export interface Project {
   id: string
   user_id: string

@@ -20,6 +20,11 @@ export const QUERY_KEYS = {
   workEntries: (filter?: WorkEntriesFilter) =>
     [...QUERY_KEYS.all(), 'work-entries', filter ?? {}] as const,
   clients:     () => [...QUERY_KEYS.all(), 'clients']        as const,
+  clientsData: () => [...QUERY_KEYS.all(), 'clients-data']   as const,
+  clientRates: (clientId?: string) =>
+    clientId
+      ? [...QUERY_KEYS.all(), 'client-rates', clientId] as const
+      : [...QUERY_KEYS.all(), 'client-rates']           as const,
   eurRate:     () => [...QUERY_KEYS.all(), 'eur-rate']       as const,
 } as const
 

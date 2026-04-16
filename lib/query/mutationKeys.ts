@@ -15,8 +15,10 @@ export const MUTATION_KEYS = {
     delete: ['work-entry', 'delete'] as const,
   },
   client: {
-    create: ['client', 'create'] as const,
-    update: ['client', 'update'] as const,
-    delete: ['client', 'delete'] as const,
+    create:         ['client', 'create']          as const,
+    update:         ['client', 'update']          as const,
+    delete:         ['client', 'delete']          as const,
+    addRate:        ['client', 'add-rate']        as const,
+    deleteRate:     ['client', 'delete-rate']     as const,
   },
 } as const
