@@ -102,6 +102,7 @@ export const usePreferencesStore = create<PreferencesStore>()(
       partialize: (state) => ({
         eurToPln:        state.eurToPln,
         useLiveRate:     state.useLiveRate,
+        liveEurRate:     state.liveEurRate,
         goal:            state.goal,
         displayCurrency: state.displayCurrency,
       }),
@@ -110,7 +111,6 @@ export const usePreferencesStore = create<PreferencesStore>()(
 )
 
 import { useShallow } from 'zustand/react/shallow'
-import { usePDF } from '@react-pdf/renderer'
 
 // ── Selektory atomowe (preferowane) ──────────────────────────────────────────
 export const useEurToPln        = () => usePreferencesStore((s) => s.eurToPln)

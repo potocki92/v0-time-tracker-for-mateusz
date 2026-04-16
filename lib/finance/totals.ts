@@ -44,7 +44,7 @@ export function calculateTotals(
     totalDays,
     earningsPLN,
     earningsEUR,
-    totalEarningsAllPLN: earningsPLN,
+    totalEarningsAllPLN: earningsPLN + earningsEUR * eurRate,
     vacationDays,
     sickDays,
     daysOff,

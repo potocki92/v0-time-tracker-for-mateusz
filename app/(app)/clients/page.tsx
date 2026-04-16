@@ -100,7 +100,7 @@ export default function ClientsPage() {
 
   async function saveClient() {
     if (!formData.name || formData.rate <= 0) {
-      toast.error('Wypelnij wymagane pola')
+      toast.error('Wypełnij wymagane pola')
       return
     }
 
@@ -150,7 +150,7 @@ export default function ClientsPage() {
     }
 
     if (error) {
-      toast.error('Blad podczas zapisywania')
+      toast.error('Błąd podczas zapisywania')
     } else {
       toast.success(editingClient ? 'Zaktualizowano klienta' : 'Dodano klienta')
       await loadClients()
@@ -167,9 +167,9 @@ export default function ClientsPage() {
       .eq('id', id)
 
     if (error) {
-      toast.error('Blad podczas usuwania')
+      toast.error('Błąd podczas usuwania')
     } else {
-      toast.success('Usunieto klienta')
+      toast.success('Usunięto klienta')
       await loadClients()
     }
     setDeleteConfirm(null)
@@ -190,7 +190,7 @@ export default function ClientsPage() {
       {clients.length === 0 ? (
         <Card className="text-center py-12">
           <CardContent>
-            <p className="text-muted-foreground mb-4">Nie masz jeszcze zadnych klientow</p>
+            <p className="text-muted-foreground mb-4">Nie masz jeszcze żadnych klientów</p>
             <Button onClick={() => openModal()}>
               <Plus className="w-4 h-4 mr-2" />
               Dodaj pierwszego klienta
@@ -392,7 +392,7 @@ export default function ClientsPage() {
 
             {/* Default */}
             <div className="flex items-center justify-between">
-              <Label>Ustaw jako domyslnego klienta</Label>
+              <Label>Ustaw jako domyślnego klienta</Label>
               <Switch
                 checked={formData.is_default}
                 onCheckedChange={(checked) => setFormData({ ...formData, is_default: checked })}
@@ -415,17 +415,17 @@ export default function ClientsPage() {
       <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Usunac klienta?</DialogTitle>
+            <DialogTitle>Usunąć klienta?</DialogTitle>
           </DialogHeader>
           <p className="text-muted-foreground">
-            Tej operacji nie mozna cofnac. Wszystkie powiazane projekty rowniez zostana usuniete.
+            Tej operacji nie można cofnąć. Wszystkie powiązane projekty również zostaną usunięte.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
               Anuluj
             </Button>
             <Button variant="destructive" onClick={() => deleteConfirm && deleteClient(deleteConfirm)}>
-              Usun
+              Usuń
             </Button>
           </DialogFooter>
         </DialogContent>
