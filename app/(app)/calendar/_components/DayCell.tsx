@@ -1,4 +1,4 @@
-import type { Client, WorkEntry } from '@/lib/types'
+import type { Client, CURRENCY, WorkEntry } from '@/lib/types'
 import { calculateEarnings, formatCurrency, getDateString, isFutureDate } from '@/lib/helpers'
 import { STATUS_LABELS } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -174,7 +174,7 @@ interface TooltipProps {
 
 function DayCellTooltip({ entry, client, earnings, dateStr, day, month, year }: TooltipProps) {
   const cfg = STATUS_CONFIG[entry.status as keyof typeof STATUS_CONFIG]
-  const MONTH_ABBR = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru']
+  const MONTH_ABBR = ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru']
 
   return (
     <div className="text-xs">
@@ -237,7 +237,7 @@ function DayCellTooltip({ entry, client, earnings, dateStr, day, month, year }: 
             <Banknote className="h-3 w-3 shrink-0" />
             <span>
               <span className="font-semibold text-foreground">
-                {formatCurrency(earnings.amount, earnings.currency)}
+                {formatCurrency(earnings.amount, earnings.currency as CURRENCY)}
               </span>
               {earnings.currency !== 'PLN' && (
                 <span className="text-[10px] text-muted-foreground ml-1">

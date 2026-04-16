@@ -1,5 +1,5 @@
 // Database types for WorkFlow Pro
-
+export type CURRENCY = "PLN" | "EUR"
 export interface Profile {
   id: string
   full_name: string | null
@@ -26,7 +26,7 @@ export interface Client {
   website: string | null
   work_type: 'hourly' | 'piecework'
   rate: number
-  currency: 'PLN' | 'EUR'
+  currency: CURRENCY
   unit: string | null
   is_default: boolean
   color: string
@@ -81,7 +81,7 @@ export interface Invoice {
   description: string | null
   billing_period: string | null
   amount: number
-  currency: 'PLN' | 'EUR'
+  currency: CURRENCY
   is_paid: boolean
   file_url: string | null
   notes: string | null
@@ -104,7 +104,7 @@ export interface ClientFormData {
   website?: string
   work_type: 'hourly' | 'piecework'
   rate: number
-  currency: 'PLN' | 'EUR'
+  currency: CURRENCY
   unit?: string
   is_default: boolean
   color: string
@@ -149,7 +149,7 @@ export interface InvoiceFormData {
   description?: string
   billing_period?: string
   amount: number
-  currency: 'PLN' | 'EUR'
+  currency: CURRENCY
   is_paid: boolean
   file_url?: string
   notes?: string
@@ -197,7 +197,7 @@ export const AVAILABLE_TAGS = [
 ] as const
 
 export const DAY_NAMES = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'] as const
-export const DAY_NAMES_FULL = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota','Niedziela'] as const
+export const DAY_NAMES_FULL = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'] as const
 
 export const MONTH_NAMES = [
   'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
