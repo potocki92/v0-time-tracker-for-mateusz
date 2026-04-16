@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import type { WorkEntry, Client } from '@/lib/types'
-import { calculateMonthlyTotals } from '@/lib/helpers'
+import { calculateMonthlyTotals } from '@/lib/finance/totals'
 import { useEffectiveEurRate } from './usePreferencesStore'
 
 export type EarningsTrendData = {

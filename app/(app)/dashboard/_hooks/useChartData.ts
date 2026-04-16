@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { calculateEarnings } from '@/lib/helpers'
+import { calculateEarnings } from '@/lib/finance/earnings'
 import { Client, WorkEntry, MONTH_NAMES } from '@/lib/types'
 import { ChartDataItem, ChartGrouping } from '../_domain/dashboard.types'
 import { toDateKey } from '@/lib/date/format'           // ← z @/lib
@@ -65,7 +65,7 @@ export function useChartData(
       const client   = entry.client_id ? clientMap.get(entry.client_id) : undefined
       const earnings = calculateEarnings(entry, client, eurRate)
       bucket.earningsPLN += earnings.amountInPLN
-      if (earnings.currency === 'EUR') bucket.earningsEUR += earnings.amount
+      bucket.earningsEUR += earnings.amountInEUR
     }
 
     return Array.from(grouped.values())

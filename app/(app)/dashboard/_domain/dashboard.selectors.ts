@@ -1,4 +1,4 @@
-import { calculateMonthlyTotals } from '@/lib/helpers'
+import { calculateMonthlyTotals } from '@/lib/finance/totals'
 import { DashboardData } from './dashboard.types'
 import { MonthlyTotals, Invoice } from '@/lib/types'
 
