@@ -1,5 +1,5 @@
 // Database types for WorkFlow Pro
-
+export type CURRENCY = "PLN" | "EUR"
 export interface Profile {
   id: string
   full_name: string | null
@@ -197,7 +197,7 @@ export const AVAILABLE_TAGS = [
 ] as const
 
 export const DAY_NAMES = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'] as const
-export const DAY_NAMES_FULL = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota','Niedziela'] as const
+export const DAY_NAMES_FULL = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'] as const
 
 export const MONTH_NAMES = [
   'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
