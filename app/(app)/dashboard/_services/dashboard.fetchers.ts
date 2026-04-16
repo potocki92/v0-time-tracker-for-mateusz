@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { fetchCurrentEurRate } from '@/lib/api/eurRate'
 import type { Client, Invoice, WorkEntry } from '@/lib/types'
+import type { WorkEntriesFilter } from '@/lib/query/queryKeys'
 
 /**
  * Surowe funkcje fetch — tylko transport, zero logiki biznesowej.
@@ -25,11 +26,26 @@ export async function fetchInvoices(userId: string): Promise<Invoice[]> {
   return data ?? []
 }
 
-export async function fetchWorkEntries(userId: string): Promise<WorkEntry[]> {
-  const { data, error } = await getSupabase()
+export async function fetchWorkEntries(userId: string, filter?: WorkEntriesFilter): Promise<WorkEntry[]> {
+  let query = getSupabase()
     .from('work_entries')
     .select('*')
     .eq('user_id', userId)
+
+  if (filter?.from) {
+    query = query.gte('date', filter.from)
+  }
+  if (filter?.to) {
+    query = query.lte('date', filter.to)
+  }
+  if (filter?.clientId) {
+    query = query.eq('client_id', filter.clientId)
+  }
+  if (filter?.projectId) {
+    query = query.eq('project_id', filter.projectId)
+  }
+
+  const { data, error } = await query
 
   if (error) throw new Error(`fetchWorkEntries: ${error.message}`)
   return data ?? []

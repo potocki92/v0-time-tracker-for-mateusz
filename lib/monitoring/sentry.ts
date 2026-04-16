@@ -102,12 +102,12 @@ export function sentryBeforeSend(
   }
 
   // Sanitize breadcrumb URLs — build a new event object (breadcrumbs is readonly)
-  const rawValues = event.breadcrumbs?.values
-  if (!rawValues || rawValues.length === 0) {
+  const breadcrumbs = event.breadcrumbs
+  if (!breadcrumbs || breadcrumbs.length === 0) {
     return event
   }
 
-  const sanitizedValues = rawValues.map((bc) => {
+  const sanitizedBreadcrumbs = breadcrumbs.map((bc) => {
     const data = bc.data as Record<string, unknown> | null | undefined
     if (!data) return bc
 
@@ -122,9 +122,6 @@ export function sentryBeforeSend(
 
   return {
     ...event,
-    breadcrumbs: {
-      ...event.breadcrumbs,
-      values: sanitizedValues,
-    },
+    breadcrumbs: sanitizedBreadcrumbs,
   }
 }
