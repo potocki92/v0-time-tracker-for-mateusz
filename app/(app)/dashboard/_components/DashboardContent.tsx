@@ -63,6 +63,7 @@ export function DashboardContent() {
           <EarningsCard
             totalPLN={totals.totalEarningsAllPLN}
             totalEUR={totals.earningsEUR}
+            earningsOnlyPLN={totals.earningsPLN}
             trend={trend}
             sparklineData={sparklineData}
             periodLabel={periodLabel}

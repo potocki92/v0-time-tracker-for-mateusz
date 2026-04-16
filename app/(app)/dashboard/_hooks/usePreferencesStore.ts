@@ -112,6 +112,13 @@ export const usePreferencesStore = create<PreferencesStore>()(
 
 import { useShallow } from 'zustand/react/shallow'
 
+// ── Selektory (do użycia z usePreferencesStore(selector)) ───────────────────
+export const selectEurRate = (s: PreferencesStore): number => {
+  if (s.useLiveRate && s.liveEurRate !== null) return s.liveEurRate
+  return s.eurToPln
+}
+export const selectGoal = (s: PreferencesStore): Goal | null => s.goal
+
 // ── Selektory atomowe (preferowane) ──────────────────────────────────────────
 export const useEurToPln        = () => usePreferencesStore((s) => s.eurToPln)
 export const useUseLiveRate     = () => usePreferencesStore((s) => s.useLiveRate)
