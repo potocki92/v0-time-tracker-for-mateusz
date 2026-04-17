@@ -1,0 +1,250 @@
+'use client'
+
+import { useMemo, useState, type ChangeEvent } from 'react'
+import { Check, CheckCircle2, ChevronsUpDown, Clock3, Upload } from 'lucide-react'
+import type { Client, Invoice } from '@/lib/types'
+import type { InvoiceFormValues } from '../_domain'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
+
+interface InvoiceFormDialogProps {
+  open: boolean
+  isSaving: boolean
+  editingInvoice: Invoice | null
+  clients: Client[]
+  values: InvoiceFormValues
+  onOpenChange: (open: boolean) => void
+  onValuesChange: (updater: (prev: InvoiceFormValues) => InvoiceFormValues) => void
+  onSave: () => void
+}
+
+export function InvoiceFormDialog({
+  open,
+  isSaving,
+  editingInvoice,
+  clients,
+  values,
+  onOpenChange,
+  onValuesChange,
+  onSave,
+}: InvoiceFormDialogProps) {
+  const [clientPopoverOpen, setClientPopoverOpen] = useState(false)
+
+  const clientDisplayLabel = useMemo(() => {
+    if (values.client_id) {
+      return clients.find((client) => client.id === values.client_id)?.name ?? 'Wybierz klienta'
+    }
+
+    if (values.new_client_name.trim()) {
+      return `Nowy klient: ${values.new_client_name.trim()}`
+    }
+
+    return 'Bez klienta'
+  }, [clients, values.client_id, values.new_client_name])
+
+  const normalizedNames = useMemo(() => clients.map((client) => client.name.toLowerCase()), [clients])
+
+  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null
+    onValuesChange((prev) => ({ ...prev, file }))
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>{editingInvoice ? 'Edytuj fakturę' : 'Nowa faktura'}</DialogTitle>
+        </DialogHeader>
+
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="invoice-name">Nazwa faktury *</Label>
+            <Input
+              id="invoice-name"
+              value={values.name}
+              onChange={(event) => onValuesChange((prev) => ({ ...prev, name: event.target.value }))}
+              placeholder="np. Faktura za marzec 2026"
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="recipient">Do kogo *</Label>
+              <Input
+                id="recipient"
+                value={values.recipient}
+                onChange={(event) => onValuesChange((prev) => ({ ...prev, recipient: event.target.value }))}
+                placeholder="Nazwa firmy / odbiorca"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="invoice-number">Numer faktury</Label>
+              <Input
+                id="invoice-number"
+                value={values.invoice_number}
+                onChange={(event) => onValuesChange((prev) => ({ ...prev, invoice_number: event.target.value }))}
+                placeholder="np. FV/04/2026/01"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-2">
+              <Label htmlFor="amount">Kwota *</Label>
+              <Input
+                id="amount"
+                type="number"
+                min={0}
+                step="0.01"
+                value={values.amount || ''}
+                onChange={(event) => onValuesChange((prev) => ({ ...prev, amount: Number(event.target.value || 0) }))}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Waluta</Label>
+              <Select
+                value={values.currency}
+                onValueChange={(value: 'PLN' | 'EUR') => onValuesChange((prev) => ({ ...prev, currency: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PLN">PLN</SelectItem>
+                  <SelectItem value="EUR">EUR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="invoice-date">Data wystawienia *</Label>
+              <Input
+                id="invoice-date"
+                type="date"
+                value={values.invoice_date}
+                onChange={(event) => onValuesChange((prev) => ({ ...prev, invoice_date: event.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label>Klient</Label>
+              <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" className="justify-between font-normal">
+                    <span className="truncate">{clientDisplayLabel}</span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[320px] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Wyszukaj klienta lub wpisz nowego..." />
+                    <CommandList>
+                      <CommandEmpty>Brak wyników.</CommandEmpty>
+                      <CommandGroup heading="Klienci">
+                        <CommandItem
+                          value="bez-klienta"
+                          onSelect={() => {
+                            onValuesChange((prev) => ({ ...prev, client_id: null, new_client_name: '' }))
+                            setClientPopoverOpen(false)
+                          }}
+                        >
+                          <Check className={cn('mr-2 h-4 w-4', !values.client_id && !values.new_client_name ? 'opacity-100' : 'opacity-0')} />
+                          Bez klienta
+                        </CommandItem>
+                        {clients.map((client) => (
+                          <CommandItem
+                            key={client.id}
+                            value={client.name}
+                            onSelect={() => {
+                              onValuesChange((prev) => ({ ...prev, client_id: client.id, new_client_name: '' }))
+                              setClientPopoverOpen(false)
+                            }}
+                          >
+                            <Check className={cn('mr-2 h-4 w-4', values.client_id === client.id ? 'opacity-100' : 'opacity-0')} />
+                            {client.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              <Input
+                value={values.new_client_name}
+                onChange={(event) =>
+                  onValuesChange((prev) => ({
+                    ...prev,
+                    new_client_name: event.target.value,
+                    client_id: null,
+                  }))
+                }
+                placeholder="lub wpisz nazwę nowego klienta"
+              />
+              {values.new_client_name.trim() && normalizedNames.includes(values.new_client_name.trim().toLowerCase()) && (
+                <p className="text-xs text-muted-foreground">Klient o tej nazwie już istnieje — zostanie użyty istniejący rekord.</p>
+              )}
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="billing-period">Okres rozliczeniowy</Label>
+              <Input
+                id="billing-period"
+                value={values.billing_period}
+                onChange={(event) => onValuesChange((prev) => ({ ...prev, billing_period: event.target.value }))}
+                placeholder="np. Marzec 2026"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <p className="text-sm font-medium">Status płatności</p>
+              <p className="text-xs text-muted-foreground">Oznacz fakturę jako opłaconą lub oczekującą.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {values.is_paid ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <Clock3 className="h-4 w-4 text-amber-600" />}
+              <Switch checked={values.is_paid} onCheckedChange={(checked) => onValuesChange((prev) => ({ ...prev, is_paid: checked }))} />
+            </div>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="pdf-upload">Załącz PDF faktury</Label>
+            <Input id="pdf-upload" type="file" accept="application/pdf" onChange={handleFileChange} />
+            <p className="text-xs text-muted-foreground">Po zapisaniu plik zostanie wysłany do Supabase Storage (bucket: invoices).</p>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="notes">Notatki</Label>
+            <Textarea
+              id="notes"
+              value={values.notes}
+              onChange={(event) => onValuesChange((prev) => ({ ...prev, notes: event.target.value }))}
+              rows={2}
+              placeholder="Dodatkowe informacje..."
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Anuluj
+          </Button>
+          <Button onClick={onSave} disabled={isSaving}>
+            <Upload className="mr-2 h-4 w-4" />
+            {isSaving ? 'Zapisywanie...' : editingInvoice ? 'Zapisz zmiany' : 'Dodaj fakturę'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
