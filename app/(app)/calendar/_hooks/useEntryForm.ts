@@ -1,68 +1,70 @@
-import { useState, useMemo, useCallback } from 'react'
+'use client'
+
+import { useCallback, useMemo, useState } from 'react'
 import type { Client, Project, WorkEntry } from '@/lib/types'
+import { DEFAULT_ENTRY_HOURS } from '../_domain/calendar.constants'
+import { selectClientProjects } from '../_domain/calendar.selectors'
+import type { WorkStatus } from '../_domain/calendar.types'
 
-export type WorkStatus = 'worked' | 'not_worked' | 'vacation' | 'sick_leave' | 'day_off'
-
-const DEFAULT_HOURS = 8
-
-export function useEntryForm(clients: Client[], projects: Project[], defaultClient: Client | undefined) {
-  const [formStatus, setFormStatus] = useState<WorkStatus>('worked')
-  const [formClientId, setFormClientId] = useState('')
-  const [formProjectId, setFormProjectId] = useState('')
-  const [formHours, setFormHours] = useState(DEFAULT_HOURS)
-  const [formQuantityFrom, setFormQuantityFrom] = useState(0)
-  const [formQuantityTo, setFormQuantityTo] = useState(0)
-  const [formNotes, setFormNotes] = useState('')
+/**
+ * Lokalny state formularza modala dodawania/edycji wpisu.
+ * Reset / populate decoupled, żeby komponenty mogły deklaratywnie ustawiać wartości.
+ */
+export function useEntryForm(
+  clients: Client[],
+  projects: Project[],
+  defaultClient: Client | undefined,
+) {
+  const [status, setStatus] = useState<WorkStatus>('worked')
+  const [clientId, setClientId] = useState('')
+  const [projectId, setProjectId] = useState('')
+  const [hours, setHours] = useState(DEFAULT_ENTRY_HOURS)
+  const [quantityFrom, setQuantityFrom] = useState(0)
+  const [quantityTo, setQuantityTo] = useState(0)
+  const [notes, setNotes] = useState('')
 
   const selectedClient = useMemo(
-    () => clients.find((c) => c.id === formClientId),
-    [clients, formClientId],
+    () => clients.find((c) => c.id === clientId),
+    [clients, clientId],
   )
 
   const clientProjects = useMemo(
-    () => projects.filter((p) => p.client_id === formClientId),
-    [projects, formClientId],
+    () => selectClientProjects(projects, clientId),
+    [projects, clientId],
   )
 
   const populateForm = useCallback((entry: WorkEntry) => {
-    setFormStatus(entry.status as WorkStatus)
-    setFormClientId(entry.client_id || '')
-    setFormProjectId(entry.project_id || '')
-    setFormHours(entry.hours || DEFAULT_HOURS)
-    setFormQuantityFrom(entry.quantity_from || 0)
-    setFormQuantityTo(entry.quantity_to || 0)
-    setFormNotes(entry.notes || '')
+    setStatus(entry.status as WorkStatus)
+    setClientId(entry.client_id ?? '')
+    setProjectId(entry.project_id ?? '')
+    setHours(entry.hours ?? DEFAULT_ENTRY_HOURS)
+    setQuantityFrom(entry.quantity_from ?? 0)
+    setQuantityTo(entry.quantity_to ?? 0)
+    setNotes(entry.notes ?? '')
   }, [])
 
   const resetForm = useCallback(() => {
-    setFormStatus('worked')
-    setFormClientId(defaultClient?.id || '')
-    setFormProjectId('')
-    setFormHours(DEFAULT_HOURS)
-    setFormQuantityFrom(0)
-    setFormQuantityTo(0)
-    setFormNotes('')
+    setStatus('worked')
+    setClientId(defaultClient?.id ?? '')
+    setProjectId('')
+    setHours(DEFAULT_ENTRY_HOURS)
+    setQuantityFrom(0)
+    setQuantityTo(0)
+    setNotes('')
   }, [defaultClient?.id])
 
   return {
-    formStatus,
-    formClientId,
-    formProjectId,
-    formHours,
-    formQuantityFrom,
-    formQuantityTo,
-    formNotes,
+    values: { status, clientId, projectId, hours, quantityFrom, quantityTo, notes },
     selectedClient,
     clientProjects,
-    setFormStatus,
-    setFormClientId,
-    setFormProjectId,
-    setFormHours,
-    setFormQuantityFrom,
-    setFormQuantityTo,
-    setFormNotes,
+    setStatus,
+    setClientId,
+    setProjectId,
+    setHours,
+    setQuantityFrom,
+    setQuantityTo,
+    setNotes,
     populateForm,
     resetForm,
-    constants: { defaultHours: DEFAULT_HOURS },
   }
 }

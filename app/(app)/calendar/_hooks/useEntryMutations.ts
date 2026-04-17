@@ -1,129 +1,80 @@
-import { useCallback, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { WorkEntry } from '@/lib/types'
-import type { WorkStatus } from './useEntryForm'
-import { getDateString, isFutureDate } from '@/lib/helpers'
+'use client'
+
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
+import {
+  deleteWorkEntry,
+  fetchCurrentUser,
+  upsertWorkEntry,
+} from '../_services/calendar.fetchers'
+import type { EntryFormValues } from '../_domain/calendar.types'
 
-interface EntryFormSnapshot {
-  formStatus: WorkStatus
-  formClientId: string
-  formProjectId: string
-  formHours: number
-  formQuantityFrom: number
-  formQuantityTo: number
-  formNotes: string
-  selectedClient: { work_type: string } | undefined
+interface SavePayload {
+  date: string
+  form: EntryFormValues
+  workType: 'hourly' | 'piecework' | undefined
+  existingId?: string
 }
 
-interface MutationDeps {
-  currentYear: number
-  currentMonth: number
-  selectedDay: number | null
-  entriesByDate: Map<string, WorkEntry>
-  getFormSnapshot: () => EntryFormSnapshot
-  populateForm: (entry: WorkEntry) => void
-  onSuccess: () => Promise<void>
-  onClose: () => void
-}
+/**
+ * Mutacje kalendarza — zgodne z pattern'em dashboardu (TanStack Mutation).
+ * Po udanej operacji invaliduje QUERY_KEYS.calendar() → useCalendarData odświeża się.
+ */
+export function useEntryMutations({ onSuccess }: { onSuccess?: () => void } = {}) {
+  const queryClient = useQueryClient()
 
-export function useEntryMutations(deps: MutationDeps) {
-  const supabase = createClient()
-  const [isSaving, setIsSaving] = useState(false)
+  const saveMutation = useMutation({
+    mutationKey: MUTATION_KEYS.workEntry.update,
+    mutationFn: async ({ date, form, workType, existingId }: SavePayload) => {
+      const user = await fetchCurrentUser()
 
-  const saveEntry = useCallback(async () => {
-    const { selectedDay, currentYear, currentMonth, entriesByDate, getFormSnapshot, onSuccess, onClose } = deps
-    if (!selectedDay) return
+      const isWorked = form.status === 'worked'
+      const isHourly = isWorked && workType === 'hourly'
+      const isPiecework = isWorked && workType === 'piecework'
 
-    const dateStr = getDateString(currentYear, currentMonth, selectedDay)
-    if (isFutureDate(dateStr)) {
-      toast.error('Nie można zapisywać wpisów w przyszłości')
-      return
-    }
-
-    setIsSaving(true)
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      const form = getFormSnapshot()
-      const existing = entriesByDate.get(dateStr)
       const payload = {
         user_id: user.id,
-        date: dateStr,
-        status: form.formStatus,
-        client_id: form.formStatus === 'worked' ? form.formClientId || null : null,
-        project_id: form.formStatus === 'worked' && form.formProjectId !== 'none' ? form.formProjectId || null : null,
-        hours: form.formStatus === 'worked' && form.selectedClient?.work_type === 'hourly' ? form.formHours : null,
-        quantity:
-          form.formStatus === 'worked' && form.selectedClient?.work_type === 'piecework'
-            ? form.formQuantityTo - form.formQuantityFrom
+        date,
+        status: form.status,
+        client_id: isWorked ? form.clientId || null : null,
+        project_id:
+          isWorked && form.projectId && form.projectId !== 'none'
+            ? form.projectId
             : null,
-        quantity_from:
-          form.formStatus === 'worked' && form.selectedClient?.work_type === 'piecework' ? form.formQuantityFrom : null,
-        quantity_to:
-          form.formStatus === 'worked' && form.selectedClient?.work_type === 'piecework' ? form.formQuantityTo : null,
-        notes: form.formNotes || null,
+        hours: isHourly ? form.hours : null,
+        quantity: isPiecework ? form.quantityTo - form.quantityFrom : null,
+        quantity_from: isPiecework ? form.quantityFrom : null,
+        quantity_to: isPiecework ? form.quantityTo : null,
+        notes: form.notes || null,
       }
 
-      const result = existing
-        ? await supabase.from('work_entries').update(payload).eq('id', existing.id)
-        : await supabase.from('work_entries').insert(payload)
+      return upsertWorkEntry(payload, existingId)
+    },
+    onSuccess: (_entry, variables) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar() })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard() })
+      toast.success(variables.existingId ? 'Zaktualizowano wpis' : 'Dodano wpis')
+      onSuccess?.()
+    },
+    onError: () => toast.error('Błąd podczas zapisywania'),
+  })
 
-      if (result.error) {
-        toast.error('Błąd podczas zapisywania')
-      } else {
-        toast.success(existing ? 'Zaktualizowano wpis' : 'Dodano wpis')
-        await onSuccess()
-        onClose()
-      }
-    } finally {
-      setIsSaving(false)
-    }
-  }, [supabase, deps])
+  const deleteMutation = useMutation({
+    mutationKey: MUTATION_KEYS.workEntry.delete,
+    mutationFn: (entryId: string) => deleteWorkEntry(entryId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar() })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard() })
+      toast.success('Usunięto wpis')
+      onSuccess?.()
+    },
+    onError: () => toast.error('Błąd podczas usuwania'),
+  })
 
-  const deleteEntry = useCallback(async () => {
-    const { selectedDay, currentYear, currentMonth, entriesByDate, onSuccess, onClose } = deps
-    if (!selectedDay) return
-
-    const dateStr = getDateString(currentYear, currentMonth, selectedDay)
-    const existing = entriesByDate.get(dateStr)
-    if (!existing) return
-
-    setIsSaving(true)
-    try {
-      const { error } = await supabase.from('work_entries').delete().eq('id', existing.id)
-      if (error) {
-        toast.error('Błąd podczas usuwania')
-      } else {
-        toast.success('Usunięto wpis')
-        await onSuccess()
-        onClose()
-      }
-    } finally {
-      setIsSaving(false)
-    }
-  }, [supabase, deps])
-
-  const clonePreviousDayEntry = useCallback(() => {
-    const { selectedDay, currentYear, currentMonth, entriesByDate, populateForm } = deps
-    if (!selectedDay) return
-
-    const currentDate = getDateString(currentYear, currentMonth, selectedDay)
-    if (isFutureDate(currentDate)) return
-
-    const prevDate = new Date(currentYear, currentMonth, selectedDay - 1)
-    const prevDateStr = getDateString(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate())
-    const prev = entriesByDate.get(prevDateStr)
-
-    if (!prev) {
-      toast.error('Brak wpisu w poprzednim dniu')
-      return
-    }
-
-    populateForm(prev)
-    toast.success('Skopiowano z poprzedniego dnia')
-  }, [deps])
-
-  return { isSaving, saveEntry, deleteEntry, clonePreviousDayEntry }
+  return {
+    saveEntry: saveMutation.mutate,
+    deleteEntry: deleteMutation.mutate,
+    isSaving: saveMutation.isPending || deleteMutation.isPending,
+  }
 }

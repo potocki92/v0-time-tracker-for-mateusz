@@ -1,17 +1,17 @@
 import type { Client, WorkEntry } from '@/lib/types'
 import { getDateString } from '@/lib/helpers'
-import { DayCell } from './DayCell'
 import { cn } from '@/lib/utils'
+import { DayCell } from './DayCell'
 
-interface CalendarGridProps {
+interface Props {
   daysInMonth: number
   firstDayOfMonth: number
   currentMonth: number
   currentYear: number
   entriesByDate: Map<string, WorkEntry>
   clients: Client[]
-  onOpenDay: (day: number) => void
   eurToPln: number
+  onOpenDay: (day: number) => void
 }
 
 export function CalendarGrid({
@@ -21,27 +21,25 @@ export function CalendarGrid({
   currentYear,
   entriesByDate,
   clients,
-  onOpenDay,
   eurToPln,
-}: CalendarGridProps) {
+  onOpenDay,
+}: Props) {
   return (
-    <div className="grid grid-cols-7 gap-1.5">
-      {/* Empty leading cells */}
+    <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
       {Array.from({ length: firstDayOfMonth }).map((_, i) => {
-        const colIndex = i
-        const isWeekend = colIndex >= 5
+        const isWeekend = i >= 5
         return (
           <div
             key={`empty-${i}`}
             className={cn(
-              'h-20 sm:h-24 rounded-lg',
+              'h-16 sm:h-24 rounded-lg',
               isWeekend ? 'bg-muted/20' : '',
             )}
+            aria-hidden
           />
         )
       })}
 
-      {/* Day cells */}
       {Array.from({ length: daysInMonth }).map((_, i) => {
         const day = i + 1
         const dateStr = getDateString(currentYear, currentMonth, day)
