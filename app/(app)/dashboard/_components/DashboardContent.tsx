@@ -1,108 +1,62 @@
-// app/(app)/dashboard/_components/DashboardContent.tsx
 'use client'
 
-import { useState, useMemo }          from 'react'
-import { useDashboardData }           from '../_hooks'
-import { useFilteredEntries }         from '../_hooks/useFilteredEntries'
-import { useEarningsTrend }           from '../_hooks/useEarningsTrend'
-import { useEarningsSparkline }       from '../_hooks/useEarningsSparkline'
-import { usePeriodLabel }             from '../_hooks/usePeriodLabel'
-import { useUnpaidInvoices }          from '../_hooks/useUnpaidInvoices'
-import { useEffectiveEurRate, useGoal } from '../_hooks/usePreferencesStore'
-import { getDateRange, getPrevRange } from '@/lib/date/dateRange'
-import type { TimeRange }             from '../_domain/dashboard.types'
-import { DashboardHeader }            from './DashboardHeader'
-import { EarningsCard }               from './card/EarningsCard'
-import { GoalCard }                   from './card/GoalCard'
-import { StatsCards }                 from './card/StatsCards'
-import { EarningsChart }              from './chart/EarningsChart'
+import { Suspense } from 'react'
 import {
-  ChartErrorBoundary,
-  InvoicesErrorBoundary,
-  StatsErrorBoundary,
-  EarningsCardBoundary,
-  GoalCardBoundary,
-} from './errors'
-import { InvoicesList } from './invoices'
-import { useDashboardTotals } from '../_hooks/useDashboardTotal'
+  DashboardRangeProvider,
+  HeaderSection,
+  KpiSection,
+  StatsSection,
+  ChartSection,
+  InvoicesSection,
+} from './sections'
+import {
+  HeaderSkeleton,
+  KpiSkeleton,
+  StatsSkeleton,
+  ChartSkeleton,
+  InvoicesSkeleton,
+} from './skeletons'
 
+/**
+ * Dashboard jest rozbity na niezależne sekcje, każda z własnym <Suspense>.
+ *
+ * Dziś wszystkie sekcje współdzielą jeden queryKey (useDashboardData),
+ * więc React Query dedupuje fetch — ale per-section Suspense daje:
+ *   (a) izolację re-suspense przy invalidacji cache,
+ *   (b) gotowość na przyszły split zapytań bez zmian tutaj,
+ *   (c) mniejsze zakresy re-renderów.
+ *
+ * Skeleton per sekcja ma stabilną wysokość (content-visibility + intrinsic-size),
+ * co eliminuje CLS po zhydraowaniu danych.
+ */
 export function DashboardContent() {
-  const { data } = useDashboardData()
-  const [range, setRange] = useState<TimeRange>('current_week')
-
-  const { userName, workEntries, clients, invoices } = data
-
-  const eurRate = useEffectiveEurRate()
-  const goal    = useGoal()
-
-  const dateRange      = useMemo(() => getDateRange(range),     [range])
-  const prevRange      = useMemo(() => getPrevRange(dateRange), [dateRange])
-  const filtered       = useFilteredEntries(workEntries, dateRange)
-  const prevFiltered   = useFilteredEntries(workEntries, prevRange)
-  const totals         = useDashboardTotals(filtered, clients)
-  const trend          = useEarningsTrend(filtered, prevFiltered, clients)
-  const sparklineData  = useEarningsSparkline(filtered, clients)
-  const unpaidInvoices = useUnpaidInvoices(invoices)
-  const periodLabel    = usePeriodLabel(range)
-  const clientsCount   = useMemo(
-    () => new Set(filtered.map((e) => e.client_id).filter(Boolean)).size,
-    [filtered],
-  )
-
   return (
-    <div className="container space-y-6 px-4 py-6">
-      <DashboardHeader
-        range={range}
-        onChangeRange={setRange}
-        userName={userName}
-        periodLabel={periodLabel}
-      />
+    <DashboardRangeProvider>
+      <div className="container space-y-6 px-4 py-6">
+        <Suspense fallback={<HeaderSkeleton />}>
+          <HeaderSection />
+        </Suspense>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <EarningsCardBoundary>
-          <EarningsCard
-            totalPLN={totals.totalEarningsAllPLN}
-            totalEUR={totals.earningsEUR}
-            earningsOnlyPLN={totals.earningsPLN}
-            trend={trend}
-            sparklineData={sparklineData}
-            periodLabel={periodLabel}
-          />
-        </EarningsCardBoundary>
+        <Suspense fallback={<KpiSkeleton />}>
+          <KpiSection />
+        </Suspense>
 
-        <GoalCardBoundary>
-          <GoalCard
-            progress={goal?.amount ? (totals.totalEarningsAllPLN / goal.amount) * 100 : 0}
-            target={goal?.amount ?? 0}
-            currency={goal?.currency ?? 'PLN'}
-          />
-        </GoalCardBoundary>
-      </div>
+        <Suspense fallback={<StatsSkeleton />}>
+          <StatsSection />
+        </Suspense>
 
-      <StatsErrorBoundary>
-        <StatsCards
-          totalHours={totals.totalHours}
-          totalDays={totals.totalDays}
-          clientsCount={clientsCount}
-          absences={totals.vacationDays + totals.sickDays}
-        />
-      </StatsErrorBoundary>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <Suspense fallback={<ChartSkeleton />}>
+              <ChartSection />
+            </Suspense>
+          </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <ChartErrorBoundary>
-            <EarningsChart
-              workEntries={workEntries}
-              clients={clients}
-              eurToPlnRate={eurRate}
-            />
-          </ChartErrorBoundary>
+          <Suspense fallback={<InvoicesSkeleton />}>
+            <InvoicesSection />
+          </Suspense>
         </div>
-
-        <InvoicesErrorBoundary>
-          <InvoicesList invoices={unpaidInvoices} />
-        </InvoicesErrorBoundary>
       </div>
-    </div>
+    </DashboardRangeProvider>
   )
 }
