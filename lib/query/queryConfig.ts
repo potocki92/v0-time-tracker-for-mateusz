@@ -12,6 +12,12 @@ export const QUERY_CONFIG = {
     retry:     1,
     refetchOnWindowFocus: 'always' as const, // dane finansowe — zawsze świeże
   },
+  calendar: {
+    staleTime: MINUTE * 5,
+    gcTime:    MINUTE * 30,
+    retry:     1,
+    refetchOnWindowFocus: 'always' as const,
+  },
   invoices: {
     staleTime: MINUTE * 2,
     gcTime:    MINUTE * 15,

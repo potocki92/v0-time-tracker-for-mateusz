@@ -1,0 +1,78 @@
+import { createClient } from '@/lib/supabase/client'
+import type { Client, Project, WorkEntry } from '@/lib/types'
+
+/**
+ * Surowe fetchers modułu kalendarza — tylko transport, zero logiki biznesowej.
+ * Analogicznie do dashboard.fetchers.ts.
+ */
+
+function getSupabase() {
+  return createClient()
+}
+
+export async function fetchCalendarClients(userId: string): Promise<Client[]> {
+  const { data, error } = await getSupabase()
+    .from('clients')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (error) throw new Error(`fetchCalendarClients: ${error.message}`)
+  return data ?? []
+}
+
+export async function fetchCalendarProjects(userId: string): Promise<Project[]> {
+  const { data, error } = await getSupabase()
+    .from('projects')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (error) throw new Error(`fetchCalendarProjects: ${error.message}`)
+  return data ?? []
+}
+
+export async function fetchCalendarWorkEntries(userId: string): Promise<WorkEntry[]> {
+  const { data, error } = await getSupabase()
+    .from('work_entries')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (error) throw new Error(`fetchCalendarWorkEntries: ${error.message}`)
+  return data ?? []
+}
+
+export async function fetchCurrentUser() {
+  const { data: { user }, error } = await getSupabase().auth.getUser()
+  if (error || !user) throw new Error('User not authenticated')
+  return user
+}
+
+// ── Mutacje ───────────────────────────────────────────────────────────────────
+
+type WorkEntryPayload = Partial<WorkEntry> & {
+  user_id: string
+  date: string
+  status: WorkEntry['status']
+}
+
+export async function upsertWorkEntry(
+  payload: WorkEntryPayload,
+  existingId?: string,
+): Promise<WorkEntry> {
+  const supabase = getSupabase()
+  const query = existingId
+    ? supabase.from('work_entries').update(payload).eq('id', existingId).select().single()
+    : supabase.from('work_entries').insert(payload).select().single()
+
+  const { data, error } = await query
+  if (error) throw new Error(`upsertWorkEntry: ${error.message}`)
+  return data as WorkEntry
+}
+
+export async function deleteWorkEntry(entryId: string): Promise<void> {
+  const { error } = await getSupabase()
+    .from('work_entries')
+    .delete()
+    .eq('id', entryId)
+
+  if (error) throw new Error(`deleteWorkEntry: ${error.message}`)
+}

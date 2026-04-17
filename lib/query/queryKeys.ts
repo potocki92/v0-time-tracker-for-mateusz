@@ -16,6 +16,7 @@ export interface WorkEntriesFilter {
 export const QUERY_KEYS = {
   all:         () => ['dashboard-module']                    as const,
   dashboard:   () => [...QUERY_KEYS.all(), 'data']           as const,
+  calendar:    () => [...QUERY_KEYS.all(), 'calendar']       as const,
   invoices:    () => [...QUERY_KEYS.all(), 'invoices']       as const,
   workEntries: (filter?: WorkEntriesFilter) =>
     [...QUERY_KEYS.all(), 'work-entries', filter ?? {}] as const,
