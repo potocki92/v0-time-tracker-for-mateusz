@@ -31,3 +31,6 @@ export type ProjectFilters = {
   search: string
   status: ProjectStatusFilter
 }
+
+export type ProjectsSortKey = 'name' | 'client' | 'status' | 'priority' | 'budget' | 'end_date' | 'start_date'
+export type ProjectsSortDirection = 'asc' | 'desc'
