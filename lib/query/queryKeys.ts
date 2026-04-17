@@ -27,6 +27,8 @@ export const QUERY_KEYS = {
       ? [...QUERY_KEYS.all(), 'client-rates', clientId] as const
       : [...QUERY_KEYS.all(), 'client-rates']           as const,
   eurRate:     () => [...QUERY_KEYS.all(), 'eur-rate']       as const,
+  projects:    () => [...QUERY_KEYS.all(), 'projects']       as const,
+  projectsData:() => [...QUERY_KEYS.all(), 'projects-data']  as const,
 } as const
 
 export type QueryKey = ReturnType<(typeof QUERY_KEYS)[keyof typeof QUERY_KEYS]>

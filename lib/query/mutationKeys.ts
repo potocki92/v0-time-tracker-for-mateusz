@@ -21,4 +21,9 @@ export const MUTATION_KEYS = {
     addRate:        ['client', 'add-rate']        as const,
     deleteRate:     ['client', 'delete-rate']     as const,
   },
+  project: {
+    create: ['project', 'create'] as const,
+    update: ['project', 'update'] as const,
+    delete: ['project', 'delete'] as const,
+  },
 } as const
