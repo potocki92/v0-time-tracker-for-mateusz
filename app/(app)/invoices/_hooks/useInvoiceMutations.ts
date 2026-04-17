@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
 import { INVOICES_MANAGER_QUERY_KEY, type SaveInvoiceInput } from '../_domain'
-import { deleteInvoice, saveInvoice } from '../_services'
+import { deleteInvoiceAction, saveInvoiceAction } from '../_services/invoices.service.server'
 
 function useInvalidateInvoices() {
   const queryClient = useQueryClient()
@@ -21,7 +21,7 @@ export function useSaveInvoice() {
 
   return useMutation({
     mutationKey: MUTATION_KEYS.invoice.create,
-    mutationFn: ({ invoiceId, values }: SaveInvoiceInput) => saveInvoice({ invoiceId, values }),
+    mutationFn: ({ invoiceId, values }: SaveInvoiceInput) => saveInvoiceAction({ invoiceId, values }),
     onSuccess: (_, variables) => {
       toast.success(variables.invoiceId ? 'Faktura została zaktualizowana' : 'Faktura została dodana')
       invalidate()
@@ -37,7 +37,7 @@ export function useDeleteInvoice() {
 
   return useMutation({
     mutationKey: MUTATION_KEYS.invoice.delete,
-    mutationFn: (invoiceId: string) => deleteInvoice(invoiceId),
+    mutationFn: (invoiceId: string) => deleteInvoiceAction(invoiceId),
     onSuccess: () => {
       toast.success('Faktura została usunięta')
       invalidate()

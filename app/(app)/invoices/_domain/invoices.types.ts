@@ -1,5 +1,7 @@
 import type { Client, CURRENCY, Invoice } from '@/lib/types'
 
+export type BillingQuarter = 'Q1' | 'Q2' | 'Q3' | 'Q4'
+
 export interface InvoicesData {
   invoices: Invoice[]
   clients: Client[]
@@ -12,6 +14,8 @@ export interface InvoiceFormValues {
   invoice_number: string
   recipient: string
   billing_period: string
+  billing_quarter: BillingQuarter
+  billing_year: number
   invoice_date: string
   amount: number
   currency: CURRENCY
