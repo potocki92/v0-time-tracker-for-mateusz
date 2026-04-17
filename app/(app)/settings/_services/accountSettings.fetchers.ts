@@ -1,14 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import type { AccountProfile, AccountSettingsFormValues } from '../_domain'
 
-type ProfileRow = {
-  id: string
-  full_name: string | null
-  username: string | null
-  avatar_url: string | null
-  email: string | null
-}
-
 export async function fetchAccountProfile(): Promise<AccountProfile> {
   const supabase = createClient()
 
@@ -20,29 +12,12 @@ export async function fetchAccountProfile(): Promise<AccountProfile> {
   if (authError) throw authError
   if (!user) throw new Error('Brak aktywnej sesji użytkownika')
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, full_name, username, avatar_url, email')
-    .eq('id', user.id)
-    .maybeSingle<ProfileRow>()
-
-  if (error) throw error
-  if (!data) {
-    return {
-      id: user.id,
-      full_name: (user.user_metadata.full_name as string | undefined) ?? null,
-      username: null,
-      avatar_url: (user.user_metadata.avatar_url as string | undefined) ?? null,
-      email: user.email ?? null,
-    }
-  }
-
   return {
-    id: data.id,
-    full_name: data.full_name,
-    username: data.username,
-    avatar_url: data.avatar_url,
-    email: data.email ?? user.email ?? null,
+    id: user.id,
+    full_name: (user.user_metadata.full_name as string | undefined) ?? null,
+    username: (user.user_metadata.username as string | undefined) ?? null,
+    avatar_url: (user.user_metadata.avatar_url as string | undefined) ?? null,
+    email: user.email ?? null,
   }
 }
 
@@ -57,15 +32,14 @@ export async function updateAccountProfile(values: AccountSettingsFormValues) {
   if (authError) throw authError
   if (!user) throw new Error('Brak aktywnej sesji użytkownika')
 
-  const payload = {
-    id: user.id,
-    full_name: values.fullName,
-    username: values.username,
-    email: user.email ?? null,
-    updated_at: new Date().toISOString(),
-  }
+  const { error } = await supabase.auth.updateUser({
+    data: {
+      ...user.user_metadata,
+      full_name: values.fullName,
+      username: values.username,
+    },
+  })
 
-  const { error } = await supabase.from('profiles').upsert(payload, { onConflict: 'id' })
   if (error) throw error
 }
 
@@ -92,10 +66,12 @@ export async function uploadAvatar(file: File): Promise<string> {
   const { data } = supabase.storage.from('avatars').getPublicUrl(path)
   const publicUrl = data.publicUrl
 
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
-    .eq('id', user.id)
+  const { error: updateError } = await supabase.auth.updateUser({
+    data: {
+      ...user.user_metadata,
+      avatar_url: publicUrl,
+    },
+  })
 
   if (updateError) throw updateError
 

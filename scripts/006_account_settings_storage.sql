@@ -1,11 +1,4 @@
--- Account settings: username + avatar in profiles and avatars storage bucket.
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS username TEXT,
-  ADD COLUMN IF NOT EXISTS avatar_url TEXT;
-
-CREATE UNIQUE INDEX IF NOT EXISTS profiles_username_unique_idx
-  ON public.profiles (LOWER(username))
-  WHERE username IS NOT NULL;
+-- Account settings storage setup for avatar uploads.
 
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('avatars', 'avatars', true)
