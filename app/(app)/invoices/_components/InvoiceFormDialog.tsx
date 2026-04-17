@@ -1,9 +1,9 @@
 'use client'
 
 import { useMemo, useState, type ChangeEvent } from 'react'
-import { Check, CheckCircle2, ChevronsUpDown, Clock3, Upload } from 'lucide-react'
+import { ArrowDownAZ, ArrowUpAZ, Check, CheckCircle2, ChevronsUpDown, Clock3, Upload } from 'lucide-react'
 import type { Client, Invoice } from '@/lib/types'
-import type { InvoiceFormValues } from '../_domain'
+import type { BillingQuarter, InvoiceFormValues } from '../_domain'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
@@ -26,6 +26,8 @@ interface InvoiceFormDialogProps {
   onSave: () => void
 }
 
+const QUARTERS: BillingQuarter[] = ['Q1', 'Q2', 'Q3', 'Q4']
+
 export function InvoiceFormDialog({
   open,
   isSaving,
@@ -37,6 +39,7 @@ export function InvoiceFormDialog({
   onSave,
 }: InvoiceFormDialogProps) {
   const [clientPopoverOpen, setClientPopoverOpen] = useState(false)
+  const [clientQuery, setClientQuery] = useState('')
 
   const clientDisplayLabel = useMemo(() => {
     if (values.client_id) {
@@ -50,7 +53,9 @@ export function InvoiceFormDialog({
     return 'Bez klienta'
   }, [clients, values.client_id, values.new_client_name])
 
-  const normalizedNames = useMemo(() => clients.map((client) => client.name.toLowerCase()), [clients])
+  const normalizedQuery = clientQuery.trim().toLowerCase()
+  const existingNameSet = useMemo(() => new Set(clients.map((client) => client.name.trim().toLowerCase())), [clients])
+  const canCreateClient = normalizedQuery.length > 0 && !existingNameSet.has(normalizedQuery)
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null
@@ -77,14 +82,80 @@ export function InvoiceFormDialog({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="recipient">Do kogo *</Label>
-              <Input
-                id="recipient"
-                value={values.recipient}
-                onChange={(event) => onValuesChange((prev) => ({ ...prev, recipient: event.target.value }))}
-                placeholder="Nazwa firmy / odbiorca"
-              />
+              <Label>Klient</Label>
+              <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" className="justify-between font-normal">
+                    <span className="truncate">{clientDisplayLabel}</span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[320px] p-0" align="start">
+                  <Command>
+                    <CommandInput
+                      value={clientQuery}
+                      onValueChange={setClientQuery}
+                      placeholder="Wyszukaj lub dodaj klienta..."
+                    />
+                    <CommandList>
+                      <CommandEmpty>Brak klientów pasujących do frazy.</CommandEmpty>
+                      <CommandGroup heading="Klienci">
+                        <CommandItem
+                          value="bez-klienta"
+                          onSelect={() => {
+                            onValuesChange((prev) => ({ ...prev, client_id: null, new_client_name: '', recipient: '' }))
+                            setClientQuery('')
+                            setClientPopoverOpen(false)
+                          }}
+                        >
+                          <Check className={cn('mr-2 h-4 w-4', !values.client_id && !values.new_client_name ? 'opacity-100' : 'opacity-0')} />
+                          Bez klienta
+                        </CommandItem>
+                        {clients.map((client) => (
+                          <CommandItem
+                            key={client.id}
+                            value={client.name}
+                            onSelect={() => {
+                              onValuesChange((prev) => ({
+                                ...prev,
+                                client_id: client.id,
+                                new_client_name: '',
+                                recipient: client.name,
+                              }))
+                              setClientQuery('')
+                              setClientPopoverOpen(false)
+                            }}
+                          >
+                            <Check className={cn('mr-2 h-4 w-4', values.client_id === client.id ? 'opacity-100' : 'opacity-0')} />
+                            {client.name}
+                          </CommandItem>
+                        ))}
+                        {canCreateClient && (
+                          <CommandItem
+                            value={`new-${clientQuery}`}
+                            onSelect={() => {
+                              const newClient = clientQuery.trim()
+                              onValuesChange((prev) => ({
+                                ...prev,
+                                client_id: null,
+                                new_client_name: newClient,
+                                recipient: newClient,
+                              }))
+                              setClientQuery('')
+                              setClientPopoverOpen(false)
+                            }}
+                          >
+                            <ArrowUpAZ className="mr-2 h-4 w-4 text-primary" />
+                            Dodaj nowego: {clientQuery.trim()}
+                          </CommandItem>
+                        )}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
+
             <div className="grid gap-2">
               <Label htmlFor="invoice-number">Numer faktury</Label>
               <Input
@@ -136,74 +207,40 @@ export function InvoiceFormDialog({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label>Klient</Label>
-              <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" role="combobox" className="justify-between font-normal">
-                    <span className="truncate">{clientDisplayLabel}</span>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[320px] p-0" align="start">
-                  <Command>
-                    <CommandInput placeholder="Wyszukaj klienta lub wpisz nowego..." />
-                    <CommandList>
-                      <CommandEmpty>Brak wyników.</CommandEmpty>
-                      <CommandGroup heading="Klienci">
-                        <CommandItem
-                          value="bez-klienta"
-                          onSelect={() => {
-                            onValuesChange((prev) => ({ ...prev, client_id: null, new_client_name: '' }))
-                            setClientPopoverOpen(false)
-                          }}
-                        >
-                          <Check className={cn('mr-2 h-4 w-4', !values.client_id && !values.new_client_name ? 'opacity-100' : 'opacity-0')} />
-                          Bez klienta
-                        </CommandItem>
-                        {clients.map((client) => (
-                          <CommandItem
-                            key={client.id}
-                            value={client.name}
-                            onSelect={() => {
-                              onValuesChange((prev) => ({ ...prev, client_id: client.id, new_client_name: '' }))
-                              setClientPopoverOpen(false)
-                            }}
-                          >
-                            <Check className={cn('mr-2 h-4 w-4', values.client_id === client.id ? 'opacity-100' : 'opacity-0')} />
-                            {client.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-
-              <Input
-                value={values.new_client_name}
-                onChange={(event) =>
-                  onValuesChange((prev) => ({
-                    ...prev,
-                    new_client_name: event.target.value,
-                    client_id: null,
-                  }))
-                }
-                placeholder="lub wpisz nazwę nowego klienta"
-              />
-              {values.new_client_name.trim() && normalizedNames.includes(values.new_client_name.trim().toLowerCase()) && (
-                <p className="text-xs text-muted-foreground">Klient o tej nazwie już istnieje — zostanie użyty istniejący rekord.</p>
-              )}
+              <Label>Kwartał</Label>
+              <Select
+                value={values.billing_quarter}
+                onValueChange={(value: BillingQuarter) => onValuesChange((prev) => ({ ...prev, billing_quarter: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUARTERS.map((quarter) => (
+                    <SelectItem key={quarter} value={quarter}>
+                      {quarter}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="billing-period">Okres rozliczeniowy</Label>
+              <Label htmlFor="billing-year">Rok rozliczeniowy</Label>
               <Input
-                id="billing-period"
-                value={values.billing_period}
-                onChange={(event) => onValuesChange((prev) => ({ ...prev, billing_period: event.target.value }))}
-                placeholder="np. Marzec 2026"
+                id="billing-year"
+                type="number"
+                min={2000}
+                max={2100}
+                value={values.billing_year}
+                onChange={(event) => onValuesChange((prev) => ({ ...prev, billing_year: Number(event.target.value || new Date().getFullYear()) }))}
               />
             </div>
+          </div>
+
+          <div className="rounded-md border border-border/80 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+            <ArrowDownAZ className="mr-2 inline size-3" />
+            Okres rozliczeniowy zostanie zapisany jako: <span className="font-medium text-foreground">{values.billing_quarter} {values.billing_year}</span>
           </div>
 
           <div className="flex items-center justify-between rounded-lg border p-3">

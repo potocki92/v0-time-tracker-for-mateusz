@@ -11,13 +11,17 @@ import { InvoicesTable } from './InvoicesTable'
 import { InvoiceFormDialog } from './InvoiceFormDialog'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
 import { useDeleteInvoice, useInvoicesData, useInvoicesFilters, useSaveInvoice } from '../_hooks'
-import type { InvoiceFormValues } from '../_domain'
+import type { BillingQuarter, InvoiceFormValues } from '../_domain'
+
+const CURRENT_YEAR = new Date().getFullYear()
 
 const INITIAL_VALUES: InvoiceFormValues = {
   name: '',
   invoice_number: '',
   recipient: '',
   billing_period: '',
+  billing_quarter: 'Q1',
+  billing_year: CURRENT_YEAR,
   invoice_date: new Date().toISOString().slice(0, 10),
   amount: 0,
   currency: 'PLN',
@@ -26,6 +30,19 @@ const INITIAL_VALUES: InvoiceFormValues = {
   file: null,
   client_id: null,
   new_client_name: '',
+}
+
+function parseQuarterPeriod(period: string | null | undefined): { quarter: BillingQuarter; year: number } {
+  const fallback = { quarter: 'Q1' as BillingQuarter, year: CURRENT_YEAR }
+  if (!period) return fallback
+
+  const match = period.trim().toUpperCase().match(/(Q[1-4])\s*(\d{4})?/)
+  if (!match) return fallback
+
+  return {
+    quarter: (match[1] as BillingQuarter) ?? fallback.quarter,
+    year: match[2] ? Number(match[2]) : fallback.year,
+  }
 }
 
 export function InvoicesContent() {
@@ -46,17 +63,26 @@ export function InvoicesContent() {
 
   function openCreate() {
     setEditingInvoice(null)
-    setFormValues({ ...INITIAL_VALUES, invoice_date: new Date().toISOString().slice(0, 10) })
+    setFormValues({
+      ...INITIAL_VALUES,
+      invoice_date: new Date().toISOString().slice(0, 10),
+      billing_quarter: 'Q1',
+      billing_year: CURRENT_YEAR,
+    })
     setFormOpen(true)
   }
 
   function openEdit(invoice: Invoice) {
+    const { quarter, year } = parseQuarterPeriod(invoice.billing_period)
+
     setEditingInvoice(invoice)
     setFormValues({
       name: invoice.name ?? '',
       invoice_number: invoice.invoice_number ?? '',
       recipient: invoice.recipient ?? '',
       billing_period: invoice.billing_period ?? '',
+      billing_quarter: quarter,
+      billing_year: year,
       invoice_date: invoice.invoice_date ?? invoice.issue_date ?? new Date().toISOString().slice(0, 10),
       amount: Number(invoice.amount ?? 0),
       currency: invoice.currency,
@@ -74,7 +100,13 @@ export function InvoicesContent() {
     if (!formValues.invoice_date) return
     if (formValues.amount <= 0) return
 
-    await saveMutation.mutateAsync({ invoiceId: editingInvoice?.id, values: formValues })
+    await saveMutation.mutateAsync({
+      invoiceId: editingInvoice?.id,
+      values: {
+        ...formValues,
+        billing_period: `${formValues.billing_quarter} ${formValues.billing_year}`,
+      },
+    })
     setFormOpen(false)
     setEditingInvoice(null)
     setFormValues(INITIAL_VALUES)
