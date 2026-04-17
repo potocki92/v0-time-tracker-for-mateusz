@@ -26,4 +26,8 @@ export const MUTATION_KEYS = {
     update: ['project', 'update'] as const,
     delete: ['project', 'delete'] as const,
   },
+  account: {
+    updateProfile: ['account', 'update-profile'] as const,
+    uploadAvatar:  ['account', 'upload-avatar']  as const,
+  },
 } as const

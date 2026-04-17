@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { useAuth }    from './_layout/hooks/useAuth'
 import { AppSidebar } from './_layout/components/sidebar/AppSidebar'
 import { MobileHeader } from './_layout/components/sidebar/MobileHeader'
+import { SettingsDrawer } from './settings/_components'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth()
@@ -23,6 +24,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </SidebarInset>
+      <SettingsDrawer />
     </SidebarProvider>
   )
 }

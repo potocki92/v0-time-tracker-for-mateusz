@@ -18,6 +18,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react'
 import Link from 'next/link'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { useOpenModal } from '@/hooks/stores/useUiStore'
 
 function getInitials(name?: string, email?: string): string {
   if (name) {
@@ -40,6 +41,7 @@ interface SidebarUserFooterProps {
  */
 export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
   const { isMobile } = useSidebar()
+  const openModal = useOpenModal()
 
   const displayName = user?.user_metadata?.full_name as string | undefined
   const email       = user?.email
@@ -99,11 +101,12 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem asChild>
-              <Link href="/settings" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Ustawienia
-              </Link>
+            <DropdownMenuItem
+              onClick={() => openModal('settings')}
+              className="flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Ustawienia
             </DropdownMenuItem>
 
             <DropdownMenuItem asChild>
