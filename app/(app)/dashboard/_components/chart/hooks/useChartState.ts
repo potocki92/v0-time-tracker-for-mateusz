@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 
-export type Grouping = 'daily' | 'weekly' | 'monthly'
+export type Grouping = 'daily' | 'weekly' | 'monthly' | 'quarterly'
 export type Period = 'week' | 'month' | 'year'
 export type DateRange = { from: Date | null; to: Date | null }
 
@@ -8,10 +8,12 @@ export const PERIOD_OPTIONS: Record<Grouping, { value: Period; label: string }[]
   daily:   [{ value: 'week', label: 'Tydzień' }, { value: 'month', label: 'Miesiąc' }, { value: 'year', label: 'Rok' }],
   weekly:  [{ value: 'month', label: 'Miesiąc' }, { value: 'year', label: 'Rok' }],
   monthly: [{ value: 'year', label: 'Rok' }],
+  quarterly: [{ value: 'year', label: 'Rok' }],
 }
 
 const DEFAULT_PERIOD: Record<Grouping, Period> = {
   daily: 'week', weekly: 'month', monthly: 'year',
+  quarterly: 'year',
 }
 
 export function getRangeFromPeriod(period: Period): DateRange {

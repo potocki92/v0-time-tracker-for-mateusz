@@ -16,6 +16,7 @@ export function ChartControls({ grouping, period, onGroupingChange, onPeriodChan
           <TabsTrigger value="daily"   className="flex-1 text-[11px]">Dziennie</TabsTrigger>
           <TabsTrigger value="weekly"  className="flex-1 text-[11px]">Tygodniowo</TabsTrigger>
           <TabsTrigger value="monthly" className="flex-1 text-[11px]">Miesięcznie</TabsTrigger>
+          <TabsTrigger value="quarterly" className="flex-1 text-[11px]">Kwartalnie</TabsTrigger>
         </TabsList>
       </Tabs>
       <Tabs value={period} onValueChange={(v) => onPeriodChange(v as Period)} className="mt-1.5">

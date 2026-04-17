@@ -8,6 +8,7 @@ const chartConfig = {
 
 type DataItem = {
   label: string
+  date: string
   hours: number
   earningsPLN: number
   earningsEUR: number
