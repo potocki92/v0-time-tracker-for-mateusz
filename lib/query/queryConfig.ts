@@ -36,6 +36,12 @@ export const QUERY_CONFIG = {
     retry:     1,
     refetchOnWindowFocus: false, // klienci się rzadko zmieniają
   },
+  projects: {
+    staleTime: MINUTE * 5,
+    gcTime:    MINUTE * 30,
+    retry:     1,
+    refetchOnWindowFocus: 'always' as const,
+  },
   eurRate: {
     staleTime: MINUTE * 60,
     gcTime:    MINUTE * 120,

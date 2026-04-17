@@ -1,16 +1,11 @@
 import { CircleDollarSign, Clock3, FolderKanban, ListTodo } from 'lucide-react'
-
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/helpers'
+import type { ProjectStats as ProjectStatsType } from '../../_domain/projects.types'
 
-type ProjectStatsProps = {
-  active: number
-  completed: number
-  planned: number
-  totalBudget: number
-}
+type Props = ProjectStatsType
 
-export function ProjectStats({ active, completed, planned, totalBudget }: ProjectStatsProps) {
+export function ProjectStats({ active, completed, planned, totalBudget }: Props) {
   return (
     <Card>
       <CardContent className="p-3 sm:p-4">
@@ -19,25 +14,25 @@ export function ProjectStats({ active, completed, planned, totalBudget }: Projec
             icon={<ListTodo className="h-4 w-4" />}
             label="W trakcie"
             value={String(active)}
-            className="text-blue-600 bg-blue-500/10"
+            accent="text-blue-600 bg-blue-500/10"
           />
           <StatItem
             icon={<FolderKanban className="h-4 w-4" />}
             label="Zakończone"
             value={String(completed)}
-            className="text-emerald-600 bg-emerald-500/10"
+            accent="text-emerald-600 bg-emerald-500/10"
           />
           <StatItem
             icon={<Clock3 className="h-4 w-4" />}
             label="Planowane"
             value={String(planned)}
-            className="text-amber-600 bg-amber-500/10"
+            accent="text-amber-600 bg-amber-500/10"
           />
           <StatItem
             icon={<CircleDollarSign className="h-4 w-4" />}
             label="Suma budżetów"
             value={formatCurrency(totalBudget, 'PLN')}
-            className="text-violet-600 bg-violet-500/10"
+            accent="text-violet-600 bg-violet-500/10"
           />
         </div>
       </CardContent>
@@ -49,13 +44,13 @@ type StatItemProps = {
   icon: React.ReactNode
   label: string
   value: string
-  className: string
+  accent: string
 }
 
-function StatItem({ icon, label, value, className }: StatItemProps) {
+function StatItem({ icon, label, value, accent }: StatItemProps) {
   return (
     <div className="flex items-center gap-3 rounded-lg border bg-background px-3 py-2.5">
-      <div className={`flex h-8 w-8 items-center justify-center rounded-md ${className}`}>{icon}</div>
+      <div className={`flex h-8 w-8 items-center justify-center rounded-md ${accent}`}>{icon}</div>
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="truncate text-sm font-semibold sm:text-base">{value}</p>
