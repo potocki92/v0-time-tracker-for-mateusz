@@ -1,7 +1,9 @@
 import { formatCurrency } from '@/lib/helpers'
+import { getQuarterLabel } from '@/lib/date/quarter'
 
 export type TooltipPayload = {
   label: string
+  date?: string
   hours: number
   earningsPLN: number
   earningsEUR: number
@@ -15,9 +17,13 @@ export function ChartTooltip({ active, payload }: {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
   if (!d.hours && !d.earningsPLN) return null
+  const quarterLabel = d.date ? getQuarterLabel(d.date) : null
 
   return (
     <div className="rounded-lg border border-border/50 bg-background/95 px-2.5 py-2 shadow-lg backdrop-blur-sm">
+      {quarterLabel && (
+        <p className="mb-0.5 text-[10px] font-semibold text-foreground">{quarterLabel}</p>
+      )}
       <p className="mb-1 text-[10px] font-medium text-muted-foreground">{d.label}</p>
       <p className="text-xs font-bold tabular-nums">{d.hours.toFixed(1)}h</p>
       {d.earningsEUR > 0 ? (

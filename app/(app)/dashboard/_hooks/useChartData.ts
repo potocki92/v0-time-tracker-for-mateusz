@@ -4,9 +4,10 @@ import { Client, WorkEntry, MONTH_NAMES } from '@/lib/types'
 import { ChartDataItem, ChartGrouping } from '../_domain/dashboard.types'
 import { toDateKey } from '@/lib/date/format'           // ← z @/lib
 import { getWeekStart, getWeekLabel } from '@/lib/date/week' // ← z @/lib
+import { getQuarterLabel } from '@/lib/date/quarter'
 
 type DateRange = { from: Date | null; to: Date | null }
-export type ChartDataItemExtended = ChartDataItem & { earningsEUR: number }
+export type ChartDataItemExtended = ChartDataItem & { earningsEUR: number; date: string }
 
 export function useChartData(
   entries: WorkEntry[],
@@ -19,7 +20,8 @@ export function useChartData(
     if (!entries.length || !dateRange.from || !dateRange.to) return []
 
     const clientMap = new Map(clients.map((c) => [c.id, c]))
-    const grouped   = new Map<string, ChartDataItemExtended & { sortDate: Date }>()
+    type GroupedDataItem = ChartDataItem & { earningsEUR: number; sortDate: Date }
+    const grouped   = new Map<string, GroupedDataItem>()
 
     const cursor = new Date(dateRange.from)
     cursor.setHours(0, 0, 0, 0)
@@ -39,12 +41,19 @@ export function useChartData(
         label    = getWeekLabel(ws)
         sortDate = ws
         cursor.setDate(cursor.getDate() + 7)
-      } else {
+      } else if (grouping === 'monthly') {
         const ms = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
         key      = `${ms.getFullYear()}-${String(ms.getMonth() + 1).padStart(2, '0')}`
         label    = MONTH_NAMES[ms.getMonth()].slice(0, 3)
         sortDate = ms
         cursor.setMonth(cursor.getMonth() + 1, 1)
+      } else {
+        const quarterStartMonth = Math.floor(cursor.getMonth() / 3) * 3
+        const qs = new Date(cursor.getFullYear(), quarterStartMonth, 1)
+        key = `${qs.getFullYear()}-Q${Math.floor(quarterStartMonth / 3) + 1}`
+        label = getQuarterLabel(qs)
+        sortDate = qs
+        cursor.setMonth(cursor.getMonth() + 3, 1)
       }
 
       if (!grouped.has(key)) {
@@ -54,9 +63,13 @@ export function useChartData(
 
     for (const entry of entries) {
       const d   = new Date(entry.date)
-      const key = grouping === 'daily'   ? toDateKey(d)
-                : grouping === 'weekly'  ? toDateKey(getWeekStart(d))
-                : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      const key = grouping === 'daily'
+        ? toDateKey(d)
+        : grouping === 'weekly'
+          ? toDateKey(getWeekStart(d))
+          : grouping === 'monthly'
+            ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+            : `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`
 
       const bucket = grouped.get(key)
       if (!bucket) continue
@@ -70,11 +83,12 @@ export function useChartData(
 
     return Array.from(grouped.values())
       .sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime())
-      .map(({ label, earningsPLN, earningsEUR, hours }) => ({
+      .map(({ label, earningsPLN, earningsEUR, hours, sortDate }) => ({
         label,
         earningsPLN: Number(earningsPLN.toFixed(2)),
         earningsEUR: Number(earningsEUR.toFixed(2)),
         hours:       Number(hours.toFixed(1)),
+        date: sortDate.toISOString(),
       }))
   }, [entries, clients, grouping, eurRate, dateRange])
 }

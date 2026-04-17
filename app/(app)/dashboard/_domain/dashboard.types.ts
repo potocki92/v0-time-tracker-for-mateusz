@@ -9,7 +9,7 @@ export type TimeRange =
   | 'current_year'
   | 'all'
 
-export type ChartGrouping = 'daily' | 'weekly' | 'monthly'
+export type ChartGrouping = 'daily' | 'weekly' | 'monthly' | 'quarterly'
 
 export type DashboardData = {
   userName: string
