@@ -86,6 +86,7 @@ export function createInvoiceColumns({
       ),
       size: 140,
       minSize: 100,
+      maxSize: 320,
     },
     {
       id: 'client',
@@ -110,6 +111,7 @@ export function createInvoiceColumns({
       sortingFn: 'alphanumeric',
       size: 240,
       minSize: 160,
+      maxSize: 480,
     },
     {
       id: 'invoice_date',
@@ -118,6 +120,7 @@ export function createInvoiceColumns({
       cell: ({ row }) => formatInvoiceDate(row.original.invoice_date || row.original.issue_date),
       size: 140,
       minSize: 110,
+      maxSize: 240,
     },
     {
       id: 'billing_period',
@@ -126,6 +129,7 @@ export function createInvoiceColumns({
       cell: ({ row }) => row.original.billing_period || '-',
       size: 120,
       minSize: 90,
+      maxSize: 200,
     },
     {
       id: 'status',
@@ -145,6 +149,7 @@ export function createInvoiceColumns({
       ),
       size: 140,
       minSize: 110,
+      maxSize: 200,
     },
     {
       id: 'amount',
@@ -153,6 +158,7 @@ export function createInvoiceColumns({
       cell: ({ row }) => formatCurrency(row.original.amount, row.original.currency),
       size: 140,
       minSize: 110,
+      maxSize: 240,
     },
     {
       id: 'actions',
