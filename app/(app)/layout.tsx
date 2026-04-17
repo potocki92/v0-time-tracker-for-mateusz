@@ -12,13 +12,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider defaultOpen={false}>
+      <a href="#main-content" className="skip-link">
+        Przejdź do treści
+      </a>
       <AppSidebar user={user} onLogout={logout} />
       {/* SidebarInset: wypycha content gdy sidebar rozwinięty */}
       <SidebarInset>
         <MobileHeader user={user} onLogout={logout} />
-        <div className="flex-1">
+        <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
           {children}
-        </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )

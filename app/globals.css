@@ -12,14 +12,20 @@
   --popover-foreground: oklch(0.14 0.005 240);
   --primary: oklch(0.55 0.18 160);
   --primary-foreground: oklch(1 0 0);
+  /* Tekst/ikony akcentu na jasnych tłach — WCAG AA min 4.5:1 vs --background/--card. */
+  --primary-accessible: oklch(0.42 0.15 160);
+  --success: oklch(0.55 0.15 150);
+  --success-foreground: oklch(0.38 0.14 150);
+  --warning: oklch(0.70 0.17 80);
+  --warning-foreground: oklch(0.42 0.15 80);
   --secondary: oklch(0.96 0.005 240);
   --secondary-foreground: oklch(0.25 0.005 240);
   --muted: oklch(0.95 0.005 240);
-  --muted-foreground: oklch(0.50 0.01 240);
+  --muted-foreground: oklch(0.45 0.01 240);
   --accent: oklch(0.94 0.01 160);
   --accent-foreground: oklch(0.30 0.08 160);
   --destructive: oklch(0.55 0.22 27);
-  --destructive-foreground: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.91 0.005 240);
   --input: oklch(0.91 0.005 240);
   --ring: oklch(0.55 0.18 160);
@@ -39,6 +45,19 @@
   --sidebar-ring: oklch(0.55 0.18 160);
 }
 
+/* Forced-contrast fallback — użytkownicy z ustawieniem "zwiększony kontrast" dostają
+ * ciemniejsze odcienie akcentu i czarne kontury focus. */
+@media (prefers-contrast: more) {
+  :root {
+    --primary: oklch(0.35 0.20 160);
+    --primary-accessible: oklch(0.32 0.18 160);
+    --success-foreground: oklch(0.30 0.14 150);
+    --muted-foreground: oklch(0.32 0.01 240);
+    --ring: oklch(0.25 0.05 240);
+    --border: oklch(0.60 0.01 240);
+  }
+}
+
 .dark {
   --background: oklch(0.13 0.01 250);
   --foreground: oklch(0.95 0.005 240);
@@ -48,17 +67,23 @@
   --popover-foreground: oklch(0.95 0.005 240);
   --primary: oklch(0.65 0.20 160);
   --primary-foreground: oklch(0.13 0.01 250);
+  /* Tekst akcentu na ciemnym tle — jaśniejszy wariant dla AA 4.5:1. */
+  --primary-accessible: oklch(0.78 0.18 160);
+  --success: oklch(0.70 0.17 150);
+  --success-foreground: oklch(0.80 0.16 150);
+  --warning: oklch(0.75 0.17 80);
+  --warning-foreground: oklch(0.82 0.15 80);
   --secondary: oklch(0.22 0.01 250);
   --secondary-foreground: oklch(0.90 0.005 240);
   --muted: oklch(0.22 0.01 250);
-  --muted-foreground: oklch(0.60 0.01 240);
+  --muted-foreground: oklch(0.72 0.01 240);
   --accent: oklch(0.25 0.03 160);
-  --accent-foreground: oklch(0.65 0.20 160);
-  --destructive: oklch(0.45 0.18 27);
-  --destructive-foreground: oklch(0.65 0.22 27);
+  --accent-foreground: oklch(0.80 0.14 160);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.98 0.005 27);
   --border: oklch(0.24 0.01 250);
   --input: oklch(0.24 0.01 250);
-  --ring: oklch(0.65 0.20 160);
+  --ring: oklch(0.78 0.18 160);
   --chart-1: oklch(0.65 0.20 160);
   --chart-2: oklch(0.55 0.15 250);
   --chart-3: oklch(0.70 0.15 40);
@@ -85,6 +110,11 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-accessible: var(--primary-accessible);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -121,6 +151,46 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+  }
+
+  /* Uniwersalny focus-visible — zgodny z WCAG 2.2 SC 2.4.11 (Focus Not Obscured),
+   * zawsze widoczny także na jasnych kartach dzięki outline-offset. */
+  :where(a, button, [role='button'], [role='tab'], [role='menuitem'], input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm, 0.25rem);
+  }
+
+  /* Windows High Contrast Mode — użyj systemowych kolorów zamiast oklch. */
+  @media (forced-colors: active) {
+    :where(a, button, [role='button'], [role='tab'], [role='menuitem']):focus-visible {
+      outline: 2px solid CanvasText;
+      outline-offset: 2px;
+    }
+  }
+}
+
+@layer components {
+  /* Skip-link — widoczny dopiero po focusie (Tab), pomija nawigację i sidebar. */
+  .skip-link {
+    position: absolute;
+    inset-inline-start: 0.5rem;
+    inset-block-start: 0.5rem;
+    z-index: 100;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transform: translateY(-150%);
+    transition: transform 150ms ease-out;
+  }
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 
