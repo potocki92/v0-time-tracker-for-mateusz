@@ -6,7 +6,6 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/
 import { FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { InvoicesHeader } from './InvoicesHeader'
-import { InvoicesFilters } from './InvoicesFilters'
 import { InvoicesTable } from './InvoicesTable'
 import { InvoiceFormDialog } from './InvoiceFormDialog'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
@@ -122,27 +121,27 @@ export function InvoicesContent() {
     <div className="container space-y-6 px-4 py-8">
       <InvoicesHeader onCreate={openCreate} />
 
-      <InvoicesFilters query={query} status={status} onQueryChange={setQuery} onStatusChange={setStatus} />
-
-      {filteredInvoices.length === 0 ? (
+      {!hasInvoices ? (
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <FileText className="size-5" />
             </EmptyMedia>
-            <EmptyTitle>{hasInvoices ? 'Brak wyników wyszukiwania' : 'Nie masz jeszcze faktur'}</EmptyTitle>
+            <EmptyTitle>Nie masz jeszcze faktur</EmptyTitle>
             <EmptyDescription>
-              {hasInvoices
-                ? 'Zmień frazę wyszukiwania albo filtr statusu i spróbuj ponownie.'
-                : 'Dodaj pierwszą fakturę, aby rozpocząć zarządzanie rozliczeniami.'}
+              Dodaj pierwszą fakturę, aby rozpocząć zarządzanie rozliczeniami.
             </EmptyDescription>
           </EmptyHeader>
-          {!hasInvoices && <Button onClick={openCreate}>Dodaj pierwszą fakturę</Button>}
+          <Button onClick={openCreate}>Dodaj pierwszą fakturę</Button>
         </Empty>
       ) : (
         <InvoicesTable
           invoices={filteredInvoices}
           clients={data.clients}
+          query={query}
+          status={status}
+          onQueryChange={setQuery}
+          onStatusChange={setStatus}
           onEdit={openEdit}
           onDelete={setDeletingInvoice}
         />
