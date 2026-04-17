@@ -1,2 +1,2 @@
-export { ProjectsGrid } from './ProjectsGrid'
+export { ProjectsTable } from './ProjectsTable'
 export { ProjectsEmpty } from './ProjectsEmpty'

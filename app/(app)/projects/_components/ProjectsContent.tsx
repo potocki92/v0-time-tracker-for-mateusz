@@ -12,7 +12,7 @@ import {
 import { ProjectsHeader } from './ProjectsHeader'
 import { ProjectsToolbar } from './ProjectsToolbar'
 import { ProjectStats } from './card/ProjectStats'
-import { ProjectsGrid } from './list/ProjectsGrid'
+import { ProjectsTable } from './list/ProjectsTable'
 import { ProjectsEmpty } from './list/ProjectsEmpty'
 import { ProjectFormDialog } from './form/ProjectFormDialog'
 import { ProjectDeleteDialog } from './form/ProjectDeleteDialog'
@@ -76,10 +76,13 @@ export function ProjectsContent() {
             onClearFilters={resetFilters}
           />
         ) : (
-          <ProjectsGrid
+          <ProjectsTable
             projects={filters.filtered}
             clients={clients}
             workEntries={workEntries}
+            sortKey={filters.sortKey}
+            sortDirection={filters.sortDirection}
+            onSort={filters.toggleSort}
             onEdit={form.openEdit}
             onDelete={setProjectToDelete}
           />
