@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { User, LogOut, Settings } from 'lucide-react'
-import Link from 'next/link'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { useOpenModal } from '@/hooks/stores/useUiStore'
 
 interface Props {
   user: SupabaseUser | null
@@ -18,6 +18,8 @@ interface Props {
 }
 
 export function UserMenu({ user, onLogout }: Props) {
+  const openModal = useOpenModal()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,11 +40,9 @@ export function UserMenu({ user, onLogout }: Props) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem asChild>
-          <Link href="/settings">
-            <Settings className="mr-2 w-4 h-4" />
-            Settings
-          </Link>
+        <DropdownMenuItem onClick={() => openModal('settings')}>
+          <Settings className="mr-2 w-4 h-4" />
+          Settings
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
