@@ -1,13 +1,11 @@
 import { createClient } from '@/lib/supabase/client'
 import type { AccountProfile, AccountSettingsFormValues } from '../_domain'
 
-type ProfileRow = {
-  id: string
-  first_name: string | null
-  last_name: string | null
-  username: string | null
-  email: string | null
-  avatar_path: string | null
+type UserMetadata = {
+  first_name?: string
+  last_name?: string
+  username?: string
+  avatar_path?: string
 }
 
 async function getCurrentUser() {
@@ -34,83 +32,43 @@ function toPublicAvatarUrl(path: string | null) {
 
   const supabase = createClient()
   const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+
   return data.publicUrl
 }
 
-function mapProfile(row: ProfileRow, fallbackEmail: string | null): AccountProfile {
-  const firstName = row.first_name?.trim() ?? ''
-  const lastName = row.last_name?.trim() ?? ''
+export async function fetchAccountProfile(): Promise<AccountProfile> {
+  const { user } = await getCurrentUser()
+
+  const metadata = (user.user_metadata ?? {}) as UserMetadata
+  const avatarPath = metadata.avatar_path ?? null
 
   return {
-    id: row.id,
-    firstName,
-    lastName,
-    username: row.username?.trim() ?? '',
-    email: row.email?.trim() ?? fallbackEmail ?? '',
-    avatarPath: row.avatar_path,
-    avatarUrl: toPublicAvatarUrl(row.avatar_path),
-  }
-}
-
-async function upsertMissingProfile(userId: string, email: string | null) {
-  const supabase = createClient()
-
-  const { error } = await supabase.from('profiles').upsert(
-    {
-      id: userId,
-      email,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'id' },
-  )
-
-  if (error) {
-    throw new Error(`Nie udało się przygotować profilu: ${error.message}`)
-  }
-}
-
-export async function fetchAccountProfile(): Promise<AccountProfile> {
-  const { supabase, user } = await getCurrentUser()
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, first_name, last_name, username, email, avatar_path')
-    .eq('id', user.id)
-    .maybeSingle<ProfileRow>()
-
-  if (error) {
-    throw new Error(`Nie udało się pobrać profilu: ${error.message}`)
+    id: user.id,
+    firstName: metadata.first_name?.trim() ?? '',
+    lastName: metadata.last_name?.trim() ?? '',
+    username: metadata.username?.trim() ?? '',
+    email: user.email ?? '',
+    avatarPath,
+    avatarUrl: toPublicAvatarUrl(avatarPath),
   }
 
-  if (!data) {
-    await upsertMissingProfile(user.id, user.email ?? null)
-
-    return {
-      id: user.id,
-      firstName: '',
-      lastName: '',
-      username: '',
-      email: user.email ?? '',
-      avatarPath: null,
-      avatarUrl: null,
-    }
-  }
-
-  return mapProfile(data, user.email ?? null)
+  return { supabase, user }
 }
 
 export async function updateAccountProfile(values: AccountSettingsFormValues) {
   const { supabase, user } = await getCurrentUser()
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({
+  const existingMetadata = (user.user_metadata ?? {}) as UserMetadata
+
+  const { error } = await supabase.auth.updateUser({
+    data: {
+      ...existingMetadata,
       first_name: values.firstName,
       last_name: values.lastName,
       username: values.username,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', user.id)
+    },
+    { onConflict: 'id' },
+  )
 
   if (error) {
     throw new Error(`Nie udało się zapisać profilu: ${error.message}`)
@@ -131,10 +89,14 @@ export async function uploadAvatar(file: File): Promise<{ avatarPath: string; av
     throw new Error(`Nie udało się wgrać pliku: ${uploadError.message}`)
   }
 
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update({ avatar_path: avatarPath, updated_at: new Date().toISOString() })
-    .eq('id', user.id)
+  const existingMetadata = (user.user_metadata ?? {}) as UserMetadata
+
+  const { error: updateError } = await supabase.auth.updateUser({
+    data: {
+      ...existingMetadata,
+      avatar_path: avatarPath,
+    },
+  })
 
   if (updateError) {
     throw new Error(`Nie udało się zapisać avatara: ${updateError.message}`)
