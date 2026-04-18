@@ -1,20 +1,23 @@
 import { z } from 'zod'
 
 export const accountSettingsSchema = z.object({
-  fullName: z
+  firstName: z
     .string()
     .trim()
-    .min(2, 'Imię i nazwisko musi mieć min. 2 znaki')
-    .max(80, 'Imię i nazwisko może mieć maks. 80 znaków'),
+    .min(2, 'Imię musi mieć min. 2 znaki')
+    .max(40, 'Imię może mieć maks. 40 znaków'),
+  lastName: z
+    .string()
+    .trim()
+    .min(2, 'Nazwisko musi mieć min. 2 znaki')
+    .max(60, 'Nazwisko może mieć maks. 60 znaków'),
   username: z
     .string()
     .trim()
+    .toLowerCase()
     .min(3, 'Nazwa użytkownika musi mieć min. 3 znaki')
     .max(30, 'Nazwa użytkownika może mieć maks. 30 znaków')
-    .regex(
-      /^[a-zA-Z0-9_.-]+$/,
-      'Użyj tylko liter, cyfr oraz znaków: _ . -',
-    ),
+    .regex(/^[a-z0-9_.-]+$/, 'Użyj tylko małych liter, cyfr oraz znaków: _ . -'),
 })
 
 export type AccountSettingsSchema = z.infer<typeof accountSettingsSchema>
