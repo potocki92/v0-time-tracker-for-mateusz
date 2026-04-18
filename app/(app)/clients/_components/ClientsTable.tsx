@@ -7,7 +7,6 @@ import {
   ChevronRight,
   History,
   Pencil,
-  Star,
   Trash2,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -22,6 +21,7 @@ import {
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/helpers'
+import { ClientDisplay } from '@/components/common/ClientDisplay'
 import type {
   ClientsSortDirection,
   ClientsSortKey,
@@ -143,23 +143,11 @@ function DesktopRow({
       <TableCell>
         <div className="flex items-center gap-3">
           <span
-            className="h-10 w-1 rounded-full"
+            className="h-10 w-1 shrink-0 rounded-full"
             style={{ backgroundColor: client.color }}
             aria-hidden
           />
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="truncate font-medium">{client.name}</span>
-              {client.is_default && (
-                <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" aria-label="Domyślny" />
-              )}
-            </div>
-            {client.email ? (
-              <span className="block truncate text-xs text-muted-foreground">{client.email}</span>
-            ) : client.nip ? (
-              <span className="block text-xs text-muted-foreground">NIP {client.nip}</span>
-            ) : null}
-          </div>
+          <ClientDisplay client={client} variant="row" size="md" />
         </div>
       </TableCell>
       <TableCell>
@@ -271,12 +259,7 @@ function MobileRow({
         className="flex min-w-0 flex-1 items-center gap-3 text-left"
       >
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <span className="truncate font-medium">{client.name}</span>
-            {client.is_default && (
-              <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" aria-label="Domyślny" />
-            )}
-          </div>
+          <ClientDisplay client={client} variant="cell" size="md" showMeta={false} />
           <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
             <span>{WORK_TYPE_LABELS[client.work_type]}</span>
             <span className="h-3 w-px bg-border" />
