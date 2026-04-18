@@ -53,9 +53,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center gap-2">
-          <Logo priority />
-          <h1 className="text-2xl font-bold tracking-tight">{BRAND.name}</h1>
+        <div className="flex flex-col items-center gap-3">
+          <Logo priority size="xl" />
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{BRAND.name}</h1>
           <p className="text-sm text-muted-foreground">{BRAND.tagline}</p>
         </div>
 

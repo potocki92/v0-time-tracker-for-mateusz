@@ -13,6 +13,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function logoutAction(): Promise<void> {
   const supabase = await createClient()
-  await supabase.auth.signOut()
-  redirect('/login')
+  // `global` revoke'uje refresh token – sesja umiera wszędzie, nie tylko w tej karcie.
+  await supabase.auth.signOut({ scope: 'global' })
+  redirect('/auth/login')
 }

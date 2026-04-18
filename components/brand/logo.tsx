@@ -13,20 +13,34 @@ export const BRAND = {
 const LOGO_SRC = '/logo.png'
 const LOGO_INTRINSIC = { width: 1024, height: 1536 } as const
 
+export type LogoSize = 'sm' | 'md' | 'lg' | 'xl'
+
+const SIZE_CLASSES: Record<LogoSize, string> = {
+  sm: 'size-6',
+  md: 'size-8',
+  lg: 'size-12 sm:size-14',
+  xl: 'size-16 sm:size-20 md:size-24',
+}
+
+const SIZE_HINT: Record<LogoSize, string> = {
+  sm: '24px',
+  md: '32px',
+  lg: '(max-width: 640px) 48px, 56px',
+  xl: '(max-width: 640px) 64px, (max-width: 768px) 80px, 96px',
+}
+
 interface LogoProps {
-  /** If provided, the logo is wrapped in a Next.js <Link>. */
-  href?: string
-  /** Hint next/image to preload. Set on above-the-fold logos. */
-  priority?: boolean
-  /** Extra classes applied to the image (e.g. to override the default 32px box). */
+  href?:      string
+  priority?:  boolean
+  size?:      LogoSize
   className?: string
-  /** Accessible name. Defaults to brand name. */
-  label?: string
+  label?:     string
 }
 
 export function Logo({
   href,
   priority,
+  size = 'md',
   className,
   label = BRAND.name,
 }: LogoProps) {
@@ -37,7 +51,8 @@ export function Logo({
       width={LOGO_INTRINSIC.width}
       height={LOGO_INTRINSIC.height}
       priority={priority}
-      className={cn('size-8 object-contain select-none', className)}
+      sizes={SIZE_HINT[size]}
+      className={cn(SIZE_CLASSES[size], 'object-contain select-none', className)}
     />
   )
 
