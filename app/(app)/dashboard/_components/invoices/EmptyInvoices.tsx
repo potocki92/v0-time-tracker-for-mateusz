@@ -1,21 +1,30 @@
-import { FileText } from 'lucide-react'
+import Link from 'next/link'
+import { CheckCircle2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { CardContent } from '@/components/ui/card'
 
 /**
- * Empty state faktury — gdy wszystkie są opłacone.
- * Wydzielony komponent — EmptyState może być reużyty w innych miejscach.
+ * Empty state faktur — gdy wszystkie są opłacone.
+ * Pozytywne wzmocnienie (zielony checkmark) + CTA do pełnego widoku.
  */
 export function EmptyInvoices() {
   return (
-    <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-      <FileText
-        className="mb-2 h-8 w-8 text-muted-foreground/40"
+    <CardContent className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+      <div
         aria-hidden
-      />
-      <p className="text-sm font-medium">Brak faktur do opłacenia</p>
-      <p className="mt-0.5 text-xs text-muted-foreground">
-        Wszystkie faktury są opłacone
-      </p>
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-[color-mix(in_oklch,var(--success)_15%,transparent)] text-[var(--success-foreground)]"
+      >
+        <CheckCircle2 className="h-6 w-6" />
+      </div>
+      <div className="space-y-0.5">
+        <p className="text-sm font-medium">Świetna robota!</p>
+        <p className="text-xs text-muted-foreground">
+          Wszystkie faktury są opłacone.
+        </p>
+      </div>
+      <Button asChild size="sm" variant="ghost" className="mt-1">
+        <Link href="/invoices">Zobacz wszystkie faktury</Link>
+      </Button>
     </CardContent>
   )
 }

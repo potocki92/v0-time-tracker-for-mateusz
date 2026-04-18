@@ -1,9 +1,21 @@
-import { Bar, BarChart, CartesianGrid, Cell, ReferenceLine, XAxis, YAxis } from 'recharts'
+import {
+  Bar,
+  Brush,
+  CartesianGrid,
+  Cell,
+  ComposedChart,
+  Line,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from 'recharts'
+import { useMemo } from 'react'
 import { ChartContainer, ChartTooltip as ShadTooltip, type ChartConfig } from '@/components/ui/chart'
 import { ChartTooltip } from './ChartTooltip'
 
 const chartConfig = {
   hours: { label: 'Godziny', color: 'var(--chart-1)' },
+  rolling: { label: 'Trend (7)', color: 'var(--chart-2)' },
 } satisfies ChartConfig
 
 type DataItem = {
@@ -21,11 +33,30 @@ type Props = {
   isYearDaily: boolean
 }
 
+/**
+ * Dorzuca do każdego punktu `rolling` — średnią z 7 poprzednich pozycji
+ * (włącznie z bieżącą). Dla krótkich serii (<4) zwraca `undefined`,
+ * żeby Recharts nie rysował linii od pierwszego punktu.
+ */
+function withRollingAverage(data: DataItem[]) {
+  const WINDOW = 7
+  return data.map((d, i) => {
+    if (i < WINDOW - 1) return { ...d, rolling: undefined as number | undefined }
+    let sum = 0
+    for (let j = i - WINDOW + 1; j <= i; j++) sum += data[j].hours
+    return { ...d, rolling: Number((sum / WINDOW).toFixed(1)) }
+  })
+}
+
 export function ChartBars({ data, avgHours, isYearDaily }: Props) {
+  const enriched = useMemo(() => withRollingAverage(data), [data])
+  const showRolling = data.length >= 7
+  const showBrush = data.length > 14
+
   return (
-    <ChartContainer config={chartConfig} className="h-[200px] w-full">
-      <BarChart
-        data={data}
+    <ChartContainer config={chartConfig} className="h-[240px] w-full">
+      <ComposedChart
+        data={enriched}
         margin={{ top: 12, right: 4, left: 0, bottom: 0 }}
         barCategoryGap={isYearDaily ? '15%' : '30%'}
       >
@@ -65,7 +96,7 @@ export function ChartBars({ data, avgHours, isYearDaily }: Props) {
           content={<ChartTooltip />}
         />
         <Bar dataKey="hours" radius={isYearDaily ? [2, 2, 0, 0] : [4, 4, 1, 1]}>
-          {data.map((entry, i) => (
+          {enriched.map((entry, i) => (
             <Cell
               key={i}
               fill={entry.hours > 0 ? 'var(--chart-1)' : 'var(--border)'}
@@ -73,7 +104,28 @@ export function ChartBars({ data, avgHours, isYearDaily }: Props) {
             />
           ))}
         </Bar>
-      </BarChart>
+        {showRolling && (
+          <Line
+            type="monotone"
+            dataKey="rolling"
+            stroke="var(--chart-2)"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 3, strokeWidth: 1, fill: 'var(--background)' }}
+            isAnimationActive={false}
+          />
+        )}
+        {showBrush && (
+          <Brush
+            dataKey="label"
+            height={18}
+            travellerWidth={8}
+            stroke="var(--border)"
+            fill="var(--muted)"
+            className="text-[10px]"
+          />
+        )}
+      </ComposedChart>
     </ChartContainer>
   )
 }

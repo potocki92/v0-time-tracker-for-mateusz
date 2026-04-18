@@ -51,6 +51,8 @@ export async function fetchAccountProfile(): Promise<AccountProfile> {
     avatarPath,
     avatarUrl: toPublicAvatarUrl(avatarPath),
   }
+
+  return { supabase, user }
 }
 
 export async function updateAccountProfile(values: AccountSettingsFormValues) {
@@ -65,7 +67,8 @@ export async function updateAccountProfile(values: AccountSettingsFormValues) {
       last_name: values.lastName,
       username: values.username,
     },
-  })
+    { onConflict: 'id' },
+  )
 
   if (error) {
     throw new Error(`Nie udało się zapisać profilu: ${error.message}`)
