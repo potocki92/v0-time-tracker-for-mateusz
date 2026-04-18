@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
-import { BRAND, Logo } from '@/components/ui/logo'
+import { BRAND, Logo } from '@/components/brand/logo'
 
 export default function LoginPage() {
   const router = useRouter()

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { cva, type VariantProps } from 'class-variance-authority'
 
@@ -10,20 +11,15 @@ export const BRAND = {
   homeHref: '/',
 } as const
 
-const markVariants = cva(
-  'inline-flex items-center justify-center shrink-0 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25',
-  {
-    variants: {
-      size: {
-        sm: 'size-7 rounded-lg [&>svg]:size-4',
-        md: 'size-9 rounded-xl [&>svg]:size-5',
-        lg: 'size-12 rounded-2xl [&>svg]:size-6',
-        xl: 'size-16 rounded-2xl [&>svg]:size-8',
-      },
-    },
-    defaultVariants: { size: 'md' },
-  },
-)
+const LOGO_SRC = '/logo.png'
+const LOGO_INTRINSIC = { width: 1024, height: 1536 } as const
+
+const markHeightClass = {
+  sm: 'h-7',
+  md: 'h-9',
+  lg: 'h-12',
+  xl: 'h-16',
+} as const
 
 const wordmarkVariants = cva('font-semibold tracking-tight whitespace-nowrap', {
   variants: {
@@ -44,7 +40,7 @@ const containerGaps = {
   xl: 'gap-3',
 } as const
 
-type LogoSize = NonNullable<VariantProps<typeof markVariants>['size']>
+type LogoSize = NonNullable<VariantProps<typeof wordmarkVariants>['size']>
 
 interface LogoProps extends React.HTMLAttributes<HTMLElement> {
   /** What to render. `icon` = mark only, `wordmark` = text only, `full` = both. */
@@ -52,37 +48,21 @@ interface LogoProps extends React.HTMLAttributes<HTMLElement> {
   size?: LogoSize
   /** If provided, the logo is wrapped in a Next.js <Link>. Use `/` in navbars. */
   href?: string
-  /** Override mark styles (e.g. disable shadow in a dense header). */
+  /** Hint next/image to preload. Set on above-the-fold logos (auth pages, hero). */
+  priority?: boolean
+  /** Override mark (image) classes. */
   markClassName?: string
-  /** Override wordmark styles (e.g. custom color in a hero). */
+  /** Override wordmark (text) classes. */
   textClassName?: string
   /** Accessible name for the whole logo. Defaults to brand name. */
   label?: string
-}
-
-function ClockMark() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  )
 }
 
 export function Logo({
   variant = 'full',
   size = 'md',
   href,
+  priority,
   className,
   markClassName,
   textClassName,
@@ -95,9 +75,14 @@ export function Logo({
   const content = (
     <>
       {showMark && (
-        <span className={cn(markVariants({ size }), markClassName)}>
-          <ClockMark />
-        </span>
+        <Image
+          src={LOGO_SRC}
+          alt=""
+          width={LOGO_INTRINSIC.width}
+          height={LOGO_INTRINSIC.height}
+          priority={priority}
+          className={cn(markHeightClass[size], 'w-auto select-none', markClassName)}
+        />
       )}
       {showText && (
         <span className={cn(wordmarkVariants({ size }), textClassName)}>

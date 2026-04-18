@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
-import { BRAND, Logo } from '@/components/ui/logo'
+import { BRAND, Logo } from '@/components/brand/logo'
 
 export default function AuthErrorPage() {
   return (
