@@ -7,9 +7,9 @@
  * Kliknięcie ikony logo = toggle sidebar (zgodnie z wymaganiem).
  */
 
-import Image  from 'next/image'
 import { motion } from 'framer-motion'
 import { SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from '@/components/ui/sidebar'
+import { BRAND, Logo } from '@/components/ui/logo'
 import { useLogoScroll } from '../../hooks'
 
 export function AppSidebarHeader() {
@@ -33,21 +33,8 @@ export function AppSidebarHeader() {
             tooltip="Otwórz / zamknij menu"
             className="gap-3"
           >
-            {/* Ikona logo — zawsze widoczna */}
-            <Image
-              src="/logo.png"
-              alt="TimeTracker"
-              width={28}
-              height={28}
-              priority
-              className="shrink-0 object-contain"
-            />
+            <Logo variant="icon" size="sm" />
 
-            {/*
-             * Tekst — pojawia się tylko gdy sidebar jest otwarty.
-             * group-data-[state=expanded] to klasa Tailwind z shadcn sidebar.
-             * Dodatkowo animacja scrolla na tekście.
-             */}
             <motion.div
               style={{ maxWidth, overflow: 'hidden' }}
               className="group-data-[collapsible=icon]:hidden"
@@ -57,7 +44,7 @@ export function AppSidebarHeader() {
                 className="text-base font-semibold tracking-tight"
                 aria-hidden="true"
               >
-                TimeTracker
+                {BRAND.name}
               </motion.span>
             </motion.div>
           </SidebarMenuButton>
