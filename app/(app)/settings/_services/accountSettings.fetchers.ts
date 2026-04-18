@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { AVATARS_BUCKET, toPublicAvatarUrl } from '@/lib/supabase/avatars'
 import type { AccountProfile, AccountSettingsFormValues } from '../_domain'
 
 type UserMetadata = {
@@ -25,15 +26,6 @@ async function getCurrentUser() {
   }
 
   return { supabase, user }
-}
-
-function toPublicAvatarUrl(path: string | null) {
-  if (!path) return null
-
-  const supabase = createClient()
-  const { data } = supabase.storage.from('avatars').getPublicUrl(path)
-
-  return data.publicUrl
 }
 
 export async function fetchAccountProfile(): Promise<AccountProfile> {
@@ -79,7 +71,7 @@ export async function uploadAvatar(file: File): Promise<{ avatarPath: string; av
   const avatarPath = `${user.id}/${crypto.randomUUID()}.${extension}`
 
   const { error: uploadError } = await supabase.storage
-    .from('avatars')
+    .from(AVATARS_BUCKET)
     .upload(avatarPath, file, { upsert: true, cacheControl: '3600' })
 
   if (uploadError) {

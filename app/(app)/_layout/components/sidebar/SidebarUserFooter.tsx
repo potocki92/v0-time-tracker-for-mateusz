@@ -19,6 +19,7 @@ import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react'
 import Link from 'next/link'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { useOpenModal } from '@/hooks/stores/useUiStore'
+import { toPublicAvatarUrl } from '@/lib/supabase/avatars'
 
 function getInitials(name?: string, email?: string): string {
   if (name) {
@@ -45,7 +46,8 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
 
   const displayName = user?.user_metadata?.full_name as string | undefined
   const email       = user?.email
-  const avatarUrl   = user?.user_metadata?.avatar_url as string | undefined
+  const avatarPath  = user?.user_metadata?.avatar_path as string | undefined
+  const avatarUrl   = toPublicAvatarUrl(avatarPath) ?? undefined
   const initials    = getInitials(displayName, email)
 
   return (
