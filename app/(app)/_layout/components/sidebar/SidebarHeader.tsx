@@ -9,7 +9,7 @@
 
 import { motion } from 'framer-motion'
 import { SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from '@/components/ui/sidebar'
-import { BRAND, Logo } from '@/components/ui/logo'
+import { BRAND, Logo } from '@/components/brand/logo'
 import { useLogoScroll } from '../../hooks'
 
 export function AppSidebarHeader() {
