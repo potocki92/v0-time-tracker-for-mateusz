@@ -32,25 +32,30 @@ export function KpiSection() {
   )
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <EarningsCardBoundary>
-        <EarningsCard
-          totalPLN={totals.totalEarningsAllPLN}
-          totalEUR={totals.earningsEUR}
-          earningsOnlyPLN={totals.earningsPLN}
-          trend={trend}
-          sparklineData={sparklineData}
-          periodLabel={periodLabel}
-        />
-      </EarningsCardBoundary>
+    <div className="grid gap-4 lg:grid-cols-12">
+      <div className="lg:col-span-8">
+        <EarningsCardBoundary>
+          <EarningsCard
+            totalPLN={totals.totalEarningsAllPLN}
+            totalEUR={totals.earningsEUR}
+            earningsOnlyPLN={totals.earningsPLN}
+            trend={trend}
+            sparklineData={sparklineData}
+            periodLabel={periodLabel}
+          />
+        </EarningsCardBoundary>
+      </div>
 
-      <GoalCardBoundary>
-        <GoalCard
-          progress={goalProgress}
-          target={goal?.amount ?? 0}
-          currency={goal?.currency ?? 'PLN'}
-        />
-      </GoalCardBoundary>
+      <div className="lg:col-span-4">
+        <GoalCardBoundary>
+          <GoalCard
+            progress={goalProgress}
+            target={goal?.amount ?? 0}
+            currency={goal?.currency ?? 'PLN'}
+            variant="radial"
+          />
+        </GoalCardBoundary>
+      </div>
     </div>
   )
 }

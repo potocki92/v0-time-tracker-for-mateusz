@@ -1,47 +1,33 @@
 'use client'
 
-import { createContext, useContext, useMemo, useState } from 'react'
-import { getDateRange, getPrevRange } from '@/lib/date/dateRange'
-import type { DateRange } from '@/lib/date/dateRange'
-import type { TimeRange } from '../../_domain/dashboard.types'
+import { createContext, useContext } from 'react'
+import {
+  useDashboardFilters,
+  type DashboardFilters,
+} from '../../_hooks/useDashboardFilters'
 
-type Ctx = {
-  range: TimeRange
-  setRange: (r: TimeRange) => void
-  dateRange: DateRange
-  prevRange: DateRange
-}
+const DashboardFiltersContext = createContext<DashboardFilters | null>(null)
 
-const DashboardRangeContext = createContext<Ctx | null>(null)
-
+/**
+ * Cienki provider — wywołuje nuqs-owy hook raz na poziomie dashboardu
+ * i rozdziela wynik przez context, żeby kilka sekcji nie subskrybowało
+ * tych samych query params niezależnie.
+ */
 export function DashboardRangeProvider({
-  defaultRange = 'current_week',
   children,
 }: {
-  defaultRange?: TimeRange
   children: React.ReactNode
 }) {
-  const [range, setRange] = useState<TimeRange>(defaultRange)
-
-  const value = useMemo<Ctx>(() => {
-    const dateRange = getDateRange(range)
-    return {
-      range,
-      setRange,
-      dateRange,
-      prevRange: getPrevRange(dateRange),
-    }
-  }, [range])
-
+  const filters = useDashboardFilters()
   return (
-    <DashboardRangeContext.Provider value={value}>
+    <DashboardFiltersContext.Provider value={filters}>
       {children}
-    </DashboardRangeContext.Provider>
+    </DashboardFiltersContext.Provider>
   )
 }
 
-export function useDashboardRange() {
-  const ctx = useContext(DashboardRangeContext)
+export function useDashboardRange(): DashboardFilters {
+  const ctx = useContext(DashboardFiltersContext)
   if (!ctx) {
     throw new Error('useDashboardRange must be used inside DashboardRangeProvider')
   }

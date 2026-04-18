@@ -33,7 +33,7 @@ export function InvoiceRow({ invoice, isPending, onMarkPaid }: InvoiceRowProps) 
         <Button
           size="icon"
           variant="ghost"
-          className="h-7 w-7 shrink-0 text-muted-foreground hover:bg-[var(--chart-1)]/10 hover:text-[var(--chart-1)]"
+          className="h-7 w-7 shrink-0 text-muted-foreground hover:bg-[color-mix(in_oklch,var(--success)_15%,transparent)] hover:text-[var(--success-foreground)] focus-visible:text-[var(--success-foreground)]"
           onClick={() => onMarkPaid(invoice.id)}
           disabled={isPending}
           aria-label={`Oznacz fakturę ${invoice.name} jako opłaconą`}
