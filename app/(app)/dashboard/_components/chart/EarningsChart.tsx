@@ -16,10 +16,18 @@ type Props = {
 }
 
 export function EarningsChart({ workEntries, clients, eurToPlnRate }: Props) {
-  const { grouping, effectiveGrouping, dateRange, prevRange, isYearDaily, setGrouping } = useChartState()
+  const {
+    grouping,
+    period,
+    dateRange,
+    prevRange,
+    isYearDaily,
+    handleGroupingChange,
+    setPeriod,
+  } = useChartState()
 
   const { mergedData, totalHours, totalEarnings, avgHours, trend, isEmpty } = useChartMetrics(
-    workEntries, clients, eurToPlnRate, effectiveGrouping, dateRange, prevRange
+    workEntries, clients, eurToPlnRate, grouping, dateRange, prevRange
   )
 
   return (
@@ -32,8 +40,9 @@ export function EarningsChart({ workEntries, clients, eurToPlnRate }: Props) {
         />
         <ChartControls
           grouping={grouping}
-          effectiveGrouping={effectiveGrouping}
-          onGroupingChange={setGrouping}
+          period={period}
+          onGroupingChange={handleGroupingChange}
+          onPeriodChange={setPeriod}
         />
       </CardHeader>
       <CardContent className="px-1 pb-3 sm:px-3">

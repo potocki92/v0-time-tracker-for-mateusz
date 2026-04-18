@@ -47,8 +47,13 @@ export function DashboardContent() {
           <KpiSection />
         </Suspense>
 
-        <div className="grid gap-6 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-4">
+        {/*
+         * gap-4 identyczny jak w KpiSection — wtedy 8/12 (chart) ma dokładnie
+         * taką samą szerokość jak 8/12 (EarningsCard) nad nim. Różnica gapów
+         * powodowała ~8px rozjazd, przez co wykres wyglądał „szerzej".
+         */}
+        <div className="grid gap-4 lg:grid-cols-12">
+          <div className="space-y-4 lg:col-span-4">
             <Suspense fallback={<StatsSkeleton />}>
               <StatsSection />
             </Suspense>
