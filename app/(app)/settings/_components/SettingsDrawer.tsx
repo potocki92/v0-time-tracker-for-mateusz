@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sheet'
 import { useCloseModal, useModalState } from '@/hooks/stores/useUiStore'
 import { useProfile, useUpdateAvatar, useUpdateProfile } from '../_hooks'
+import { AppearanceSettings } from './AppearanceSettings'
 import { AvatarUpload } from './AvatarUpload'
 import { ProfileForm } from './ProfileForm'
 
@@ -85,6 +86,8 @@ export function SettingsDrawer() {
                   await updateProfile.mutateAsync(values)
                 }}
               />
+
+              <AppearanceSettings />
             </>
           )}
         </div>

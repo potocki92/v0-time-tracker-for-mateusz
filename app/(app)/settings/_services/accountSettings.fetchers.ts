@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import { AVATARS_BUCKET, toPublicAvatarUrl } from '@/lib/supabase/avatars'
+import { AVATARS_BUCKET, resolveAvatarUrl } from '@/lib/supabase/avatars'
 import type { AccountProfile, AccountSettingsFormValues } from '../_domain'
 
 type UserMetadata = {
@@ -33,6 +33,7 @@ export async function fetchAccountProfile(): Promise<AccountProfile> {
 
   const metadata = (user.user_metadata ?? {}) as UserMetadata
   const avatarPath = metadata.avatar_path ?? null
+  const avatarUrl = await resolveAvatarUrl(avatarPath, { preferSigned: true })
 
   return {
     id: user.id,
@@ -41,7 +42,7 @@ export async function fetchAccountProfile(): Promise<AccountProfile> {
     username: metadata.username?.trim() ?? '',
     email: user.email ?? '',
     avatarPath,
-    avatarUrl: toPublicAvatarUrl(avatarPath),
+    avatarUrl,
   }
 }
 
@@ -72,7 +73,7 @@ export async function uploadAvatar(file: File): Promise<{ avatarPath: string; av
 
   const { error: uploadError } = await supabase.storage
     .from(AVATARS_BUCKET)
-    .upload(avatarPath, file, { upsert: true, cacheControl: '3600' })
+    .upload(avatarPath, file, { upsert: true, cacheControl: '3600', contentType: file.type })
 
   if (uploadError) {
     throw new Error(`Nie udało się wgrać pliku: ${uploadError.message}`)
@@ -91,10 +92,10 @@ export async function uploadAvatar(file: File): Promise<{ avatarPath: string; av
     throw new Error(`Nie udało się zapisać avatara: ${updateError.message}`)
   }
 
-  const avatarUrl = toPublicAvatarUrl(avatarPath)
+  const avatarUrl = await resolveAvatarUrl(avatarPath, { preferSigned: true })
 
   if (!avatarUrl) {
-    throw new Error('Nie udało się wygenerować publicznego adresu avatara')
+    throw new Error('Nie udało się wygenerować adresu avatara')
   }
 
   return { avatarPath, avatarUrl }
