@@ -53,17 +53,22 @@ export function KpiSkeleton() {
 
 export function StatsSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      {[0, 1, 2].map((i) => (
-        <Card key={i} className="text-center">
-          <CardContent className="space-y-2 pt-6">
-            <SkeletonBlock height={24} rounded="full" className="mx-auto w-6" />
-            <SkeletonBlock height={28} className="mx-auto w-12" />
-            <SkeletonBlock height={12} className="mx-auto w-14" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <Card>
+      <CardHeader className="pb-2">
+        <SkeletonBlock height={16} className="w-24" />
+      </CardHeader>
+      <CardContent className="space-y-2 px-3 pb-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex items-center justify-between py-1.5">
+            <div className="flex items-center gap-2.5">
+              <SkeletonBlock height={28} className="w-7" rounded="md" />
+              <SkeletonBlock height={14} className="w-20" />
+            </div>
+            <SkeletonBlock height={20} className="w-10" />
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   )
 }
 
@@ -79,7 +84,7 @@ export function ChartSkeleton() {
         <SkeletonBlock height={24} />
       </CardHeader>
       <CardContent className="px-3 pb-4">
-        <SkeletonBlock height={200} rounded="lg" />
+        <SkeletonBlock height={240} rounded="lg" />
       </CardContent>
     </Card>
   )

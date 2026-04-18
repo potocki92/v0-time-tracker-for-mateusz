@@ -7,6 +7,7 @@ import { useChartMetrics } from './hooks/useChartMetrics'
 import { ChartHeader } from './ChartHeader'
 import { ChartControls } from './ChartControls'
 import { ChartBars } from './ChartBars'
+import { ChartEmptyState } from './ChartEmptyState'
 
 type Props = {
   workEntries: WorkEntry[]
@@ -15,10 +16,10 @@ type Props = {
 }
 
 export function EarningsChart({ workEntries, clients, eurToPlnRate }: Props) {
-  const { grouping, period, dateRange, prevRange, isYearDaily, handleGroupingChange, setPeriod } = useChartState()
+  const { grouping, effectiveGrouping, dateRange, prevRange, isYearDaily, setGrouping } = useChartState()
 
   const { mergedData, totalHours, totalEarnings, avgHours, trend, isEmpty } = useChartMetrics(
-    workEntries, clients, eurToPlnRate, grouping, dateRange, prevRange
+    workEntries, clients, eurToPlnRate, effectiveGrouping, dateRange, prevRange
   )
 
   return (
@@ -31,16 +32,13 @@ export function EarningsChart({ workEntries, clients, eurToPlnRate }: Props) {
         />
         <ChartControls
           grouping={grouping}
-          period={period}
-          onGroupingChange={handleGroupingChange}
-          onPeriodChange={setPeriod}
+          effectiveGrouping={effectiveGrouping}
+          onGroupingChange={setGrouping}
         />
       </CardHeader>
       <CardContent className="px-1 pb-3 sm:px-3">
         {isEmpty ? (
-          <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-xs text-muted-foreground">
-            Brak danych
-          </div>
+          <ChartEmptyState />
         ) : (
           <ChartBars data={mergedData} avgHours={avgHours} isYearDaily={isYearDaily} />
         )}
