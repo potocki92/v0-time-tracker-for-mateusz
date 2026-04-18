@@ -8,11 +8,23 @@ type Props = {
   onPeriodChange: (p: Period) => void
 }
 
+type GroupingLabel = { short: string; full: string }
+
+const GROUPING_LABELS: Record<Grouping, GroupingLabel> = {
+  daily: { short: 'Dzień', full: 'Dziennie' },
+  weekly: { short: 'Tydz.', full: 'Tygodniowo' },
+  monthly: { short: 'M-c', full: 'Miesięcznie' },
+  quarterly: { short: 'Kw.', full: 'Kwartalnie' },
+}
+
 /**
  * Dwie kontrolki: grouping (gęstość słupków) × period (okno czasu).
  * Opcje period są zawężane do dozwolonych dla bieżącego grouping
  * (PERIOD_OPTIONS). Dzięki temu np. „dziennie + rok" działa, a niedozwolone
  * kombinacje typu „kwartalnie + tydzień" w ogóle się nie pokazują.
+ *
+ * Mobile: krótkie etykiety (Dzień / Tydz. / M-c / Kw.), żeby 4 taby mieściły się
+ * w jednym rzędzie; od sm+ pełne („Dziennie" itd.) — visuallyHidden dla SR.
  */
 export function ChartControls({
   grouping,
@@ -25,13 +37,15 @@ export function ChartControls({
       <Tabs
         value={grouping}
         onValueChange={(v) => onGroupingChange(v as Grouping)}
-        className="mt-2"
+        className="mt-1"
       >
         <TabsList aria-label="Grupowanie wykresu zarobków" className="h-7 w-full">
-          <TabsTrigger value="daily" className="flex-1 text-[11px]">Dziennie</TabsTrigger>
-          <TabsTrigger value="weekly" className="flex-1 text-[11px]">Tygodniowo</TabsTrigger>
-          <TabsTrigger value="monthly" className="flex-1 text-[11px]">Miesięcznie</TabsTrigger>
-          <TabsTrigger value="quarterly" className="flex-1 text-[11px]">Kwartalnie</TabsTrigger>
+          {(Object.keys(GROUPING_LABELS) as Grouping[]).map((g) => (
+            <TabsTrigger key={g} value={g} className="min-w-0 flex-1 text-[11px]">
+              <span className="sm:hidden">{GROUPING_LABELS[g].short}</span>
+              <span className="hidden sm:inline">{GROUPING_LABELS[g].full}</span>
+            </TabsTrigger>
+          ))}
         </TabsList>
       </Tabs>
       <Tabs
@@ -41,7 +55,7 @@ export function ChartControls({
       >
         <TabsList aria-label="Zakres okresu wykresu" className="h-6 w-full bg-muted/40">
           {PERIOD_OPTIONS[grouping].map((opt) => (
-            <TabsTrigger key={opt.value} value={opt.value} className="flex-1 text-[10px]">
+            <TabsTrigger key={opt.value} value={opt.value} className="min-w-0 flex-1 text-[10px]">
               {opt.label}
             </TabsTrigger>
           ))}

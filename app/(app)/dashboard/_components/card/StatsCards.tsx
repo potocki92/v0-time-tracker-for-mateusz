@@ -42,11 +42,11 @@ export function StatsCards({ totalHours, totalDays, clientsCount, absences }: Pr
   ]
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
+    <Card className="gap-3 py-4 sm:gap-6 sm:py-6">
+      <CardHeader className="px-4 pb-1 sm:px-6 sm:pb-2">
         <CardTitle className="text-sm font-semibold">Aktywność</CardTitle>
       </CardHeader>
-      <CardContent className="px-3 pb-3">
+      <CardContent className="px-3 pb-3 sm:px-3">
         <ul role="list" className="divide-y divide-border/50">
           {stats.map((s) => (
             <li

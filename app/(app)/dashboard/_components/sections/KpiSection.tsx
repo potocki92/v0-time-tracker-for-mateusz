@@ -32,7 +32,7 @@ export function KpiSection() {
   )
 
   return (
-    <div className="grid gap-4 lg:grid-cols-12">
+    <div className="grid gap-3 sm:gap-4 lg:grid-cols-12">
       <div className="lg:col-span-8">
         <EarningsCardBoundary>
           <EarningsCard

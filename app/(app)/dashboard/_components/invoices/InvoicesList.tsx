@@ -18,14 +18,14 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
   const visibleInvoices = invoices.filter((inv) => !localHidden.has(inv.id))
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-semibold">
+    <Card className="gap-3 py-4 sm:gap-6 sm:py-6">
+      <CardHeader className="px-4 pb-1 sm:px-6 sm:pb-2">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="truncate text-sm font-semibold">
             Faktury do opłacenia
           </CardTitle>
           {visibleInvoices.length > 0 && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="shrink-0 text-xs">
               {visibleInvoices.length}
             </Badge>
           )}
