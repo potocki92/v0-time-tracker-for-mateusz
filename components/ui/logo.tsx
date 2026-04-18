@@ -116,13 +116,13 @@ export function Logo({
   if (href) {
     return (
       <Link
+        {...(rest as React.ComponentProps<typeof Link>)}
         href={href}
         aria-label={label}
         className={cn(
           baseClasses,
           'rounded-md outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         )}
-        {...(rest as React.ComponentProps<typeof Link>)}
       >
         {content}
       </Link>
