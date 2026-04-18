@@ -19,14 +19,17 @@ import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react'
 import Link from 'next/link'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { useOpenModal } from '@/hooks/stores/useUiStore'
-import { toPublicAvatarUrl } from '@/lib/supabase/avatars'
+import { useProfile } from '@/app/(app)/settings/_hooks'
 
 function getInitials(name?: string, email?: string): string {
   if (name) {
-    const parts = name.trim().split(/\s+/)
-    return parts.length >= 2
-      ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
-      : parts[0].slice(0, 2).toUpperCase()
+    const parts = name.trim().split(/\s+/).filter(Boolean)
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+    }
+    if (parts[0]) {
+      return parts[0].slice(0, 2).toUpperCase()
+    }
   }
   return email?.[0]?.toUpperCase() ?? 'U'
 }
@@ -38,17 +41,22 @@ interface SidebarUserFooterProps {
 
 /**
  * WAŻNE: komponent NIE zawiera <SidebarFooter> — ten wrapper jest w AppSidebar.
- * Wcześniej był podwójny <SidebarFooter> co łamało layout.
  */
 export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
   const { isMobile } = useSidebar()
   const openModal = useOpenModal()
 
-  const displayName = user?.user_metadata?.full_name as string | undefined
-  const email       = user?.email
-  const avatarPath  = user?.user_metadata?.avatar_path as string | undefined
-  const avatarUrl   = toPublicAvatarUrl(avatarPath) ?? undefined
-  const initials    = getInitials(displayName, email)
+  // Profile przez React Query: sidebar i panel Ustawień dzielą to samo źródło prawdy,
+  // więc po uploadzie avatara (invalidateQueries) sidebar odświeża się automatycznie.
+  const { data: profile } = useProfile()
+
+  const firstName   = profile?.firstName ?? ''
+  const lastName    = profile?.lastName ?? ''
+  const fullName    = `${firstName} ${lastName}`.trim()
+  const displayName = fullName || profile?.username || 'Użytkownik'
+  const email       = profile?.email ?? user?.email ?? ''
+  const avatarUrl   = profile?.avatarUrl ?? undefined
+  const initials    = getInitials(fullName || profile?.username, email)
 
   return (
     <SidebarMenu>
@@ -57,12 +65,12 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              tooltip={displayName ?? 'Użytkownik'}
+              tooltip={displayName}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 {avatarUrl && (
-                  <AvatarImage src={avatarUrl} alt={displayName ?? 'Użytkownik'} />
+                  <AvatarImage src={avatarUrl} alt={displayName} />
                 )}
                 <AvatarFallback className="rounded-lg text-xs">
                   {initials}
@@ -70,12 +78,8 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
               </Avatar>
 
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {displayName ?? 'Użytkownik'}
-                </span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {email}
-                </span>
+                <span className="truncate font-semibold">{displayName}</span>
+                <span className="truncate text-xs text-muted-foreground">{email}</span>
               </div>
 
               <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0" />
@@ -91,11 +95,11 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName ?? ''} />}
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
                   <AvatarFallback className="rounded-lg text-xs">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{displayName ?? 'Użytkownik'}</span>
+                  <span className="truncate font-semibold">{displayName}</span>
                   <span className="truncate text-xs text-muted-foreground">{email}</span>
                 </div>
               </div>

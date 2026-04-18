@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
+import { ColorThemeProvider } from '@/components/color-theme-provider'
+import { ColorThemeInitScript } from '@/components/color-theme-init-script'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 import { Providers } from './providers'
@@ -51,6 +53,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl" suppressHydrationWarning>
+      <head>
+        <ColorThemeInitScript />
+      </head>
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -58,10 +63,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Providers>
-          {children}
-          </Providers>
-          <Toaster richColors position="top-center" />
+          <ColorThemeProvider>
+            <Providers>
+              {children}
+            </Providers>
+            <Toaster richColors position="top-center" />
+          </ColorThemeProvider>
         </ThemeProvider>
         <Analytics />
       </body>
