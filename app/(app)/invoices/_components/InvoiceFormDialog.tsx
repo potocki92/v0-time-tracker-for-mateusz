@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { ClientDisplay } from '@/components/common/ClientDisplay'
 
 interface InvoiceFormDialogProps {
   open: boolean
@@ -86,7 +87,16 @@ export function InvoiceFormDialog({
               <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" role="combobox" className="justify-between font-normal">
-                    <span className="truncate">{clientDisplayLabel}</span>
+                    {values.client_id ? (
+                      <ClientDisplay
+                        client={clients.find((c) => c.id === values.client_id) ?? null}
+                        variant="select-item"
+                        size="sm"
+                        className="min-w-0"
+                      />
+                    ) : (
+                      <span className="truncate">{clientDisplayLabel}</span>
+                    )}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -126,8 +136,8 @@ export function InvoiceFormDialog({
                               setClientPopoverOpen(false)
                             }}
                           >
-                            <Check className={cn('mr-2 h-4 w-4', values.client_id === client.id ? 'opacity-100' : 'opacity-0')} />
-                            {client.name}
+                            <Check className={cn('mr-2 h-4 w-4 shrink-0', values.client_id === client.id ? 'opacity-100' : 'opacity-0')} />
+                            <ClientDisplay client={client} variant="select-item" size="sm" />
                           </CommandItem>
                         ))}
                         {canCreateClient && (

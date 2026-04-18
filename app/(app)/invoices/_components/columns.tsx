@@ -4,7 +4,6 @@ import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 
 import type { Column, ColumnDef } from '@tanstack/react-table'
 import type { Client, Invoice } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { getInitials, stringToColor } from '../_domain/utils'
+import { ClientDisplay } from '@/components/common/ClientDisplay'
 
 interface CreateColumnsOptions {
   clients: Client[]
@@ -21,9 +20,14 @@ interface CreateColumnsOptions {
   onDelete: (invoice: Invoice) => void
 }
 
-function getClientName(clients: Client[], clientId: string | null) {
+function findClient(clients: Client[], clientId: string | null): Client | null {
+  if (!clientId) return null
+  return clients.find((client) => client.id === clientId) ?? null
+}
+
+function clientSortKey(clients: Client[], clientId: string | null): string {
   if (!clientId) return 'Bez klienta'
-  return clients.find((client) => client.id === clientId)?.name ?? 'Nieznany klient'
+  return findClient(clients, clientId)?.name ?? 'Nieznany klient'
 }
 
 function formatInvoiceDate(date: string | null | undefined) {
@@ -90,24 +94,15 @@ export function createInvoiceColumns({
     },
     {
       id: 'client',
-      accessorFn: (row) => getClientName(clients, row.client_id),
+      accessorFn: (row) => clientSortKey(clients, row.client_id),
       header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.client} />,
-      cell: ({ row }) => {
-        const name = getClientName(clients, row.original.client_id)
-        return (
-          <div className="flex items-center gap-2">
-            <Avatar className="size-6 shrink-0">
-              <AvatarFallback
-                className="text-[10px] font-bold text-white"
-                style={{ background: stringToColor(name) }}
-              >
-                {getInitials(name)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="truncate">{name}</span>
-          </div>
-        )
-      },
+      cell: ({ row }) => (
+        <ClientDisplay
+          client={findClient(clients, row.original.client_id)}
+          variant="cell"
+          size="md"
+        />
+      ),
       sortingFn: 'alphanumeric',
       size: 240,
       minSize: 160,
