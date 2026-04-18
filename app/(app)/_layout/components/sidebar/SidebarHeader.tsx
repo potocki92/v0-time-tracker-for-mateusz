@@ -33,7 +33,7 @@ export function AppSidebarHeader() {
             tooltip="Otwórz / zamknij menu"
             className="gap-3"
           >
-            <Logo size="sm" />
+            <Logo />
 
             <motion.div
               style={{ maxWidth, overflow: 'hidden' }}
