@@ -1,5 +1,6 @@
 'use client'
 
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Sheet,
   SheetContent,
@@ -8,21 +9,40 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useCloseModal, useModalState } from '@/hooks/stores/useUiStore'
-import {
-  useAccountProfile,
-  useUpdateAccountProfile,
-  useUploadAvatar,
-} from '../_hooks'
+import { useProfile, useUpdateAvatar, useUpdateProfile } from '../_hooks'
 import { AvatarUpload } from './AvatarUpload'
 import { ProfileForm } from './ProfileForm'
+
+function SettingsSkeleton() {
+  return (
+    <div className="space-y-5">
+      <div className="rounded-xl border p-4">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-16 w-16 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-9 w-32" />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3 rounded-xl border p-4">
+        <Skeleton className="h-5 w-24" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    </div>
+  )
+}
 
 export function SettingsDrawer() {
   const modal = useModalState('settings')
   const closeModal = useCloseModal()
 
-  const profileQuery = useAccountProfile()
-  const updateProfile = useUpdateAccountProfile()
-  const uploadAvatar = useUploadAvatar()
+  const profileQuery = useProfile()
+  const updateProfile = useUpdateProfile()
+  const updateAvatar = useUpdateAvatar()
 
   const profile = profileQuery.data
 
@@ -37,26 +57,24 @@ export function SettingsDrawer() {
         </SheetHeader>
 
         <div className="space-y-6 p-4">
-          {profileQuery.isLoading && (
-            <div className="rounded-xl border p-4 text-sm text-muted-foreground">
-              Ładowanie ustawień...
-            </div>
-          )}
+          {profileQuery.isLoading && <SettingsSkeleton />}
 
           {profileQuery.isError && (
             <div className="rounded-xl border border-destructive/40 p-4 text-sm text-destructive">
-              Nie udało się pobrać danych konta.
+              {profileQuery.error instanceof Error
+                ? profileQuery.error.message
+                : 'Nie udało się pobrać danych konta.'}
             </div>
           )}
 
           {profile && (
             <>
               <AvatarUpload
-                avatarUrl={profile.avatar_url}
-                fallbackLabel={profile.full_name ?? profile.email ?? 'Użytkownik'}
-                isUploading={uploadAvatar.isPending}
+                avatarUrl={profile.avatarUrl}
+                fallbackLabel={`${profile.firstName} ${profile.lastName}`.trim() || profile.email}
+                isUploading={updateAvatar.isPending}
                 onUpload={async (file) => {
-                  await uploadAvatar.mutateAsync(file)
+                  await updateAvatar.mutateAsync(file)
                 }}
               />
 

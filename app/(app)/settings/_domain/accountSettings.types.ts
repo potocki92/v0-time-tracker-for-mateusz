@@ -1,12 +1,15 @@
 export type AccountProfile = {
   id: string
-  full_name: string | null
-  username: string | null
-  email: string | null
-  avatar_url: string | null
+  firstName: string
+  lastName: string
+  username: string
+  email: string
+  avatarPath: string | null
+  avatarUrl: string | null
 }
 
 export type AccountSettingsFormValues = {
-  fullName: string
+  firstName: string
+  lastName: string
   username: string
 }

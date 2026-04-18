@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { Camera, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { avatarFileSchema } from '../_domain'
 
 type AvatarUploadProps = {
@@ -15,8 +16,9 @@ type AvatarUploadProps = {
 }
 
 function getInitials(label: string) {
-  const parts = label.trim().split(/\s+/)
+  const parts = label.trim().split(/\s+/).filter(Boolean)
   if (!parts[0]) return 'U'
+
   return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase()
 }
 
@@ -27,6 +29,11 @@ export function AvatarUpload({
   onUpload,
 }: AvatarUploadProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const [isImageLoading, setIsImageLoading] = useState(Boolean(avatarUrl))
+
+  useEffect(() => {
+    setIsImageLoading(Boolean(avatarUrl))
+  }, [avatarUrl])
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -44,13 +51,28 @@ export function AvatarUpload({
 
   return (
     <div className="flex items-center gap-4 rounded-xl border p-4">
-      <Avatar className="h-16 w-16">
-        {avatarUrl && <AvatarImage src={avatarUrl} alt={fallbackLabel} />}
-        <AvatarFallback>{getInitials(fallbackLabel)}</AvatarFallback>
-      </Avatar>
+      <div className="relative h-16 w-16">
+        {isImageLoading && <Skeleton className="absolute inset-0 h-16 w-16 rounded-full" />}
+
+        <Avatar className="h-16 w-16">
+          {avatarUrl && (
+            <AvatarImage
+              src={avatarUrl}
+              alt={fallbackLabel}
+              onLoadingStatusChange={(status) => {
+                if (status === 'loaded' || status === 'error') {
+                  setIsImageLoading(false)
+                }
+              }}
+            />
+          )}
+          <AvatarFallback>{getInitials(fallbackLabel)}</AvatarFallback>
+        </Avatar>
+      </div>
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Zdjęcie profilowe</p>
+
         <input
           ref={inputRef}
           type="file"

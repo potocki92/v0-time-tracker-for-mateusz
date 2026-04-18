@@ -1,12 +1,21 @@
 'use client'
 
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Loader2, Mail } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import type { AccountProfile } from '../_domain'
-import { accountSettingsSchema, type AccountSettingsFormValues } from '../_domain'
+import type { AccountProfile, AccountSettingsFormValues } from '../_domain'
+import { accountSettingsSchema } from '../_domain'
 
 type ProfileFormProps = {
   profile: AccountProfile
@@ -15,94 +24,108 @@ type ProfileFormProps = {
 }
 
 export function ProfileForm({ profile, isSaving, onSave }: ProfileFormProps) {
-  const initialValues = useMemo(
-    () => ({
-      fullName: profile.full_name ?? '',
-      username: profile.username ?? '',
-    }),
-    [profile.full_name, profile.username],
-  )
-
-  const [form, setForm] = useState<AccountSettingsFormValues>(initialValues)
-  const [error, setError] = useState<string | null>(null)
+  const form = useForm<AccountSettingsFormValues>({
+    resolver: zodResolver(accountSettingsSchema),
+    defaultValues: {
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      username: profile.username,
+    },
+  })
 
   useEffect(() => {
-    setForm(initialValues)
-  }, [initialValues])
-
-  const isDirty =
-    form.fullName !== initialValues.fullName || form.username !== initialValues.username
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    const parsed = accountSettingsSchema.safeParse(form)
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? 'Formularz zawiera błędy')
-      return
-    }
-
-    setError(null)
-    await onSave(parsed.data)
-  }
+    form.reset({
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      username: profile.username,
+    })
+  }, [form, profile.firstName, profile.lastName, profile.username])
 
   return (
-    <form className="space-y-5" onSubmit={(event) => void handleSubmit(event)}>
-      <section className="space-y-4 rounded-xl border p-4">
-        <header>
-          <h3 className="text-sm font-semibold">Profil</h3>
-          <p className="text-xs text-muted-foreground">Podstawowe dane Twojego konta.</p>
-        </header>
+    <Form {...form}>
+      <form
+        className="space-y-5"
+        onSubmit={form.handleSubmit(async (values) => {
+          await onSave(values)
+        })}
+      >
+        <section className="space-y-4 rounded-xl border p-4">
+          <header>
+            <h3 className="text-sm font-semibold">Profil</h3>
+            <p className="text-xs text-muted-foreground">Podstawowe dane Twojego konta.</p>
+          </header>
 
-        <div className="space-y-2">
-          <Label htmlFor="fullName">Imię i nazwisko</Label>
-          <Input
-            id="fullName"
-            value={form.fullName}
-            onChange={(event) =>
-              setForm((prev) => ({ ...prev, fullName: event.target.value }))
-            }
-            placeholder="np. Jan Kowalski"
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Imię</FormLabel>
+                  <FormControl>
+                    <Input placeholder="np. Jan" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nazwisko</FormLabel>
+                  <FormControl>
+                    <Input placeholder="np. Kowalski" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nazwa użytkownika</FormLabel>
+                <FormControl>
+                  <Input placeholder="np. jan.kowalski" autoCapitalize="none" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
+        </section>
 
-        <div className="space-y-2">
-          <Label htmlFor="username">Nazwa użytkownika</Label>
-          <Input
-            id="username"
-            value={form.username}
-            onChange={(event) =>
-              setForm((prev) => ({ ...prev, username: event.target.value }))
-            }
-            placeholder="np. jan.kowalski"
-          />
-        </div>
-      </section>
+        <section className="space-y-4 rounded-xl border p-4">
+          <header>
+            <h3 className="text-sm font-semibold">Adres email</h3>
+            <p className="text-xs text-muted-foreground">
+              Email jest synchronizowany z kontem i nie można go tu edytować.
+            </p>
+          </header>
 
-      <section className="space-y-4 rounded-xl border p-4">
-        <header>
-          <h3 className="text-sm font-semibold">Bezpieczeństwo konta</h3>
-          <p className="text-xs text-muted-foreground">Aktualny adres email.</p>
-        </header>
+          <Input value={profile.email} disabled readOnly />
+        </section>
 
-        <div className="flex items-center gap-2 rounded-lg border bg-muted/20 px-3 py-2 text-sm">
-          <Mail className="h-4 w-4 text-muted-foreground" />
-          <span className="truncate">{profile.email ?? 'Brak adresu email'}</span>
-        </div>
-      </section>
-
-      {error && <p className="text-sm text-destructive">{error}</p>}
-
-      <Button type="submit" disabled={!isDirty || isSaving} className="w-full">
-        {isSaving ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Zapisywanie...
-          </>
-        ) : (
-          'Zapisz zmiany'
-        )}
-      </Button>
-    </form>
+        <Button
+          type="submit"
+          disabled={!form.formState.isDirty || isSaving}
+          className="w-full"
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Zapisywanie...
+            </>
+          ) : (
+            'Zapisz zmiany'
+          )}
+        </Button>
+      </form>
+    </Form>
   )
 }

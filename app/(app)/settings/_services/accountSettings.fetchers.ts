@@ -1,79 +1,109 @@
 import { createClient } from '@/lib/supabase/client'
 import type { AccountProfile, AccountSettingsFormValues } from '../_domain'
 
-export async function fetchAccountProfile(): Promise<AccountProfile> {
+type UserMetadata = {
+  first_name?: string
+  last_name?: string
+  username?: string
+  avatar_path?: string
+}
+
+async function getCurrentUser() {
   const supabase = createClient()
 
   const {
     data: { user },
-    error: authError,
+    error,
   } = await supabase.auth.getUser()
 
-  if (authError) throw authError
-  if (!user) throw new Error('Brak aktywnej sesji użytkownika')
+  if (error) {
+    throw new Error(`Błąd pobierania sesji: ${error.message}`)
+  }
+
+  if (!user) {
+    throw new Error('Brak aktywnej sesji użytkownika')
+  }
+
+  return { supabase, user }
+}
+
+function toPublicAvatarUrl(path: string | null) {
+  if (!path) return null
+
+  const supabase = createClient()
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+
+  return data.publicUrl
+}
+
+export async function fetchAccountProfile(): Promise<AccountProfile> {
+  const { user } = await getCurrentUser()
+
+  const metadata = (user.user_metadata ?? {}) as UserMetadata
+  const avatarPath = metadata.avatar_path ?? null
 
   return {
     id: user.id,
-    full_name: (user.user_metadata.full_name as string | undefined) ?? null,
-    username: (user.user_metadata.username as string | undefined) ?? null,
-    avatar_url: (user.user_metadata.avatar_url as string | undefined) ?? null,
-    email: user.email ?? null,
+    firstName: metadata.first_name?.trim() ?? '',
+    lastName: metadata.last_name?.trim() ?? '',
+    username: metadata.username?.trim() ?? '',
+    email: user.email ?? '',
+    avatarPath,
+    avatarUrl: toPublicAvatarUrl(avatarPath),
   }
 }
 
 export async function updateAccountProfile(values: AccountSettingsFormValues) {
-  const supabase = createClient()
+  const { supabase, user } = await getCurrentUser()
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError) throw authError
-  if (!user) throw new Error('Brak aktywnej sesji użytkownika')
+  const existingMetadata = (user.user_metadata ?? {}) as UserMetadata
 
   const { error } = await supabase.auth.updateUser({
     data: {
-      ...user.user_metadata,
-      full_name: values.fullName,
+      ...existingMetadata,
+      first_name: values.firstName,
+      last_name: values.lastName,
       username: values.username,
     },
   })
 
-  if (error) throw error
+  if (error) {
+    throw new Error(`Nie udało się zapisać profilu: ${error.message}`)
+  }
 }
 
-export async function uploadAvatar(file: File): Promise<string> {
-  const supabase = createClient()
+export async function uploadAvatar(file: File): Promise<{ avatarPath: string; avatarUrl: string }> {
+  const { supabase, user } = await getCurrentUser()
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError) throw authError
-  if (!user) throw new Error('Brak aktywnej sesji użytkownika')
-
-  const ext = file.name.split('.').pop() ?? 'jpg'
-  const path = `${user.id}/${crypto.randomUUID()}.${ext}`
+  const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+  const avatarPath = `${user.id}/${crypto.randomUUID()}.${extension}`
 
   const { error: uploadError } = await supabase.storage
     .from('avatars')
-    .upload(path, file, { upsert: true, cacheControl: '3600' })
+    .upload(avatarPath, file, { upsert: true, cacheControl: '3600' })
 
-  if (uploadError) throw uploadError
+  if (uploadError) {
+    throw new Error(`Nie udało się wgrać pliku: ${uploadError.message}`)
+  }
 
-  const { data } = supabase.storage.from('avatars').getPublicUrl(path)
-  const publicUrl = data.publicUrl
+  const existingMetadata = (user.user_metadata ?? {}) as UserMetadata
 
   const { error: updateError } = await supabase.auth.updateUser({
     data: {
-      ...user.user_metadata,
-      avatar_url: publicUrl,
+      ...existingMetadata,
+      avatar_path: avatarPath,
     },
   })
 
-  if (updateError) throw updateError
+  if (updateError) {
+    throw new Error(`Nie udało się zapisać avatara: ${updateError.message}`)
+  }
 
-  return publicUrl
+  const avatarUrl = toPublicAvatarUrl(avatarPath)
+
+  if (!avatarUrl) {
+    throw new Error('Nie udało się wygenerować publicznego adresu avatara')
+  }
+
+  return { avatarPath, avatarUrl }
 }
