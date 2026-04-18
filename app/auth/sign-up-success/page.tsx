@@ -1,18 +1,16 @@
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Clock, Mail, ArrowLeft } from 'lucide-react'
+import { Mail, ArrowLeft } from 'lucide-react'
+import { BRAND, Logo } from '@/components/ui/logo'
 
 export default function SignUpSuccessPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        {/* Logo */}
-        <div className="flex flex-col items-center space-y-2">
-          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
-            <Clock className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight">WorkFlow Pro</h1>
+        <div className="flex flex-col items-center gap-2">
+          <Logo variant="icon" size="xl" />
+          <h1 className="text-2xl font-bold tracking-tight">{BRAND.name}</h1>
         </div>
 
         {/* Success Card */}
@@ -48,9 +46,8 @@ export default function SignUpSuccessPage() {
           </CardContent>
         </Card>
 
-        {/* Footer */}
         <p className="text-center text-xs text-muted-foreground/60">
-          WorkFlow Pro v3.0
+          {BRAND.name} v3.0
         </p>
       </div>
     </div>

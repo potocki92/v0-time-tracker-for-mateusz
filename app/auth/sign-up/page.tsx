@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Clock, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react'
+import { Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
+import { BRAND, Logo } from '@/components/ui/logo'
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -61,13 +62,10 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
       <div className="w-full max-w-md space-y-8">
-        {/* Logo */}
-        <div className="flex flex-col items-center space-y-2">
-          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
-            <Clock className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight">WorkFlow Pro</h1>
-          <p className="text-sm text-muted-foreground">Rejestr czasu pracy</p>
+        <div className="flex flex-col items-center gap-2">
+          <Logo variant="icon" size="xl" />
+          <h1 className="text-2xl font-bold tracking-tight">{BRAND.name}</h1>
+          <p className="text-sm text-muted-foreground">{BRAND.tagline}</p>
         </div>
 
         {/* Sign Up Card */}
@@ -168,9 +166,8 @@ export default function SignUpPage() {
           Powrot do logowania
         </Link>
 
-        {/* Footer */}
         <p className="text-center text-xs text-muted-foreground/60">
-          WorkFlow Pro v3.0
+          {BRAND.name} v3.0
         </p>
       </div>
     </div>
