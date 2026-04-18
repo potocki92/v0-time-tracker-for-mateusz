@@ -9,7 +9,7 @@ export default function AuthErrorPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center gap-2">
-          <Logo size="xl" priority />
+          <Logo priority />
           <h1 className="text-2xl font-bold tracking-tight">{BRAND.name}</h1>
         </div>
 
