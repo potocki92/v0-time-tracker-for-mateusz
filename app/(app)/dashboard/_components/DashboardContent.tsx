@@ -38,7 +38,7 @@ import {
 export function DashboardContent() {
   return (
     <DashboardRangeProvider>
-      <div className="container space-y-6 px-4 py-6">
+      <div className="container space-y-4 px-3 py-4 sm:space-y-6 sm:px-4 sm:py-6">
         <Suspense fallback={<HeaderSkeleton />}>
           <HeaderSection />
         </Suspense>
@@ -51,9 +51,10 @@ export function DashboardContent() {
          * gap-4 identyczny jak w KpiSection — wtedy 8/12 (chart) ma dokładnie
          * taką samą szerokość jak 8/12 (EarningsCard) nad nim. Różnica gapów
          * powodowała ~8px rozjazd, przez co wykres wyglądał „szerzej".
+         * Mobile: stack 1-col z gap-3; lg+: bento 4/8.
          */}
-        <div className="grid gap-4 lg:grid-cols-12">
-          <div className="space-y-4 lg:col-span-4">
+        <div className="grid gap-3 sm:gap-4 lg:grid-cols-12">
+          <div className="min-w-0 space-y-3 sm:space-y-4 lg:col-span-4">
             <Suspense fallback={<StatsSkeleton />}>
               <StatsSection />
             </Suspense>
@@ -62,7 +63,7 @@ export function DashboardContent() {
             </Suspense>
           </div>
 
-          <div className="lg:col-span-8">
+          <div className="min-w-0 lg:col-span-8">
             <Suspense fallback={<ChartSkeleton />}>
               <ChartSection />
             </Suspense>

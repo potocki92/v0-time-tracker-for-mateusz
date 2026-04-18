@@ -31,8 +31,8 @@ export function EarningsChart({ workEntries, clients, eurToPlnRate }: Props) {
   )
 
   return (
-    <Card className="w-full overflow-hidden">
-      <CardHeader className="pb-2 pt-4">
+    <Card className="w-full gap-3 overflow-hidden py-4 sm:gap-6 sm:py-6">
+      <CardHeader className="gap-2 px-4 pb-2 sm:px-6 sm:pt-2">
         <ChartHeader
           trend={trend}
           totalHours={totalHours}
