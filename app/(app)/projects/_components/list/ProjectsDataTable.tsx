@@ -23,6 +23,7 @@ import {
 import {
   PROJECT_PRIORITY_BADGE_CLASS,
   PROJECT_STATUS_BADGE_CLASS,
+  PROJECT_STATUS_FILTER_OPTIONS
 } from '../../_domain/projects.constants'
 
 type ProjectsDataTableProps = {
@@ -155,13 +156,7 @@ export function ProjectsDataTable({
         columnId: 'status',
         label: 'Status',
         type: 'chips',
-        options: [
-          { label: 'Wszystko', value: 'all' },
-          { label: 'Planowane', value: 'planned' },
-          { label: 'W trakcie', value: 'in_progress' },
-          { label: 'Zakończone', value: 'completed' },
-          { label: 'Wstrzymane', value: 'on_hold' },
-        ],
+        options: PROJECT_STATUS_FILTER_OPTIONS
       },
       {
         columnId: 'priority',
