@@ -30,4 +30,8 @@ export const MUTATION_KEYS = {
     updateProfile: ['account', 'update-profile'] as const,
     uploadAvatar:  ['account', 'upload-avatar']  as const,
   },
+  auth: {
+    login:  ['auth', 'login']   as const,
+    signUp: ['auth', 'sign-up'] as const,
+  },
 } as const
