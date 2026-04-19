@@ -11,9 +11,11 @@ export const config = {
      * Match tylko routes które potrzebują sesji:
      * - chroniona strefa app
      * - auth flows (redirect po login)
-     * - root (redirect / → /dashboard lub /auth/login)
+     *
+     * UWAGA: `/` celowo NIE jest w matcherze — root to publiczny landing page.
+     * Obsługa zalogowanego usera na `/` odbywa się w samym page.tsx
+     * (server component czyta sesję i pokazuje CTA "Przejdź do panelu").
      */
-    '/',
     '/dashboard/:path*',
     '/calendar/:path*',
     '/invoices/:path*',
