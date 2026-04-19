@@ -3,6 +3,7 @@
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { useMemo } from 'react'
 import { useProfile } from '@/app/(app)/settings/_hooks'
+import { toPublicAvatarUrl } from '@/lib/supabase/avatars'
 
 function getInitials(name?: string, email?: string): string {
   if (name) {
@@ -29,23 +30,35 @@ export function useUserIdentity(user: SupabaseUser | null): UserIdentity {
   const { data: profile } = useProfile()
 
   return useMemo(() => {
+    const metadata = (user?.user_metadata ?? {}) as {
+      full_name?: string
+      first_name?: string
+      last_name?: string
+      username?: string
+      avatar_path?: string
+    }
+
     const firstName = profile?.firstName ?? ''
     const lastName = profile?.lastName ?? ''
-    const fullName = `${firstName} ${lastName}`.trim()
+    const profileFullName = `${firstName} ${lastName}`.trim()
+    const metadataFullName = `${metadata.first_name ?? ''} ${metadata.last_name ?? ''}`.trim()
 
     const fallbackDisplayName =
-      (user?.user_metadata?.full_name as string | undefined)?.trim() ||
+      metadata.full_name?.trim() ||
+      metadataFullName ||
+      metadata.username?.trim() ||
       (user?.email?.split('@')[0] ?? '')
 
-    const displayName = fullName || profile?.username || fallbackDisplayName || 'Użytkownik'
+    const displayName = profileFullName || profile?.username || fallbackDisplayName || 'Użytkownik'
     const email = profile?.email ?? user?.email ?? ''
-    const avatarUrl = profile?.avatarUrl ?? undefined
+    const optimisticAvatarUrl = toPublicAvatarUrl(metadata.avatar_path)
+    const avatarUrl = profile?.avatarUrl ?? optimisticAvatarUrl ?? undefined
 
     return {
       displayName,
       email,
       avatarUrl,
-      initials: getInitials(fullName || profile?.username || fallbackDisplayName, email),
+      initials: getInitials(profileFullName || profile?.username || fallbackDisplayName, email),
     }
   }, [profile, user])
 }
