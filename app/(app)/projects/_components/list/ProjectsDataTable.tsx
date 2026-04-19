@@ -156,11 +156,11 @@ export function ProjectsDataTable({
         label: 'Status',
         type: 'chips',
         options: [
-          { label: 'All', value: 'all' },
-          { label: 'Planned', value: 'planned' },
-          { label: 'In Progress', value: 'in_progress' },
-          { label: 'Completed', value: 'completed' },
-          { label: 'On Hold', value: 'on_hold' },
+          { label: 'Wszystko', value: 'all' },
+          { label: 'Planowane', value: 'planned' },
+          { label: 'W trakcie', value: 'in_progress' },
+          { label: 'Zakończone', value: 'completed' },
+          { label: 'Wstrzymane', value: 'on_hold' },
         ],
       },
       {
@@ -168,9 +168,9 @@ export function ProjectsDataTable({
         label: 'Priority',
         type: 'select',
         options: [
-          { label: 'Low', value: 'low' },
-          { label: 'Medium', value: 'medium' },
-          { label: 'High', value: 'high' },
+          { label: 'Niski', value: 'low' },
+          { label: 'Średni', value: 'medium' },
+          { label: 'Wysoki', value: 'high' },
         ],
       },
     ],
@@ -184,8 +184,8 @@ export function ProjectsDataTable({
       filters={filters}
       onAddRow={onAddProject}
       onDeleteRows={(rows) => rows.forEach((project) => onDeleteProject(project))}
-      searchPlaceholder="Search projects, clients, status..."
-      emptyLabel="No matching projects. Try changing filters or search phrase."
+      searchPlaceholder="Wyszukaj projekt, klientów, status..."
+      emptyLabel="Brak pasujących projektów. Spróbuj zmienić filtry lub frazę wyszukiwania."
       initialVisibility={{ budget_amount: false }}
     />
   )
