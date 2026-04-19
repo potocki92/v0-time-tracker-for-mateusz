@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { buildMetadata } from '@/lib/seo/metadata'
 
+import { AuthShell } from './_components/AuthShell'
+
 /**
  * Strefa auth nie powinna być indeksowana — to formularze stanowe,
  * bez wartości SEO, z potencjalnymi parametrami redirect/tokenami.
@@ -18,5 +20,5 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return <AuthShell>{children}</AuthShell>
 }
