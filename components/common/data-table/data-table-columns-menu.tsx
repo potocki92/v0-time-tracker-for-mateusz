@@ -19,11 +19,11 @@ export function DataTableColumnsMenu<TData extends RowData>({ table }: { table: 
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="h-9 gap-1">
-          <SlidersHorizontal className="size-4" /> Columns
+          <SlidersHorizontal className="size-4" /> Kolumny
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuLabel>Column visibility</DropdownMenuLabel>
+        <DropdownMenuLabel>Widoczność kolumny</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {columns.map((column) => (
           <DropdownMenuCheckboxItem
@@ -32,7 +32,7 @@ export function DataTableColumnsMenu<TData extends RowData>({ table }: { table: 
             onCheckedChange={(value) => column.toggleVisibility(Boolean(value))}
             onSelect={(event) => event.preventDefault()}
           >
-            {column.id}
+            {column.label}
           </DropdownMenuCheckboxItem>
         ))}
       </DropdownMenuContent>
