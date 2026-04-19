@@ -41,31 +41,15 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
-
-  const redirectWithSessionCookies = (pathname: string) => {
-    const url = request.nextUrl.clone()
-    url.pathname = pathname
-
-    const response = NextResponse.redirect(url)
-
-    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
-      response.cookies.set(name, value)
-    })
-
-    return response
-  }
-
   // NOTE:
   // We intentionally do not force unauthenticated redirects here for app routes.
   // In some environments `signInWithPassword` session propagation to middleware cookies
   // can lag behind the client state (local/session storage), causing redirect loops
   // right after successful login. Protected screens perform their own user checks.
-
-  // Redirect root to dashboard if logged in, login if not
-  if (request.nextUrl.pathname === '/') {
-    return redirectWithSessionCookies(user ? '/dashboard' : '/auth/login')
-  }
+  //
+  // `/` (landing) jest obsługiwane po stronie page.tsx (server component),
+  // dzięki czemu CDN może cache'ować publiczny landing bez nadmiarowych redirectów.
+  void user
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:
