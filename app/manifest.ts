@@ -22,7 +22,8 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: '/icon-light-32x32.png', sizes: '32x32', type: 'image/png', purpose: 'any' },
       { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
       { src: '/apple-icon.png', sizes: '180x180', type: 'image/png', purpose: 'any' },
-      { src: '/logo.png', sizes: '1024x1536', type: 'image/png', purpose: 'any maskable' },
+      { src: '/logo.png', sizes: '1024x1536', type: 'image/png', purpose: 'any' },
+      { src: '/logo.png', sizes: '1024x1536', type: 'image/png', purpose: 'maskable' },
     ],
   }
 }
