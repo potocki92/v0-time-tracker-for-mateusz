@@ -548,6 +548,10 @@
 }
 
 @layer components {
+  .avatar-ring {
+    @apply bg-background/35 backdrop-blur-[8px] shadow-avatar-ring shadow-avatar-outer;
+  }
+
   /* Skip-link — widoczny dopiero po focusie (Tab), pomija nawigację i sidebar. */
   .skip-link {
     position: absolute;

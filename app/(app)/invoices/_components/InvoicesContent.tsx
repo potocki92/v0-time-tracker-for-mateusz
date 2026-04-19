@@ -9,7 +9,7 @@ import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
 import { InvoiceFormDialog } from './InvoiceFormDialog'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
-import { useDeleteInvoice, useInvoicesData, useInvoicesFilters, useSaveInvoice } from '../_hooks'
+import { useDeleteInvoice, useInvoicesData, useSaveInvoice } from '../_hooks'
 import type { BillingQuarter, InvoiceFormValues } from '../_domain'
 
 const CURRENT_YEAR = new Date().getFullYear()
@@ -46,8 +46,6 @@ function parseQuarterPeriod(period: string | null | undefined): { quarter: Billi
 
 export function InvoicesContent() {
   const { data } = useInvoicesData()
-  const { filteredInvoices, query, setQuery, setStatus, status } = useInvoicesFilters(data.invoices)
-
   const saveMutation = useSaveInvoice()
   const deleteMutation = useDeleteInvoice()
 
@@ -136,12 +134,8 @@ export function InvoicesContent() {
         </Empty>
       ) : (
         <InvoicesTable
-          invoices={filteredInvoices}
+          invoices={data.invoices}
           clients={data.clients}
-          query={query}
-          status={status}
-          onQueryChange={setQuery}
-          onStatusChange={setStatus}
           onEdit={openEdit}
           onDelete={setDeletingInvoice}
         />
