@@ -7,78 +7,66 @@ import { cn } from '@/lib/utils'
 
 interface FormWrapperProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
-  title?:       React.ReactNode
-  description?: React.ReactNode
-  footer?:      React.ReactNode
-  /** Removes the default glassmorphism card styling (useful for embedded forms). */
-  bare?:        boolean
+  title?:        React.ReactNode
+  description?:  React.ReactNode
+  footer?:       React.ReactNode
+  /** Small content rendered below the description (e.g. announcement, badge). */
+  headerExtra?:  React.ReactNode
+  /** Forces the old card treatment (border + shadow). Default: false — caller owns the surface. */
+  boxed?:        boolean
 }
 
 /**
- * Presentational shell for forms. Neutral by default — works in a modal,
- * a page, a drawer. On auth pages it becomes a glassmorphism card.
+ * Presentational wrapper for form content.
+ *
+ * By default the wrapper is transparent — it just provides an animated
+ * title / description / footer frame. The surface (card, border, padding)
+ * lives in the page layout (e.g. `AuthShell`). Pass `boxed` to get the
+ * old standalone card treatment.
  */
 export const FormWrapper = React.forwardRef<HTMLDivElement, FormWrapperProps>(
   function FormWrapper(
-    { title, description, footer, bare, className, children, ...rest },
+    { title, description, footer, headerExtra, boxed, className, children, ...rest },
     ref,
   ) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 16, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0,  scale: 1 }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        className={cn('w-full', !bare && 'max-w-md mx-auto')}
+        className={cn('w-full', className)}
       >
         <div
           ref={ref}
           className={cn(
-            !bare && [
-              'relative overflow-hidden rounded-2xl',
-              'border border-border/50',
-              'bg-card/70 supports-[backdrop-filter]:bg-card/50 backdrop-blur-xl',
-              'shadow-[0_8px_40px_-12px_rgba(0,0,0,0.25)]',
-              'dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.6)]',
-            ],
-            className,
+            boxed &&
+              'rounded-2xl border border-border/60 bg-card p-6 shadow-sm sm:p-8',
           )}
           {...rest}
         >
-          {!bare ? (
-            <>
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"
-              />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -top-24 -right-24 h-56 w-56 rounded-full bg-primary/20 blur-3xl"
-              />
-            </>
+          {title || description ? (
+            <header className="mb-8 space-y-2">
+              {title ? (
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-[2rem]">
+                  {title}
+                </h1>
+              ) : null}
+              {description ? (
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {description}
+                </p>
+              ) : null}
+              {headerExtra}
+            </header>
           ) : null}
 
-          <div className={cn('relative p-6 sm:p-8', bare && 'p-0')}>
-            {title || description ? (
-              <header className="mb-6 space-y-1.5">
-                {title ? (
-                  <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                    {title}
-                  </h2>
-                ) : null}
-                {description ? (
-                  <p className="text-sm text-muted-foreground">{description}</p>
-                ) : null}
-              </header>
-            ) : null}
+          {children}
 
-            {children}
-
-            {footer ? (
-              <div className="mt-6 border-t border-border/40 pt-5">
-                {footer}
-              </div>
-            ) : null}
-          </div>
+          {footer ? (
+            <div className="mt-8 border-t border-border/50 pt-6">
+              {footer}
+            </div>
+          ) : null}
         </div>
       </motion.div>
     )

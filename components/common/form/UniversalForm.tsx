@@ -88,7 +88,7 @@ export function UniversalForm<TValues extends FieldValues>({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className={cn('space-y-5', className)}
+        className={cn('space-y-6', className)}
       >
         <FormSubmittingFieldset enabled={disableOnSubmit}>
           {fields?.map((field) => (
@@ -165,12 +165,12 @@ export const SubmitButton = React.forwardRef<
       type="submit"
       disabled={isDisabled}
       className={cn(
-        'relative inline-flex h-11 w-full items-center justify-center gap-2 overflow-hidden',
-        'rounded-lg bg-primary px-4 text-base font-semibold text-primary-foreground',
-        'shadow-lg shadow-primary/20 transition-all duration-200',
-        'hover:shadow-xl hover:shadow-primary/30 hover:brightness-[1.03] active:scale-[0.98]',
+        'relative mt-2 inline-flex h-12 w-full items-center justify-center gap-2 overflow-hidden',
+        'rounded-xl bg-primary px-5 text-[0.95rem] font-semibold text-primary-foreground tracking-tight',
+        'shadow-md shadow-primary/20 transition-all duration-200',
+        'hover:shadow-lg hover:shadow-primary/30 hover:brightness-[1.04] active:scale-[0.99]',
         'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
         className,
       )}
       {...rest}
