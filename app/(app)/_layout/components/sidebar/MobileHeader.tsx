@@ -21,11 +21,11 @@ interface Props {
 
 export function MobileHeader({ user, onLogout }: Props) {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/55 backdrop-blur-[8px]">
-      <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between px-[var(--header-inline-padding)] py-3">
+    <header className="z-40 border-b border-border bg-background">
+      <div className="flex items-center justify-between px-[var(--header-inline-padding)] py-[var(--header-y-padding)]">
         <div className="flex items-center gap-3">
           <SidebarTrigger className="-ml-1" />
-          <span className="glass-effect-text text-xxs font-semibold tracking-[0.04em] uppercase text-foreground/90">
+          <span className="text-xs font-semibold tracking-wide uppercase text-foreground/90">
             Time Tracker
           </span>
         </div>
