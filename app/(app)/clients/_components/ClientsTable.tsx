@@ -29,7 +29,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
     () => [
       {
         accessorKey: 'name',
-        header: 'Client',
+        header: 'Klient',
         size: 280,
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
@@ -41,7 +41,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
       {
         id: 'work_type',
         accessorFn: (row) => row.work_type,
-        header: 'Type / Currency',
+        header: 'Typ / Waluta',
         size: 170,
         cell: ({ row }) => (
           <div className="flex flex-wrap gap-1">
@@ -52,13 +52,13 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
       },
       {
         accessorKey: 'currency',
-        header: 'Currency',
+        header: 'Waluta',
         size: 90,
       },
       {
         id: 'rate',
         accessorFn: (row) => row.rate,
-        header: 'Rate',
+        header: 'Stawka',
         size: 140,
         cell: ({ row }) => {
           const unit = row.original.work_type === 'hourly' ? 'h' : (row.original.unit ?? 'szt')
@@ -73,7 +73,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
       {
         id: 'earnings',
         accessorFn: (row) => row.totalEarningsInClientCurrency,
-        header: 'Earnings',
+        header: 'Zarobki',
         size: 140,
         cell: ({ row }) =>
           row.original.totalEarningsInClientCurrency > 0
@@ -83,11 +83,11 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
       {
         id: 'hours',
         accessorFn: (row) => row.totalHours,
-        header: 'Hours / Days',
+        header: 'Godziny / Dni',
         size: 130,
         cell: ({ row }) =>
           row.original.totalHours > 0
-            ? `${row.original.totalHours.toFixed(1)}h · ${row.original.totalDays} days`
+            ? `${row.original.totalHours.toFixed(1)}h · ${row.original.totalDays} dni`
             : '—',
       },
       {
@@ -105,13 +105,13 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onClick={() => onShowHistory(row.original)}>
-                <History className="mr-2 size-4" /> History
+                <History className="mr-2 size-4" /> Historia stawek
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onEdit(row.original)}>
-                <Pencil className="mr-2 size-4" /> Edit
+                <Pencil className="mr-2 size-4" /> Edytuj
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDelete(row.original)} className="text-destructive focus:text-destructive">
-                <Trash2 className="mr-2 size-4" /> Delete
+                <Trash2 className="mr-2 size-4" /> Usuń
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -124,17 +124,17 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
   const filters = useMemo<DataTableFilter[]>(() => [
     {
       columnId: 'work_type',
-      label: 'Work type',
+      label: 'Typ rozliczenia',
       type: 'chips',
       options: [
-        { label: 'All', value: 'all' },
-        { label: 'Hourly', value: 'hourly' },
-        { label: 'Piecework', value: 'piecework' },
+        { label: 'Wszystkie', value: 'all' },
+        { label: 'Godzinowe', value: 'hourly' },
+        { label: 'Akord', value: 'piecework' },
       ],
     },
     {
       columnId: 'currency',
-      label: 'Currency',
+      label: 'Waluta',
       type: 'select',
       options: [
         { label: 'PLN', value: 'PLN' },
@@ -148,8 +148,9 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
       data={clients}
       columns={columns}
       filters={filters}
-      searchPlaceholder="Search clients, city, email..."
-      emptyLabel="No clients found."
+      storageKey="clients-table-filters-v1"
+      searchPlaceholder="Szukaj klientów po nazwie, mieście, e-mailu..."
+      emptyLabel="Brak klientów spełniających kryteria."
       initialVisibility={{ hours: false, currency: false }}
     />
   )

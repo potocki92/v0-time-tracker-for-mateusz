@@ -24,6 +24,7 @@ export type DataTableProps<TData extends RowData> = {
   searchPlaceholder?: string
   emptyLabel?: string
   filters?: DataTableFilter[]
+  storageKey?: string
   initialVisibility?: VisibilityState
   pageSize?: number
   onAddRow?: () => void

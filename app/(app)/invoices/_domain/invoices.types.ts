@@ -7,8 +7,6 @@ export interface InvoicesData {
   clients: Client[]
 }
 
-export type InvoiceStatusFilter = 'all' | 'paid' | 'unpaid'
-
 export interface InvoiceFormValues {
   name: string
   invoice_number: string

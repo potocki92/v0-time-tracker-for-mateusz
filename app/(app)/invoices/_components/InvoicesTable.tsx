@@ -25,9 +25,9 @@ export function InvoicesTable({ invoices, clients, onEdit, onDelete }: InvoicesT
         label: 'Status',
         type: 'chips',
         options: [
-          { label: 'All', value: 'all' },
-          { label: 'Paid', value: 'paid' },
-          { label: 'Unpaid', value: 'unpaid' },
+          { label: 'Wszystkie', value: 'all' },
+          { label: 'Opłacone', value: 'paid' },
+          { label: 'Nieopłacone', value: 'unpaid' },
         ],
       },
     ],
@@ -39,8 +39,9 @@ export function InvoicesTable({ invoices, clients, onEdit, onDelete }: InvoicesT
       data={invoices}
       columns={columns}
       filters={filters}
-      searchPlaceholder="Search by ID, number, client, recipient..."
-      emptyLabel="No invoices match the current filters."
+      storageKey="invoices-table-filters-v1"
+      searchPlaceholder="Szukaj po ID, numerze, kliencie lub odbiorcy..."
+      emptyLabel="Brak faktur spełniających kryteria."
       initialVisibility={{ billing_period: false }}
     />
   )

@@ -40,12 +40,12 @@ export function DataTableToolbar<TData extends RowData>({
         <div className="flex items-center gap-2">
           {onDeleteSelected && (
             <Button type="button" variant="outline" size="sm" className="h-9 gap-1" onClick={onDeleteSelected} disabled={selectedCount === 0}>
-              <Trash2 className="size-4" /> Delete ({selectedCount})
+              <Trash2 className="size-4" /> Usuń ({selectedCount})
             </Button>
           )}
           {onAddRow && (
             <Button type="button" size="sm" className="h-9 gap-1" onClick={onAddRow}>
-              <Plus className="size-4" /> Add row
+              <Plus className="size-4" /> Dodaj
             </Button>
           )}
           <DataTableColumnsMenu table={table} />
@@ -61,19 +61,23 @@ export function DataTableToolbar<TData extends RowData>({
 
           if (filter.type === 'chips') {
             return (
-              <div key={filter.columnId} className="flex flex-wrap items-center gap-1">
-                {filter.options.map((option) => (
-                  <Button
-                    key={option.value}
-                    type="button"
-                    variant={value === option.value ? 'default' : 'outline'}
-                    size="sm"
-                    className="h-8 rounded-full px-3 text-xs"
-                    onClick={() => column.setFilterValue(option.value === 'all' ? undefined : option.value)}
-                  >
-                    {option.label}
-                  </Button>
-                ))}
+              <div key={filter.columnId} className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground">{filter.label}</span>
+                <div className="inline-flex h-9 items-center gap-1 rounded-lg bg-muted/40 p-1">
+                  {filter.options.map((option) => (
+                    <Button
+                      key={option.value}
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 rounded-md px-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                      data-state={value === option.value ? 'active' : 'inactive'}
+                      onClick={() => column.setFilterValue(option.value === 'all' ? undefined : option.value)}
+                    >
+                      {option.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
             )
           }
@@ -84,11 +88,11 @@ export function DataTableToolbar<TData extends RowData>({
               value={value}
               onValueChange={(next) => column.setFilterValue(next === 'all' ? undefined : next)}
             >
-              <SelectTrigger className="h-8 w-[190px]">
+              <SelectTrigger className="h-9 w-[210px] rounded-lg border-border/60 bg-muted/20">
                 <SelectValue placeholder={filter.label} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{filter.allLabel ?? `All ${filter.label.toLowerCase()}`}</SelectItem>
+                <SelectItem value="all">{filter.allLabel ?? `Wszystkie: ${filter.label.toLowerCase()}`}</SelectItem>
                 {filter.options.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
