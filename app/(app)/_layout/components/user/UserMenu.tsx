@@ -25,15 +25,15 @@ export function UserMenu({ user, onLogout }: Props) {
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full"
+          className="size-auto rounded-full p-0 hover:bg-transparent focus-visible:ring-0"
           aria-label={displayName}
         >
           <Avatar
             avatarUrl={avatarUrl}
             displayName={displayName}
             initials={initials}
-            className="size-7"
-            fallbackClassName="bg-muted text-xs font-semibold"
+            className=""
+            fallbackClassName="bg-muted/80 text-xs font-semibold"
             showIconFallback
           />
         </Button>

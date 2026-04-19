@@ -35,8 +35,9 @@ export function UserMenuPanel({
             avatarUrl={avatarUrl}
             displayName={displayName}
             initials={initials}
-            className="h-8 w-8 rounded-lg"
-            fallbackClassName="rounded-lg text-xs"
+            className="rounded-lg p-[2px]"
+            avatarClassName="size-8 rounded-lg"
+            fallbackClassName="rounded-lg bg-muted text-xs"
           />
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">{displayName}</span>
