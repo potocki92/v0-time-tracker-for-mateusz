@@ -28,29 +28,21 @@ export function Avatar({
   showIconFallback = false,
 }: AvatarProps) {
   return (
-    <div
+    <UiAvatar
       className={cn(
-        'group sticky top-0 rounded-full bg-background/35 p-[3px] backdrop-blur-[8px] shadow-avatar-ring shadow-avatar-outer',
+        'size-8 rounded-full shadow-[var(--shadow-avatar-ring)]',
+        avatarClassName,
         className,
       )}
     >
-      <UiAvatar
-        className={cn(
-          'size-14 rounded-full transition-transform duration-300 ease-out',
-          avatarClassName,
-        )}
+      {avatarUrl ? (
+        <AvatarImage src={avatarUrl} alt={displayName} className="rounded-full object-cover" />
+      ) : null}
+      <AvatarFallback
+        className={cn('text-xs font-semibold uppercase', fallbackClassName)}
       >
-        {avatarUrl ? (
-          <AvatarImage
-            src={avatarUrl}
-            alt={displayName}
-            className="rounded-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
-          />
-        ) : null}
-        <AvatarFallback className={cn('text-sm font-semibold', fallbackClassName)}>
-          {initials || (showIconFallback ? <User className="h-4 w-4" /> : 'U')}
-        </AvatarFallback>
-      </UiAvatar>
-    </div>
+        {initials || (showIconFallback ? <User className="size-4" /> : 'U')}
+      </AvatarFallback>
+    </UiAvatar>
   )
 }
