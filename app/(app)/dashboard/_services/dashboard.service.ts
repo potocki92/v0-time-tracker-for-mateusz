@@ -20,8 +20,8 @@ import {
   fetchInvoices,
   fetchEurRate,
 } from './dashboard.fetchers'
-import { usePreferencesStore }  from '../_hooks/usePreferencesStore'
-import type { DashboardData }   from '@/app/(app)/dashboard/_domain/dashboard.types'
+import { usePreferencesStore } from '../_hooks/usePreferencesStore'
+import type { DashboardData } from '@/app/(app)/dashboard/_domain/dashboard.types'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -41,10 +41,18 @@ function resolveUserName(metadata: Record<string, unknown>, email?: string): str
 // ── Service ───────────────────────────────────────────────────────────────────
 
 export async function getDashboardData(): Promise<DashboardData> {
+  const eurRatePromise = fetchEurRate().then((eurRateLive) => {
+    if (eurRateLive !== null) {
+      usePreferencesStore.getState().setLiveRate(eurRateLive)
+    }
+
+    return eurRateLive
+  })
+
   // Krok 1: user + eurRate równolegle (eurRate nie potrzebuje <user.id>)
-  const [user, eurRateLive] = await Promise.all([
+  const [user] = await Promise.all([
     fetchCurrentUser(),
-    fetchEurRate(),
+    eurRatePromise,
   ])
 
   // Krok 2: wszystkie dane usera równolegle
@@ -53,13 +61,6 @@ export async function getDashboardData(): Promise<DashboardData> {
     fetchWorkEntries(user.id),
     fetchInvoices(user.id),
   ])
-
-  // Live rate — fire and forget update do storu
-  if (eurRateLive !== null) {
-    // BUG w starym kodzie: wpisywałeś rate do pola useLiveRate (boolean)
-    // Powinno trafić do osobnego pola lub być przekazane przez return
-    usePreferencesStore.getState().setLiveRate(eurRateLive)
-  }
 
   const metadata = (user.user_metadata ?? {}) as Record<string, unknown>
   return {
