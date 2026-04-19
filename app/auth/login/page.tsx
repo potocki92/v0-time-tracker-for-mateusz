@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { BRAND, Logo } from '@/components/brand/logo'
@@ -51,24 +51,31 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
+    <main
+      id="main-content"
+      className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4"
+    >
       <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center gap-3">
+        <header className="flex flex-col items-center gap-3">
           <Logo priority size="xl" />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{BRAND.name}</h1>
           <p className="text-sm text-muted-foreground">{BRAND.tagline}</p>
-        </div>
+        </header>
 
-        {/* Login Card */}
         <Card className="border-0 shadow-xl shadow-black/5 dark:shadow-black/20">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl">Zaloguj się</CardTitle>
+            <h2 className="text-xl leading-none font-semibold">Zaloguj się</h2>
             <CardDescription>
               Wprowadź swoje dane aby kontynuować
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form
+              onSubmit={handleLogin}
+              className="space-y-4"
+              aria-label="Formularz logowania"
+              noValidate
+            >
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -98,9 +105,15 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                    aria-pressed={showPassword}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="w-4 h-4" aria-hidden="true" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -122,21 +135,24 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Sign up link */}
-        <p className="text-center text-sm text-muted-foreground">
-          Nie masz jeszcze konta?{' '}
-          <Link
-            href="/auth/sign-up"
-            className="font-medium text-primary hover:underline underline-offset-4"
-          >
-            Zarejestruj się
-          </Link>
-        </p>
+        <nav aria-label="Odnośniki do rejestracji" className="text-center">
+          <p className="text-sm text-muted-foreground">
+            Nie masz jeszcze konta?{' '}
+            <Link
+              href="/auth/sign-up"
+              className="font-medium text-primary hover:underline underline-offset-4"
+            >
+              Zarejestruj się
+            </Link>
+          </p>
+        </nav>
 
-        <p className="text-center text-xs text-muted-foreground/60">
-          {BRAND.name} v3.0
-        </p>
+        <footer>
+          <p className="text-center text-xs text-muted-foreground/60">
+            {BRAND.name} v3.0
+          </p>
+        </footer>
       </div>
-    </div>
+    </main>
   )
 }

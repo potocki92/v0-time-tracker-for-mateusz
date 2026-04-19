@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { BRAND, Logo } from '@/components/brand/logo'
@@ -60,24 +60,31 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
+    <main
+      id="main-content"
+      className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4"
+    >
       <div className="w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center gap-3">
+        <header className="flex flex-col items-center gap-3">
           <Logo priority size="xl" />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{BRAND.name}</h1>
           <p className="text-sm text-muted-foreground">{BRAND.tagline}</p>
-        </div>
+        </header>
 
-        {/* Sign Up Card */}
         <Card className="border-0 shadow-xl shadow-black/5 dark:shadow-black/20">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl">Utworz konto</CardTitle>
+            <h2 className="text-xl leading-none font-semibold">Utworz konto</h2>
             <CardDescription>
               Wprowadz swoje dane aby zalozyc konto
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form
+              onSubmit={handleSignUp}
+              className="space-y-4"
+              aria-label="Formularz rejestracji"
+              noValidate
+            >
               <div className="space-y-2">
                 <Label htmlFor="fullName">Imie i nazwisko</Label>
                 <Input
@@ -120,9 +127,15 @@ export default function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+                    aria-pressed={showPassword}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="w-4 h-4" aria-hidden="true" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -157,19 +170,22 @@ export default function SignUpPage() {
           </CardContent>
         </Card>
 
-        {/* Back to login */}
-        <Link
-          href="/auth/login"
-          className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Powrot do logowania
-        </Link>
+        <nav aria-label="Powrót do logowania">
+          <Link
+            href="/auth/login"
+            className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            Powrot do logowania
+          </Link>
+        </nav>
 
-        <p className="text-center text-xs text-muted-foreground/60">
-          {BRAND.name} v3.0
-        </p>
+        <footer>
+          <p className="text-center text-xs text-muted-foreground/60">
+            {BRAND.name} v3.0
+          </p>
+        </footer>
       </div>
-    </div>
+    </main>
   )
 }
