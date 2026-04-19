@@ -475,10 +475,9 @@
   --text-4xl--line-height: 1.15;
   --text-h1--line-height: 1.05;
 
-  --header-inline-padding: clamp(3rem, 2.6rem + 2vw, 5rem);
-
+  --header-inline-padding: clamp(1rem, 0.75rem + 1vw, 1.5rem);
+  --header-y-padding: clamp(0.5rem, 0.45rem + 0.2vw, 0.75rem);
   --shadow-avatar-ring: 0 0 0 1px rgba(47, 47, 50, 0.2);
-  --shadow-avatar-outer: 0 1px 15px -2px rgb(0 0 0 / 0.1);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -587,11 +586,6 @@
  */
 
 @layer utilities {
-  .glass-effect-text {
-    backdrop-filter: blur(7.1px);
-    -webkit-backdrop-filter: blur(7.1px);
-  }
-
   /* Bazowa animacja skeleton — jedna dla całej strony */
   @keyframes skeleton-shimmer {
     0%, 100% {

@@ -43,8 +43,8 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
                 avatarUrl={avatarUrl}
                 displayName={displayName}
                 initials={initials}
-                className="h-8 w-8 rounded-lg"
-                fallbackClassName="rounded-lg text-xs"
+                className="size-8"
+                fallbackClassName="text-xs"
               />
 
               <div className="grid flex-1 text-left text-sm leading-tight">
