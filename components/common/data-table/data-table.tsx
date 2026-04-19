@@ -14,6 +14,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import { Table, TableHeader, TableRow } from '@/components/ui/table'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { DataTableBody } from './data-table-body'
 import { DataTableHeaderCell } from './data-table-header-cell'
 import { DataTablePagination } from './data-table-pagination'
@@ -26,17 +27,44 @@ export function DataTable<TData extends RowData>({
   searchPlaceholder = 'Search...',
   emptyLabel = 'No records found.',
   filters = [],
+  storageKey,
   initialVisibility,
   onAddRow,
   onDeleteRows,
   pageSize = 8,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([])
-  const [globalFilter, setGlobalFilter] = useState('')
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [persistedFilters, setPersistedFilters] = useLocalStorage<{
+    globalFilter: string
+    columnFilters: ColumnFiltersState
+  }>(
+    storageKey ?? '__data-table-filters_disabled',
+    { globalFilter: '', columnFilters: [] },
+  )
+  const [globalFilter, setGlobalFilterState] = useState(storageKey ? persistedFilters.globalFilter : '')
+  const [columnFilters, setColumnFiltersState] = useState<ColumnFiltersState>(
+    storageKey ? persistedFilters.columnFilters : [],
+  )
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialVisibility ?? {})
   const [columnSizing, setColumnSizing] = useState({})
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  const setGlobalFilter = (value: string) => {
+    setGlobalFilterState(value)
+    if (storageKey) {
+      setPersistedFilters((prev) => ({ ...prev, globalFilter: value }))
+    }
+  }
+
+  const setColumnFilters = (value: ColumnFiltersState | ((prev: ColumnFiltersState) => ColumnFiltersState)) => {
+    setColumnFiltersState((prev) => {
+      const next = typeof value === 'function' ? value(prev) : value
+      if (storageKey) {
+        setPersistedFilters((persisted) => ({ ...persisted, columnFilters: next }))
+      }
+      return next
+    })
+  }
 
   const table = useReactTable({
     data,
