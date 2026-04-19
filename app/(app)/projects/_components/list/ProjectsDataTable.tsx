@@ -48,7 +48,7 @@ export function ProjectsDataTable({
       createSelectionColumn<Project>(),
       {
         accessorKey: 'name',
-        header: 'Project',
+        header: 'Projekt',
         minSize: 240,
         size: 300,
         cell: ({ row }) => {
@@ -78,7 +78,7 @@ export function ProjectsDataTable({
       {
         id: 'client',
         accessorFn: (project) => clientsById.get(project.client_id) ?? 'No client',
-        header: 'Client',
+        header: 'Klient',
         size: 180,
       },
       {
@@ -96,7 +96,7 @@ export function ProjectsDataTable({
       },
       {
         accessorKey: 'priority',
-        header: 'Priority',
+        header: 'Priorytet',
         size: 130,
         cell: ({ row }) => {
           const priority = row.original.priority
@@ -109,14 +109,14 @@ export function ProjectsDataTable({
       },
       {
         accessorKey: 'budget_amount',
-        header: 'Budget',
+        header: 'Budżet',
         size: 120,
         cell: ({ row }) =>
           row.original.budget_amount ? formatCurrency(row.original.budget_amount, 'PLN') : '—',
       },
       {
         accessorKey: 'end_date',
-        header: 'Deadline',
+        header: 'Termin',
         size: 130,
         cell: ({ row }) => (row.original.end_date ? formatDate(row.original.end_date) : '—'),
       },
