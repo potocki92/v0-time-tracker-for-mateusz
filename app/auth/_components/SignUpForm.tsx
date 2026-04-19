@@ -71,7 +71,7 @@ export function SignUpForm() {
   return (
     <FormWrapper
       title="Utwórz konto"
-      description="Zacznij śledzić czas pracy i wystawiać faktury w kilka minut."
+      description="Zacznij śledzić czas pracy i wystawiać faktury w kilka minut. To nie zajmie więcej niż chwila."
       footer={
         <p className="text-center text-sm text-muted-foreground">
           Masz już konto?{' '}

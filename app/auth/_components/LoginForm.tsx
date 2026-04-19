@@ -47,7 +47,7 @@ export function LoginForm() {
   return (
     <FormWrapper
       title="Witaj z powrotem"
-      description="Zaloguj się, aby wrócić do rejestracji czasu pracy."
+      description="Zaloguj się, aby wrócić do rejestracji czasu pracy i zarządzania klientami."
       footer={
         <p className="text-center text-sm text-muted-foreground">
           Nie masz jeszcze konta?{' '}

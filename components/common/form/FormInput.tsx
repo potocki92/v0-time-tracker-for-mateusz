@@ -23,6 +23,8 @@ interface FormInputProps<TValues extends FieldValues>
  * - Uses `register` (uncontrolled) for zero re-renders on keystroke.
  * - `useFormState({ name })` subscribes only to this field's error state,
  *   so parent components don't re-render when other fields change.
+ * - Softer aria-invalid styling (reduced ring opacity, gentler red)
+ *   — full-strength destructive is reserved for critical UI.
  * - Animated error reveal via Framer Motion.
  */
 export function FormInput<TValues extends FieldValues>({
@@ -61,22 +63,25 @@ export function FormInput<TValues extends FieldValues>({
   const commonProps = {
     id: fieldId,
     'aria-invalid': !!error,
-    'aria-describedby': [descId, error ? errorId : undefined]
-      .filter(Boolean)
-      .join(' ') || undefined,
+    'aria-describedby':
+      [descId, error ? errorId : undefined].filter(Boolean).join(' ') ||
+      undefined,
     autoComplete,
     placeholder,
     disabled: disabled || isSubmitting,
   } as const
 
+  const softInvalidClass =
+    'aria-invalid:border-destructive/55 aria-invalid:ring-destructive/10 dark:aria-invalid:ring-destructive/20'
+
   return (
-    <div className={cn('space-y-1.5', className)} data-slot="form-field">
+    <div className={cn('space-y-2', className)} data-slot="form-field">
       <div className="flex items-center justify-between gap-2">
         <Label
           htmlFor={fieldId}
           className={cn(
             'text-sm font-medium transition-colors',
-            error && 'text-destructive',
+            error && 'text-destructive/90',
           )}
         >
           {label}
@@ -88,7 +93,7 @@ export function FormInput<TValues extends FieldValues>({
         {hasIcon ? (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted-foreground/80 transition-colors group-focus-within:text-primary"
+            className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-muted-foreground/80 transition-colors group-focus-within:text-primary"
           >
             {icon}
           </span>
@@ -99,22 +104,27 @@ export function FormInput<TValues extends FieldValues>({
             {...commonProps}
             {...register(name)}
             className={cn(
-              'min-h-[96px] bg-background/60 backdrop-blur-sm border-border/60',
-              'focus-visible:border-primary/70 focus-visible:ring-primary/30',
-              hasIcon && 'pl-10',
+              'min-h-[112px] resize-none rounded-xl border-border/70 bg-background px-4 py-3 text-[0.95rem] shadow-sm transition',
+              'focus-visible:border-primary/70 focus-visible:ring-primary/25',
+              softInvalidClass,
+              hasIcon && 'pl-11',
               inputClassName,
             )}
           />
         ) : (
           <Input
             {...commonProps}
-            {...register(name, type === 'number' ? { valueAsNumber: true } : undefined)}
+            {...register(
+              name,
+              type === 'number' ? { valueAsNumber: true } : undefined,
+            )}
             type={effectiveType}
             className={cn(
-              'h-11 bg-background/60 backdrop-blur-sm border-border/60',
-              'focus-visible:border-primary/70 focus-visible:ring-primary/30',
-              hasIcon && 'pl-10',
-              hasRight && 'pr-11',
+              'h-12 rounded-xl border-border/70 bg-background px-4 text-[0.95rem] shadow-sm transition',
+              'focus-visible:border-primary/70 focus-visible:ring-primary/25',
+              softInvalidClass,
+              hasIcon && 'pl-11',
+              hasRight && 'pr-12',
               inputClassName,
             )}
           />
@@ -127,7 +137,7 @@ export function FormInput<TValues extends FieldValues>({
             onClick={() => setRevealed((v) => !v)}
             aria-label={revealed ? 'Ukryj hasło' : 'Pokaż hasło'}
             aria-pressed={revealed}
-            className="absolute inset-y-0 right-2 flex items-center justify-center rounded-md px-2 text-muted-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="absolute inset-y-0 right-2 flex items-center justify-center rounded-lg px-2 text-muted-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {revealed ? (
               <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -154,7 +164,7 @@ export function FormInput<TValues extends FieldValues>({
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -4, height: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="text-xs font-medium text-destructive"
+            className="pt-0.5 text-[13px] text-destructive/75 dark:text-destructive/80"
           >
             {error.message}
           </motion.p>
