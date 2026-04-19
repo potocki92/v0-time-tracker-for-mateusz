@@ -35,9 +35,6 @@ export function ClientsContent() {
     setWorkTypeFilter,
     currencyFilter,
     setCurrencyFilter,
-    sortKey,
-    sortDirection,
-    toggleSort,
     allWithStats,
     visible,
   } = useClientsFilters(data.clients, data.workEntries, rateHistoryMap)
@@ -122,9 +119,6 @@ export function ClientsContent() {
           <Card className="overflow-hidden">
             <ClientsTable
               clients={visible}
-              sortKey={sortKey}
-              sortDirection={sortDirection}
-              onSort={toggleSort}
               onEdit={openEdit}
               onDelete={(c) => setDeleteCandidate(toClient(c))}
               onShowHistory={(c) => setHistoryClient(toClient(c))}

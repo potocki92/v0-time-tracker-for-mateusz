@@ -68,7 +68,7 @@ export const COLUMN_LABELS: Record<string, string> = {
   client: 'Klient',
   invoice_date: 'Data',
   billing_period: 'Kwartał',
-  status: 'Status',
+  payment_status: 'Status',
   amount: 'Kwota',
   actions: 'Akcje',
 }
@@ -127,9 +127,9 @@ export function createInvoiceColumns({
       maxSize: 200,
     },
     {
-      id: 'status',
-      accessorFn: (row) => (row.is_paid ? 1 : 0),
-      header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.status} />,
+      id: 'payment_status',
+      accessorFn: (row) => (row.is_paid ? 'paid' : 'unpaid'),
+      header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.payment_status} />,
       cell: ({ row }) => (
         <Badge
           variant={row.original.is_paid ? 'secondary' : 'outline'}

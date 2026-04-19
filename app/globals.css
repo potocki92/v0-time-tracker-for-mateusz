@@ -548,6 +548,12 @@
 }
 
 @layer components {
+  .avatar-ring {
+    background-color: color-mix(in oklab, var(--background) 35%, transparent);
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-avatar-ring), var(--shadow-avatar-outer);
+  }
+
   /* Skip-link — widoczny dopiero po focusie (Tab), pomija nawigację i sidebar. */
   .skip-link {
     position: absolute;
