@@ -3,16 +3,14 @@
 import { useState } from 'react'
 import type { Project } from '@/lib/types'
 import {
-  useProjectFilters,
   useProjectForm,
   useProjectMutations,
   useProjectStats,
   useProjectsData,
 } from '../_hooks'
 import { ProjectsHeader } from './ProjectsHeader'
-import { ProjectsToolbar } from './ProjectsToolbar'
 import { ProjectStats } from './card/ProjectStats'
-import { ProjectsTable } from './list/ProjectsTable'
+import { ProjectsDataTable } from './list/ProjectsDataTable'
 import { ProjectsEmpty } from './list/ProjectsEmpty'
 import { ProjectFormDialog } from './form/ProjectFormDialog'
 import { ProjectDeleteDialog } from './form/ProjectDeleteDialog'
@@ -20,10 +18,9 @@ import { ProjectsListBoundary, ProjectsStatsBoundary } from './errors'
 
 export function ProjectsContent() {
   const { data } = useProjectsData()
-  const { projects, clients, workEntries } = data
+  const { projects, clients } = data
 
   const stats = useProjectStats(projects)
-  const filters = useProjectFilters(data)
   const form = useProjectForm(clients)
   const { save, remove } = useProjectMutations()
 
@@ -45,11 +42,6 @@ export function ProjectsContent() {
     })
   }
 
-  const resetFilters = () => {
-    filters.setSearch('')
-    filters.setStatus('all')
-  }
-
   return (
     <div className="container space-y-6 px-4 py-6">
       <ProjectsHeader total={projects.length} onCreate={form.openCreate} />
@@ -58,33 +50,21 @@ export function ProjectsContent() {
         <ProjectStats {...stats} />
       </ProjectsStatsBoundary>
 
-      <ProjectsToolbar
-        search={filters.search}
-        status={filters.status}
-        isFiltering={filters.isFiltering}
-        onSearchChange={filters.setSearch}
-        onStatusChange={filters.setStatus}
-        onReset={resetFilters}
-      />
-
       <ProjectsListBoundary>
-        {filters.filtered.length === 0 ? (
+        {projects.length === 0 ? (
           <ProjectsEmpty
-            hasProjects={projects.length > 0}
-            search={filters.search}
+            hasProjects={false}
+            search=""
             onCreate={form.openCreate}
-            onClearFilters={resetFilters}
+            onClearFilters={() => {}}
           />
         ) : (
-          <ProjectsTable
-            projects={filters.filtered}
+          <ProjectsDataTable
+            data={projects}
             clients={clients}
-            workEntries={workEntries}
-            sortKey={filters.sortKey}
-            sortDirection={filters.sortDirection}
-            onSort={filters.toggleSort}
-            onEdit={form.openEdit}
-            onDelete={setProjectToDelete}
+            onAddProject={form.openCreate}
+            onEditProject={form.openEdit}
+            onDeleteProject={setProjectToDelete}
           />
         )}
       </ProjectsListBoundary>
