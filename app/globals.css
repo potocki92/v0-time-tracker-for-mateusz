@@ -451,6 +451,34 @@
 @theme inline {
   --font-sans: 'Inter', 'Inter Fallback';
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+
+  /* Fluid typography: 16px → 20px base between 320px and 1920px */
+  --text-xxs: clamp(0.833rem, 0.813rem + 0.104vw, 0.938rem);
+  --text-xs: clamp(0.913rem, 0.879rem + 0.170vw, 1.083rem);
+  --text-sm: clamp(1rem, 0.95rem + 0.25vw, 1.25rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.25rem);
+  --text-lg: clamp(1.2rem, 1.107rem + 0.467vw, 1.667rem);
+  --text-xl: clamp(1.44rem, 1.282rem + 0.791vw, 2.231rem);
+  --text-2xl: clamp(1.728rem, 1.47rem + 1.289vw, 3.017rem);
+  --text-3xl: clamp(1.893rem, 1.587rem + 1.527vw, 3.42rem);
+  --text-4xl: clamp(2.074rem, 1.698rem + 1.879vw, 3.953rem);
+  --text-h1: clamp(2.488rem, 1.955rem + 2.665vw, 5.153rem);
+
+  --text-xxs--line-height: 1.25rem;
+  --text-xs--line-height: 1.35rem;
+  --text-sm--line-height: 1.5rem;
+  --text-base--line-height: 1.6rem;
+  --text-lg--line-height: 1.65;
+  --text-xl--line-height: 1.5;
+  --text-2xl--line-height: 1.35;
+  --text-3xl--line-height: 1.2;
+  --text-4xl--line-height: 1.15;
+  --text-h1--line-height: 1.05;
+
+  --header-inline-padding: clamp(3rem, 2.6rem + 2vw, 5rem);
+
+  --shadow-avatar-ring: 0 0 0 1px rgba(47, 47, 50, 0.2);
+  --shadow-avatar-outer: 0 1px 15px -2px rgb(0 0 0 / 0.1);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -559,6 +587,11 @@
  */
 
 @layer utilities {
+  .glass-effect-text {
+    backdrop-filter: blur(7.1px);
+    -webkit-backdrop-filter: blur(7.1px);
+  }
+
   /* Bazowa animacja skeleton — jedna dla całej strony */
   @keyframes skeleton-shimmer {
     0%, 100% {
