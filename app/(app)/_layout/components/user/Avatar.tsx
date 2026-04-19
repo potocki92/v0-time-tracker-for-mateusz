@@ -27,7 +27,7 @@ export function Avatar({
   return (
     <UiAvatar className={className}>
       {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
-      <AvatarFallback className={fallbackClassName}>
+      <AvatarFallback className={fallbackClassName} delayMs={avatarUrl ? 500 : 0}>
         {initials || (showIconFallback ? <User className="h-4 w-4" /> : 'U')}
       </AvatarFallback>
     </UiAvatar>

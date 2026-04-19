@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useSetGoal } from '../../_hooks/usePreferencesStore'
+import { syncPreferencesToSupabase } from '../PreferencesProvider'
 import type { Currency, Goal } from '../../_domain/dashboard.types'
 
 type Props = {
@@ -55,11 +56,13 @@ export function GoalEditDialog({ open, onOpenChange, initialGoal }: Props) {
     e.preventDefault()
     if (!isValid) return
     setGoal({ amount: parsed, currency })
+    void syncPreferencesToSupabase()
     onOpenChange(false)
   }
 
   function handleClear() {
     setGoal(null)
+    void syncPreferencesToSupabase()
     onOpenChange(false)
   }
 

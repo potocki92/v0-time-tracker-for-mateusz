@@ -8,6 +8,7 @@ import { useEarningsSparkline } from '../../_hooks/useEarningsSparkline'
 import { usePeriodLabel } from '../../_hooks/usePeriodLabel'
 import { useGoal } from '../../_hooks/usePreferencesStore'
 import { useDashboardTotals } from '../../_hooks/useDashboardTotal'
+import { calculateGoalProgress } from '@/lib/finance/goal'
 import { EarningsCard } from '../card/EarningsCard'
 import { GoalCard } from '../card/GoalCard'
 import { EarningsCardBoundary, GoalCardBoundary } from '../errors'
@@ -27,8 +28,8 @@ export function KpiSection() {
   const periodLabel = usePeriodLabel(range)
 
   const goalProgress = useMemo(
-    () => (goal?.amount ? (totals.totalEarningsAllPLN / goal.amount) * 100 : 0),
-    [goal?.amount, totals.totalEarningsAllPLN],
+    () => calculateGoalProgress(goal, totals),
+    [goal, totals],
   )
 
   return (
