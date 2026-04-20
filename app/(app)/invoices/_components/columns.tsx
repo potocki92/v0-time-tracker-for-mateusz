@@ -83,6 +83,7 @@ export function createInvoiceColumns({
       id: 'invoice_number',
       accessorFn: (row) => row.invoice_number ?? row.id.slice(0, 8),
       header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.invoice_number} />,
+      meta: { label: 'ID' },
       cell: ({ row }) => (
         <span className="font-medium">
           {row.original.invoice_number || row.original.id.slice(0, 8)}
@@ -96,6 +97,7 @@ export function createInvoiceColumns({
       id: 'client',
       accessorFn: (row) => clientSortKey(clients, row.client_id),
       header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.client} />,
+      meta: { label: 'Klient' },
       cell: ({ row }) => (
         <ClientDisplay
           client={findClient(clients, row.original.client_id)}
@@ -112,6 +114,7 @@ export function createInvoiceColumns({
       id: 'invoice_date',
       accessorFn: (row) => new Date(row.invoice_date ?? row.issue_date ?? '1970-01-01').getTime(),
       header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.invoice_date} />,
+      meta: { label: 'Data' },
       cell: ({ row }) => formatInvoiceDate(row.original.invoice_date || row.original.issue_date),
       size: 140,
       minSize: 110,
@@ -121,6 +124,7 @@ export function createInvoiceColumns({
       id: 'billing_period',
       accessorFn: (row) => row.billing_period ?? '',
       header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.billing_period} />,
+      meta: { label: 'Kwartał' },
       cell: ({ row }) => row.original.billing_period || '-',
       size: 120,
       minSize: 90,
@@ -130,6 +134,7 @@ export function createInvoiceColumns({
       id: 'payment_status',
       accessorFn: (row) => (row.is_paid ? 'paid' : 'unpaid'),
       header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.payment_status} />,
+      meta: { label: 'Status' },
       cell: ({ row }) => (
         <Badge
           variant={row.original.is_paid ? 'secondary' : 'outline'}
@@ -150,6 +155,7 @@ export function createInvoiceColumns({
       id: 'amount',
       accessorFn: (row) => Number(row.amount ?? 0),
       header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.amount} />,
+      meta: { label: 'Kwota' },
       cell: ({ row }) => formatCurrency(row.original.amount, row.original.currency),
       size: 140,
       minSize: 110,
