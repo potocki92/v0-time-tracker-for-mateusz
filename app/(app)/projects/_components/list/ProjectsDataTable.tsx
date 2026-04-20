@@ -2,11 +2,13 @@
 
 import { useMemo } from 'react'
 import { DataTable, type DataTableFilter } from '@/components/common/data-table'
+import { useIsMobile } from '@/hooks/use-mobile'
 import {
   PROJECT_STATUS_FILTER_OPTIONS,
 } from '../../_domain/projects.constants'
 import type { Client, Project } from '@/lib/types'
 import { columns, type ProjectsTableMeta } from './columns'
+import { ProjectsMobileAccordion } from './ProjectsMobileAccordion'
 
 type ProjectsDataTableProps = {
   data: Project[]
@@ -23,6 +25,7 @@ export function ProjectsDataTable({
   onEditProject,
   onDeleteProject,
 }: ProjectsDataTableProps) {
+  const isMobile = useIsMobile()
   const clientsById = useMemo(() => new Map(clients.map((client) => [client.id, client])), [clients])
 
   const tableMeta = useMemo<ProjectsTableMeta>(
@@ -51,6 +54,17 @@ export function ProjectsDataTable({
     ],
     [],
   )
+
+  if (isMobile) {
+    return (
+      <ProjectsMobileAccordion
+        data={data}
+        clients={clients}
+        onEditProject={onEditProject}
+        onDeleteProject={onDeleteProject}
+      />
+    )
+  }
 
   return (
     <DataTable
