@@ -1,6 +1,7 @@
 'use server'
 
 import { unstable_noStore as noStore, revalidatePath } from 'next/cache'
+import { cache } from 'react'
 import { uploadInvoicePdf } from '@/services/invoices'
 import { createClient } from '@/lib/supabase/server'
 import type { Client, Invoice } from '@/lib/types'
@@ -57,7 +58,7 @@ async function createClientIfNeeded(name: string, userId: string): Promise<strin
   return data.id
 }
 
-export async function getInvoicesDataServer(): Promise<InvoicesData> {
+const getInvoicesDataServerCached = cache(async (): Promise<InvoicesData> => {
   noStore()
 
   const supabase = await createClient()
@@ -81,6 +82,10 @@ export async function getInvoicesDataServer(): Promise<InvoicesData> {
     invoices: (invoicesRes.data ?? []) as Invoice[],
     clients: (clientsRes.data ?? []) as Client[],
   }
+})
+
+export async function getInvoicesDataServer(): Promise<InvoicesData> {
+  return getInvoicesDataServerCached()
 }
 
 export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput) {

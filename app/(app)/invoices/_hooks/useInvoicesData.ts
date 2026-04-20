@@ -10,5 +10,8 @@ export function useInvoicesData() {
     queryKey: INVOICES_MANAGER_QUERY_KEY,
     queryFn: getInvoicesData,
     ...QUERY_CONFIG.invoices,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 }
