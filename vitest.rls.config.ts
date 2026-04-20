@@ -3,12 +3,11 @@
 // Uruchomienie: vitest run --config vitest.rls.config.ts
 
 import { defineConfig } from 'vitest/config'
-import { loadEnv } from 'vite'
 
 export default defineConfig(({ mode }) => {
-  // Ładuje .env.test.local — zawiera TEST_USER_A_PASSWORD itd.
-  // Ten plik NIE trafia do repozytorium (dodaj do .gitignore)
-  const env = loadEnv(mode, process.cwd(), 'TEST_')
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.startsWith('TEST_')),
+  )
 
   return {
     test: {

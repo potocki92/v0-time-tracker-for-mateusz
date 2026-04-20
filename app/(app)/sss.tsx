@@ -27,7 +27,7 @@ import {
   Monitor
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+import type { AuthChangeEvent, Session, User as SupabaseUser } from '@supabase/supabase-js'
 import Image from 'next/image'
 
 const navItems = [
@@ -51,7 +51,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     setMounted(true)
     const supabase = createClient()
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: SupabaseUser | null } }) => {
       setUser(user)
       setAuthChecked(true)
 
@@ -60,7 +60,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       }
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       setUser(session?.user ?? null)
 
       if (event === 'SIGNED_OUT' || !session?.user) {
