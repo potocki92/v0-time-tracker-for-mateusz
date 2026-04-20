@@ -49,6 +49,7 @@ export function ProjectsDataTable({
       {
         accessorKey: 'name',
         header: 'Projekt',
+        meta: { label: 'Projekt' },
         minSize: 240,
         size: 300,
         cell: ({ row }) => {
@@ -79,11 +80,13 @@ export function ProjectsDataTable({
         id: 'client',
         accessorFn: (project) => clientsById.get(project.client_id) ?? 'No client',
         header: 'Klient',
+        meta: { label: 'Klient' },
         size: 180,
       },
       {
         accessorKey: 'status',
         header: 'Status',
+        meta; { label: 'Status' },
         size: 150,
         cell: ({ row }) => {
           const status = row.original.status
@@ -97,6 +100,7 @@ export function ProjectsDataTable({
       {
         accessorKey: 'priority',
         header: 'Priorytet',
+        meta: { label: 'Priorytet' },
         size: 130,
         cell: ({ row }) => {
           const priority = row.original.priority
@@ -110,6 +114,7 @@ export function ProjectsDataTable({
       {
         accessorKey: 'budget_amount',
         header: 'Budżet',
+        meta: { label: 'Budżet' },
         size: 120,
         cell: ({ row }) =>
           row.original.budget_amount ? formatCurrency(row.original.budget_amount, 'PLN') : '—',
@@ -117,6 +122,7 @@ export function ProjectsDataTable({
       {
         accessorKey: 'end_date',
         header: 'Termin',
+        meta: { label: 'Termin' },
         size: 130,
         cell: ({ row }) => (row.original.end_date ? formatDate(row.original.end_date) : '—'),
       },
