@@ -140,13 +140,13 @@ export function ProjectsDataTable({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-36">
               <DropdownMenuItem onClick={() => onEditProject(row.original)}>
-                <Pencil className="mr-2 size-4" /> Edit
+                <Pencil className="mr-2 size-4" /> Edytuj
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onDeleteProject(row.original)}
                 className="text-destructive focus:text-destructive"
               >
-                <Trash2 className="mr-2 size-4" /> Delete
+                <Trash2 className="mr-2 size-4" /> Usuń
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
