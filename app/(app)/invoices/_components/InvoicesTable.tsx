@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import type { Client, Invoice } from '@/lib/types'
 import { DataTable, type DataTableFilter } from '@/components/common/data-table'
-import { createInvoiceColumns } from './columns'
+import { columns, type InvoicesTableMeta } from './columns'
 
 interface InvoicesTableProps {
   invoices: Invoice[]
@@ -13,9 +13,11 @@ interface InvoicesTableProps {
 }
 
 export function InvoicesTable({ invoices, clients, onEdit, onDelete }: InvoicesTableProps) {
-  const columns = useMemo(
-    () => createInvoiceColumns({ clients, onEdit, onDelete }),
-    [clients, onEdit, onDelete],
+  const clientsById = useMemo(() => new Map(clients.map((client) => [client.id, client])), [clients])
+
+  const tableMeta = useMemo<InvoicesTableMeta>(
+    () => ({ clientsById, onEdit, onDelete }),
+    [clientsById, onDelete, onEdit],
   )
 
   const filters = useMemo<DataTableFilter[]>(
@@ -38,11 +40,13 @@ export function InvoicesTable({ invoices, clients, onEdit, onDelete }: InvoicesT
     <DataTable
       data={invoices}
       columns={columns}
+      meta={tableMeta}
       filters={filters}
-      storageKey="invoices-table-filters-v1"
+      storageKey={{ filters: 'invoices-table-filters-v1', layout: 'invoices-table-layout-v1' }}
       searchPlaceholder="Szukaj po ID, numerze, kliencie lub odbiorcy..."
       emptyLabel="Brak faktur spełniających kryteria."
       initialVisibility={{ billing_period: false }}
+      enableColumnDnd
     />
   )
 }
