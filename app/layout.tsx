@@ -28,15 +28,6 @@ export const metadata: Metadata = {
   ...buildMetadata({ path: '/' }),
   generator: 'Next.js',
   manifest: '/manifest.webmanifest',
-  icons: {
-    icon: [
-      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-icon.png',
-    shortcut: '/icon.svg',
-  },
   other: {
     'google-site-verification': process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? '',
   },
