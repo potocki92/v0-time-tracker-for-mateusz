@@ -86,7 +86,7 @@ export function ProjectsDataTable({
       {
         accessorKey: 'status',
         header: 'Status',
-        meta; { label: 'Status' },
+        meta: { label: 'Status' },
         size: 150,
         cell: ({ row }) => {
           const status = row.original.status
