@@ -3,15 +3,11 @@ import { uploadInvoicePdf } from '@/services/invoices'
 import type { Client, Invoice } from '@/lib/types'
 import type { InvoiceFormValues } from '../_domain'
 
-function getSupabase() {
-  return createClient()
-}
-
-async function fetchCurrentUserId() {
+async function fetchCurrentUserId(supabase = createClient()) {
   const {
     data: { user },
     error,
-  } = await getSupabase().auth.getUser()
+  } = await supabase.auth.getUser()
 
   if (error || !user) {
     throw new Error('Brak autoryzacji użytkownika')
@@ -21,11 +17,12 @@ async function fetchCurrentUserId() {
 }
 
 export async function fetchInvoicesAndClients(): Promise<{ invoices: Invoice[]; clients: Client[] }> {
-  const userId = await fetchCurrentUserId()
+  const supabase = createClient()
+  const userId = await fetchCurrentUserId(supabase)
 
   const [invoicesRes, clientsRes] = await Promise.all([
-    getSupabase().from('invoices').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
-    getSupabase().from('clients').select('*').eq('user_id', userId).order('name', { ascending: true }),
+    supabase.from('invoices').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+    supabase.from('clients').select('*').eq('user_id', userId).order('name', { ascending: true }),
   ])
 
   if (invoicesRes.error) throw new Error(invoicesRes.error.message)
@@ -37,12 +34,15 @@ export async function fetchInvoicesAndClients(): Promise<{ invoices: Invoice[]; 
   }
 }
 
-export async function createClientIfNeeded(name: string): Promise<string | null> {
+export async function createClientIfNeeded(
+  name: string,
+  options?: { userId?: string; supabase?: ReturnType<typeof createClient> },
+): Promise<string | null> {
   const trimmedName = name.trim()
   if (!trimmedName) return null
 
-  const userId = await fetchCurrentUserId()
-  const supabase = getSupabase()
+  const supabase = options?.supabase ?? createClient()
+  const userId = options?.userId ?? (await fetchCurrentUserId(supabase))
 
   const existing = await supabase
     .from('clients')
@@ -76,10 +76,15 @@ export async function createClientIfNeeded(name: string): Promise<string | null>
 }
 
 export async function saveInvoice({ invoiceId, values }: { invoiceId?: string; values: InvoiceFormValues }) {
-  const userId = await fetchCurrentUserId()
-  const supabase = getSupabase()
+  const supabase = createClient()
+  const userId = await fetchCurrentUserId(supabase)
 
-  const resolvedClientId = values.client_id ?? (await createClientIfNeeded(values.new_client_name))
+  const resolvedClientId =
+    values.client_id ??
+    (await createClientIfNeeded(values.new_client_name, {
+      userId,
+      supabase,
+    }))
 
   const pdfUrl = values.file
     ? await uploadInvoicePdf({
@@ -119,6 +124,7 @@ export async function saveInvoice({ invoiceId, values }: { invoiceId?: string; v
 }
 
 export async function deleteInvoice(invoiceId: string) {
-  const { error } = await getSupabase().from('invoices').delete().eq('id', invoiceId)
+  const supabase = createClient()
+  const { error } = await supabase.from('invoices').delete().eq('id', invoiceId)
   if (error) throw new Error(error.message)
 }
