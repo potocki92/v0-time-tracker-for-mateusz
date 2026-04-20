@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
-import type { User } from '@supabase/supabase-js'
+import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js'
 
 import { createClient } from '@/lib/supabase/client'
 import { performLogout } from '@/lib/auth/logout'
@@ -18,7 +18,7 @@ export function useAuth() {
     const supabase = createClient()
     let active = true
 
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(({ data }: { data: { user: User | null } }) => {
       if (!active) return
       setUser(data.user)
       setLoading(false)
@@ -27,7 +27,7 @@ export function useAuth() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       const currentUser = session?.user ?? null
       setUser(currentUser)
 
