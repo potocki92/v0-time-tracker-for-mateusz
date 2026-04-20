@@ -10,8 +10,8 @@ export const BRAND = {
   homeHref: '/',
 } as const
 
-const LOGO_SRC = '/logo.png'
-const LOGO_INTRINSIC = { width: 1024, height: 1536 } as const
+const LOGO_SRC = '/icon.svg'
+const LOGO_INTRINSIC = { width: 180, height: 180 } as const
 
 export type LogoSize = 'sm' | 'md' | 'lg' | 'xl'
 
