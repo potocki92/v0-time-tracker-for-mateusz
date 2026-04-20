@@ -30,6 +30,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
       {
         accessorKey: 'name',
         header: 'Klient',
+        meta: { label: 'Klient' },
         size: 280,
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
@@ -42,6 +43,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
         id: 'work_type',
         accessorFn: (row) => row.work_type,
         header: 'Typ / Waluta',
+        meta: { label: 'Typ / Waluta' },
         size: 170,
         cell: ({ row }) => (
           <div className="flex flex-wrap gap-1">
@@ -53,12 +55,14 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
       {
         accessorKey: 'currency',
         header: 'Waluta',
+        meta: { label: 'Waluta' },
         size: 90,
       },
       {
         id: 'rate',
         accessorFn: (row) => row.rate,
         header: 'Stawka',
+        meta: { label: 'Stawka' },
         size: 140,
         cell: ({ row }) => {
           const unit = row.original.work_type === 'hourly' ? 'h' : (row.original.unit ?? 'szt')
@@ -74,6 +78,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
         id: 'earnings',
         accessorFn: (row) => row.totalEarningsInClientCurrency,
         header: 'Zarobki',
+        meta: { label: 'Zarobki' },
         size: 140,
         cell: ({ row }) =>
           row.original.totalEarningsInClientCurrency > 0
@@ -84,6 +89,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
         id: 'hours',
         accessorFn: (row) => row.totalHours,
         header: 'Godziny / Dni',
+        meta: { label: 'Godziny / Dni' },
         size: 130,
         cell: ({ row }) =>
           row.original.totalHours > 0
