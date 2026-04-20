@@ -32,7 +32,7 @@ export function DataTableColumnsMenu<TData extends RowData>({ table }: { table: 
             onCheckedChange={(value) => column.toggleVisibility(Boolean(value))}
             onSelect={(event) => event.preventDefault()}
           >
-            {column.id}
+            {(column.columnDef.meta as any)?.label ?? column.id}
           </DropdownMenuCheckboxItem>
         ))}
       </DropdownMenuContent>
