@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ColorThemeProvider } from '@/components/color-theme-provider'
@@ -9,6 +10,19 @@ import { buildMetadata } from '@/lib/seo/metadata'
 import { SITE } from '@/lib/seo/site'
 import './globals.css'
 import { Providers } from './providers'
+
+const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-inter',
+  display: 'swap',
+  preload: true,
+})
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+  display: 'swap',
+  preload: false,
+})
 
 export const metadata: Metadata = {
   ...buildMetadata({ path: '/' }),
@@ -40,9 +54,11 @@ export default function RootLayout({
     <html lang="pl" suppressHydrationWarning>
       <head>
         <ColorThemeInitScript />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <GlobalJsonLd />
       </head>
-      <body className="font-sans antialiased">
+      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring"
