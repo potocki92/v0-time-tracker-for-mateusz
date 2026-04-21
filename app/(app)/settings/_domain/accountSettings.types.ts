@@ -1,6 +1,7 @@
 export type InvoiceTemplateKey = 'classic' | 'modern' | 'minimal'
 
 export type InvoiceSettings = {
+  userPrefix: string
   numberingPattern: string
   series: string
   branch: string

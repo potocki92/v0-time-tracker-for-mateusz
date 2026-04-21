@@ -4,6 +4,7 @@ import type { Client, Invoice } from '@/lib/types'
 import type { ImportInvoiceCsvRow, InvoiceFormValues, InvoiceSettings } from '../_domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
+  userPrefix: 'FV',
   numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
   series: 'A',
   branch: 'HQ',

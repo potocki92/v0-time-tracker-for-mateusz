@@ -11,6 +11,7 @@ type UserMetadata = {
 }
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
+  userPrefix: 'FV',
   numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
   series: 'A',
   branch: 'HQ',

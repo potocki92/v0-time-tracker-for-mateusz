@@ -8,6 +8,7 @@ import type { Client, Invoice } from '@/lib/types'
 import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../_domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
+  userPrefix: 'FV',
   numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
   series: 'A',
   branch: 'HQ',
@@ -47,38 +48,50 @@ function resolveIssueDate(dayOfWeek: number) {
   return todayUtc
 }
 
-async function buildInvoiceNumber({
+function sanitizePrefix(prefix: string | null | undefined) {
+  const normalized = (prefix ?? '').trim().toUpperCase()
+  return normalized || 'FV'
+}
+
+function buildInvoiceNumberLabel(prefix: string, seq: number, issueDate: Date) {
+  const year = issueDate.getUTCFullYear()
+  const month = issueDate.getUTCMonth() + 1
+  return `${prefix} ${seq}/${pad(month)}/${year}`
+}
+
+async function reserveNextInvoiceNumber({
   supabase,
   userId,
-  settings,
+  prefix,
   issueDate,
 }: {
   supabase: Awaited<ReturnType<typeof createClient>>
   userId: string
-  settings: InvoiceSettings
+  prefix: string
   issueDate: Date
 }) {
-  const year = issueDate.getUTCFullYear()
-  const month = issueDate.getUTCMonth() + 1
-  const start = settings.resetSequence === 'yearly' ? `${year}-01-01` : `${year}-${pad(month)}-01`
-
-  const { count, error } = await supabase
-    .from('invoices')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gte('issue_date', start)
-    .lte('issue_date', formatDateIso(issueDate))
+  const { data, error } = await supabase.rpc('reserve_invoice_sequence', {
+    p_user_id: userId,
+    p_prefix: prefix,
+    p_issue_date: formatDateIso(issueDate),
+  })
 
   if (error) throw new Error(error.message)
+  const seq = Number(data)
+  if (!Number.isFinite(seq) || seq <= 0) {
+    throw new Error('Nie udało się zarezerwować kolejnego numeru faktury')
+  }
 
-  const seq = (count ?? 0) + 1
-  return settings.numberingPattern
-    .replaceAll('{SERIA}', settings.series)
-    .replaceAll('{BRANCH}', settings.branch)
-    .replaceAll('{YYYY}', String(year))
-    .replaceAll('{YY}', String(year).slice(2))
-    .replaceAll('{MM}', pad(month))
-    .replaceAll('{SEQ}', pad(seq))
+  return buildInvoiceNumberLabel(prefix, seq, issueDate)
+}
+
+function shouldRunAutoIssueToday(settings: InvoiceSettings) {
+  if (!settings.autoIssueEnabled) return false
+
+  const now = new Date()
+  const todayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  const configuredDay = Number.isInteger(settings.autoIssueDay) ? settings.autoIssueDay : 6
+  return todayUtc.getUTCDay() === configuredDay
 }
 
 async function fetchCurrentUserId() {
@@ -217,6 +230,16 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
     data: { user },
   } = await supabase.auth.getUser()
   const settings = resolveInvoiceSettings((user?.user_metadata ?? {}) as UserMetadata)
+  const userPrefix = sanitizePrefix(settings.userPrefix || settings.series)
+
+  if (!shouldRunAutoIssueToday(settings)) {
+    const issueDate = resolveIssueDate(settings.autoIssueDay)
+    const periodEnd = formatDateIso(issueDate)
+    const periodStartDate = new Date(issueDate)
+    periodStartDate.setUTCDate(periodStartDate.getUTCDate() - 6)
+    const periodStart = formatDateIso(periodStartDate)
+    return { created: 0, skipped: 0, periodStart, periodEnd }
+  }
 
   const issueDate = resolveIssueDate(settings.autoIssueDay)
   const periodEnd = formatDateIso(issueDate)
@@ -282,7 +305,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
     }
   }
 
-  const insertPayload = []
+  const insertPayload: Array<Record<string, unknown>> = []
   for (const client of clientsRes.data ?? []) {
     const hours = clientHours.get(client.id) ?? 0
     if (hours <= 0) continue
@@ -292,13 +315,11 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 
     const dueDate = new Date(issueDate)
     dueDate.setUTCDate(dueDate.getUTCDate() + settings.dueDays)
-    const invoiceNumber = await buildInvoiceNumber({ supabase, userId, settings, issueDate })
 
     insertPayload.push({
       user_id: userId,
       client_id: client.id,
       name: `Auto faktura ${client.name} (${periodStart} - ${periodEnd})`,
-      invoice_number: invoiceNumber,
       recipient: client.name,
       billing_period: billingPeriod,
       issue_date: periodEnd,
@@ -321,13 +342,40 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
     return { created: 0, skipped: clientIds.length, periodStart, periodEnd }
   }
 
-  const { error: insertError } = await supabase.from('invoices').insert(insertPayload)
-  if (insertError) throw new Error(insertError.message)
+  let created = 0
+
+  for (const invoicePayload of insertPayload) {
+    let inserted = false
+    let attempts = 0
+
+    while (!inserted && attempts < 3) {
+      attempts += 1
+      const invoiceNumber = await reserveNextInvoiceNumber({ supabase, userId, prefix: userPrefix, issueDate })
+      const { error: insertError } = await supabase.from('invoices').insert({
+        ...invoicePayload,
+        invoice_number: invoiceNumber,
+      })
+
+      if (!insertError) {
+        inserted = true
+        created += 1
+        continue
+      }
+
+      if (insertError.code !== '23505') {
+        throw new Error(insertError.message)
+      }
+    }
+
+    if (!inserted) {
+      throw new Error('Nie udało się zapisać auto-faktury przez konflikt numeracji')
+    }
+  }
 
   revalidatePath('/invoices')
   revalidatePath('/dashboard')
 
-  return { created: insertPayload.length, skipped: 0, periodStart, periodEnd }
+  return { created, skipped: 0, periodStart, periodEnd }
 }
 
 export async function deleteInvoiceAction(invoiceId: string) {
