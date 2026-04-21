@@ -34,6 +34,8 @@ export interface UniversalFormProps<TValues extends FieldValues> {
   className?:    string
   /** When true, disables fields while submission is in-flight. Default: true. */
   disableOnSubmit?: boolean
+  /** Resets form when `defaultValues` changes (useful for edit/create dialogs). */
+  resetOnDefaultValuesChange?: boolean
 }
 
 type ReactOrRenderChildren<TValues extends FieldValues> =
@@ -68,6 +70,7 @@ export function UniversalForm<TValues extends FieldValues>({
   id,
   className,
   disableOnSubmit = true,
+  resetOnDefaultValuesChange = false,
 }: UniversalFormProps<TValues>) {
   const methods = useForm<TValues>({
     resolver,
@@ -77,6 +80,11 @@ export function UniversalForm<TValues extends FieldValues>({
     shouldFocusError: true,
     criteriaMode:     'firstError',
   })
+
+  React.useEffect(() => {
+    if (!resetOnDefaultValuesChange) return
+    methods.reset(defaultValues)
+  }, [defaultValues, methods, resetOnDefaultValuesChange])
 
   return (
     <FormProvider {...methods}>
