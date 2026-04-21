@@ -25,20 +25,28 @@ export function calculateEarnings(
   client: Client | undefined,
   eurRate: number,
 ): EarningsResult {
-  if (!client || entry.status !== 'worked') {
+  if (entry.status !== 'worked') {
+    return ZERO_EARNINGS
+  }
+
+  const appliedWorkType = entry.billing_work_type ?? client?.work_type
+  const appliedRate = entry.billing_rate ?? client?.rate ?? 0
+  const appliedCurrency = entry.billing_currency ?? client?.currency ?? 'PLN'
+
+  if (!appliedWorkType) {
     return ZERO_EARNINGS
   }
 
   let amount = 0
 
-  switch (client.work_type) {
+  switch (appliedWorkType) {
     case 'hourly': {
-      amount = (entry.hours ?? 0) * client.rate
+      amount = (entry.hours ?? 0) * appliedRate
       break
     }
 
     case 'piecework': {
-      amount = resolveQuantity(entry) * client.rate
+      amount = resolveQuantity(entry) * appliedRate
       break
     }
 
@@ -46,11 +54,11 @@ export function calculateEarnings(
       amount = 0
   }
 
-  const isEUR = client.currency === 'EUR'
+  const isEUR = appliedCurrency === 'EUR'
 
   return {
     amount,
-    currency: client.currency,
+    currency: appliedCurrency,
     amountInEUR: isEUR ? amount : 0,
     amountInPLN: isEUR ? eurToPln(amount, eurRate) : amount,
   }

@@ -100,6 +100,10 @@ CREATE TABLE IF NOT EXISTS public.work_entries (
   category TEXT DEFAULT 'work',
   tags TEXT[],
   note TEXT,
+  billing_rate NUMERIC(10,2),
+  billing_currency TEXT,
+  billing_work_type TEXT,
+  billing_unit TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, date)
