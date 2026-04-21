@@ -1,7 +1,24 @@
 import { createClient } from '@/lib/supabase/client'
 import { uploadInvoicePdf } from '@/services/invoices'
 import type { Client, Invoice } from '@/lib/types'
-import type { ImportInvoiceCsvRow, InvoiceFormValues } from '../_domain'
+import type { ImportInvoiceCsvRow, InvoiceFormValues, InvoiceSettings } from '../_domain'
+
+const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
+  numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
+  series: 'A',
+  branch: 'HQ',
+  resetSequence: 'monthly',
+  defaultTemplate: 'classic',
+  templateAccentColor: '#1d4ed8',
+  templateFooter: 'Dziękujemy za współpracę.',
+  autoIssueEnabled: false,
+  autoIssueDay: 6,
+  dueDays: 7,
+}
+
+type UserMetadata = {
+  invoice_settings?: Partial<InvoiceSettings>
+}
 
 async function fetchCurrentUserId(supabase = createClient()) {
   const {
@@ -13,12 +30,13 @@ async function fetchCurrentUserId(supabase = createClient()) {
     throw new Error('Brak autoryzacji użytkownika')
   }
 
-  return user.id
+  return user
 }
 
-export async function fetchInvoicesAndClients(): Promise<{ invoices: Invoice[]; clients: Client[] }> {
+export async function fetchInvoicesAndClients(): Promise<{ invoices: Invoice[]; clients: Client[]; settings: InvoiceSettings }> {
   const supabase = createClient()
-  const userId = await fetchCurrentUserId(supabase)
+  const user = await fetchCurrentUserId(supabase)
+  const userId = user.id
 
   const [invoicesRes, clientsRes] = await Promise.all([
     supabase.from('invoices').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
@@ -31,6 +49,10 @@ export async function fetchInvoicesAndClients(): Promise<{ invoices: Invoice[]; 
   return {
     invoices: (invoicesRes.data ?? []) as Invoice[],
     clients: (clientsRes.data ?? []) as Client[],
+    settings: {
+      ...DEFAULT_INVOICE_SETTINGS,
+      ...(((user.user_metadata ?? {}) as UserMetadata).invoice_settings ?? {}),
+    },
   }
 }
 
@@ -42,7 +64,7 @@ export async function createClientIfNeeded(
   if (!trimmedName) return null
 
   const supabase = options?.supabase ?? createClient()
-  const userId = options?.userId ?? (await fetchCurrentUserId(supabase))
+  const userId = options?.userId ?? (await fetchCurrentUserId(supabase)).id
 
   const existing = await supabase
     .from('clients')
@@ -77,7 +99,7 @@ export async function createClientIfNeeded(
 
 export async function saveInvoice({ invoiceId, values }: { invoiceId?: string; values: InvoiceFormValues }) {
   const supabase = createClient()
-  const userId = await fetchCurrentUserId(supabase)
+  const userId = (await fetchCurrentUserId(supabase)).id
 
   const resolvedClientId =
     values.client_id ??
@@ -107,6 +129,7 @@ export async function saveInvoice({ invoiceId, values }: { invoiceId?: string; v
     is_paid: values.is_paid,
     file_url: pdfUrl,
     notes: values.notes.trim() || null,
+    template_key: values.template_key,
   }
 
   if (invoiceId) {
@@ -133,7 +156,7 @@ export async function importInvoicesFromCsv(rows: ImportInvoiceCsvRow[]) {
   if (rows.length === 0) return
 
   const supabase = createClient()
-  const userId = await fetchCurrentUserId(supabase)
+  const userId = (await fetchCurrentUserId(supabase)).id
 
   const payload = []
 

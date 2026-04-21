@@ -1,12 +1,26 @@
 import { createClient } from '@/lib/supabase/client'
 import { AVATARS_BUCKET, resolveAvatarUrl } from '@/lib/supabase/avatars'
-import type { AccountProfile, AccountSettingsFormValues } from '../_domain'
+import type { AccountProfile, AccountSettingsFormValues, InvoiceSettings } from '../_domain'
 
 type UserMetadata = {
   first_name?: string
   last_name?: string
   username?: string
   avatar_path?: string
+  invoice_settings?: Partial<InvoiceSettings>
+}
+
+const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
+  numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
+  series: 'A',
+  branch: 'HQ',
+  resetSequence: 'monthly',
+  defaultTemplate: 'classic',
+  templateAccentColor: '#1d4ed8',
+  templateFooter: 'Dziękujemy za współpracę.',
+  autoIssueEnabled: false,
+  autoIssueDay: 6,
+  dueDays: 7,
 }
 
 async function getCurrentUser() {
@@ -43,6 +57,10 @@ export async function fetchAccountProfile(): Promise<AccountProfile> {
     email: user.email ?? '',
     avatarPath,
     avatarUrl,
+    invoiceSettings: {
+      ...DEFAULT_INVOICE_SETTINGS,
+      ...(metadata.invoice_settings ?? {}),
+    },
   }
 }
 
@@ -62,6 +80,22 @@ export async function updateAccountProfile(values: AccountSettingsFormValues) {
 
   if (error) {
     throw new Error(`Nie udało się zapisać profilu: ${error.message}`)
+  }
+}
+
+export async function updateInvoiceAutomationSettings(values: InvoiceSettings) {
+  const { supabase, user } = await getCurrentUser()
+  const existingMetadata = (user.user_metadata ?? {}) as UserMetadata
+
+  const { error } = await supabase.auth.updateUser({
+    data: {
+      ...existingMetadata,
+      invoice_settings: values,
+    },
+  })
+
+  if (error) {
+    throw new Error(`Nie udało się zapisać ustawień faktur: ${error.message}`)
   }
 }
 
