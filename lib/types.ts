@@ -111,6 +111,12 @@ export interface Invoice {
   is_paid: boolean
   file_url: string | null
   notes: string | null
+  template_key?: 'classic' | 'modern' | 'minimal' | null
+  template_accent_color?: string | null
+  template_footer?: string | null
+  auto_generated?: boolean
+  period_start?: string | null
+  period_end?: string | null
   note?: string | null
   month?: number
   year?: number

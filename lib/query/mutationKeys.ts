@@ -8,6 +8,8 @@ export const MUTATION_KEYS = {
     create:   ['invoice', 'create']    as const,
     update:   ['invoice', 'update']    as const,
     delete:   ['invoice', 'delete']    as const,
+    autoIssue: ['invoice', 'auto-issue'] as const,
+    updateSettings: ['invoice', 'update-settings'] as const,
   },
   workEntry: {
     create: ['work-entry', 'create'] as const,
