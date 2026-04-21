@@ -30,3 +30,16 @@ export interface SaveInvoiceInput {
   invoiceId?: string
   values: InvoiceFormValues
 }
+
+export interface ImportInvoiceCsvRow {
+  name: string
+  invoice_number: string
+  recipient: string
+  client_name: string
+  billing_period: string
+  invoice_date: string
+  amount: number
+  currency: CURRENCY
+  is_paid: boolean
+  notes: string
+}
