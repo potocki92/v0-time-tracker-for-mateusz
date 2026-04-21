@@ -10,12 +10,14 @@ import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
 import { InvoiceFormDialog } from './InvoiceFormDialog'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
+import { InvoiceAutomationSettings } from './InvoiceAutomationSettings'
 import {
   useDeleteInvoice,
   useInvoiceAccountingCsv,
   useInvoicesData,
   useRunAutoIssueInvoices,
   useSaveInvoice,
+  useUpdateInvoiceSettings,
 } from '../_hooks'
 import type { BillingQuarter, InvoiceFormValues } from '../_domain'
 
