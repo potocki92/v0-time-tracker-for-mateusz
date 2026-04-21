@@ -3,12 +3,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
-import { INVOICES_MANAGER_QUERY_KEY, type InvoiceSettings, type SaveInvoiceInput } from '../_domain'
+import { INVOICES_MANAGER_QUERY_KEY, type SaveInvoiceInput } from '../_domain'
 import {
   deleteInvoiceAction,
   runAutoIssueInvoicesAction,
   saveInvoiceAction,
-  updateInvoiceSettingsAction,
 } from '../_services/invoices.service.server'
 
 function useInvalidateInvoices() {
@@ -49,22 +48,6 @@ export function useDeleteInvoice() {
     },
     onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : 'Nie udało się usunąć faktury')
-    },
-  })
-}
-
-export function useUpdateInvoiceSettings() {
-  const invalidate = useInvalidateInvoices()
-
-  return useMutation({
-    mutationKey: MUTATION_KEYS.invoice.updateSettings,
-    mutationFn: (settings: Partial<InvoiceSettings>) => updateInvoiceSettingsAction(settings),
-    onSuccess: () => {
-      toast.success('Zapisano ustawienia numeracji i szablonów')
-      invalidate()
-    },
-    onError: (error: unknown) => {
-      toast.error(error instanceof Error ? error.message : 'Nie udało się zapisać ustawień')
     },
   })
 }

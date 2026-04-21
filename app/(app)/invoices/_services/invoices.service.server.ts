@@ -210,37 +210,6 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
   revalidatePath('/dashboard')
 }
 
-export async function updateInvoiceSettingsAction(nextSettings: Partial<InvoiceSettings>) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
-
-  if (error || !user) {
-    throw new Error('Brak autoryzacji użytkownika')
-  }
-
-  const currentMetadata = (user.user_metadata ?? {}) as UserMetadata
-  const mergedSettings = {
-    ...resolveInvoiceSettings(currentMetadata),
-    ...nextSettings,
-  }
-
-  const { error: updateError } = await supabase.auth.updateUser({
-    data: {
-      ...currentMetadata,
-      invoice_settings: mergedSettings,
-    },
-  })
-
-  if (updateError) {
-    throw new Error(updateError.message)
-  }
-
-  revalidatePath('/invoices')
-}
-
 export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
   const userId = await fetchCurrentUserId()
   const supabase = await createClient()

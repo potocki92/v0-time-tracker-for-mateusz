@@ -9,7 +9,6 @@ export const MUTATION_KEYS = {
     update:   ['invoice', 'update']    as const,
     delete:   ['invoice', 'delete']    as const,
     autoIssue: ['invoice', 'auto-issue'] as const,
-    updateSettings: ['invoice', 'update-settings'] as const,
   },
   workEntry: {
     create: ['work-entry', 'create'] as const,
@@ -31,6 +30,7 @@ export const MUTATION_KEYS = {
   account: {
     updateProfile: ['account', 'update-profile'] as const,
     uploadAvatar:  ['account', 'upload-avatar']  as const,
+    updateInvoiceSettings: ['account', 'update-invoice-settings'] as const,
   },
   auth: {
     login:  ['auth', 'login']   as const,

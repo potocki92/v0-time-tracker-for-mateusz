@@ -59,7 +59,6 @@ export function InvoicesContent() {
   const saveMutation = useSaveInvoice()
   const deleteMutation = useDeleteInvoice()
   const autoIssueMutation = useRunAutoIssueInvoices()
-  const updateSettingsMutation = useUpdateInvoiceSettings()
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
@@ -160,14 +159,6 @@ export function InvoicesContent() {
         onImportAccounting={handleImportClick}
         onRunAutoIssue={() => void autoIssueMutation.mutateAsync()}
         isAutoIssueRunning={autoIssueMutation.isPending}
-      />
-
-      <InvoiceAutomationSettings
-        settings={data.settings}
-        isSaving={updateSettingsMutation.isPending}
-        onSave={async (settings) => {
-          await updateSettingsMutation.mutateAsync(settings)
-        }}
       />
 
       <input
