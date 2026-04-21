@@ -102,6 +102,12 @@ export function DataTable<TData extends RowData>({
     setColumnOrderState(layoutState.columnOrder)
   }, [layoutState.columnOrder, layoutState.columnSizing])
 
+  useEffect(() => {
+    if (filtersKey === DISABLED_FILTERS_KEY) return
+    setGlobalFilterState(persistedFilters.globalFilter)
+    setColumnFiltersState(persistedFilters.columnFilters)
+  }, [filtersKey, persistedFilters.columnFilters, persistedFilters.globalFilter])
+
   const setGlobalFilter = useCallback((value: string) => {
     setGlobalFilterState(value)
     if (filtersKey !== DISABLED_FILTERS_KEY) {
