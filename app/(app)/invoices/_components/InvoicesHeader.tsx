@@ -1,16 +1,20 @@
-import { Download, Plus, Upload } from 'lucide-react'
+import { Bot, Download, Plus, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface InvoicesHeaderProps {
   onCreate: () => void
   onExportAccounting: () => void
   onImportAccounting: () => void
+  onRunAutoIssue: () => void
+  isAutoIssueRunning: boolean
 }
 
 export function InvoicesHeader({
   onCreate,
   onExportAccounting,
   onImportAccounting,
+  onRunAutoIssue,
+  isAutoIssueRunning,
 }: InvoicesHeaderProps) {
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -27,6 +31,10 @@ export function InvoicesHeader({
         <Button variant="outline" onClick={onImportAccounting}>
           <Upload className="mr-2 h-4 w-4" />
           Import CSV
+        </Button>
+        <Button variant="outline" onClick={onRunAutoIssue} disabled={isAutoIssueRunning}>
+          <Bot className="mr-2 h-4 w-4" />
+          {isAutoIssueRunning ? 'Generowanie...' : 'Auto-fakturowanie'}
         </Button>
         <Button onClick={onCreate}>
           <Plus className="mr-2 h-4 w-4" />

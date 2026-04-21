@@ -3,7 +3,7 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
 import { ArrowDownAZ, ArrowUpAZ, Check, CheckCircle2, ChevronsUpDown, Clock3, Upload } from 'lucide-react'
 import type { Client, Invoice } from '@/lib/types'
-import type { BillingQuarter, InvoiceFormValues } from '../_domain'
+import type { BillingQuarter, InvoiceFormValues, InvoiceTemplateKey } from '../_domain'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
@@ -28,6 +28,7 @@ interface InvoiceFormDialogProps {
 }
 
 const QUARTERS: BillingQuarter[] = ['Q1', 'Q2', 'Q3', 'Q4']
+const TEMPLATES: InvoiceTemplateKey[] = ['classic', 'modern', 'minimal']
 
 export function InvoiceFormDialog({
   open,
@@ -212,6 +213,24 @@ export function InvoiceFormDialog({
                 value={values.invoice_date}
                 onChange={(event) => onValuesChange((prev) => ({ ...prev, invoice_date: event.target.value }))}
               />
+            </div>
+            <div className="grid gap-2">
+              <Label>Szablon</Label>
+              <Select
+                value={values.template_key}
+                onValueChange={(value: InvoiceTemplateKey) => onValuesChange((prev) => ({ ...prev, template_key: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TEMPLATES.map((template) => (
+                    <SelectItem key={template} value={template}>
+                      {template}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

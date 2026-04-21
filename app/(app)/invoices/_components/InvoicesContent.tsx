@@ -10,11 +10,14 @@ import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
 import { InvoiceFormDialog } from './InvoiceFormDialog'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
+import { InvoiceAutomationSettings } from './InvoiceAutomationSettings'
 import {
   useDeleteInvoice,
   useInvoiceAccountingCsv,
   useInvoicesData,
+  useRunAutoIssueInvoices,
   useSaveInvoice,
+  useUpdateInvoiceSettings,
 } from '../_hooks'
 import type { BillingQuarter, InvoiceFormValues } from '../_domain'
 
@@ -32,6 +35,7 @@ const INITIAL_VALUES: InvoiceFormValues = {
   currency: 'PLN',
   is_paid: false,
   notes: '',
+  template_key: 'classic',
   file: null,
   client_id: null,
   new_client_name: '',
@@ -54,6 +58,8 @@ export function InvoicesContent() {
   const { data } = useInvoicesData()
   const saveMutation = useSaveInvoice()
   const deleteMutation = useDeleteInvoice()
+  const autoIssueMutation = useRunAutoIssueInvoices()
+  const updateSettingsMutation = useUpdateInvoiceSettings()
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
@@ -77,6 +83,7 @@ export function InvoicesContent() {
       invoice_date: new Date().toISOString().slice(0, 10),
       billing_quarter: 'Q1',
       billing_year: CURRENT_YEAR,
+      template_key: data.settings.defaultTemplate,
     })
     setFormOpen(true)
   }
@@ -97,6 +104,7 @@ export function InvoicesContent() {
       currency: invoice.currency,
       is_paid: invoice.is_paid,
       notes: invoice.notes ?? invoice.note ?? '',
+      template_key: invoice.template_key ?? data.settings.defaultTemplate,
       client_id: invoice.client_id,
       file: null,
       new_client_name: '',
@@ -150,6 +158,16 @@ export function InvoicesContent() {
         onCreate={openCreate}
         onExportAccounting={exportAccountingCsv}
         onImportAccounting={handleImportClick}
+        onRunAutoIssue={() => void autoIssueMutation.mutateAsync()}
+        isAutoIssueRunning={autoIssueMutation.isPending}
+      />
+
+      <InvoiceAutomationSettings
+        settings={data.settings}
+        isSaving={updateSettingsMutation.isPending}
+        onSave={async (settings) => {
+          await updateSettingsMutation.mutateAsync(settings)
+        }}
       />
 
       <input
