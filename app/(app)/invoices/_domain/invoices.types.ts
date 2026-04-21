@@ -11,6 +11,7 @@ export interface InvoicesData {
 export type InvoiceTemplateKey = 'classic' | 'modern' | 'minimal'
 
 export interface InvoiceSettings {
+  userPrefix: string
   numberingPattern: string
   series: string
   branch: string

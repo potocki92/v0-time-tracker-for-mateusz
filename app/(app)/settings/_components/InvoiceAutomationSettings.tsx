@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 
 const schema = z.object({
+  userPrefix: z.string().trim().min(1).max(12),
   numberingPattern: z.string().trim().min(3),
   series: z.string().trim().min(1),
   branch: z.string().trim().min(1),
@@ -58,13 +59,16 @@ export function InvoiceAutomationSettings({ settings, isSaving, onSave }: Props)
         <header>
           <h3 className="text-sm font-semibold">Faktury: numeracja, szablon i automatyzacja</h3>
           <p className="text-xs text-muted-foreground">
-            Tokeny numeracji: {'{SERIA}'} {'{BRANCH}'} {'{YYYY}'} {'{YY}'} {'{MM}'} {'{SEQ}'}
+            Auto-fakturowanie używa formatu: [PREFIKS] [NUMER]/[MM]/[YYYY]
           </p>
         </header>
 
         <div className="grid gap-3 sm:grid-cols-2">
+          <FormField control={form.control} name="userPrefix" render={({ field }) => (
+            <FormItem><FormLabel>Prefiks użytkownika</FormLabel><FormControl><Input {...field} placeholder="np. FR" /></FormControl><FormMessage /></FormItem>
+          )} />
           <FormField control={form.control} name="numberingPattern" render={({ field }) => (
-            <FormItem className="sm:col-span-2"><FormLabel>Wzór numeru</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+            <FormItem><FormLabel>Wzór numeru (manualny)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
           )} />
           <FormField control={form.control} name="series" render={({ field }) => (
             <FormItem><FormLabel>Seria</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
