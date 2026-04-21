@@ -9,9 +9,10 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useCloseModal, useModalState } from '@/hooks/stores/useUiStore'
-import { useProfile, useUpdateAvatar, useUpdateProfile } from '../_hooks'
+import { useProfile, useUpdateAvatar, useUpdateInvoiceAutomationSettings, useUpdateProfile } from '../_hooks'
 import { AppearanceSettings } from './AppearanceSettings'
 import { AvatarUpload } from './AvatarUpload'
+import { InvoiceAutomationSettings } from './InvoiceAutomationSettings'
 import { ProfileForm } from './ProfileForm'
 
 function SettingsSkeleton() {
@@ -44,6 +45,7 @@ export function SettingsDrawer() {
   const profileQuery = useProfile()
   const updateProfile = useUpdateProfile()
   const updateAvatar = useUpdateAvatar()
+  const updateInvoiceSettings = useUpdateInvoiceAutomationSettings()
 
   const profile = profileQuery.data
 
@@ -88,6 +90,14 @@ export function SettingsDrawer() {
               />
 
               <AppearanceSettings />
+
+              <InvoiceAutomationSettings
+                settings={profile.invoiceSettings}
+                isSaving={updateInvoiceSettings.isPending}
+                onSave={async (values) => {
+                  await updateInvoiceSettings.mutateAsync(values)
+                }}
+              />
             </>
           )}
         </div>

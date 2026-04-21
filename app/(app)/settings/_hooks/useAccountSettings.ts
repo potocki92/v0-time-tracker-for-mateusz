@@ -3,10 +3,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
-import type { AccountSettingsFormValues } from '../_domain'
+import type { AccountSettingsFormValues, InvoiceSettings } from '../_domain'
 import {
   fetchAccountProfile,
   updateAccountProfile,
+  updateInvoiceAutomationSettings,
   uploadAvatar,
 } from '../_services'
 
@@ -46,6 +47,23 @@ export function useUpdateAvatar() {
     },
     onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : 'Nie udało się wgrać avatara')
+    },
+  })
+}
+
+export function useUpdateInvoiceAutomationSettings() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationKey: MUTATION_KEYS.account.updateInvoiceSettings,
+    mutationFn: (values: InvoiceSettings) => updateInvoiceAutomationSettings(values),
+    onSuccess: async () => {
+      toast.success('Zapisano ustawienia automatyzacji faktur')
+      await qc.invalidateQueries({ queryKey: QUERY_KEYS.accountProfile() })
+      await qc.invalidateQueries({ queryKey: QUERY_KEYS.invoices() })
+    },
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Nie udało się zapisać ustawień faktur')
     },
   })
 }
