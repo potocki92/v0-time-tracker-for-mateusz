@@ -1,15 +1,21 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState, type ChangeEvent } from 'react'
 import type { Invoice } from '@/lib/types'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
 import { InvoiceFormDialog } from './InvoiceFormDialog'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
-import { useDeleteInvoice, useInvoicesData, useSaveInvoice } from '../_hooks'
+import {
+  useDeleteInvoice,
+  useInvoiceAccountingCsv,
+  useInvoicesData,
+  useSaveInvoice,
+} from '../_hooks'
 import type { BillingQuarter, InvoiceFormValues } from '../_domain'
 
 const CURRENT_YEAR = new Date().getFullYear()
@@ -53,6 +59,12 @@ export function InvoicesContent() {
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null)
   const [formValues, setFormValues] = useState<InvoiceFormValues>(INITIAL_VALUES)
+  const importInputRef = useRef<HTMLInputElement | null>(null)
+
+  const { exportAccountingCsv, importAccountingCsv } = useInvoiceAccountingCsv({
+    invoices: data.invoices,
+    clients: data.clients,
+  })
 
   const isSaving = saveMutation.isPending
 
@@ -115,9 +127,38 @@ export function InvoicesContent() {
     setDeletingInvoice(null)
   }
 
+  function handleImportClick() {
+    importInputRef.current?.click()
+  }
+
+  async function handleImportChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      await importAccountingCsv(file)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Nie udało się zaimportować pliku CSV.')
+    } finally {
+      event.target.value = ''
+    }
+  }
+
   return (
     <div className="container space-y-6 px-4 py-8">
-      <InvoicesHeader onCreate={openCreate} />
+      <InvoicesHeader
+        onCreate={openCreate}
+        onExportAccounting={exportAccountingCsv}
+        onImportAccounting={handleImportClick}
+      />
+
+      <input
+        ref={importInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        className="hidden"
+        onChange={(event) => void handleImportChange(event)}
+      />
 
       {!hasInvoices ? (
         <Empty>

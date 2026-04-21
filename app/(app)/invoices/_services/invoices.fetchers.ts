@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { uploadInvoicePdf } from '@/services/invoices'
 import type { Client, Invoice } from '@/lib/types'
-import type { InvoiceFormValues } from '../_domain'
+import type { ImportInvoiceCsvRow, InvoiceFormValues } from '../_domain'
 
 async function fetchCurrentUserId(supabase = createClient()) {
   const {
@@ -126,5 +126,40 @@ export async function saveInvoice({ invoiceId, values }: { invoiceId?: string; v
 export async function deleteInvoice(invoiceId: string) {
   const supabase = createClient()
   const { error } = await supabase.from('invoices').delete().eq('id', invoiceId)
+  if (error) throw new Error(error.message)
+}
+
+export async function importInvoicesFromCsv(rows: ImportInvoiceCsvRow[]) {
+  if (rows.length === 0) return
+
+  const supabase = createClient()
+  const userId = await fetchCurrentUserId(supabase)
+
+  const payload = []
+
+  for (const row of rows) {
+    const resolvedClientId = row.client_name
+      ? await createClientIfNeeded(row.client_name, {
+          userId,
+          supabase,
+        })
+      : null
+
+    payload.push({
+      user_id: userId,
+      client_id: resolvedClientId,
+      name: row.name.trim(),
+      invoice_number: row.invoice_number.trim() || null,
+      recipient: row.recipient.trim() || null,
+      billing_period: row.billing_period.trim() || null,
+      issue_date: row.invoice_date,
+      amount: row.amount,
+      currency: row.currency,
+      is_paid: row.is_paid,
+      notes: row.notes.trim() || null,
+    })
+  }
+
+  const { error } = await supabase.from('invoices').insert(payload)
   if (error) throw new Error(error.message)
 }

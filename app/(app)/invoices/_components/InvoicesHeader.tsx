@@ -1,11 +1,17 @@
-import { Plus } from 'lucide-react'
+import { Download, Plus, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface InvoicesHeaderProps {
   onCreate: () => void
+  onExportAccounting: () => void
+  onImportAccounting: () => void
 }
 
-export function InvoicesHeader({ onCreate }: InvoicesHeaderProps) {
+export function InvoicesHeader({
+  onCreate,
+  onExportAccounting,
+  onImportAccounting,
+}: InvoicesHeaderProps) {
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div className="space-y-1">
@@ -13,10 +19,20 @@ export function InvoicesHeader({ onCreate }: InvoicesHeaderProps) {
         <p className="text-muted-foreground">Zarządzaj fakturami klientów i kontroluj płatności.</p>
       </div>
 
-      <Button onClick={onCreate}>
-        <Plus className="mr-2 h-4 w-4" />
-        Dodaj fakturę
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={onExportAccounting}>
+          <Download className="mr-2 h-4 w-4" />
+          Eksport CSV
+        </Button>
+        <Button variant="outline" onClick={onImportAccounting}>
+          <Upload className="mr-2 h-4 w-4" />
+          Import CSV
+        </Button>
+        <Button onClick={onCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          Dodaj fakturę
+        </Button>
+      </div>
     </div>
   )
 }
