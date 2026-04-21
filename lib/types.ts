@@ -87,6 +87,10 @@ export interface WorkEntry {
   category: string | null
   tags: string[]
   notes: string | null
+  billing_rate: number | null
+  billing_currency: CURRENCY | null
+  billing_work_type: 'hourly' | 'piecework' | null
+  billing_unit: string | null
   created_at: string
 }
 
