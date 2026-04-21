@@ -21,6 +21,7 @@ const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   templateFooter: 'Dziękujemy za współpracę.',
   autoIssueEnabled: false,
   autoIssueDay: 6,
+  autoIssueClientId: null,
   dueDays: 7,
 }
 
@@ -44,11 +45,21 @@ async function getCurrentUser() {
 }
 
 export async function fetchAccountProfile(): Promise<AccountProfile> {
-  const { user } = await getCurrentUser()
+  const { user, supabase } = await getCurrentUser()
 
   const metadata = (user.user_metadata ?? {}) as UserMetadata
   const avatarPath = metadata.avatar_path ?? null
   const avatarUrl = await resolveAvatarUrl(avatarPath, { preferSigned: true })
+
+  const { data: clientsData, error: clientsError } = await supabase
+    .from('clients')
+    .select('id, name')
+    .eq('user_id', user.id)
+    .order('name', { ascending: true })
+
+  if (clientsError) {
+    throw new Error(`Nie udało się pobrać klientów dla auto-fakturowania: ${clientsError.message}`)
+  }
 
   return {
     id: user.id,
@@ -62,6 +73,10 @@ export async function fetchAccountProfile(): Promise<AccountProfile> {
       ...DEFAULT_INVOICE_SETTINGS,
       ...(metadata.invoice_settings ?? {}),
     },
+    invoiceAutomationClients: (clientsData ?? []).map((client: { id: string; name: string }) => ({
+      id: client.id,
+      name: client.name,
+    })),
   }
 }
 

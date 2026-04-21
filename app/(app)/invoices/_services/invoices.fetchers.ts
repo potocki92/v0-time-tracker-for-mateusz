@@ -14,6 +14,7 @@ const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   templateFooter: 'Dziękujemy za współpracę.',
   autoIssueEnabled: false,
   autoIssueDay: 6,
+  autoIssueClientId: null,
   dueDays: 7,
 }
 

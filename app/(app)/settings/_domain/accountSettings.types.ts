@@ -11,7 +11,13 @@ export type InvoiceSettings = {
   templateFooter: string
   autoIssueEnabled: boolean
   autoIssueDay: number
+  autoIssueClientId: string | null
   dueDays: number
+}
+
+export type InvoiceAutomationClientOption = {
+  id: string
+  name: string
 }
 
 export type AccountProfile = {
@@ -23,6 +29,7 @@ export type AccountProfile = {
   avatarPath: string | null
   avatarUrl: string | null
   invoiceSettings: InvoiceSettings
+  invoiceAutomationClients: InvoiceAutomationClientOption[]
 }
 
 export type AccountSettingsFormValues = {

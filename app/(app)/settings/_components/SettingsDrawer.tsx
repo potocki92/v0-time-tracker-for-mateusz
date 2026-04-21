@@ -93,6 +93,7 @@ export function SettingsDrawer() {
 
               <InvoiceAutomationSettings
                 settings={profile.invoiceSettings}
+                clients={profile.invoiceAutomationClients}
                 isSaving={updateInvoiceSettings.isPending}
                 onSave={async (values) => {
                   await updateInvoiceSettings.mutateAsync(values)
