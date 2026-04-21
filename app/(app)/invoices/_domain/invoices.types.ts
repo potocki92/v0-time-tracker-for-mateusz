@@ -21,6 +21,7 @@ export interface InvoiceSettings {
   templateFooter: string
   autoIssueEnabled: boolean
   autoIssueDay: number
+  autoIssueClientId: string | null
   dueDays: number
 }
 

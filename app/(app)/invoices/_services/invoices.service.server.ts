@@ -18,6 +18,7 @@ const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   templateFooter: 'Dziękujemy za współpracę.',
   autoIssueEnabled: false,
   autoIssueDay: 6,
+  autoIssueClientId: null,
   dueDays: 7,
 }
 
@@ -247,6 +248,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
   periodStartDate.setUTCDate(periodStartDate.getUTCDate() - 6)
   const periodStart = formatDateIso(periodStartDate)
   const billingPeriod = `TYDZIEN ${periodStart} - ${periodEnd}`
+  const autoIssueClientId = settings.autoIssueClientId
 
   const { data: existingInvoices, error: existingError } = await supabase
     .from('invoices')
@@ -261,85 +263,63 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
     return { created: 0, skipped: existingInvoices?.length ?? 0, periodStart, periodEnd }
   }
 
-  const { data: entries, error: entriesError } = await supabase
-    .from('work_entries')
-    .select('client_id, hours')
-    .eq('user_id', userId)
-    .gte('date', periodStart)
-    .lte('date', periodEnd)
-    .not('client_id', 'is', null)
-    .gt('hours', 0)
-
-  if (entriesError) throw new Error(entriesError.message)
-  if (!entries?.length) {
-    return { created: 0, skipped: 0, periodStart, periodEnd }
+  if (!autoIssueClientId) {
+    return { created: 0, skipped: 1, periodStart, periodEnd }
   }
 
-  const clientHours = new Map<string, number>()
-  for (const entry of entries) {
-    const clientId = entry.client_id as string
-    const total = clientHours.get(clientId) ?? 0
-    clientHours.set(clientId, total + Number(entry.hours ?? 0))
-  }
-
-  const clientIds = [...clientHours.keys()]
-  const [clientsRes, ratesRes] = await Promise.all([
-    supabase.from('clients').select('id, name, rate, currency').in('id', clientIds),
+  const [clientRes, ratesRes] = await Promise.all([
+    supabase
+      .from('clients')
+      .select('id, name, rate, currency')
+      .eq('user_id', userId)
+      .eq('id', autoIssueClientId)
+      .maybeSingle(),
     supabase
       .from('client_rates')
       .select('client_id, rate, currency, effective_from')
-      .in('client_id', clientIds)
+      .eq('client_id', autoIssueClientId)
       .lte('effective_from', periodEnd)
       .order('effective_from', { ascending: false }),
   ])
-  if (clientsRes.error) throw new Error(clientsRes.error.message)
+  if (clientRes.error) throw new Error(clientRes.error.message)
   if (ratesRes.error) throw new Error(ratesRes.error.message)
-
-  const newestRateByClient = new Map<string, { rate: number; currency: 'PLN' | 'EUR' }>()
-  for (const rate of ratesRes.data ?? []) {
-    if (!newestRateByClient.has(rate.client_id)) {
-      newestRateByClient.set(rate.client_id, {
-        rate: Number(rate.rate ?? 0),
-        currency: (rate.currency as 'PLN' | 'EUR') ?? 'PLN',
-      })
-    }
+  if (!clientRes.data) {
+    return { created: 0, skipped: 1, periodStart, periodEnd }
   }
 
-  const insertPayload: Array<Record<string, unknown>> = []
-  for (const client of clientsRes.data ?? []) {
-    const hours = clientHours.get(client.id) ?? 0
-    if (hours <= 0) continue
-    const rate = newestRateByClient.get(client.id) ?? { rate: Number(client.rate ?? 0), currency: client.currency as 'PLN' | 'EUR' }
-    const amount = Number((hours * rate.rate).toFixed(2))
-    if (amount <= 0) continue
-
-    const dueDate = new Date(issueDate)
-    dueDate.setUTCDate(dueDate.getUTCDate() + settings.dueDays)
-
-    insertPayload.push({
-      user_id: userId,
-      client_id: client.id,
-      name: `Auto faktura ${client.name} (${periodStart} - ${periodEnd})`,
-      recipient: client.name,
-      billing_period: billingPeriod,
-      issue_date: periodEnd,
-      invoice_date: periodEnd,
-      due_date: formatDateIso(dueDate),
-      amount,
-      currency: rate.currency,
-      is_paid: false,
-      notes: `Wygenerowano automatycznie na podstawie przepracowanych godzin (${hours.toFixed(2)} h).`,
-      template_key: settings.defaultTemplate,
-      template_accent_color: settings.templateAccentColor,
-      template_footer: settings.templateFooter,
-      auto_generated: true,
-      period_start: periodStart,
-      period_end: periodEnd,
-    })
+  const newestRate = ratesRes.data?.[0]
+  const amount = Number(newestRate?.rate ?? clientRes.data.rate ?? 0)
+  const currency = (newestRate?.currency as 'PLN' | 'EUR') ?? (clientRes.data.currency as 'PLN' | 'EUR') ?? 'PLN'
+  if (amount <= 0) {
+    return { created: 0, skipped: 1, periodStart, periodEnd }
   }
+
+  const dueDate = new Date(issueDate)
+  dueDate.setUTCDate(dueDate.getUTCDate() + settings.dueDays)
+
+  const insertPayload: Array<Record<string, unknown>> = [{
+    user_id: userId,
+    client_id: clientRes.data.id,
+    name: `Auto faktura ${clientRes.data.name} (${periodStart} - ${periodEnd})`,
+    recipient: clientRes.data.name,
+    billing_period: billingPeriod,
+    issue_date: periodEnd,
+    invoice_date: periodEnd,
+    due_date: formatDateIso(dueDate),
+    amount,
+    currency,
+    is_paid: false,
+    notes: 'Wygenerowano automatycznie z ustawionej stawki tygodniowej klienta.',
+    template_key: settings.defaultTemplate,
+    template_accent_color: settings.templateAccentColor,
+    template_footer: settings.templateFooter,
+    auto_generated: true,
+    period_start: periodStart,
+    period_end: periodEnd,
+  }]
 
   if (insertPayload.length === 0) {
-    return { created: 0, skipped: clientIds.length, periodStart, periodEnd }
+    return { created: 0, skipped: 1, periodStart, periodEnd }
   }
 
   let created = 0
