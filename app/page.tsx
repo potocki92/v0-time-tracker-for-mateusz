@@ -3,16 +3,18 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { buildMetadata } from '@/lib/seo/metadata'
 
-import { LandingNavbar } from './_landing/LandingNavbar'
-import { Hero } from './_landing/Hero'
-import { StatsStrip } from './_landing/StatsStrip'
-import { Features } from './_landing/Features'
-import { FeatureShowcase } from './_landing/FeatureShowcase'
-import { HowItWorks } from './_landing/HowItWorks'
-import { Testimonial } from './_landing/Testimonial'
-import { Faq } from './_landing/Faq'
-import { FinalCta } from './_landing/FinalCta'
-import { Footer } from './_landing/Footer'
+import {
+  LandingNavbarSection,
+  HeroSection,
+  StatsStripSection,
+  FeaturesSection,
+  FeatureShowcaseSection,
+  HowItWorksSection,
+  TestimonialSection,
+  FaqSection,
+  FinalCtaSection,
+  FooterSection,
+} from './_landing/components'
 
 export const metadata: Metadata = buildMetadata({
   path: '/',
@@ -31,18 +33,18 @@ export default async function LandingPage() {
 
   return (
     <>
-      <LandingNavbar isAuthenticated={isAuthenticated} />
+      <LandingNavbarSection isAuthenticated={isAuthenticated} />
       <main id="main-content" tabIndex={-1} className="focus:outline-none">
-        <Hero isAuthenticated={isAuthenticated} />
-        <StatsStrip />
-        <Features />
-        <FeatureShowcase />
-        <HowItWorks />
-        <Testimonial />
-        <Faq />
-        <FinalCta isAuthenticated={isAuthenticated} />
+        <HeroSection isAuthenticated={isAuthenticated} />
+        <StatsStripSection />
+        <FeaturesSection />
+        <FeatureShowcaseSection />
+        <HowItWorksSection />
+        <TestimonialSection />
+        <FaqSection />
+        <FinalCtaSection isAuthenticated={isAuthenticated} />
       </main>
-      <Footer />
+      <FooterSection />
     </>
   )
 }
