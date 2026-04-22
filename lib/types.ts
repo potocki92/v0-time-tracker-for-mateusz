@@ -29,6 +29,8 @@ export interface Client {
   currency: CURRENCY
   unit: string | null
   is_default: boolean
+  auto_invoice_enabled?: boolean
+  auto_invoice_frequency?: 'weekly' | 'monthly'
   color: string
   created_at: string
 }
@@ -139,6 +141,8 @@ export interface ClientFormData {
   currency: CURRENCY
   unit?: string
   is_default: boolean
+  auto_invoice_enabled?: boolean
+  auto_invoice_frequency?: 'weekly' | 'monthly'
   color: string
 }
 

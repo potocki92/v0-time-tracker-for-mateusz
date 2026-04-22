@@ -87,6 +87,8 @@ function toClientRow(input: ClientMutationInput) {
     currency:     input.currency,
     unit:         input.work_type === 'piecework' ? (input.unit ?? null) : null,
     is_default:   input.is_default,
+    auto_invoice_enabled: Boolean(input.auto_invoice_enabled),
+    auto_invoice_frequency: input.auto_invoice_frequency ?? 'weekly',
     color:        input.color,
   }
 }

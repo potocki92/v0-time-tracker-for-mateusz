@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { InvoiceAutomationClientOption, InvoiceSettings } from '../_domain'
+import type { InvoiceSettings } from '../_domain'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -21,31 +21,18 @@ const schema = z.object({
   templateAccentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   templateFooter: z.string().trim().max(180),
   autoIssueEnabled: z.boolean(),
-  autoIssueDay: z.coerce.number().int().min(0).max(6),
-  autoIssueClientId: z.string().uuid().nullable(),
   dueDays: z.coerce.number().int().min(1).max(90),
 })
 
 type FormValues = z.infer<typeof schema>
 
-const DAYS = [
-  { value: '1', label: 'Poniedziałek' },
-  { value: '2', label: 'Wtorek' },
-  { value: '3', label: 'Środa' },
-  { value: '4', label: 'Czwartek' },
-  { value: '5', label: 'Piątek' },
-  { value: '6', label: 'Sobota' },
-  { value: '0', label: 'Niedziela' },
-]
-
 type Props = {
   settings: InvoiceSettings
-  clients: InvoiceAutomationClientOption[]
   isSaving: boolean
   onSave: (values: InvoiceSettings) => Promise<void>
 }
 
-export function InvoiceAutomationSettings({ settings, clients, isSaving, onSave }: Props) {
+export function InvoiceAutomationSettings({ settings, isSaving, onSave }: Props) {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: settings,
@@ -101,12 +88,9 @@ export function InvoiceAutomationSettings({ settings, clients, isSaving, onSave 
             <FormItem className="flex items-center justify-between"><FormLabel>Auto-wystawianie</FormLabel><FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl></FormItem>
           )} />
           <div className="grid gap-2 sm:grid-cols-3">
-            <FormField control={form.control} name="autoIssueDay" render={({ field }) => (
-              <FormItem><Select value={String(field.value)} onValueChange={(value) => field.onChange(Number(value))}><FormControl><SelectTrigger><SelectValue placeholder="Dzień" /></SelectTrigger></FormControl><SelectContent>{DAYS.map((day) => <SelectItem key={day.value} value={day.value}>{day.label}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
-            )} />
-            <FormField control={form.control} name="autoIssueClientId" render={({ field }) => (
-              <FormItem><Select value={field.value ?? 'none'} onValueChange={(value) => field.onChange(value === 'none' ? null : value)}><FormControl><SelectTrigger><SelectValue placeholder="Klient auto-faktury" /></SelectTrigger></FormControl><SelectContent><SelectItem value="none">Brak</SelectItem>{clients.map((client) => <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>
-            )} />
+            <div className="sm:col-span-2 rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+              Wystawianie działa automatycznie w sobotę o 23:00 (UTC). Klient i częstotliwość ustawiasz na karcie klienta.
+            </div>
             <FormField control={form.control} name="dueDays" render={({ field }) => (
               <FormItem><FormControl><Input type="number" min={1} max={90} {...field} /></FormControl><FormMessage /></FormItem>
             )} />

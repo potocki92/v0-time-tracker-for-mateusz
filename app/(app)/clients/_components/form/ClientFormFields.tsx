@@ -21,6 +21,8 @@ export function ClientFormFields({ isEditMode }: { isEditMode: boolean }) {
   const currency = useWatch({ control, name: 'currency' })
   const color = useWatch({ control, name: 'color' })
   const isDefault = useWatch({ control, name: 'is_default' })
+  const autoInvoiceEnabled = useWatch({ control, name: 'auto_invoice_enabled' })
+  const autoInvoiceFrequency = useWatch({ control, name: 'auto_invoice_frequency' })
 
   return (
     <div className="space-y-4">
@@ -161,6 +163,46 @@ export function ClientFormFields({ isEditMode }: { isEditMode: boolean }) {
             })
           }
         />
+      </div>
+
+      <div className="space-y-3 rounded-lg border p-3">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="client-auto-invoice">Auto-fakturowanie dla klienta</Label>
+          <Switch
+            id="client-auto-invoice"
+            checked={autoInvoiceEnabled}
+            onCheckedChange={(value) =>
+              setValue('auto_invoice_enabled', value, {
+                shouldDirty: true,
+              })
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Częstotliwość auto-fakturowania</Label>
+          <Select
+            value={autoInvoiceFrequency}
+            onValueChange={(value) =>
+              setValue('auto_invoice_frequency', value as ClientFormValues['auto_invoice_frequency'], {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+            disabled={!autoInvoiceEnabled}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="weekly">Co tydzień</SelectItem>
+              <SelectItem value="monthly">Co miesiąc</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Generator działa w soboty o 23:00 (UTC). Kwota jest liczona z przepracowanych wpisów w kalendarzu.
+          </p>
+        </div>
       </div>
     </div>
   )

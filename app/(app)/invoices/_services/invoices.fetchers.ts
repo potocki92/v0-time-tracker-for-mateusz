@@ -13,8 +13,6 @@ const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   templateAccentColor: '#1d4ed8',
   templateFooter: 'Dziękujemy za współpracę.',
   autoIssueEnabled: false,
-  autoIssueDay: 6,
-  autoIssueClientId: null,
   dueDays: 7,
 }
 
