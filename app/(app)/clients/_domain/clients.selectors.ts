@@ -55,19 +55,31 @@ export function selectClientsWithStats(
 
 /**
  * Wyszukiwanie po nazwie / NIP / email — case-insensitive.
+ * Dodatkowo normalizujemy diakrytyki i wielokrotne spacje.
  * Pusty query → wszyscy klienci.
  */
+function normalizeSearchValue(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+}
+
 export function filterClientsBySearch<T extends Client>(
   clients: T[],
   query: string,
 ): T[] {
-  const q = query.trim().toLowerCase()
+  const q = normalizeSearchValue(query)
   if (!q) return clients
-  return clients.filter((c) =>
-    c.name.toLowerCase().includes(q) ||
-    (c.nip?.toLowerCase().includes(q) ?? false) ||
-    (c.email?.toLowerCase().includes(q) ?? false),
-  )
+
+  return clients.filter((c) => {
+    const name = normalizeSearchValue(c.name)
+    const nip = normalizeSearchValue(c.nip ?? '')
+    const email = normalizeSearchValue(c.email ?? '')
+    return name.includes(q) || nip.includes(q) || email.includes(q)
+  })
 }
 
 export function filterClientsByWorkType<T extends Client>(

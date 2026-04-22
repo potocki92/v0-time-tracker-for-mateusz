@@ -39,6 +39,13 @@ const INITIAL_VALUES: InvoiceFormValues = {
   new_client_name: '',
 }
 
+function formatTestInvoiceDateTag(date: Date) {
+  const yyyy = date.getFullYear()
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
 function parseQuarterPeriod(period: string | null | undefined): { quarter: BillingQuarter; year: number } {
   const fallback = { quarter: 'Q1' as BillingQuarter, year: CURRENT_YEAR }
   if (!period) return fallback
@@ -132,6 +139,28 @@ export function InvoicesContent() {
     setDeletingInvoice(null)
   }
 
+  async function handleCreateTestInvoice() {
+    const now = new Date()
+    const dateTag = formatTestInvoiceDateTag(now)
+
+    await saveMutation.mutateAsync({
+      values: {
+        ...INITIAL_VALUES,
+        name: `Faktura testowa ${dateTag}`,
+        recipient: 'Kontrahent testowy',
+        billing_quarter: 'Q1',
+        billing_year: now.getFullYear(),
+        invoice_date: now.toISOString().slice(0, 10),
+        amount: 1,
+        currency: 'PLN',
+        is_paid: false,
+        notes: 'Automatyczny test tworzenia faktury (rekord bez PDF).',
+        new_client_name: 'Klient testowy',
+        template_key: data.settings.defaultTemplate,
+      },
+    })
+  }
+
   function handleImportClick() {
     importInputRef.current?.click()
   }
@@ -156,7 +185,9 @@ export function InvoicesContent() {
         onExportAccounting={exportAccountingCsv}
         onImportAccounting={handleImportClick}
         onRunAutoIssue={() => void autoIssueMutation.mutateAsync()}
+        onCreateTestInvoice={() => void handleCreateTestInvoice()}
         isAutoIssueRunning={autoIssueMutation.isPending}
+        isCreatingTestInvoice={saveMutation.isPending && !editingInvoice}
       />
 
       <input
