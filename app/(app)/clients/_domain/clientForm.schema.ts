@@ -15,6 +15,8 @@ export const clientFormSchema = z
     currency:   z.enum(['PLN', 'EUR']),
     unit:       z.string().trim().optional().or(z.literal('')),
     is_default: z.boolean(),
+    auto_invoice_enabled: z.boolean(),
+    auto_invoice_frequency: z.enum(['weekly', 'monthly']),
     color:      z
       .string()
       .regex(/^#[0-9a-f]{6}$/i, 'Kolor musi być w formacie hex')
@@ -43,6 +45,8 @@ export const EMPTY_CLIENT_FORM_VALUES: ClientFormValues = {
   currency:   'PLN',
   unit:       'kW',
   is_default: false,
+  auto_invoice_enabled: false,
+  auto_invoice_frequency: 'weekly',
   color:      CLIENT_COLORS[0],
 }
 
@@ -63,6 +67,8 @@ export function toClientFormValues(client: Client): ClientFormValues {
     currency:   client.currency,
     unit:       client.unit ?? 'kW',
     is_default: client.is_default,
+    auto_invoice_enabled: Boolean(client.auto_invoice_enabled),
+    auto_invoice_frequency: client.auto_invoice_frequency ?? 'weekly',
     color:      client.color,
   }
 }
@@ -79,6 +85,8 @@ export function toClientMutationInput(values: ClientFormValues): ClientFormData 
     currency:   values.currency,
     unit:       toOptional(values.unit),
     is_default: values.is_default,
+    auto_invoice_enabled: values.auto_invoice_enabled,
+    auto_invoice_frequency: values.auto_invoice_frequency,
     color:      values.color,
   }
 }

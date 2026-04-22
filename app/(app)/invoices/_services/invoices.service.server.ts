@@ -17,8 +17,6 @@ const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   templateAccentColor: '#1d4ed8',
   templateFooter: 'Dziękujemy za współpracę.',
   autoIssueEnabled: false,
-  autoIssueDay: 6,
-  autoIssueClientId: null,
   dueDays: 7,
 }
 
@@ -41,7 +39,7 @@ function formatDateIso(date: Date) {
   return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`
 }
 
-function resolveIssueDate(dayOfWeek: number) {
+function resolveIssueDate(dayOfWeek = 6) {
   const now = new Date()
   const todayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
   const diff = (todayUtc.getUTCDay() - dayOfWeek + 7) % 7
@@ -91,8 +89,68 @@ function shouldRunAutoIssueToday(settings: InvoiceSettings) {
 
   const now = new Date()
   const todayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
-  const configuredDay = Number.isInteger(settings.autoIssueDay) ? settings.autoIssueDay : 6
+  const configuredDay = 6
   return todayUtc.getUTCDay() === configuredDay
+}
+
+function resolveWeeklyPeriod(issueDate: Date) {
+  const periodEnd = formatDateIso(issueDate)
+  const periodStartDate = new Date(issueDate)
+  periodStartDate.setUTCDate(periodStartDate.getUTCDate() - 6)
+  const periodStart = formatDateIso(periodStartDate)
+  return {
+    periodStart,
+    periodEnd,
+    billingPeriod: `TYDZIEN ${periodStart} - ${periodEnd}`,
+  }
+}
+
+function isFirstSaturdayInMonth(issueDate: Date) {
+  return issueDate.getUTCDate() <= 7
+}
+
+function resolveMonthlyPeriod(issueDate: Date) {
+  const year = issueDate.getUTCFullYear()
+  const month = issueDate.getUTCMonth()
+  const start = new Date(Date.UTC(year, month - 1, 1))
+  const end = new Date(Date.UTC(year, month, 0))
+  const periodStart = formatDateIso(start)
+  const periodEnd = formatDateIso(end)
+  return {
+    periodStart,
+    periodEnd,
+    billingPeriod: `MIESIAC ${periodStart} - ${periodEnd}`,
+  }
+}
+
+function calculateEntryAmount(
+  entry: {
+    status: string
+    hours: number | null
+    quantity: number | null
+    quantity_from: number | null
+    quantity_to: number | null
+    billing_rate: number | null
+    billing_work_type: 'hourly' | 'piecework' | null
+  },
+  fallback: {
+    rate: number
+    workType: 'hourly' | 'piecework'
+  },
+) {
+  if (entry.status !== 'worked') return 0
+
+  const rate = Number(entry.billing_rate ?? fallback.rate ?? 0)
+  if (!Number.isFinite(rate) || rate <= 0) return 0
+
+  const workType = entry.billing_work_type ?? fallback.workType
+  if (workType === 'piecework') {
+    const quantity = Number(entry.quantity ?? ((entry.quantity_to ?? 0) - (entry.quantity_from ?? 0)))
+    return Number.isFinite(quantity) && quantity > 0 ? quantity * rate : 0
+  }
+
+  const hours = Number(entry.hours ?? 0)
+  return Number.isFinite(hours) && hours > 0 ? hours * rate : 0
 }
 
 async function fetchCurrentUserId() {
@@ -232,99 +290,105 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
   } = await supabase.auth.getUser()
   const settings = resolveInvoiceSettings((user?.user_metadata ?? {}) as UserMetadata)
   const userPrefix = sanitizePrefix(settings.userPrefix || settings.series)
+  const issueDate = resolveIssueDate(6)
+  const fallbackPeriod = resolveWeeklyPeriod(issueDate)
 
   if (!shouldRunAutoIssueToday(settings)) {
-    const issueDate = resolveIssueDate(settings.autoIssueDay)
-    const periodEnd = formatDateIso(issueDate)
-    const periodStartDate = new Date(issueDate)
-    periodStartDate.setUTCDate(periodStartDate.getUTCDate() - 6)
-    const periodStart = formatDateIso(periodStartDate)
-    return { created: 0, skipped: 0, periodStart, periodEnd }
+    return { created: 0, skipped: 0, periodStart: fallbackPeriod.periodStart, periodEnd: fallbackPeriod.periodEnd }
   }
 
-  const issueDate = resolveIssueDate(settings.autoIssueDay)
-  const periodEnd = formatDateIso(issueDate)
-  const periodStartDate = new Date(issueDate)
-  periodStartDate.setUTCDate(periodStartDate.getUTCDate() - 6)
-  const periodStart = formatDateIso(periodStartDate)
-  const billingPeriod = `TYDZIEN ${periodStart} - ${periodEnd}`
-  const autoIssueClientId = settings.autoIssueClientId
-
-  const { data: existingInvoices, error: existingError } = await supabase
-    .from('invoices')
-    .select('id')
+  const { data: clients, error: clientsError } = await supabase
+    .from('clients')
+    .select('id, name, rate, currency, work_type, auto_invoice_enabled, auto_invoice_frequency')
     .eq('user_id', userId)
-    .eq('billing_period', billingPeriod)
-    .eq('auto_generated', true)
+    .eq('auto_invoice_enabled', true)
 
-  if (existingError) throw new Error(existingError.message)
-
-  if ((existingInvoices ?? []).length > 0) {
-    return { created: 0, skipped: existingInvoices?.length ?? 0, periodStart, periodEnd }
-  }
-
-  if (!autoIssueClientId) {
-    return { created: 0, skipped: 1, periodStart, periodEnd }
-  }
-
-  const [clientRes, ratesRes] = await Promise.all([
-    supabase
-      .from('clients')
-      .select('id, name, rate, currency')
-      .eq('user_id', userId)
-      .eq('id', autoIssueClientId)
-      .maybeSingle(),
-    supabase
-      .from('client_rates')
-      .select('client_id, rate, currency, effective_from')
-      .eq('client_id', autoIssueClientId)
-      .lte('effective_from', periodEnd)
-      .order('effective_from', { ascending: false }),
-  ])
-  if (clientRes.error) throw new Error(clientRes.error.message)
-  if (ratesRes.error) throw new Error(ratesRes.error.message)
-  if (!clientRes.data) {
-    return { created: 0, skipped: 1, periodStart, periodEnd }
-  }
-
-  const newestRate = ratesRes.data?.[0]
-  const amount = Number(newestRate?.rate ?? clientRes.data.rate ?? 0)
-  const currency = (newestRate?.currency as 'PLN' | 'EUR') ?? (clientRes.data.currency as 'PLN' | 'EUR') ?? 'PLN'
-  if (amount <= 0) {
-    return { created: 0, skipped: 1, periodStart, periodEnd }
-  }
-
-  const dueDate = new Date(issueDate)
-  dueDate.setUTCDate(dueDate.getUTCDate() + settings.dueDays)
-
-  const insertPayload: Array<Record<string, unknown>> = [{
-    user_id: userId,
-    client_id: clientRes.data.id,
-    name: `Auto faktura ${clientRes.data.name} (${periodStart} - ${periodEnd})`,
-    recipient: clientRes.data.name,
-    billing_period: billingPeriod,
-    issue_date: periodEnd,
-    invoice_date: periodEnd,
-    due_date: formatDateIso(dueDate),
-    amount,
-    currency,
-    is_paid: false,
-    notes: 'Wygenerowano automatycznie z ustawionej stawki tygodniowej klienta.',
-    template_key: settings.defaultTemplate,
-    template_accent_color: settings.templateAccentColor,
-    template_footer: settings.templateFooter,
-    auto_generated: true,
-    period_start: periodStart,
-    period_end: periodEnd,
-  }]
-
-  if (insertPayload.length === 0) {
-    return { created: 0, skipped: 1, periodStart, periodEnd }
+  if (clientsError) throw new Error(clientsError.message)
+  if (!clients?.length) {
+    return { created: 0, skipped: 1, periodStart: fallbackPeriod.periodStart, periodEnd: fallbackPeriod.periodEnd }
   }
 
   let created = 0
+  let skipped = 0
+  let firstPeriodStart = fallbackPeriod.periodStart
+  let firstPeriodEnd = fallbackPeriod.periodEnd
 
-  for (const invoicePayload of insertPayload) {
+  for (const client of clients) {
+    const frequency = client.auto_invoice_frequency === 'monthly' ? 'monthly' : 'weekly'
+    if (frequency === 'monthly' && !isFirstSaturdayInMonth(issueDate)) {
+      skipped += 1
+      continue
+    }
+
+    const period = frequency === 'monthly' ? resolveMonthlyPeriod(issueDate) : resolveWeeklyPeriod(issueDate)
+    firstPeriodStart = period.periodStart
+    firstPeriodEnd = period.periodEnd
+
+    const { data: existingInvoices, error: existingError } = await supabase
+      .from('invoices')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('client_id', client.id)
+      .eq('billing_period', period.billingPeriod)
+      .eq('auto_generated', true)
+
+    if (existingError) throw new Error(existingError.message)
+    if ((existingInvoices ?? []).length > 0) {
+      skipped += 1
+      continue
+    }
+
+    const { data: entries, error: entriesError } = await supabase
+      .from('work_entries')
+      .select('status, hours, quantity, quantity_from, quantity_to, billing_rate, billing_work_type')
+      .eq('user_id', userId)
+      .eq('client_id', client.id)
+      .gte('date', period.periodStart)
+      .lte('date', period.periodEnd)
+
+    if (entriesError) throw new Error(entriesError.message)
+
+    const amount = Number(
+      (entries ?? []).reduce(
+        (sum, entry) =>
+          sum +
+          calculateEntryAmount(entry, {
+            rate: Number(client.rate ?? 0),
+            workType: client.work_type === 'piecework' ? 'piecework' : 'hourly',
+          }),
+        0,
+      ).toFixed(2),
+    )
+
+    if (amount <= 0) {
+      skipped += 1
+      continue
+    }
+
+    const dueDate = new Date(issueDate)
+    dueDate.setUTCDate(dueDate.getUTCDate() + settings.dueDays)
+
+    const invoicePayload: Record<string, unknown> = {
+      user_id: userId,
+      client_id: client.id,
+      name: `Auto faktura ${client.name} (${period.periodStart} - ${period.periodEnd})`,
+      recipient: client.name,
+      billing_period: period.billingPeriod,
+      issue_date: formatDateIso(issueDate),
+      invoice_date: formatDateIso(issueDate),
+      due_date: formatDateIso(dueDate),
+      amount,
+      currency: (client.currency as 'PLN' | 'EUR') ?? 'PLN',
+      is_paid: false,
+      notes: 'Wygenerowano automatycznie z przepracowanych wpisów w kalendarzu.',
+      template_key: settings.defaultTemplate,
+      template_accent_color: settings.templateAccentColor,
+      template_footer: settings.templateFooter,
+      auto_generated: true,
+      period_start: period.periodStart,
+      period_end: period.periodEnd,
+    }
+
     let inserted = false
     let attempts = 0
 
@@ -355,7 +419,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
   revalidatePath('/invoices')
   revalidatePath('/dashboard')
 
-  return { created, skipped: 0, periodStart, periodEnd }
+  return { created, skipped, periodStart: firstPeriodStart, periodEnd: firstPeriodEnd }
 }
 
 export async function deleteInvoiceAction(invoiceId: string) {

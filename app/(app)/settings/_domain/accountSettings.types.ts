@@ -10,8 +10,6 @@ export type InvoiceSettings = {
   templateAccentColor: string
   templateFooter: string
   autoIssueEnabled: boolean
-  autoIssueDay: number
-  autoIssueClientId: string | null
   dueDays: number
 }
 

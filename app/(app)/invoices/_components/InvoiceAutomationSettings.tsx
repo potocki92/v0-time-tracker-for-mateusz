@@ -14,16 +14,6 @@ interface InvoiceAutomationSettingsProps {
   onSave: (settings: Partial<InvoiceSettings>) => Promise<void>
 }
 
-const DAYS = [
-  { value: 1, label: 'Poniedziałek' },
-  { value: 2, label: 'Wtorek' },
-  { value: 3, label: 'Środa' },
-  { value: 4, label: 'Czwartek' },
-  { value: 5, label: 'Piątek' },
-  { value: 6, label: 'Sobota' },
-  { value: 0, label: 'Niedziela' },
-]
-
 export function InvoiceAutomationSettings({ settings, isSaving, onSave }: InvoiceAutomationSettingsProps) {
   const [draft, setDraft] = useState(settings)
 
@@ -99,15 +89,9 @@ export function InvoiceAutomationSettings({ settings, isSaving, onSave }: Invoic
             <Switch checked={draft.autoIssueEnabled} onCheckedChange={(checked) => setDraft((prev) => ({ ...prev, autoIssueEnabled: checked }))} />
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
-            <Select
-              value={String(draft.autoIssueDay)}
-              onValueChange={(value) => setDraft((prev) => ({ ...prev, autoIssueDay: Number(value) }))}
-            >
-              <SelectTrigger><SelectValue placeholder="Dzień" /></SelectTrigger>
-              <SelectContent>
-                {DAYS.map((day) => <SelectItem key={day.value} value={String(day.value)}>{day.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <div className="rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+              Harmonogram: każda sobota, 23:00 (UTC). Klienta i częstotliwość ustawiasz na karcie klienta.
+            </div>
             <Input
               type="number"
               min={1}
