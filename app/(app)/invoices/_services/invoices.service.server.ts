@@ -305,7 +305,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 
   if (clientsError) throw new Error(clientsError.message)
   if (!clients?.length) {
-    return { created: 0, skipped: 1, periodStart: fallbackPeriod.periodStart, periodEnd: fallbackPeriod.periodEnd }
+    return { created: 0, skipped: 0, periodStart: fallbackPeriod.periodStart, periodEnd: fallbackPeriod.periodEnd }
   }
 
   let created = 0
