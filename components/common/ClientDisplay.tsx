@@ -106,7 +106,8 @@ export const ClientDisplay = memo(function ClientDisplay({
   const color     = client ? resolveColor(client, name) : 'hsl(0, 0%, 60%)'
   const initials  = clientInitials(name)
   const avatarUrl = client?.avatar_url ?? null
-  const meta      = client?.email || (client?.nip ? `NIP ${client.nip}` : null)
+  const taxPrefix = client?.nip && /^\d{10}$/.test(client.nip.trim()) ? 'NIP' : 'Tax ID'
+  const meta      = client?.email || (client?.nip ? `${taxPrefix} ${client.nip}` : null)
 
   if (variant === 'badge') {
     return (
