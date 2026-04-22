@@ -7,7 +7,7 @@ export const clientFormSchema = z
   .object({
     name:       z.string().trim().min(1, 'Podaj nazwę klienta'),
     nip:        z.string().trim().optional().or(z.literal('')),
-    is_foreign_client: z.boolean(),
+    country_code: z.enum(['PL', 'DE']),
     regon:      z.string().trim().regex(/^\d{9}$/, 'REGON musi mieć 9 cyfr').optional().or(z.literal('')),
     email:      z.string().trim().email('Podaj poprawny adres email').optional().or(z.literal('')),
     phone:      z.string().trim().optional().or(z.literal('')),
@@ -26,13 +26,15 @@ export const clientFormSchema = z
   .superRefine((value, ctx) => {
     const normalizedTaxId = value.nip?.trim() ?? ''
 
-    if (value.is_foreign_client) {
-      const isValidForeignTaxId = normalizedTaxId.length === 0 || /^[A-Za-z0-9./\-]{3,20}$/.test(normalizedTaxId)
-      if (!isValidForeignTaxId) {
+    if (value.country_code === 'DE') {
+      const isValidGermanTaxId = normalizedTaxId.length === 0
+        || /^DE[0-9]{9}$/.test(normalizedTaxId.toUpperCase())
+        || /^\d{2}\/\d{3}\/\d{5}$/.test(normalizedTaxId)
+      if (!isValidGermanTaxId) {
         ctx.addIssue({
           code:    z.ZodIssueCode.custom,
           path:    ['nip'],
-          message: 'Dla klienta zagranicznego podaj STR./Tax ID (3-20 znaków: litery, cyfry, ./-)',
+          message: 'Dla Niemiec podaj USt-IdNr (np. DE123456789) lub St. Nr. (np. 22/287/20628)',
         })
       }
     } else if (normalizedTaxId.length > 0 && !/^\d{10}$/.test(normalizedTaxId)) {
@@ -57,7 +59,7 @@ export type ClientFormValues = z.infer<typeof clientFormSchema>
 export const EMPTY_CLIENT_FORM_VALUES: ClientFormValues = {
   name:       '',
   nip:        '',
-  is_foreign_client: false,
+  country_code: 'PL',
   regon:      '',
   email:      '',
   phone:      '',
@@ -76,16 +78,22 @@ function toOptional(value?: string): string | undefined {
   return normalized ? normalized : undefined
 }
 
-function isForeignTaxId(value: string | null | undefined): boolean {
-  if (!value) return false
-  return !/^\d{10}$/.test(value.trim())
+function inferCountryCode(value: string | null | undefined): ClientFormValues['country_code'] {
+  const normalized = value?.trim()
+  if (!normalized) return 'PL'
+
+  if (/^DE[0-9]{9}$/i.test(normalized) || /^\d{2}\/\d{3}\/\d{5}$/.test(normalized)) {
+    return 'DE'
+  }
+
+  return 'PL'
 }
 
 export function toClientFormValues(client: Client): ClientFormValues {
   return {
     name:       client.name,
     nip:        client.nip ?? '',
-    is_foreign_client: isForeignTaxId(client.nip),
+    country_code: inferCountryCode(client.nip),
     regon:      client.regon ?? '',
     email:      client.email ?? '',
     phone:      client.phone ?? '',
