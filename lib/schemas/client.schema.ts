@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const clientSchema = z.object({
   name: z.string().min(1, 'Nazwa wymagana'),
-  nip:  z.string().regex(/^\d{10}$/, 'NIP musi mieć 10 cyfr').optional().or(z.literal('')),
+  nip:  z.string().trim().optional().or(z.literal('')),
   email: z.string().email('Niepoprawny email').optional().or(z.literal('')),
   work_type: z.enum(['hourly', 'piecework']),
   rate:      z.coerce.number().positive('Stawka musi być dodatnia'),

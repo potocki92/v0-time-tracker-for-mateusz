@@ -21,6 +21,7 @@ export function ClientFormFields({ isEditMode }: { isEditMode: boolean }) {
   const currency = useWatch({ control, name: 'currency' })
   const color = useWatch({ control, name: 'color' })
   const isDefault = useWatch({ control, name: 'is_default' })
+  const isForeignClient = useWatch({ control, name: 'is_foreign_client' })
   const autoInvoiceEnabled = useWatch({ control, name: 'auto_invoice_enabled' })
   const autoInvoiceFrequency = useWatch({ control, name: 'auto_invoice_frequency' })
 
@@ -35,13 +36,34 @@ export function ClientFormFields({ isEditMode }: { isEditMode: boolean }) {
       <div className="grid grid-cols-2 gap-4">
         <FormInput<ClientFormValues>
           name="nip"
-          label="NIP"
-          placeholder="1234567890"
+          label={isForeignClient ? 'STR./Tax ID' : 'NIP'}
+          placeholder={isForeignClient ? 'np. DE123456789' : '1234567890'}
         />
         <FormInput<ClientFormValues>
           name="regon"
           label="REGON"
           placeholder="123456789"
+          disabled={isForeignClient}
+        />
+      </div>
+
+      <div className="flex items-center justify-between">
+        <Label htmlFor="client-foreign">Klient zagraniczny (bez polskiego NIP)</Label>
+        <Switch
+          id="client-foreign"
+          checked={isForeignClient}
+          onCheckedChange={(value) => {
+            setValue('is_foreign_client', value, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+            if (value) {
+              setValue('regon', '', {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          }}
         />
       </div>
 
