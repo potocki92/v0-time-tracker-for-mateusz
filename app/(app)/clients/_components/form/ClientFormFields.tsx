@@ -21,9 +21,10 @@ export function ClientFormFields({ isEditMode }: { isEditMode: boolean }) {
   const currency = useWatch({ control, name: 'currency' })
   const color = useWatch({ control, name: 'color' })
   const isDefault = useWatch({ control, name: 'is_default' })
-  const isForeignClient = useWatch({ control, name: 'is_foreign_client' })
+  const countryCode = useWatch({ control, name: 'country_code' })
   const autoInvoiceEnabled = useWatch({ control, name: 'auto_invoice_enabled' })
   const autoInvoiceFrequency = useWatch({ control, name: 'auto_invoice_frequency' })
+  const isGermanClient = countryCode === 'DE'
 
   return (
     <div className="space-y-4">
@@ -34,38 +35,40 @@ export function ClientFormFields({ isEditMode }: { isEditMode: boolean }) {
       />
 
       <div className="grid grid-cols-2 gap-4">
-        <FormInput<ClientFormValues>
-          name="nip"
-          label={isForeignClient ? 'STR./Tax ID' : 'NIP'}
-          placeholder={isForeignClient ? 'np. DE123456789' : '1234567890'}
-        />
-        <FormInput<ClientFormValues>
-          name="regon"
-          label="REGON"
-          placeholder="123456789"
-          disabled={isForeignClient}
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <Label htmlFor="client-foreign">Klient zagraniczny (bez polskiego NIP)</Label>
-        <Switch
-          id="client-foreign"
-          checked={isForeignClient}
-          onCheckedChange={(value) => {
-            setValue('is_foreign_client', value, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-            if (value) {
-              setValue('regon', '', {
+        <div className="space-y-2">
+          <Label>Kraj klienta *</Label>
+          <Select
+            value={countryCode}
+            onValueChange={(value) =>
+              setValue('country_code', value as ClientFormValues['country_code'], {
                 shouldDirty: true,
                 shouldValidate: true,
               })
             }
-          }}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="PL">Polska (PL)</SelectItem>
+              <SelectItem value="DE">Niemcy (DE)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <FormInput<ClientFormValues>
+          name="nip"
+          label={isGermanClient ? 'St. Nr. / USt-IdNr' : 'NIP'}
+          placeholder={isGermanClient ? 'np. 22/287/20628 lub DE123456789' : '1234567890'}
         />
       </div>
+
+      <FormInput<ClientFormValues>
+        name="regon"
+        label="REGON"
+        placeholder="123456789"
+        disabled={isGermanClient}
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
