@@ -1,4 +1,4 @@
-import { Bot, Download, Plus, Upload } from 'lucide-react'
+import { Bot, Download, FlaskConical, Plus, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface InvoicesHeaderProps {
@@ -6,7 +6,9 @@ interface InvoicesHeaderProps {
   onExportAccounting: () => void
   onImportAccounting: () => void
   onRunAutoIssue: () => void
+  onCreateTestInvoice: () => void
   isAutoIssueRunning: boolean
+  isCreatingTestInvoice: boolean
 }
 
 export function InvoicesHeader({
@@ -14,7 +16,9 @@ export function InvoicesHeader({
   onExportAccounting,
   onImportAccounting,
   onRunAutoIssue,
+  onCreateTestInvoice,
   isAutoIssueRunning,
+  isCreatingTestInvoice,
 }: InvoicesHeaderProps) {
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -35,6 +39,14 @@ export function InvoicesHeader({
         <Button variant="outline" onClick={onRunAutoIssue} disabled={isAutoIssueRunning}>
           <Bot className="mr-2 h-4 w-4" />
           {isAutoIssueRunning ? 'Generowanie...' : 'Auto-fakturowanie'}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={onCreateTestInvoice}
+          disabled={isCreatingTestInvoice || isAutoIssueRunning}
+        >
+          <FlaskConical className="mr-2 h-4 w-4" />
+          {isCreatingTestInvoice ? 'Tworzenie testu...' : 'Utwórz testową fakturę'}
         </Button>
         <Button onClick={onCreate}>
           <Plus className="mr-2 h-4 w-4" />
