@@ -52,7 +52,7 @@ export function DataTableToolbar<TData extends RowData>({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         {filters.map((filter) => {
           const column = table.getColumn(filter.columnId)
           if (!column) return null
@@ -61,9 +61,9 @@ export function DataTableToolbar<TData extends RowData>({
 
           if (filter.type === 'chips') {
             return (
-              <div key={filter.columnId} className="flex flex-wrap items-center gap-2">
+              <div key={filter.columnId} className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
                 <span className="text-xs font-medium text-muted-foreground">{filter.label}</span>
-                <div className="inline-flex h-9 items-center gap-1 rounded-lg bg-muted/40 p-1">
+                <div className="inline-flex h-9 max-w-full flex-wrap items-center gap-1 overflow-hidden rounded-lg bg-muted/40 p-1">
                   {filter.options.map((option) => (
                     <Button
                       key={option.value}
@@ -83,23 +83,27 @@ export function DataTableToolbar<TData extends RowData>({
           }
 
           return (
-            <Select
-              key={filter.columnId}
-              value={value}
-              onValueChange={(next) => column.setFilterValue(next === 'all' ? undefined : next)}
-            >
-              <SelectTrigger className="h-9 w-[210px] rounded-lg border-border/60 bg-muted/20">
-                <SelectValue placeholder={filter.label} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{filter.allLabel ?? `Wszystkie: ${filter.label.toLowerCase()}`}</SelectItem>
-                {filter.options.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div key={filter.columnId} className="min-w-0 flex-1 sm:flex-none sm:w-[210px]">
+              <Select
+                value={value}
+                onValueChange={(next) => column.setFilterValue(next === 'all' ? undefined : next)}
+              >
+                <SelectTrigger
+                  className="h-9 w-full min-w-0 rounded-lg border-border/60 bg-muted/20"
+                  aria-label={`Filtruj: ${filter.label}`}
+                >
+                  <SelectValue placeholder={filter.label} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{filter.allLabel ?? `Wszystkie: ${filter.label.toLowerCase()}`}</SelectItem>
+                  {filter.options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           )
         })}
       </div>
