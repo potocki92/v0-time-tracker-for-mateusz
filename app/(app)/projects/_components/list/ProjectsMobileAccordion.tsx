@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState, type ReactNode } from 'react'
-import { Flag, X } from 'lucide-react'
+import { Flag, Search } from 'lucide-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -9,15 +9,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { formatCurrency, formatDate } from '@/lib/helpers'
 import { PRIORITY_LABELS, PROJECT_STATUS_LABELS, type Client, type Project } from '@/lib/types'
 import {
-  PROJECT_STATUS_FILTER_OPTIONS,
   PROJECT_PRIORITY_BADGE_CLASS,
   PROJECT_STATUS_BADGE_CLASS,
 } from '../../_domain/projects.constants'
 import type { ProjectFiltersState } from '../../_hooks/useProjectFilters'
+import { ProjectsFiltersSheet } from './ProjectsFiltersSheet'
 
 type ProjectsMobileAccordionProps = {
   data: Project[]
@@ -59,61 +58,23 @@ export function ProjectsMobileAccordion({
   const selectedVisibleCount = data.filter((project) => selectedIds.includes(project.id)).length
 
   return (
-    <div className="space-y-4">
-      <Card className="py-4">
-        <CardContent className="space-y-3 px-4">
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <div className="relative min-w-0 flex-1">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
           <Input
             value={filters.search}
             onChange={(event) => filters.setSearch(event.target.value)}
             placeholder="Szukaj projektu, klienta..."
-            className="h-11"
+            className="h-11 pl-9"
             aria-label="Szukaj projektu"
           />
-          <div className="grid grid-cols-2 gap-2">
-            <div className="min-w-0">
-              <Select value={filters.status} onValueChange={(v) => filters.setStatus(v as typeof filters.status)}>
-                <SelectTrigger className="h-11 w-full min-w-0" aria-label="Filtruj po statusie">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Wszystkie</SelectItem>
-                  {PROJECT_STATUS_FILTER_OPTIONS.filter((o) => o.value !== 'all').map((status) => (
-                    <SelectItem key={status.value} value={status.value}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="min-w-0">
-              <Select value={filters.priority} onValueChange={(v) => filters.setPriority(v as typeof filters.priority)}>
-                <SelectTrigger className="h-11 w-full min-w-0" aria-label="Filtruj po priorytecie">
-                  <SelectValue placeholder="Priorytet" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Wszystkie</SelectItem>
-                  <SelectItem value="low">Niski</SelectItem>
-                  <SelectItem value="medium">Średni</SelectItem>
-                  <SelectItem value="high">Wysoki</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {filters.isFiltering && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={filters.reset}
-              className="h-9 w-full justify-center gap-1 text-muted-foreground"
-            >
-              <X className="size-3.5" aria-hidden /> Wyczyść filtry
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+        <ProjectsFiltersSheet filters={filters} />
+      </div>
 
       {selectedIds.length > 0 && (
         <Card className="border-destructive/30 bg-card/80 py-3">
@@ -149,13 +110,15 @@ export function ProjectsMobileAccordion({
                   value={project.id}
                   className={isLast ? 'border-b-0 px-4' : 'border-b border-border/60 px-4'}
                 >
-                  <div className="flex items-start gap-3 py-4">
-                    <Checkbox
-                      checked={isSelected}
-                      onCheckedChange={(checked) => toggleSelection(project.id, checked === true)}
-                      aria-label={`Zaznacz projekt ${project.name}`}
-                      className="mt-1 size-5"
-                    />
+                  <div className="flex items-center gap-1 py-2">
+                    <label className="flex size-11 shrink-0 cursor-pointer items-center justify-center">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={(checked) => toggleSelection(project.id, checked === true)}
+                        aria-label={`Zaznacz projekt ${project.name}`}
+                        className="size-5"
+                      />
+                    </label>
 
                     <div className="min-w-0 flex-1">
                       <AccordionTrigger className="w-full py-0 hover:no-underline">

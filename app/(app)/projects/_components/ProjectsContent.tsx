@@ -11,6 +11,7 @@ import {
   useProjectsData,
 } from '../_hooks'
 import { ProjectsHeader } from './ProjectsHeader'
+import { ProjectsFab } from './ProjectsFab'
 import { ProjectStats } from './card/ProjectStats'
 import { ProjectsDataTable } from './list/ProjectsDataTable'
 import { ProjectsMobileAccordion } from './list/ProjectsMobileAccordion'
@@ -47,7 +48,9 @@ export function ProjectsContent() {
   }, [projectToDelete, remove])
 
   return (
-    <div className="container space-y-6 px-4 py-6">
+    <div
+      className="container space-y-6 px-4 py-6 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6"
+    >
       <ProjectsHeader total={projects.length} onCreate={form.openCreate} />
 
       <ProjectsStatsBoundary>
@@ -98,6 +101,8 @@ export function ProjectsContent() {
         onCancel={() => setProjectToDelete(null)}
         onConfirm={handleDeleteConfirm}
       />
+
+      <ProjectsFab onClick={form.openCreate} />
     </div>
   )
 }
