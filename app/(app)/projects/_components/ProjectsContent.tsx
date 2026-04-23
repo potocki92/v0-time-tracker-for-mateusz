@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useIsMobile } from '@/hooks/use-mobile'
 import type { Project } from '@/lib/types'
 import {
+  useProjectFilters,
   useProjectForm,
   useProjectMutations,
   useProjectStats,
@@ -11,6 +13,7 @@ import {
 import { ProjectsHeader } from './ProjectsHeader'
 import { ProjectStats } from './card/ProjectStats'
 import { ProjectsDataTable } from './list/ProjectsDataTable'
+import { ProjectsMobileAccordion } from './list/ProjectsMobileAccordion'
 import { ProjectsEmpty } from './list/ProjectsEmpty'
 import { ProjectFormDialog } from './form/ProjectFormDialog'
 import { ProjectDeleteDialog } from './form/ProjectDeleteDialog'
@@ -20,27 +23,28 @@ export function ProjectsContent() {
   const { data } = useProjectsData()
   const { projects, clients } = data
 
+  const isMobile = useIsMobile()
   const stats = useProjectStats(projects)
+  const filters = useProjectFilters(data)
   const form = useProjectForm(clients)
   const { save, remove } = useProjectMutations()
 
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
 
-  const handleSubmit = () => {
+  const { editing, formData, close: closeForm } = form
+  const handleSubmit = useCallback(() => {
     save.mutate(
-      { editingId: form.editing?.id ?? null, formData: form.formData },
-      {
-        onSuccess: () => form.close(),
-      },
+      { editingId: editing?.id ?? null, formData },
+      { onSuccess: () => closeForm() },
     )
-  }
+  }, [editing, formData, closeForm, save])
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = useCallback(() => {
     if (!projectToDelete) return
     remove.mutate(projectToDelete.id, {
       onSuccess: () => setProjectToDelete(null),
     })
-  }
+  }, [projectToDelete, remove])
 
   return (
     <div className="container space-y-6 px-4 py-6">
@@ -56,7 +60,15 @@ export function ProjectsContent() {
             hasProjects={false}
             search=""
             onCreate={form.openCreate}
-            onClearFilters={() => {}}
+            onClearFilters={filters.reset}
+          />
+        ) : isMobile ? (
+          <ProjectsMobileAccordion
+            data={filters.filtered}
+            clients={clients}
+            filters={filters}
+            onEditProject={form.openEdit}
+            onDeleteProject={setProjectToDelete}
           />
         ) : (
           <ProjectsDataTable

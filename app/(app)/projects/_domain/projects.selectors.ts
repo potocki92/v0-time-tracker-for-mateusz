@@ -70,14 +70,20 @@ export function selectClientName(
 
 export function selectFilteredProjects(
   data: ProjectsData,
-  filters: { search: string; status: 'all' | Project['status'] },
+  filters: {
+    search: string
+    status: 'all' | Project['status']
+    priority?: 'all' | Project['priority']
+  },
 ): Project[] {
   const { projects, clients } = data
   const query = filters.search.trim().toLowerCase()
+  const priority = filters.priority ?? 'all'
   const nameById = selectClientNameById(clients)
 
   return projects.filter((project) => {
     if (filters.status !== 'all' && project.status !== filters.status) return false
+    if (priority !== 'all' && project.priority !== priority) return false
     if (!query) return true
 
     const clientName = project.client_id ? nameById.get(project.client_id) ?? '' : ''
