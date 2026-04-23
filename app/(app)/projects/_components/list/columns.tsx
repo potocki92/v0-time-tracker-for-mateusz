@@ -71,7 +71,12 @@ export const columns: ColumnDef<Project>[] = [
     cell: ({ row, table }) => {
       const meta = table.options.meta as ProjectsTableMeta | undefined
       const client = row.original.client_id ? meta?.clientsById.get(row.original.client_id) : undefined
-      return client?.name ?? 'No client'
+      const label = client?.name ?? 'Brak klienta'
+      return (
+        <span className="block max-w-full truncate" title={label}>
+          {label}
+        </span>
+      )
     },
   },
   {
@@ -128,11 +133,11 @@ export const columns: ColumnDef<Project>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="size-7" aria-label="Akcje projektu">
+            <Button variant="ghost" size="icon" className="size-8" aria-label="Akcje projektu">
               <MoreHorizontal className="size-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-36">
+          <DropdownMenuContent align="end" collisionPadding={8} className="min-w-[9rem]">
             <DropdownMenuItem onClick={() => meta?.onEditProject(row.original)}>
               <Pencil className="mr-2 size-4" /> Edytuj
             </DropdownMenuItem>

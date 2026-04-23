@@ -89,31 +89,35 @@ export function ProjectsMobileAccordion({
             className="h-11"
           />
           <div className="grid grid-cols-2 gap-2">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-11">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Wszystkie statusy</SelectItem>
-                {PROJECT_STATUS_FILTER_OPTIONS.map((status) => (
-                  <SelectItem key={status.value} value={status.value}>
-                    {status.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="min-w-0">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-11 w-full min-w-0" aria-label="Filtruj po statusie">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Wszystkie</SelectItem>
+                  {PROJECT_STATUS_FILTER_OPTIONS.map((status) => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger className="h-11">
-                <SelectValue placeholder="Priorytet" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Wszystkie priorytety</SelectItem>
-                <SelectItem value="low">Niski</SelectItem>
-                <SelectItem value="medium">Średni</SelectItem>
-                <SelectItem value="high">Wysoki</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="min-w-0">
+              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                <SelectTrigger className="h-11 w-full min-w-0" aria-label="Filtruj po priorytecie">
+                  <SelectValue placeholder="Priorytet" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Wszystkie</SelectItem>
+                  <SelectItem value="low">Niski</SelectItem>
+                  <SelectItem value="medium">Średni</SelectItem>
+                  <SelectItem value="high">Wysoki</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
