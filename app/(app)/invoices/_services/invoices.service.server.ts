@@ -2,7 +2,11 @@
 
 import { unstable_noStore as noStore, revalidatePath } from 'next/cache'
 import { cache } from 'react'
-import { uploadInvoicePdf } from '@/services/invoices'
+import {
+  extractInvoicePdfPath,
+  removeInvoicePdf,
+  uploadInvoicePdfWithMeta,
+} from '@/services/invoices'
 import { createClient } from '@/lib/supabase/server'
 import type { Client, Invoice } from '@/lib/types'
 import { calculateEntryMoney, fallbackFromClient } from '@/lib/finance/entry-calculations'
@@ -202,14 +206,26 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
   const userId = await fetchCurrentUserId()
   const supabase = await createClient()
 
+  // Step 1: resolve existing invoice (needed for cleaning up the replaced PDF later).
+  let previousFileUrl: string | null = null
+  if (invoiceId) {
+    const { data: existing, error: fetchError } = await supabase
+      .from('invoices')
+      .select('file_url')
+      .eq('id', invoiceId)
+      .eq('user_id', userId)
+      .maybeSingle()
+    if (fetchError) throw new Error(fetchError.message)
+    if (!existing) throw new Error('Nie znaleziono faktury do edycji')
+    previousFileUrl = existing.file_url ?? null
+  }
+
   const resolvedClientId = values.client_id ?? (await createClientIfNeeded(values.new_client_name, userId))
 
-  const pdfUrl = values.file
-    ? await uploadInvoicePdf({
-        supabase,
-        userId,
-        file: values.file,
-      })
+  // Step 2: upload PDF only if the user provided one. Keep filePath handy so we
+  // can delete the orphan if the DB write fails below.
+  const uploaded = values.file
+    ? await uploadInvoicePdfWithMeta({ supabase, userId, file: values.file })
     : null
 
   const payload = {
@@ -224,21 +240,39 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     amount: values.amount,
     currency: values.currency,
     is_paid: values.is_paid,
-    file_url: pdfUrl,
+    file_url: uploaded?.publicUrl ?? null,
     notes: values.notes.trim() || null,
     template_key: values.template_key,
   }
 
-  if (invoiceId) {
-    const { error } = await supabase
-      .from('invoices')
-      .update({ ...payload, file_url: pdfUrl ?? undefined })
-      .eq('id', invoiceId)
+  // Step 3: DB write with compensating cleanup on failure.
+  try {
+    if (invoiceId) {
+      const updatePayload: typeof payload = {
+        ...payload,
+        // Keep existing file_url if no new PDF was uploaded.
+        file_url: uploaded?.publicUrl ?? previousFileUrl,
+      }
+      const { error } = await supabase.from('invoices').update(updatePayload).eq('id', invoiceId)
+      if (error) throw new Error(error.message)
+    } else {
+      const { error } = await supabase.from('invoices').insert(payload)
+      if (error) throw new Error(error.message)
+    }
+  } catch (err) {
+    // DB write failed → remove the orphan PDF we just uploaded.
+    if (uploaded) {
+      await removeInvoicePdf(supabase, uploaded.filePath, uploaded.bucket)
+    }
+    throw err
+  }
 
-    if (error) throw new Error(error.message)
-  } else {
-    const { error } = await supabase.from('invoices').insert(payload)
-    if (error) throw new Error(error.message)
+  // Step 4: on a successful update with a replaced PDF, delete the previous file.
+  if (invoiceId && uploaded && previousFileUrl && previousFileUrl !== uploaded.publicUrl) {
+    const oldPath = extractInvoicePdfPath(previousFileUrl)
+    if (oldPath) {
+      await removeInvoicePdf(supabase, oldPath)
+    }
   }
 
   revalidatePath('/invoices')
@@ -389,8 +423,22 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 
 export async function deleteInvoiceAction(invoiceId: string) {
   const supabase = await createClient()
+
+  // Fetch file_url first so we can clean up Storage after the DB row is gone.
+  const { data: existing, error: fetchError } = await supabase
+    .from('invoices')
+    .select('file_url')
+    .eq('id', invoiceId)
+    .maybeSingle()
+  if (fetchError) throw new Error(fetchError.message)
+
   const { error } = await supabase.from('invoices').delete().eq('id', invoiceId)
   if (error) throw new Error(error.message)
+
+  const storagePath = extractInvoicePdfPath(existing?.file_url ?? null)
+  if (storagePath) {
+    await removeInvoicePdf(supabase, storagePath)
+  }
 
   revalidatePath('/invoices')
   revalidatePath('/dashboard')
