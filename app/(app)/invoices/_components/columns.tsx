@@ -4,6 +4,12 @@ import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 
 import type { Column, ColumnDef } from '@tanstack/react-table'
 import type { Client, Invoice } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
+import { displayInvoiceNumber } from '@/lib/finance/invoice-number'
+import {
+  INVOICE_STATUS_BADGE_CLASS,
+  INVOICE_STATUS_LABELS_PL,
+  deriveInvoiceStatus,
+} from '@/lib/finance/invoice-status'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -82,7 +88,7 @@ function createSelectionColumn<TData>(): ColumnDef<TData, unknown> {
 
 export const COLUMN_LABELS: Record<string, string> = {
   select: 'Zaznacz',
-  invoice_number: 'ID',
+  invoice_number: 'Numer',
   client: 'Klient',
   invoice_date: 'Data',
   billing_period: 'Kwartał',
@@ -95,34 +101,28 @@ export const columns: ColumnDef<Invoice>[] = [
   createSelectionColumn<Invoice>(),
   {
     id: 'invoice_number',
-    accessorFn: (row) => row.invoice_number ?? row.id.slice(0, 8),
+    accessorFn: (row) => displayInvoiceNumber(row),
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.invoice_number} />,
-    meta: { label: 'ID' },
+    meta: { label: COLUMN_LABELS.invoice_number },
+    // UI invariant: never render the raw DB id. Legacy rows without a business
+    // number display a neutral placeholder returned by displayInvoiceNumber().
     cell: ({ row }) => (
-      <span className="font-medium">
-        {row.original.invoice_number || row.original.id.slice(0, 8)}
-      </span>
+      <span className="font-medium tabular-nums">{displayInvoiceNumber(row.original)}</span>
     ),
-    size: 140,
-    minSize: 100,
+    size: 160,
+    minSize: 120,
     maxSize: 320,
   },
   {
     id: 'client',
     accessorFn: (row) => row.client_id ?? 'Bez klienta',
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.client} />,
-    meta: { label: 'Klient' },
+    meta: { label: COLUMN_LABELS.client },
     cell: ({ row, table }) => {
       const meta = table.options.meta as InvoicesTableMeta | undefined
       const client = row.original.client_id ? meta?.clientsById.get(row.original.client_id) ?? null : null
 
-      return (
-        <ClientDisplay
-          client={client}
-          variant="cell"
-          size="md"
-        />
-      )
+      return <ClientDisplay client={client} variant="cell" size="md" />
     },
     sortingFn: 'alphanumeric',
     size: 240,
@@ -133,7 +133,7 @@ export const columns: ColumnDef<Invoice>[] = [
     id: 'invoice_date',
     accessorFn: (row) => new Date(row.invoice_date ?? row.issue_date ?? '1970-01-01').getTime(),
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.invoice_date} />,
-    meta: { label: 'Data' },
+    meta: { label: COLUMN_LABELS.invoice_date },
     cell: ({ row }) => formatInvoiceDate(row.original.invoice_date || row.original.issue_date),
     size: 140,
     minSize: 110,
@@ -143,7 +143,7 @@ export const columns: ColumnDef<Invoice>[] = [
     id: 'billing_period',
     accessorFn: (row) => row.billing_period ?? '',
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.billing_period} />,
-    meta: { label: 'Kwartał' },
+    meta: { label: COLUMN_LABELS.billing_period },
     cell: ({ row }) => row.original.billing_period || '-',
     size: 120,
     minSize: 90,
@@ -151,21 +151,17 @@ export const columns: ColumnDef<Invoice>[] = [
   },
   {
     id: 'payment_status',
-    accessorFn: (row) => (row.is_paid ? 'paid' : 'unpaid'),
+    accessorFn: (row) => deriveInvoiceStatus(row),
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.payment_status} />,
-    meta: { label: 'Status' },
-    cell: ({ row }) => (
-      <Badge
-        variant={row.original.is_paid ? 'secondary' : 'outline'}
-        className={
-          row.original.is_paid
-            ? 'text-emerald-700 dark:text-emerald-400'
-            : 'text-amber-700 dark:text-amber-400'
-        }
-      >
-        {row.original.is_paid ? 'Opłacona' : 'Nieopłacona'}
-      </Badge>
-    ),
+    meta: { label: COLUMN_LABELS.payment_status },
+    cell: ({ row }) => {
+      const status = deriveInvoiceStatus(row.original)
+      return (
+        <Badge variant="outline" className={INVOICE_STATUS_BADGE_CLASS[status]}>
+          {INVOICE_STATUS_LABELS_PL[status]}
+        </Badge>
+      )
+    },
     size: 140,
     minSize: 110,
     maxSize: 200,
@@ -174,8 +170,12 @@ export const columns: ColumnDef<Invoice>[] = [
     id: 'amount',
     accessorFn: (row) => Number(row.amount ?? 0),
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.amount} />,
-    meta: { label: 'Kwota' },
-    cell: ({ row }) => formatCurrency(row.original.amount, row.original.currency),
+    meta: { label: COLUMN_LABELS.amount },
+    cell: ({ row }) => (
+      <span className="font-semibold tabular-nums">
+        {formatCurrency(row.original.amount, row.original.currency)}
+      </span>
+    ),
     size: 140,
     minSize: 110,
     maxSize: 240,

@@ -15,6 +15,7 @@ import {
   invoiceSettingsSchema,
   resolveInvoiceSettings as parseInvoiceSettings,
 } from '@/lib/schemas/invoice-settings.schema'
+import { formatInvoiceNumber, sanitizeInvoicePrefix } from '@/lib/finance/invoice-number'
 import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../_domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
@@ -44,17 +45,6 @@ function resolveIssueDate(dayOfWeek = 6) {
   return todayUtc
 }
 
-function sanitizePrefix(prefix: string | null | undefined) {
-  const normalized = (prefix ?? '').trim().toUpperCase()
-  return normalized || 'FV'
-}
-
-function buildInvoiceNumberLabel(prefix: string, seq: number, issueDate: Date) {
-  const year = issueDate.getUTCFullYear()
-  const month = issueDate.getUTCMonth() + 1
-  return `${prefix} ${seq}/${pad(month)}/${year}`
-}
-
 async function reserveNextInvoiceNumber({
   supabase,
   userId,
@@ -78,7 +68,16 @@ async function reserveNextInvoiceNumber({
     throw new Error('Nie udało się zarezerwować kolejnego numeru faktury')
   }
 
-  return buildInvoiceNumberLabel(prefix, seq, issueDate)
+  return formatInvoiceNumber(prefix, seq, issueDate)
+}
+
+function parseIssueDateSafe(value: string | null | undefined): Date {
+  if (value) {
+    const parsed = new Date(value)
+    if (!Number.isNaN(parsed.getTime())) return parsed
+  }
+  const now = new Date()
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
 }
 
 function shouldRunAutoIssueToday(settings: InvoiceSettings) {
@@ -228,11 +227,31 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     ? await uploadInvoicePdfWithMeta({ supabase, userId, file: values.file })
     : null
 
+  // Step 2b: resolve the business-friendly invoice number.
+  // Every invoice — including drafts and legacy rows being edited — must carry a
+  // business number. We reserve one whenever the form leaves it blank, so the UI
+  // never has to fall back to the DB id.
+  let resolvedInvoiceNumber: string | null = values.invoice_number.trim() || null
+  if (!resolvedInvoiceNumber) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    const settings = resolveInvoiceSettings(user?.user_metadata)
+    const prefix = sanitizeInvoicePrefix(settings.userPrefix || settings.series)
+    const issueDate = parseIssueDateSafe(values.invoice_date)
+    resolvedInvoiceNumber = await reserveNextInvoiceNumber({
+      supabase,
+      userId,
+      prefix,
+      issueDate,
+    })
+  }
+
   const payload = {
     user_id: userId,
     client_id: resolvedClientId,
     name: values.name.trim(),
-    invoice_number: values.invoice_number.trim() || null,
+    invoice_number: resolvedInvoiceNumber,
     recipient: (values.recipient || values.new_client_name || '').trim() || null,
     billing_period: values.billing_period.trim() || `${values.billing_quarter} ${values.billing_year}`,
     issue_date: values.invoice_date,
@@ -286,7 +305,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
     data: { user },
   } = await supabase.auth.getUser()
   const settings = resolveInvoiceSettings(user?.user_metadata)
-  const userPrefix = sanitizePrefix(settings.userPrefix || settings.series)
+  const userPrefix = sanitizeInvoicePrefix(settings.userPrefix || settings.series)
   const issueDate = resolveIssueDate(6)
   const fallbackPeriod = resolveWeeklyPeriod(issueDate)
 
