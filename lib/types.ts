@@ -96,6 +96,34 @@ export interface WorkEntry {
   created_at: string
 }
 
+export type InvoiceLifecycleStatus = 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED'
+
+export interface InvoiceLineItem {
+  id: string
+  invoice_id: string
+  user_id: string
+  position: number
+  description: string
+  unit: string
+  quantity: number
+  unit_price_net: number
+  vat_rate: number
+  net_amount: number
+  vat_amount: number
+  gross_amount: number
+  created_at: string
+  updated_at: string
+}
+
+export interface InvoiceLineItemInput {
+  position?: number
+  description: string
+  unit?: string
+  quantity: number
+  unit_price_net: number
+  vat_rate: number
+}
+
 export interface Invoice {
   id: string
   user_id: string
@@ -109,8 +137,13 @@ export interface Invoice {
   description: string | null
   billing_period: string | null
   amount: number
+  net_amount?: number | null
+  vat_amount?: number | null
+  gross_amount?: number | null
   currency: CURRENCY
   is_paid: boolean
+  paid_date?: string | null
+  status?: InvoiceLifecycleStatus | null
   file_url: string | null
   notes: string | null
   template_key?: 'classic' | 'modern' | 'minimal' | null

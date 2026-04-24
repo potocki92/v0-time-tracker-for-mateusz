@@ -2,33 +2,30 @@
 
 import { unstable_noStore as noStore, revalidatePath } from 'next/cache'
 import { cache } from 'react'
-import { uploadInvoicePdf } from '@/services/invoices'
+import {
+  extractInvoicePdfPath,
+  removeInvoicePdf,
+  uploadInvoicePdfWithMeta,
+} from '@/services/invoices'
 import { createClient } from '@/lib/supabase/server'
 import type { Client, Invoice } from '@/lib/types'
+import { calculateEntryMoney, fallbackFromClient } from '@/lib/finance/entry-calculations'
+import { sum, toDb, zero } from '@/lib/finance/money'
+import {
+  invoiceSettingsSchema,
+  resolveInvoiceSettings as parseInvoiceSettings,
+} from '@/lib/schemas/invoice-settings.schema'
 import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../_domain'
 
-const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
-  userPrefix: 'FV',
-  numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
-  series: 'A',
-  branch: 'HQ',
-  resetSequence: 'monthly',
-  defaultTemplate: 'classic',
-  templateAccentColor: '#1d4ed8',
-  templateFooter: 'Dziękujemy za współpracę.',
-  autoIssueEnabled: false,
-  dueDays: 7,
-}
+const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
 
-type UserMetadata = {
-  invoice_settings?: Partial<InvoiceSettings>
-}
-
-function resolveInvoiceSettings(metadata: UserMetadata | null | undefined): InvoiceSettings {
-  return {
-    ...DEFAULT_INVOICE_SETTINGS,
-    ...(metadata?.invoice_settings ?? {}),
-  }
+function resolveInvoiceSettings(rawMetadata: unknown): InvoiceSettings {
+  return parseInvoiceSettings(rawMetadata, (issues) => {
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.warn('[invoice-settings] metadata did not match schema, using defaults:', issues)
+    }
+  })
 }
 
 function pad(num: number) {
@@ -123,36 +120,6 @@ function resolveMonthlyPeriod(issueDate: Date) {
   }
 }
 
-function calculateEntryAmount(
-  entry: {
-    status: string
-    hours: number | null
-    quantity: number | null
-    quantity_from: number | null
-    quantity_to: number | null
-    billing_rate: number | null
-    billing_work_type: 'hourly' | 'piecework' | null
-  },
-  fallback: {
-    rate: number
-    workType: 'hourly' | 'piecework'
-  },
-) {
-  if (entry.status !== 'worked') return 0
-
-  const rate = Number(entry.billing_rate ?? fallback.rate ?? 0)
-  if (!Number.isFinite(rate) || rate <= 0) return 0
-
-  const workType = entry.billing_work_type ?? fallback.workType
-  if (workType === 'piecework') {
-    const quantity = Number(entry.quantity ?? ((entry.quantity_to ?? 0) - (entry.quantity_from ?? 0)))
-    return Number.isFinite(quantity) && quantity > 0 ? quantity * rate : 0
-  }
-
-  const hours = Number(entry.hours ?? 0)
-  return Number.isFinite(hours) && hours > 0 ? hours * rate : 0
-}
-
 async function fetchCurrentUserId() {
   const supabase = await createClient()
   const {
@@ -227,7 +194,7 @@ const getInvoicesDataServerCached = cache(async (): Promise<InvoicesData> => {
   return {
     invoices: (invoicesRes.data ?? []) as Invoice[],
     clients: (clientsRes.data ?? []) as Client[],
-    settings: resolveInvoiceSettings((user.user_metadata ?? {}) as UserMetadata),
+    settings: resolveInvoiceSettings(user.user_metadata),
   }
 })
 
@@ -239,14 +206,26 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
   const userId = await fetchCurrentUserId()
   const supabase = await createClient()
 
+  // Step 1: resolve existing invoice (needed for cleaning up the replaced PDF later).
+  let previousFileUrl: string | null = null
+  if (invoiceId) {
+    const { data: existing, error: fetchError } = await supabase
+      .from('invoices')
+      .select('file_url')
+      .eq('id', invoiceId)
+      .eq('user_id', userId)
+      .maybeSingle()
+    if (fetchError) throw new Error(fetchError.message)
+    if (!existing) throw new Error('Nie znaleziono faktury do edycji')
+    previousFileUrl = existing.file_url ?? null
+  }
+
   const resolvedClientId = values.client_id ?? (await createClientIfNeeded(values.new_client_name, userId))
 
-  const pdfUrl = values.file
-    ? await uploadInvoicePdf({
-        supabase,
-        userId,
-        file: values.file,
-      })
+  // Step 2: upload PDF only if the user provided one. Keep filePath handy so we
+  // can delete the orphan if the DB write fails below.
+  const uploaded = values.file
+    ? await uploadInvoicePdfWithMeta({ supabase, userId, file: values.file })
     : null
 
   const payload = {
@@ -261,21 +240,39 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     amount: values.amount,
     currency: values.currency,
     is_paid: values.is_paid,
-    file_url: pdfUrl,
+    file_url: uploaded?.publicUrl ?? null,
     notes: values.notes.trim() || null,
     template_key: values.template_key,
   }
 
-  if (invoiceId) {
-    const { error } = await supabase
-      .from('invoices')
-      .update({ ...payload, file_url: pdfUrl ?? undefined })
-      .eq('id', invoiceId)
+  // Step 3: DB write with compensating cleanup on failure.
+  try {
+    if (invoiceId) {
+      const updatePayload: typeof payload = {
+        ...payload,
+        // Keep existing file_url if no new PDF was uploaded.
+        file_url: uploaded?.publicUrl ?? previousFileUrl,
+      }
+      const { error } = await supabase.from('invoices').update(updatePayload).eq('id', invoiceId)
+      if (error) throw new Error(error.message)
+    } else {
+      const { error } = await supabase.from('invoices').insert(payload)
+      if (error) throw new Error(error.message)
+    }
+  } catch (err) {
+    // DB write failed → remove the orphan PDF we just uploaded.
+    if (uploaded) {
+      await removeInvoicePdf(supabase, uploaded.filePath, uploaded.bucket)
+    }
+    throw err
+  }
 
-    if (error) throw new Error(error.message)
-  } else {
-    const { error } = await supabase.from('invoices').insert(payload)
-    if (error) throw new Error(error.message)
+  // Step 4: on a successful update with a replaced PDF, delete the previous file.
+  if (invoiceId && uploaded && previousFileUrl && previousFileUrl !== uploaded.publicUrl) {
+    const oldPath = extractInvoicePdfPath(previousFileUrl)
+    if (oldPath) {
+      await removeInvoicePdf(supabase, oldPath)
+    }
   }
 
   revalidatePath('/invoices')
@@ -288,7 +285,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const settings = resolveInvoiceSettings((user?.user_metadata ?? {}) as UserMetadata)
+  const settings = resolveInvoiceSettings(user?.user_metadata)
   const userPrefix = sanitizePrefix(settings.userPrefix || settings.series)
   const issueDate = resolveIssueDate(6)
   const fallbackPeriod = resolveWeeklyPeriod(issueDate)
@@ -340,7 +337,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 
     const { data: entries, error: entriesError } = await supabase
       .from('work_entries')
-      .select('status, hours, quantity, quantity_from, quantity_to, billing_rate, billing_work_type')
+      .select('status, hours, quantity, quantity_from, quantity_to, billing_rate, billing_currency, billing_work_type')
       .eq('user_id', userId)
       .eq('client_id', client.id)
       .gte('date', period.periodStart)
@@ -348,17 +345,19 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 
     if (entriesError) throw new Error(entriesError.message)
 
-    const amount = Number(
-      (entries ?? []).reduce(
-        (sum, entry) =>
-          sum +
-          calculateEntryAmount(entry, {
-            rate: Number(client.rate ?? 0),
-            workType: client.work_type === 'piecework' ? 'piecework' : 'hourly',
-          }),
-        0,
-      ).toFixed(2),
-    )
+    const invoiceCurrency = (client.currency as 'PLN' | 'EUR') ?? 'PLN'
+    const clientFallback = fallbackFromClient({
+      rate: Number(client.rate ?? 0),
+      currency: invoiceCurrency,
+      work_type: client.work_type === 'piecework' ? 'piecework' : 'hourly',
+    })
+
+    const entryMoneys = (entries ?? [])
+      .map((entry) => calculateEntryMoney(entry, clientFallback))
+      .filter((m) => m.currency === invoiceCurrency)
+
+    const totalMoney = entryMoneys.length > 0 ? sum(entryMoneys, invoiceCurrency) : zero(invoiceCurrency)
+    const amount = toDb(totalMoney)
 
     if (amount <= 0) {
       skipped += 1
@@ -378,7 +377,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
       invoice_date: formatDateIso(issueDate),
       due_date: formatDateIso(dueDate),
       amount,
-      currency: (client.currency as 'PLN' | 'EUR') ?? 'PLN',
+      currency: invoiceCurrency,
       is_paid: false,
       notes: 'Wygenerowano automatycznie z przepracowanych wpisów w kalendarzu.',
       template_key: settings.defaultTemplate,
@@ -424,8 +423,22 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 
 export async function deleteInvoiceAction(invoiceId: string) {
   const supabase = await createClient()
+
+  // Fetch file_url first so we can clean up Storage after the DB row is gone.
+  const { data: existing, error: fetchError } = await supabase
+    .from('invoices')
+    .select('file_url')
+    .eq('id', invoiceId)
+    .maybeSingle()
+  if (fetchError) throw new Error(fetchError.message)
+
   const { error } = await supabase.from('invoices').delete().eq('id', invoiceId)
   if (error) throw new Error(error.message)
+
+  const storagePath = extractInvoicePdfPath(existing?.file_url ?? null)
+  if (storagePath) {
+    await removeInvoicePdf(supabase, storagePath)
+  }
 
   revalidatePath('/invoices')
   revalidatePath('/dashboard')
