@@ -21,9 +21,13 @@ export interface Client {
   address: string | null
   city: string | null
   postal_code: string | null
+  region: string | null
+  country_code: string | null
   phone: string | null
   email: string | null
   website: string | null
+  locale: string | null
+  timezone: string | null
   work_type: 'hourly' | 'piecework'
   rate: number
   currency: CURRENCY
@@ -166,9 +170,13 @@ export interface ClientFormData {
   address?: string
   city?: string
   postal_code?: string
+  region?: string
+  country_code?: string
   phone?: string
   email?: string
   website?: string
+  locale?: string
+  timezone?: string
   work_type: 'hourly' | 'piecework'
   rate: number
   currency: CURRENCY
