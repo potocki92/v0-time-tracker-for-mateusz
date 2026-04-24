@@ -5,6 +5,8 @@ import { cache } from 'react'
 import { uploadInvoicePdf } from '@/services/invoices'
 import { createClient } from '@/lib/supabase/server'
 import type { Client, Invoice } from '@/lib/types'
+import { calculateEntryMoney, fallbackFromClient } from '@/lib/finance/entry-calculations'
+import { sum, toDb, zero } from '@/lib/finance/money'
 import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../_domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
@@ -121,36 +123,6 @@ function resolveMonthlyPeriod(issueDate: Date) {
     periodEnd,
     billingPeriod: `MIESIAC ${periodStart} - ${periodEnd}`,
   }
-}
-
-function calculateEntryAmount(
-  entry: {
-    status: string
-    hours: number | null
-    quantity: number | null
-    quantity_from: number | null
-    quantity_to: number | null
-    billing_rate: number | null
-    billing_work_type: 'hourly' | 'piecework' | null
-  },
-  fallback: {
-    rate: number
-    workType: 'hourly' | 'piecework'
-  },
-) {
-  if (entry.status !== 'worked') return 0
-
-  const rate = Number(entry.billing_rate ?? fallback.rate ?? 0)
-  if (!Number.isFinite(rate) || rate <= 0) return 0
-
-  const workType = entry.billing_work_type ?? fallback.workType
-  if (workType === 'piecework') {
-    const quantity = Number(entry.quantity ?? ((entry.quantity_to ?? 0) - (entry.quantity_from ?? 0)))
-    return Number.isFinite(quantity) && quantity > 0 ? quantity * rate : 0
-  }
-
-  const hours = Number(entry.hours ?? 0)
-  return Number.isFinite(hours) && hours > 0 ? hours * rate : 0
 }
 
 async function fetchCurrentUserId() {
@@ -340,7 +312,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 
     const { data: entries, error: entriesError } = await supabase
       .from('work_entries')
-      .select('status, hours, quantity, quantity_from, quantity_to, billing_rate, billing_work_type')
+      .select('status, hours, quantity, quantity_from, quantity_to, billing_rate, billing_currency, billing_work_type')
       .eq('user_id', userId)
       .eq('client_id', client.id)
       .gte('date', period.periodStart)
@@ -348,17 +320,19 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 
     if (entriesError) throw new Error(entriesError.message)
 
-    const amount = Number(
-      (entries ?? []).reduce(
-        (sum, entry) =>
-          sum +
-          calculateEntryAmount(entry, {
-            rate: Number(client.rate ?? 0),
-            workType: client.work_type === 'piecework' ? 'piecework' : 'hourly',
-          }),
-        0,
-      ).toFixed(2),
-    )
+    const invoiceCurrency = (client.currency as 'PLN' | 'EUR') ?? 'PLN'
+    const clientFallback = fallbackFromClient({
+      rate: Number(client.rate ?? 0),
+      currency: invoiceCurrency,
+      work_type: client.work_type === 'piecework' ? 'piecework' : 'hourly',
+    })
+
+    const entryMoneys = (entries ?? [])
+      .map((entry) => calculateEntryMoney(entry, clientFallback))
+      .filter((m) => m.currency === invoiceCurrency)
+
+    const totalMoney = entryMoneys.length > 0 ? sum(entryMoneys, invoiceCurrency) : zero(invoiceCurrency)
+    const amount = toDb(totalMoney)
 
     if (amount <= 0) {
       skipped += 1
@@ -378,7 +352,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
       invoice_date: formatDateIso(issueDate),
       due_date: formatDateIso(dueDate),
       amount,
-      currency: (client.currency as 'PLN' | 'EUR') ?? 'PLN',
+      currency: invoiceCurrency,
       is_paid: false,
       notes: 'Wygenerowano automatycznie z przepracowanych wpisów w kalendarzu.',
       template_key: settings.defaultTemplate,

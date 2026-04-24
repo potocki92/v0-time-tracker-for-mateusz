@@ -1,5 +1,6 @@
 import { WorkEntry, Client, MonthlyTotals, AdvancedStats, DAY_NAMES_FULL } from '@/lib/types'
-import { calculateEarnings } from './earnings'
+import { calculateEntryMoney, fallbackFromClient } from './entry-calculations'
+import { add, convert, toMajor, zero } from './money'
 
 export function calculateTotals(
   entries: WorkEntry[],
@@ -10,8 +11,8 @@ export function calculateTotals(
 
   let totalHours = 0
   let totalDays = 0
-  let earningsPLN = 0
-  let earningsEUR = 0
+  let earningsPLN = zero('PLN')
+  let earningsEUR = zero('EUR')
 
   let vacationDays = 0
   let sickDays = 0
@@ -26,13 +27,15 @@ export function calculateTotals(
       totalDays++
       totalHours += entry.hours ?? 0
 
-      const earnings = calculateEarnings(entry, client, eurRate)
+      const fallback = client
+        ? fallbackFromClient(client)
+        : { rate: 0, currency: 'PLN' as const, workType: 'hourly' as const }
+      const money = calculateEntryMoney(entry, fallback)
 
-      // Separate pure PLN and pure EUR to avoid double-counting
-      if (earnings.amountInEUR > 0) {
-        earningsEUR += earnings.amountInEUR
+      if (money.currency === 'EUR') {
+        earningsEUR = add(earningsEUR, money)
       } else {
-        earningsPLN += earnings.amountInPLN
+        earningsPLN = add(earningsPLN, money)
       }
     }
 
@@ -41,12 +44,14 @@ export function calculateTotals(
     if (entry.status === 'day_off') daysOff++
   }
 
+  const totalAllPLN = add(earningsPLN, convert(earningsEUR, 'PLN', eurRate))
+
   return {
     totalHours,
     totalDays,
-    earningsPLN,
-    earningsEUR,
-    totalEarningsAllPLN: earningsPLN + earningsEUR * eurRate,
+    earningsPLN: toMajor(earningsPLN),
+    earningsEUR: toMajor(earningsEUR),
+    totalEarningsAllPLN: toMajor(totalAllPLN),
     vacationDays,
     sickDays,
     daysOff,
