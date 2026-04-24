@@ -1,49 +1,61 @@
 'use client'
 
-import { Plus, Users } from 'lucide-react'
+import { Plus, SearchX, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
 
 type Props = {
   hasAnyClient: boolean
-  onAddClient:  () => void
+  onAddClient: () => void
   onClearFilters: () => void
 }
 
 export function ClientsEmpty({ hasAnyClient, onAddClient, onClearFilters }: Props) {
+  if (hasAnyClient) {
+    return (
+      <Empty className="border bg-card/60">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <SearchX />
+          </EmptyMedia>
+          <EmptyTitle>Brak wyników</EmptyTitle>
+          <EmptyDescription>
+            Zmień wyszukiwanie lub wyczyść filtry, aby zobaczyć swoich klientów.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          <Button variant="outline" onClick={onClearFilters}>
+            Wyczyść filtry
+          </Button>
+        </EmptyContent>
+      </Empty>
+    )
+  }
+
   return (
-    <Card>
-      <CardContent className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-          <Users className="h-6 w-6 text-muted-foreground" />
-        </div>
-        {hasAnyClient ? (
-          <>
-            <div>
-              <p className="font-medium">Brak wyników dla wybranych filtrów</p>
-              <p className="text-sm text-muted-foreground">
-                Spróbuj usunąć wyszukiwanie lub zmień filtr typu/waluty.
-              </p>
-            </div>
-            <Button variant="outline" onClick={onClearFilters}>
-              Wyczyść filtry
-            </Button>
-          </>
-        ) : (
-          <>
-            <div>
-              <p className="font-medium">Nie masz jeszcze żadnych klientów</p>
-              <p className="text-sm text-muted-foreground">
-                Dodaj pierwszego klienta, żeby zacząć logować czas pracy i wystawiać faktury.
-              </p>
-            </div>
-            <Button onClick={onAddClient}>
-              <Plus className="mr-2 h-4 w-4" />
-              Dodaj pierwszego klienta
-            </Button>
-          </>
-        )}
-      </CardContent>
-    </Card>
+    <Empty className="border bg-card/60">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Users />
+        </EmptyMedia>
+        <EmptyTitle>Jeszcze nie masz klientów</EmptyTitle>
+        <EmptyDescription>
+          Dodaj pierwszego klienta, aby zacząć logować czas pracy i wystawiać faktury.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button onClick={onAddClient}>
+          <Plus className="mr-2 h-4 w-4" />
+          Dodaj pierwszego klienta
+        </Button>
+      </EmptyContent>
+    </Empty>
   )
 }

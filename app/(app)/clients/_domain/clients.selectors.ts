@@ -75,10 +75,8 @@ export function filterClientsBySearch<T extends Client>(
   if (!q) return clients
 
   return clients.filter((c) => {
-    const name = normalizeSearchValue(c.name)
-    const nip = normalizeSearchValue(c.nip ?? '')
-    const email = normalizeSearchValue(c.email ?? '')
-    return name.includes(q) || nip.includes(q) || email.includes(q)
+    const haystack = [c.name, c.nip, c.email, c.city, c.phone]
+    return haystack.some((v) => normalizeSearchValue(v ?? '').includes(q))
   })
 }
 

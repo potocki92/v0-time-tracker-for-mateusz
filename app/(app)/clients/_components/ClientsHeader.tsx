@@ -60,48 +60,51 @@ export function ClientsHeader({
         </Button>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto]">
-        <div className="relative">
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Szukaj po nazwie, NIP, email..."
+            placeholder="Szukaj po nazwie, mieście, telefonie..."
             className="pl-9"
+            aria-label="Szukaj klientów"
           />
         </div>
 
-        <Select
-          value={workTypeFilter}
-          onValueChange={(v) => onWorkTypeFilterChange(v as ClientsWorkTypeFilter)}
-        >
-          <SelectTrigger className="w-full sm:w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {WORK_TYPE_FILTER_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="hidden items-center gap-2 sm:flex">
+          <Select
+            value={workTypeFilter}
+            onValueChange={(v) => onWorkTypeFilterChange(v as ClientsWorkTypeFilter)}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {WORK_TYPE_FILTER_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select
-          value={currencyFilter}
-          onValueChange={(v) => onCurrencyFilterChange(v as ClientsCurrencyFilter)}
-        >
-          <SelectTrigger className="w-full sm:w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CURRENCY_FILTER_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select
+            value={currencyFilter}
+            onValueChange={(v) => onCurrencyFilterChange(v as ClientsCurrencyFilter)}
+          >
+            <SelectTrigger className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCY_FILTER_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   )
