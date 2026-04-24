@@ -7,30 +7,21 @@ import { createClient } from '@/lib/supabase/server'
 import type { Client, Invoice } from '@/lib/types'
 import { calculateEntryMoney, fallbackFromClient } from '@/lib/finance/entry-calculations'
 import { sum, toDb, zero } from '@/lib/finance/money'
+import {
+  invoiceSettingsSchema,
+  resolveInvoiceSettings as parseInvoiceSettings,
+} from '@/lib/schemas/invoice-settings.schema'
 import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../_domain'
 
-const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
-  userPrefix: 'FV',
-  numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
-  series: 'A',
-  branch: 'HQ',
-  resetSequence: 'monthly',
-  defaultTemplate: 'classic',
-  templateAccentColor: '#1d4ed8',
-  templateFooter: 'Dziękujemy za współpracę.',
-  autoIssueEnabled: false,
-  dueDays: 7,
-}
+const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
 
-type UserMetadata = {
-  invoice_settings?: Partial<InvoiceSettings>
-}
-
-function resolveInvoiceSettings(metadata: UserMetadata | null | undefined): InvoiceSettings {
-  return {
-    ...DEFAULT_INVOICE_SETTINGS,
-    ...(metadata?.invoice_settings ?? {}),
-  }
+function resolveInvoiceSettings(rawMetadata: unknown): InvoiceSettings {
+  return parseInvoiceSettings(rawMetadata, (issues) => {
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.warn('[invoice-settings] metadata did not match schema, using defaults:', issues)
+    }
+  })
 }
 
 function pad(num: number) {
@@ -199,7 +190,7 @@ const getInvoicesDataServerCached = cache(async (): Promise<InvoicesData> => {
   return {
     invoices: (invoicesRes.data ?? []) as Invoice[],
     clients: (clientsRes.data ?? []) as Client[],
-    settings: resolveInvoiceSettings((user.user_metadata ?? {}) as UserMetadata),
+    settings: resolveInvoiceSettings(user.user_metadata),
   }
 })
 
@@ -260,7 +251,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const settings = resolveInvoiceSettings((user?.user_metadata ?? {}) as UserMetadata)
+  const settings = resolveInvoiceSettings(user?.user_metadata)
   const userPrefix = sanitizePrefix(settings.userPrefix || settings.series)
   const issueDate = resolveIssueDate(6)
   const fallbackPeriod = resolveWeeklyPeriod(issueDate)

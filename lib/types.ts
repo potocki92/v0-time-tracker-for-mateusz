@@ -96,6 +96,8 @@ export interface WorkEntry {
   created_at: string
 }
 
+export type InvoiceLifecycleStatus = 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED'
+
 export interface Invoice {
   id: string
   user_id: string
@@ -111,6 +113,8 @@ export interface Invoice {
   amount: number
   currency: CURRENCY
   is_paid: boolean
+  paid_date?: string | null
+  status?: InvoiceLifecycleStatus | null
   file_url: string | null
   notes: string | null
   template_key?: 'classic' | 'modern' | 'minimal' | null
