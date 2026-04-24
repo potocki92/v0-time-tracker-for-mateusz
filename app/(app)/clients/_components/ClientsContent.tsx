@@ -11,9 +11,11 @@ import {
   useUpdateClient,
 } from '../_hooks/useClientMutations'
 import { useCurrentUser } from '@/hooks/auth/useCurrentUser'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { ClientsHeader } from './ClientsHeader'
 import { ClientsStats } from './ClientsStats'
 import { ClientsTable } from './ClientsTable'
+import { ClientsMobileList } from './ClientsMobileList'
 import { ClientsEmpty } from './ClientsEmpty'
 import { ClientFormDialog } from './ClientFormDialog'
 import { DeleteClientDialog } from './DeleteClientDialog'
@@ -27,6 +29,7 @@ export function ClientsContent() {
   const { data: authUser }          = useCurrentUser()
   const userId                      = authUser?.id ?? null
   const { data: rateHistoryMap = {} } = useClientRatesMap(userId ?? '')
+  const isMobile                    = useIsMobile()
 
   const {
     search,
@@ -114,6 +117,20 @@ export function ClientsContent() {
           onAddClient={openCreate}
           onClearFilters={clearFilters}
         />
+      ) : isMobile ? (
+        <ClientsTableBoundary>
+          <ClientsMobileList
+            clients={visible}
+            workTypeFilter={workTypeFilter}
+            onWorkTypeFilterChange={setWorkTypeFilter}
+            currencyFilter={currencyFilter}
+            onCurrencyFilterChange={setCurrencyFilter}
+            onClearFilters={clearFilters}
+            onEdit={openEdit}
+            onDelete={(c) => setDeleteCandidate(toClient(c))}
+            onShowHistory={(c) => setHistoryClient(toClient(c))}
+          />
+        </ClientsTableBoundary>
       ) : (
         <ClientsTableBoundary>
           <Card className="overflow-hidden">
