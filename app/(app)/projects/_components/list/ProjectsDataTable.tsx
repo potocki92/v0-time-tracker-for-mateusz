@@ -6,13 +6,14 @@ import { useIsMobile } from '@/hooks/use-mobile'
 import {
   PROJECT_STATUS_FILTER_OPTIONS,
 } from '../../_domain/projects.constants'
-import type { Client, Project } from '@/lib/types'
+import type { Client, Project, WorkEntry } from '@/lib/types'
 import { columns, type ProjectsTableMeta } from './columns'
 import { ProjectsMobileAccordion } from './ProjectsMobileAccordion'
 
 type ProjectsDataTableProps = {
   data: Project[]
   clients: Client[]
+  workEntries?: WorkEntry[]
   onAddProject: () => void
   onEditProject: (project: Project) => void
   onDeleteProject: (project: Project) => void
@@ -21,6 +22,7 @@ type ProjectsDataTableProps = {
 export function ProjectsDataTable({
   data,
   clients,
+  workEntries,
   onAddProject,
   onEditProject,
   onDeleteProject,
@@ -60,6 +62,7 @@ export function ProjectsDataTable({
       <ProjectsMobileAccordion
         data={data}
         clients={clients}
+        workEntries={workEntries}
         onEditProject={onEditProject}
         onDeleteProject={onDeleteProject}
       />

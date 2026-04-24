@@ -18,7 +18,7 @@ import { ProjectsListBoundary, ProjectsStatsBoundary } from './errors'
 
 export function ProjectsContent() {
   const { data } = useProjectsData()
-  const { projects, clients } = data
+  const { projects, clients, workEntries } = data
 
   const stats = useProjectStats(projects)
   const form = useProjectForm(clients)
@@ -62,6 +62,7 @@ export function ProjectsContent() {
           <ProjectsDataTable
             data={projects}
             clients={clients}
+            workEntries={workEntries}
             onAddProject={form.openCreate}
             onEditProject={form.openEdit}
             onDeleteProject={setProjectToDelete}
