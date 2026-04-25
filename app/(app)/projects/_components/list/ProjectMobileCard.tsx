@@ -1,19 +1,30 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import {
   CalendarDays,
   ChevronDown,
+  Clock,
   Flag,
+  MoreHorizontal,
   Pencil,
+  Target,
   Trash2,
-  User as UserIcon,
+  Wallet,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Progress } from '@/components/ui/progress'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import { formatCurrency, formatDate } from '@/lib/helpers'
 import { PRIORITY_LABELS, PROJECT_STATUS_LABELS, type Project } from '@/lib/types'
@@ -33,6 +44,48 @@ type Props = {
   onDelete: () => void
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000
+
+const STATUS_DOT: Record<Project['status'], string> = {
+  planned: 'bg-slate-400',
+  in_progress: 'bg-blue-500',
+  completed: 'bg-emerald-500',
+  on_hold: 'bg-amber-500',
+}
+
+function projectInitials(name: string): string {
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('') || '·'
+  )
+}
+
+function formatRelativeDeadline(iso: string): { label: string; overdue: boolean; soon: boolean } {
+  const days = Math.floor((new Date(iso).getTime() - Date.now()) / DAY_MS)
+  if (days < 0) return { label: `${Math.abs(days)} dni po terminie`, overdue: true, soon: false }
+  if (days === 0) return { label: 'dziś', overdue: false, soon: true }
+  if (days === 1) return { label: 'jutro', overdue: false, soon: true }
+  if (days < 7) return { label: `za ${days} dni`, overdue: false, soon: true }
+  return { label: formatDate(iso), overdue: false, soon: false }
+}
+
+/**
+ * Mobile-first project card. Visually aligned with ClientCard / InvoiceCard:
+ *   - same article shell (rounded-2xl, border, hover state)
+ *   - header with colored avatar + name + subtitle and a MoreHorizontal trigger
+ *     opening a bottom Sheet for secondary actions
+ *   - badge row (status, priority)
+ *   - dl grid for primary metrics (budget, deadline)
+ *   - optional progress bar
+ *   - collapsible "Pokaż szczegóły" with description and dates
+ *
+ * Selection (a project-only feature) is preserved via a small checkbox overlay
+ * in the top-left corner so it doesn't dominate the layout.
+ */
 export function ProjectMobileCard({
   project,
   clientName,
@@ -42,214 +95,276 @@ export function ProjectMobileCard({
   onEdit,
   onDelete,
 }: Props) {
-  const [expanded, setExpanded] = useState(false)
+  const [actionsOpen, setActionsOpen] = useState(false)
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
+  const initials = projectInitials(project.name)
+  const subtitle = clientName ?? 'Bez klienta'
   const hasDeadline = Boolean(project.end_date)
-  const isOverdue =
-    hasDeadline &&
-    project.status !== 'completed' &&
-    new Date(project.end_date as string).getTime() < Date.now()
-  const hasProgress = progress && progress.target > 0
+  const deadline = hasDeadline ? formatRelativeDeadline(project.end_date as string) : null
+  const overdue = !!deadline?.overdue && project.status !== 'completed'
+  const hasProgress = !!progress && progress.target > 0
+  const hasDetails = Boolean(
+    project.description || project.start_date || project.end_date || project.budget_amount,
+  )
+
+  function withClose(action: () => void) {
+    return () => {
+      setActionsOpen(false)
+      action()
+    }
+  }
 
   return (
     <article
       className={cn(
-        'relative overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-colors',
-        'hover:bg-accent/30 focus-within:ring-2 focus-within:ring-ring/60',
+        'group relative rounded-2xl border bg-card p-4 shadow-sm transition-colors hover:border-border',
         selected ? 'border-primary/50 ring-1 ring-primary/40' : 'border-border/60',
       )}
     >
-      <span
-        aria-hidden="true"
-        className="absolute inset-y-0 left-0 w-1"
-        style={{ backgroundColor: project.color }}
+      {/* Selection toggle — kept compact and out of the way so it doesn't
+          break visual parity with ClientCard / InvoiceCard. */}
+      <Checkbox
+        checked={selected}
+        onCheckedChange={(checked) => onToggleSelect(checked === true)}
+        aria-label={`Zaznacz projekt ${project.name}`}
+        className={cn(
+          'absolute left-3 top-3 z-10 size-4 rounded-md border-border/70 bg-background/90 shadow-sm backdrop-blur transition-opacity',
+          selected ? 'opacity-100' : 'opacity-60 group-hover:opacity-100',
+        )}
       />
 
-      <div className="flex items-start gap-3 pl-4 pr-2 pt-3">
-        <Checkbox
-          checked={selected}
-          onCheckedChange={(checked) => onToggleSelect(checked === true)}
-          aria-label={`Zaznacz projekt ${project.name}`}
-          className="mt-1 h-5 w-5 shrink-0"
-        />
+      <header className="flex items-start justify-between gap-3 pl-7">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="relative shrink-0">
+            <Avatar className="size-11">
+              <AvatarFallback
+                className="text-sm font-bold text-white"
+                style={{ background: project.color }}
+              >
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <span
+              aria-hidden
+              title={PROJECT_STATUS_LABELS[project.status]}
+              className={cn(
+                'absolute -bottom-0.5 -right-0.5 size-3 rounded-full ring-2 ring-card',
+                STATUS_DOT[project.status],
+              )}
+            />
+          </div>
 
-        <button
-          type="button"
-          onClick={() => setExpanded((prev) => !prev)}
-          aria-expanded={expanded}
-          aria-controls={`project-${project.id}-details`}
-          className="group -mx-1 flex min-w-0 flex-1 items-start gap-2 rounded-md px-1 py-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
-        >
-          <div className="min-w-0 flex-1 space-y-2">
-            <h3
-              className="line-clamp-2 break-words text-[15px] font-semibold leading-tight"
-              title={project.name}
-            >
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-sm font-semibold text-foreground" title={project.name}>
               {project.name}
             </h3>
-
-            <div className="flex flex-wrap items-center gap-1.5">
-              <Badge
-                variant="outline"
-                className={cn('text-[11px]', PROJECT_STATUS_BADGE_CLASS[project.status])}
-              >
-                {PROJECT_STATUS_LABELS[project.status]}
-              </Badge>
-              <Badge
-                variant="outline"
-                className={cn(
-                  'inline-flex items-center gap-1 text-[11px]',
-                  PROJECT_PRIORITY_BADGE_CLASS[project.priority],
-                )}
-              >
-                <Flag className="h-3 w-3" />
-                {PRIORITY_LABELS[project.priority]}
-              </Badge>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-              <span className="inline-flex min-w-0 items-center gap-1">
-                <UserIcon className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{clientName ?? 'Bez klienta'}</span>
-              </span>
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1',
-                  isOverdue && 'font-medium text-rose-600 dark:text-rose-400',
-                )}
-              >
-                <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-                {hasDeadline ? formatDate(project.end_date as string) : 'Brak terminu'}
-              </span>
-            </div>
-
-            {hasProgress ? (
-              <div className="space-y-1 pt-0.5">
-                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span>
-                    {Math.round(progress!.quantityDone)} / {progress!.target}
-                  </span>
-                  <span className="font-semibold tabular-nums text-foreground">
-                    {Math.round(progress!.percent)}%
-                  </span>
-                </div>
-                <Progress
-                  value={progress!.percent}
-                  className={cn(
-                    'h-1.5',
-                    project.status === 'completed'
-                      ? '[&>div]:bg-emerald-500'
-                      : '[&>div]:bg-blue-500',
-                  )}
-                />
-              </div>
-            ) : null}
+            <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
           </div>
+        </div>
 
-          <ChevronDown
-            className={cn(
-              'mt-1 h-5 w-5 shrink-0 text-muted-foreground transition-transform',
-              expanded && 'rotate-180',
-            )}
-          />
-        </button>
-      </div>
-
-      <div
-        id={`project-${project.id}-details`}
-        hidden={!expanded}
-        className="space-y-3 px-4 pb-3 pt-3"
-      >
-        <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <DetailRow
-              label="Klient"
-              value={
-                <span className="inline-flex min-w-0 items-center gap-2">
-                  <Avatar className="size-6 border border-border/60">
-                    <AvatarFallback className="text-[10px] font-semibold">
-                      {getInitials(clientName ?? 'Brak')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="truncate">{clientName ?? 'Bez klienta'}</span>
-                </span>
-              }
-            />
-            <DetailRow
-              label="Budżet"
-              value={
-                project.budget_amount
-                  ? formatCurrency(Number(project.budget_amount), 'PLN')
-                  : '—'
-              }
-            />
-            <DetailRow
-              label="Start"
-              value={project.start_date ? formatDate(project.start_date) : '—'}
-            />
-            <DetailRow
-              label="Koniec"
-              value={project.end_date ? formatDate(project.end_date) : '—'}
-            />
-          </div>
-
-          {project.description ? (
-            <div className="mt-3 border-t border-border/60 pt-3">
-              <DetailRow
-                label="Opis"
-                value={
-                  <span className="block break-words text-sm leading-relaxed">
-                    {project.description}
-                  </span>
-                }
+        <Sheet open={actionsOpen} onOpenChange={setActionsOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="-mr-2 h-9 w-9 shrink-0 text-muted-foreground"
+              aria-label={`Więcej akcji dla projektu ${project.name}`}
+            >
+              <MoreHorizontal className="size-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side="bottom"
+            className="rounded-t-2xl px-0 pb-[max(env(safe-area-inset-bottom),1rem)]"
+          >
+            <SheetHeader className="pb-2">
+              <SheetTitle className="text-base">{project.name}</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col">
+              <ActionItem
+                icon={<Pencil className="size-4" />}
+                label="Edytuj projekt"
+                onClick={withClose(onEdit)}
+              />
+              <ActionItem
+                icon={<Trash2 className="size-4" />}
+                label="Usuń projekt"
+                destructive
+                onClick={withClose(onDelete)}
               />
             </div>
-          ) : null}
-        </div>
+          </SheetContent>
+        </Sheet>
+      </header>
 
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="h-11"
-            onClick={onEdit}
-          >
-            <Pencil className="mr-2 h-4 w-4" />
-            Edytuj
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            className="h-11 text-destructive hover:bg-destructive/10 hover:text-destructive"
-            onClick={onDelete}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Usuń
-          </Button>
-        </div>
+      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+        <Badge
+          variant="outline"
+          className={cn('text-[11px]', PROJECT_STATUS_BADGE_CLASS[project.status])}
+        >
+          {PROJECT_STATUS_LABELS[project.status]}
+        </Badge>
+        <Badge
+          variant="outline"
+          className={cn(
+            'inline-flex items-center gap-1 text-[11px]',
+            PROJECT_PRIORITY_BADGE_CLASS[project.priority],
+          )}
+        >
+          <Flag className="h-3 w-3" />
+          {PRIORITY_LABELS[project.priority]}
+        </Badge>
+        {overdue ? (
+          <Badge variant="outline" className="border-rose-500/30 bg-rose-500/10 text-[11px] text-rose-700 dark:text-rose-300">
+            <Clock className="mr-1 h-3 w-3" />
+            Po terminie
+          </Badge>
+        ) : null}
       </div>
+
+      <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-border/60 pt-3 text-xs">
+        <div className="min-w-0">
+          <dt className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+            <Wallet className="h-3 w-3" />
+            Budżet
+          </dt>
+          <dd className="mt-0.5 truncate text-sm font-semibold tabular-nums text-foreground">
+            {project.budget_amount ? formatCurrency(Number(project.budget_amount), 'PLN') : '—'}
+          </dd>
+        </div>
+        <div className="min-w-0 text-right">
+          <dt className="flex items-center justify-end gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+            <CalendarDays className="h-3 w-3" />
+            Termin
+          </dt>
+          <dd
+            className={cn(
+              'mt-0.5 truncate text-sm font-medium tabular-nums text-foreground',
+              overdue && 'text-rose-600 dark:text-rose-400',
+              deadline?.soon && !overdue && 'text-amber-600 dark:text-amber-400',
+            )}
+          >
+            {deadline?.label ?? '—'}
+          </dd>
+        </div>
+      </dl>
+
+      {hasProgress ? (
+        <div className="mt-3 space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <Target className="h-3 w-3" />
+              {Math.round(progress!.quantityDone)} / {progress!.target}
+            </span>
+            <span className="font-semibold tabular-nums text-foreground">
+              {Math.round(progress!.percent)}%
+            </span>
+          </div>
+          <Progress
+            value={progress!.percent}
+            className={cn(
+              'h-1.5',
+              project.status === 'completed' ? '[&>div]:bg-emerald-500' : '[&>div]:bg-blue-500',
+            )}
+          />
+        </div>
+      ) : null}
+
+      {hasDetails ? (
+        <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen} className="mt-3">
+          <CollapsibleTrigger asChild>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between gap-2 rounded-md px-1 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <span>{detailsOpen ? 'Ukryj szczegóły' : 'Pokaż szczegóły'}</span>
+              <ChevronDown
+                className={cn('size-3.5 transition-transform', detailsOpen && 'rotate-180')}
+              />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
+            <dl className="mt-2 space-y-1.5 rounded-lg bg-muted/40 p-3 text-xs">
+              {project.start_date ? (
+                <DetailRow label="Start" value={formatDate(project.start_date)} />
+              ) : null}
+              {project.end_date ? (
+                <DetailRow label="Koniec" value={formatDate(project.end_date)} />
+              ) : null}
+              {project.description ? (
+                <DetailRow label="Opis" value={project.description} multiline />
+              ) : null}
+            </dl>
+          </CollapsibleContent>
+        </Collapsible>
+      ) : null}
     </article>
   )
 }
 
-function DetailRow({ label, value }: { label: string; value: ReactNode }) {
+function DetailRow({
+  label,
+  value,
+  multiline,
+}: {
+  label: string
+  value: string
+  multiline?: boolean
+}) {
   return (
-    <div className="min-w-0 space-y-1">
-      <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-        {label}
-      </p>
-      <div className="min-w-0 break-words text-sm font-medium text-foreground">{value}</div>
+    <div
+      className={cn(
+        'gap-3',
+        multiline ? 'flex flex-col' : 'flex items-start justify-between',
+      )}
+    >
+      <dt className="shrink-0 text-muted-foreground">{label}</dt>
+      <dd
+        className={cn(
+          'min-w-0 font-medium text-foreground',
+          multiline ? 'whitespace-pre-line break-words' : 'truncate text-right',
+        )}
+      >
+        {value}
+      </dd>
     </div>
   )
 }
 
-function getInitials(value: string) {
-  return value
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('')
+interface ActionItemProps {
+  icon: React.ReactNode
+  label: string
+  onClick?: () => void
+  href?: string
+  external?: boolean
+  destructive?: boolean
+}
+
+function ActionItem({ icon, label, onClick, href, external, destructive }: ActionItemProps) {
+  const className = cn(
+    'flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-muted/60',
+    destructive ? 'text-destructive' : 'text-foreground',
+  )
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
+        className={className}
+      >
+        <span className={destructive ? 'text-destructive' : 'text-muted-foreground'}>{icon}</span>
+        {label}
+      </a>
+    )
+  }
+
+  return (
+    <button type="button" onClick={onClick} className={className}>
+      <span className={destructive ? 'text-destructive' : 'text-muted-foreground'}>{icon}</span>
+      {label}
+    </button>
+  )
 }
