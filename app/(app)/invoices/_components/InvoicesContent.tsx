@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
-import { InvoiceBuilderDialog, createDefaultInvoiceBuilderValues } from './_components/builder'
+import { InvoiceBuilderDialog, createDefaultInvoiceBuilderValues } from '../_components/builder'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
 import {
   useDeleteInvoice,
