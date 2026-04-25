@@ -1,42 +1,52 @@
 'use client'
 
 import { Suspense } from 'react'
-import { DashboardRangeProvider } from './sections'
 import {
-  HeaderSection,
+  ActivitySection,
+  DashboardRangeProvider,
   EarningsSection,
-  StatsSection,
-  HeatmapSection,
-  QuickActionsSection,
+  EffectiveRateSection,
+  GoalSection,
+  HeaderSection,
+  HoursSection,
   InvoicesSection,
+  ProjectsSection,
+  QuickActionsSection,
+  UpcomingSection,
+  WeeklyGlanceSection,
 } from './sections'
 import {
+  ChartSkeleton,
   HeaderSkeleton,
+  InvoicesSkeleton,
   KpiSkeleton,
   StatsSkeleton,
-  ChartSkeleton,
-  InvoicesSkeleton,
 } from './skeletons'
 import { BottomNav } from './navigation/BottomNav'
+import { Footer, SectionHeader } from './linear'
 
 /**
  * Linear-style dark dashboard, mobile-first, single column.
- * Sekcje (od góry):
- *   1. TopBar (Dashboard + bell + green play timer)
- *   2. Earnings overview (area chart + circular progress goal)
- *   3. Stats row (hours / clients / absences)
- *   4. Hours heatmap (GitHub style)
- *   5. Quick actions (2-col grid)
- *   6. Invoices list (status pills)
- *   7. Bottom nav (sticky)
  *
- * Tła i bordery są na sztywno czarne — pełen Linear-look niezależnie od motywu.
+ * Order (top → bottom):
+ *   - TopBar + HeroGreeting + period tabs
+ *   - Earnings (area chart + forecast)
+ *   - Monthly goal (circular + surplus + streak)
+ *   - Hours (progress + heatmap grid)
+ *   - Effective rate (per-client bars)
+ *   - Activity (stat tiles + recent feed)
+ *   - SCHEDULE & BILLING ─ Projects, Invoices
+ *   - UP NEXT ─ Upcoming
+ *   - Quick actions (6 tiles)
+ *   - This week at a glance (bar chart)
+ *   - Footer (synced/version)
+ *   - Bottom nav (sticky)
  */
 export function DashboardContent() {
   return (
     <DashboardRangeProvider>
       <div className="min-h-screen bg-black text-white">
-        <div className="mx-auto w-full max-w-2xl space-y-4 px-3 pb-28 pt-2 sm:px-4">
+        <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4">
           <Suspense fallback={<HeaderSkeleton />}>
             <HeaderSection />
           </Suspense>
@@ -45,19 +55,45 @@ export function DashboardContent() {
             <EarningsSection />
           </Suspense>
 
-          <Suspense fallback={<StatsSkeleton />}>
-            <StatsSection />
+          <Suspense fallback={<KpiSkeleton />}>
+            <GoalSection />
           </Suspense>
 
           <Suspense fallback={<ChartSkeleton />}>
-            <HeatmapSection />
+            <HoursSection />
           </Suspense>
 
-          <QuickActionsSection />
+          <Suspense fallback={<StatsSkeleton />}>
+            <EffectiveRateSection />
+          </Suspense>
+
+          <Suspense fallback={<StatsSkeleton />}>
+            <ActivitySection />
+          </Suspense>
+
+          <SectionHeader label="Schedule & billing" />
+
+          <Suspense fallback={<InvoicesSkeleton />}>
+            <ProjectsSection />
+          </Suspense>
 
           <Suspense fallback={<InvoicesSkeleton />}>
             <InvoicesSection />
           </Suspense>
+
+          <SectionHeader label="Up next" />
+
+          <Suspense fallback={<InvoicesSkeleton />}>
+            <UpcomingSection />
+          </Suspense>
+
+          <QuickActionsSection />
+
+          <Suspense fallback={<ChartSkeleton />}>
+            <WeeklyGlanceSection />
+          </Suspense>
+
+          <Footer />
         </div>
         <BottomNav />
       </div>

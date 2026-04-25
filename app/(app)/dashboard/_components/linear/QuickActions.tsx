@@ -2,101 +2,81 @@
 
 import Link from 'next/link'
 import {
-  Timer,
-  FilePlus2,
+  Play,
+  FileText,
+  FolderPlus,
   UserPlus,
-  CalendarPlus,
+  CalendarOff,
+  Download,
+  Command,
   type LucideIcon,
 } from 'lucide-react'
 
 type Action = {
   href: string
   label: string
-  description: string
   icon: LucideIcon
   shortcut: string
-  accent?: boolean
+  highlight?: boolean
 }
 
 const ACTIONS: readonly Action[] = [
-  {
-    href: '/calendar?action=new',
-    label: 'New entry',
-    description: 'Log work hours',
-    icon: Timer,
-    shortcut: '⌘ + T',
-    accent: true,
-  },
-  {
-    href: '/invoices?action=new',
-    label: 'New invoice',
-    description: 'Bill a client',
-    icon: FilePlus2,
-    shortcut: '⌘ + I',
-  },
-  {
-    href: '/clients?action=new',
-    label: 'Add client',
-    description: 'Register a new partner',
-    icon: UserPlus,
-    shortcut: '⌘ + K',
-  },
-  {
-    href: '/calendar',
-    label: 'Plan week',
-    description: 'Open calendar',
-    icon: CalendarPlus,
-    shortcut: '⌘ + W',
-  },
+  { href: '/calendar?action=new', label: 'Start timer', icon: Play, shortcut: '⌘ T', highlight: true },
+  { href: '/invoices?action=new', label: 'New invoice', icon: FileText, shortcut: '⌘ I' },
+  { href: '/projects?action=new', label: 'New project', icon: FolderPlus, shortcut: '⌘ P' },
+  { href: '/clients?action=new', label: 'Add client', icon: UserPlus, shortcut: '⌘ U' },
+  { href: '/calendar?action=time-off', label: 'Log time off', icon: CalendarOff, shortcut: '' },
+  { href: '/invoices?action=export', label: 'Export month', icon: Download, shortcut: '' },
 ] as const
 
 export function QuickActions() {
   return (
     <section
-      aria-label="Szybkie akcje"
+      aria-label="Quick actions"
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
     >
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-white">Quick actions</h2>
-        <span className="text-[10px] uppercase tracking-wider text-zinc-500">
-          Shortcuts
+      <header className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          Quick actions
+        </p>
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-500">
+          <Command className="h-3.5 w-3.5" aria-hidden />
         </span>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        {ACTIONS.map(({ href, label, description, icon: Icon, shortcut, accent }) => (
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
+        {ACTIONS.map(({ href, label, icon: Icon, shortcut, highlight }) => (
           <Link
             key={href}
             href={href}
-            className={`group relative flex flex-col gap-2 overflow-hidden rounded-xl border p-3 transition sm:p-4 ${
-              accent
-                ? 'border-emerald-500/30 bg-emerald-500/[0.06] hover:border-emerald-500/60 hover:bg-emerald-500/10'
+            className={`group relative flex items-start gap-3 overflow-hidden rounded-xl border p-3 transition ${
+              highlight
+                ? 'border-[#1a1a1a] bg-[#0e120e] hover:border-emerald-500/40 hover:bg-emerald-500/[0.08]'
                 : 'border-[#1a1a1a] bg-[#0e0e0e] hover:border-[#262626] hover:bg-[#111]'
             }`}
           >
-            {accent && (
+            {highlight && (
               <span
                 aria-hidden
-                className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-emerald-500/15 blur-2xl"
+                className="pointer-events-none absolute left-0 top-0 h-full w-[2px] bg-emerald-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]"
               />
             )}
-            <div className="relative flex items-center justify-between">
-              <span
-                className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                  accent
-                    ? 'bg-emerald-500 text-black shadow-[0_0_12px_-2px_rgba(34,197,94,0.6)]'
-                    : 'bg-[#161616] text-zinc-300 ring-1 ring-[#1f1f1f]'
-                }`}
-              >
-                <Icon className="h-4 w-4" aria-hidden />
-              </span>
-              <kbd className="rounded-md border border-[#1f1f1f] bg-black/60 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400">
-                {shortcut}
-              </kbd>
-            </div>
-            <div className="relative">
+            <span
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
+                highlight
+                  ? 'text-emerald-400'
+                  : 'text-zinc-300'
+              }`}
+            >
+              <Icon className="h-4 w-4" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-white">{label}</p>
-              <p className="mt-0.5 text-xs text-zinc-500">{description}</p>
+              {shortcut && (
+                <kbd className="mt-1 inline-block font-mono text-[10px] tracking-wider text-zinc-500">
+                  {shortcut}
+                </kbd>
+              )}
             </div>
           </Link>
         ))}
