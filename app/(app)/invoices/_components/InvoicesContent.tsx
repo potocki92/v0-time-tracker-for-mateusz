@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
-import { InvoiceFormDialog } from './InvoiceFormDialog'
+import { InvoiceBuilderDialog, createDefaultInvoiceBuilderValues } from './_components/builder'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
 import {
   useDeleteInvoice,
@@ -219,17 +219,19 @@ export function InvoicesContent() {
           onDelete={setDeletingInvoice}
         />
       )}
+      builder'
 
-      <InvoiceFormDialog
-        open={formOpen}
-        isSaving={isSaving}
-        editingInvoice={editingInvoice}
-        clients={data.clients}
-        values={formValues}
-        onOpenChange={setFormOpen}
-        onValuesChange={setFormValues}
-        onSave={handleSaveInvoice}
-      />
+<InvoiceBuilderDialog
+  open={formOpen}
+  isSaving={mutation.isPending}
+  initialValues={editing ? toBuilderValues(editing) : undefined}
+  defaults={{ invoiceNumber: nextNumber, dueDays: 14 }}
+  onClose={() => setFormOpen(false)}
+  onSubmit={async (values) => {
+    await mutation.mutateAsync(values) // values: InvoiceBuilderValues, już zwalidowane
+    setFormOpen(false)
+  }}
+/>
 
       <DeleteInvoiceDialog
         invoice={deletingInvoice}
