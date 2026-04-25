@@ -4,8 +4,8 @@ import { useMemo } from 'react'
 import { useDashboardData } from '../../_hooks'
 import { useFilteredEntries } from '../../_hooks/useFilteredEntries'
 import { useDashboardTotals } from '../../_hooks/useDashboardTotal'
-import { StatsCards } from '../card/StatsCards'
 import { StatsErrorBoundary } from '../errors'
+import { StatsRow } from '../linear'
 import { useDashboardRange } from './DashboardRangeContext'
 
 export function StatsSection() {
@@ -23,7 +23,7 @@ export function StatsSection() {
 
   return (
     <StatsErrorBoundary>
-      <StatsCards
+      <StatsRow
         totalHours={totals.totalHours}
         totalDays={totals.totalDays}
         clientsCount={clientsCount}
