@@ -1,22 +1,38 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { SkeletonBlock } from './SkeletonBlock'
 
 /**
- * Minimalne, per-sekcja fallbacki dla niezależnych <Suspense>.
- * Zamiast 130-liniowego mirroru layoutu — 3–5 bloczków na sekcję.
- * Każda sekcja ma stabilną, znaną wysokość (contain-intrinsic-size w SkeletonBlock),
- * co eliminuje Cumulative Layout Shift po zhydraowaniu danych.
+ * Linear-style dark skeletons.
+ * Każdy box ma stałą wysokość — eliminuje CLS po hydracji.
  */
+
+function DarkBox({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div
+      className={`rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5 ${className ?? ''}`}
+    >
+      {children}
+    </div>
+  )
+}
 
 export function HeaderSkeleton() {
   return (
-    <div className="sticky top-0 z-20 -mx-4 border-b bg-background/95 px-4 pb-4 pt-2">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-2">
-          <SkeletonBlock height={28} className="w-52" />
-          <SkeletonBlock height={12} className="w-36" />
+    <div className="sticky top-0 z-40 -mx-3 border-b border-[#1a1a1a] bg-black/80 px-3 pb-3 pt-3 backdrop-blur-md sm:-mx-4 sm:px-4">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1.5">
+          <SkeletonBlock height={24} className="w-32" />
+          <SkeletonBlock height={10} className="w-44" />
         </div>
-        <SkeletonBlock height={40} className="sm:w-64" />
+        <div className="flex gap-2">
+          <SkeletonBlock height={40} className="w-10" rounded="lg" />
+          <SkeletonBlock height={40} className="w-10" rounded="lg" />
+        </div>
       </div>
     </div>
   )
@@ -24,86 +40,74 @@ export function HeaderSkeleton() {
 
 export function KpiSkeleton() {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <Card className="border-primary/20">
-        <CardHeader className="pb-2">
-          <SkeletonBlock height={16} className="w-20" />
-        </CardHeader>
-        <CardContent className="space-y-3">
+    <DarkBox>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-2">
+          <SkeletonBlock height={12} className="w-20" />
           <SkeletonBlock height={36} className="w-44" />
           <SkeletonBlock height={12} className="w-32" />
-          <SkeletonBlock height={24} className="w-16" rounded="full" />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="pb-2">
-          <SkeletonBlock height={16} className="w-32" />
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <SkeletonBlock height={8} rounded="full" />
-          <div className="flex justify-between">
-            <SkeletonBlock height={16} className="w-10" />
-            <SkeletonBlock height={16} className="w-28" />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          <SkeletonBlock height={20} className="w-16" rounded="full" />
+        </div>
+        <SkeletonBlock height={76} className="w-[76px]" rounded="full" />
+      </div>
+      <SkeletonBlock height={132} className="mt-4" rounded="lg" />
+    </DarkBox>
   )
 }
 
 export function StatsSkeleton() {
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <SkeletonBlock height={16} className="w-24" />
-      </CardHeader>
-      <CardContent className="space-y-2 px-3 pb-3">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center justify-between py-1.5">
-            <div className="flex items-center gap-2.5">
-              <SkeletonBlock height={28} className="w-7" rounded="md" />
-              <SkeletonBlock height={14} className="w-20" />
-            </div>
-            <SkeletonBlock height={20} className="w-10" />
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+    <div className="grid grid-cols-3 gap-2 sm:gap-3">
+      {[0, 1, 2].map((i) => (
+        <DarkBox key={i}>
+          <SkeletonBlock height={12} className="w-16" />
+          <SkeletonBlock height={24} className="mt-2 w-12" />
+          <SkeletonBlock height={10} className="mt-1 w-16" />
+        </DarkBox>
+      ))}
+    </div>
   )
 }
 
 export function ChartSkeleton() {
   return (
-    <Card className="w-full overflow-hidden">
-      <CardHeader className="pb-2 pt-4 space-y-2">
-        <div className="flex items-center justify-between">
-          <SkeletonBlock height={20} className="w-40" />
-          <SkeletonBlock height={20} className="w-16" rounded="full" />
+    <DarkBox>
+      <div className="flex items-end justify-between">
+        <div className="space-y-1.5">
+          <SkeletonBlock height={14} className="w-16" />
+          <SkeletonBlock height={10} className="w-28" />
         </div>
-        <SkeletonBlock height={28} />
-        <SkeletonBlock height={24} />
-      </CardHeader>
-      <CardContent className="px-3 pb-4">
-        <SkeletonBlock height={240} rounded="lg" />
-      </CardContent>
-    </Card>
+        <SkeletonBlock height={10} className="w-32" />
+      </div>
+      <SkeletonBlock height={108} className="mt-4" rounded="md" />
+    </DarkBox>
   )
 }
 
 export function InvoicesSkeleton() {
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <SkeletonBlock height={20} className="w-36" />
-          <SkeletonBlock height={20} className="w-8" rounded="full" />
+    <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]">
+      <div className="flex items-center justify-between border-b border-[#1a1a1a] px-4 py-3 sm:px-5">
+        <div className="space-y-1.5">
+          <SkeletonBlock height={14} className="w-20" />
+          <SkeletonBlock height={10} className="w-24" />
         </div>
-      </CardHeader>
-      <CardContent className="space-y-2 px-3 pb-3">
+        <SkeletonBlock height={20} className="w-16" rounded="md" />
+      </div>
+      <div className="space-y-0">
         {[0, 1, 2].map((i) => (
-          <SkeletonBlock key={i} height={48} rounded="lg" />
+          <div
+            key={i}
+            className="flex items-center gap-3 border-b border-[#161616] px-4 py-3 last:border-b-0 sm:px-5"
+          >
+            <div className="flex-1 space-y-1.5">
+              <SkeletonBlock height={14} className="w-40" />
+              <SkeletonBlock height={10} className="w-24" />
+            </div>
+            <SkeletonBlock height={14} className="w-16" />
+          </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

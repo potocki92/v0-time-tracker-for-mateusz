@@ -1,41 +1,37 @@
 import {
-  LayoutDashboard,
+  Home,
   Calendar,
-  FolderKanban,
+  Briefcase,
   Users,
-  FileText,
+  Receipt,
 } from 'lucide-react'
 import type { NavItem } from './BottomNav.types'
 
-/**
- * Definicja elementów nawigacji.
- * `prefetch: true` — dane prefetchowane na hover/focus linka.
- */
 export const NAV_ITEMS: readonly NavItem[] = [
   {
     href:     '/dashboard',
-    label:    'Dashboard',
-    icon:     LayoutDashboard,
-    prefetch: true,           // ← prefetch danych dashboardu
+    label:    'Home',
+    icon:     Home,
+    prefetch: true,
   },
   {
     href:  '/calendar',
-    label: 'Kalendarz',
+    label: 'Calendar',
     icon:  Calendar,
   },
   {
     href:  '/projects',
-    label: 'Projekty',
-    icon:  FolderKanban,
+    label: 'Work',
+    icon:  Briefcase,
   },
   {
     href:  '/clients',
-    label: 'Klienci',
+    label: 'Clients',
     icon:  Users,
   },
   {
     href:  '/invoices',
-    label: 'Faktury',
-    icon:  FileText,
+    label: 'Bills',
+    icon:  Receipt,
   },
 ] as const

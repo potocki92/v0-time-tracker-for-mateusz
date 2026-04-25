@@ -2,20 +2,17 @@
 
 import { useDashboardData } from '../../_hooks'
 import { usePeriodLabel } from '../../_hooks/usePeriodLabel'
-import { DashboardHeader } from '../DashboardHeader'
+import { LinearTopBar } from '../linear'
 import { useDashboardRange } from './DashboardRangeContext'
 
 export function HeaderSection() {
   const { data } = useDashboardData()
-  const { range, setRange } = useDashboardRange()
+  const { range } = useDashboardRange()
   const periodLabel = usePeriodLabel(range)
 
-  return (
-    <DashboardHeader
-      range={range}
-      onChangeRange={setRange}
-      userName={data.userName}
-      periodLabel={periodLabel}
-    />
-  )
+  const subtitle = data.userName
+    ? `Hi ${data.userName}${periodLabel ? ` · ${periodLabel}` : ''}`
+    : periodLabel
+
+  return <LinearTopBar title="Dashboard" subtitle={subtitle} />
 }

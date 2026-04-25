@@ -2,24 +2,24 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { NAV_ITEMS }            from './BottomNav.constants'
-import { cn }                   from '@/lib/utils'
+import { NAV_ITEMS } from './BottomNav.constants'
+import { cn } from '@/lib/utils'
 import { usePrefetchDashboard } from '@/hooks/prefetch'
 
 /**
- * Dolna nawigacja mobilna.
- * Linki z `prefetch: true` prefetchują dane na hover/focus.
+ * Linear-style dolny pasek nawigacji.
+ * Aktywna ikona w emerald + delikatna poświata; tło czarne z subtelnym borderem.
  */
 export function BottomNav() {
-  const pathname            = usePathname()
+  const pathname = usePathname()
   const { prefetchOnHover } = usePrefetchDashboard()
 
   return (
     <nav
       aria-label="Nawigacja główna"
-      className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#1a1a1a] bg-black/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
     >
-      <ul className="flex h-16 items-center" role="list">
+      <ul className="flex h-16 items-stretch" role="list">
         {NAV_ITEMS.map(({ href, label, icon: Icon, prefetch }) => {
           const isActive = pathname === href
           return (
@@ -30,13 +30,25 @@ export function BottomNav() {
                 onMouseEnter={prefetch ? prefetchOnHover : undefined}
                 onFocus={prefetch ? prefetchOnHover : undefined}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium transition-colors',
+                  'flex h-full flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors',
                   isActive
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'text-emerald-400'
+                    : 'text-zinc-500 hover:text-zinc-200',
                 )}
               >
-                <Icon className={cn('h-5 w-5 transition-transform', isActive && 'scale-110')} aria-hidden />
+                <span
+                  className={cn(
+                    'flex h-8 w-8 items-center justify-center rounded-lg transition',
+                    isActive
+                      ? 'bg-emerald-500/10 shadow-[0_0_14px_-4px_rgba(34,197,94,0.6)]'
+                      : '',
+                  )}
+                >
+                  <Icon
+                    className={cn('h-5 w-5 transition-transform', isActive && 'scale-105')}
+                    aria-hidden
+                  />
+                </span>
                 <span>{label}</span>
               </Link>
             </li>
