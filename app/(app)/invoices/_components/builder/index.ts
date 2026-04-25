@@ -2,19 +2,22 @@
  * Public surface of the redesigned Invoice Builder.
  *
  * Consumers should only need to import the dialog and the helpers used to
- * shape its initial values. Everything else (sections, line item row,
- * shared fields) is an implementation detail.
+ * shape its initial values. The dialog's internal form layer lives in
+ * `./form` — kept as an implementation detail so callers stay decoupled
+ * from individual fields, sections and RHF wiring.
  */
 
 export { InvoiceBuilderDialog } from './InvoiceBuilderDialog'
 
 export {
+  addDaysIso,
+  builderValuesToFormValues,
   createDefaultInvoiceBuilderValues,
   emptyLineItem,
+  invoiceToBuilderValues,
   isForeignCurrency,
   isInvoiceBuilderCurrency,
   makeLineItemId,
   todayIso,
-  addDaysIso,
   type InvoiceBuilderDefaults,
-} from './invoice-builder.helpers'
+} from './form'

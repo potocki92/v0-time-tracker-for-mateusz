@@ -2,13 +2,18 @@
 
 import { useMemo, useRef, useState, type ChangeEvent } from 'react'
 import type { Invoice } from '@/lib/types'
+import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
-import { InvoiceBuilderDialog, createDefaultInvoiceBuilderValues } from '../_components/builder'
+import {
+  InvoiceBuilderDialog,
+  builderValuesToFormValues,
+  invoiceToBuilderValues,
+} from './builder'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
 import {
   useDeleteInvoice,
@@ -17,7 +22,7 @@ import {
   useRunAutoIssueInvoices,
   useSaveInvoice,
 } from '../_hooks'
-import type { BillingQuarter, InvoiceFormValues } from '../_domain'
+import type { InvoiceFormValues } from '../_domain'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
@@ -46,19 +51,6 @@ function formatTestInvoiceDateTag(date: Date) {
   return `${yyyy}-${mm}-${dd}`
 }
 
-function parseQuarterPeriod(period: string | null | undefined): { quarter: BillingQuarter; year: number } {
-  const fallback = { quarter: 'Q1' as BillingQuarter, year: CURRENT_YEAR }
-  if (!period) return fallback
-
-  const match = period.trim().toUpperCase().match(/(Q[1-4])\s*(\d{4})?/)
-  if (!match) return fallback
-
-  return {
-    quarter: (match[1] as BillingQuarter) ?? fallback.quarter,
-    year: match[2] ? Number(match[2]) : fallback.year,
-  }
-}
-
 export function InvoicesContent() {
   const { data } = useInvoicesData()
   const saveMutation = useSaveInvoice()
@@ -68,7 +60,6 @@ export function InvoicesContent() {
   const [formOpen, setFormOpen] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null)
-  const [formValues, setFormValues] = useState<InvoiceFormValues>(INITIAL_VALUES)
   const importInputRef = useRef<HTMLInputElement | null>(null)
 
   const { exportAccountingCsv, importAccountingCsv } = useInvoiceAccountingCsv({
@@ -80,57 +71,45 @@ export function InvoicesContent() {
 
   const hasInvoices = useMemo(() => data.invoices.length > 0, [data.invoices.length])
 
+  const builderInitialValues = useMemo<InvoiceBuilderValues | undefined>(
+    () => (editingInvoice ? invoiceToBuilderValues(editingInvoice) : undefined),
+    [editingInvoice],
+  )
+
+  const builderDefaults = useMemo(
+    () => ({ dueDays: data.settings.dueDays }),
+    [data.settings.dueDays],
+  )
+
   function openCreate() {
     setEditingInvoice(null)
-    setFormValues({
-      ...INITIAL_VALUES,
-      invoice_date: new Date().toISOString().slice(0, 10),
-      billing_quarter: 'Q1',
-      billing_year: CURRENT_YEAR,
-      template_key: data.settings.defaultTemplate,
-    })
     setFormOpen(true)
   }
 
   function openEdit(invoice: Invoice) {
-    const { quarter, year } = parseQuarterPeriod(invoice.billing_period)
-
     setEditingInvoice(invoice)
-    setFormValues({
-      name: invoice.name ?? '',
-      invoice_number: invoice.invoice_number ?? '',
-      recipient: invoice.recipient ?? '',
-      billing_period: invoice.billing_period ?? '',
-      billing_quarter: quarter,
-      billing_year: year,
-      invoice_date: invoice.invoice_date ?? invoice.issue_date ?? new Date().toISOString().slice(0, 10),
-      amount: Number(invoice.amount ?? 0),
-      currency: invoice.currency,
-      is_paid: invoice.is_paid,
-      notes: invoice.notes ?? invoice.note ?? '',
-      template_key: invoice.template_key ?? data.settings.defaultTemplate,
-      client_id: invoice.client_id,
-      file: null,
-      new_client_name: '',
-    })
     setFormOpen(true)
   }
 
-  async function handleSaveInvoice() {
-    if (!formValues.name.trim()) return
-    if (!formValues.invoice_date) return
-    if (formValues.amount <= 0) return
+  function closeForm() {
+    setFormOpen(false)
+    setEditingInvoice(null)
+  }
+
+  async function handleBuilderSubmit(values: InvoiceBuilderValues) {
+    const payload = builderValuesToFormValues(values, {
+      clientId:    editingInvoice?.client_id ?? null,
+      settings:    data.settings,
+      isPaid:      editingInvoice?.is_paid ?? false,
+      templateKey: editingInvoice?.template_key ?? data.settings.defaultTemplate,
+    })
 
     await saveMutation.mutateAsync({
       invoiceId: editingInvoice?.id,
-      values: {
-        ...formValues,
-        billing_period: `${formValues.billing_quarter} ${formValues.billing_year}`,
-      },
+      values:    payload,
     })
-    setFormOpen(false)
-    setEditingInvoice(null)
-    setFormValues(INITIAL_VALUES)
+
+    closeForm()
   }
 
   async function handleDeleteInvoice() {
@@ -219,19 +198,15 @@ export function InvoicesContent() {
           onDelete={setDeletingInvoice}
         />
       )}
-      builder'
 
-<InvoiceBuilderDialog
-  open={formOpen}
-  isSaving={mutation.isPending}
-  initialValues={editing ? toBuilderValues(editing) : undefined}
-  defaults={{ invoiceNumber: nextNumber, dueDays: 14 }}
-  onClose={() => setFormOpen(false)}
-  onSubmit={async (values) => {
-    await mutation.mutateAsync(values) // values: InvoiceBuilderValues, już zwalidowane
-    setFormOpen(false)
-  }}
-/>
+      <InvoiceBuilderDialog
+        open={formOpen}
+        isSaving={isSaving}
+        initialValues={builderInitialValues}
+        defaults={builderDefaults}
+        onClose={closeForm}
+        onSubmit={handleBuilderSubmit}
+      />
 
       <DeleteInvoiceDialog
         invoice={deletingInvoice}

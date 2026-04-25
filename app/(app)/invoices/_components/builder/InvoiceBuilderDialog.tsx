@@ -13,9 +13,11 @@ import { Button } from '@/components/ui/button'
 import { SubmitButton, UniversalForm } from '@/components/common/form'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
 
-import { InvoiceBuilderFields } from './InvoiceBuilderFields'
-import { useInvoiceBuilderForm } from './useInvoiceBuilderForm'
-import type { InvoiceBuilderDefaults } from './invoice-builder.helpers'
+import {
+  InvoiceBuilderFields,
+  useInvoiceBuilderForm,
+  type InvoiceBuilderDefaults,
+} from './form'
 
 interface InvoiceBuilderDialogProps {
   open:           boolean
