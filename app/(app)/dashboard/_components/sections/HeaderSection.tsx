@@ -1,18 +1,17 @@
 'use client'
 
 import { useDashboardData } from '../../_hooks'
-import { usePeriodLabel } from '../../_hooks/usePeriodLabel'
-import { LinearTopBar } from '../linear'
+import { HeroGreeting, LinearTopBar } from '../linear'
 import { useDashboardRange } from './DashboardRangeContext'
 
 export function HeaderSection() {
   const { data } = useDashboardData()
-  const { range } = useDashboardRange()
-  const periodLabel = usePeriodLabel(range)
+  const { range, setRange } = useDashboardRange()
 
-  const subtitle = data.userName
-    ? `Hi ${data.userName}${periodLabel ? ` · ${periodLabel}` : ''}`
-    : periodLabel
-
-  return <LinearTopBar title="Dashboard" subtitle={subtitle} />
+  return (
+    <>
+      <LinearTopBar title="Dashboard" />
+      <HeroGreeting userName={data.userName} range={range} onChangeRange={setRange} />
+    </>
+  )
 }

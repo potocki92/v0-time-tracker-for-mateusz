@@ -1,23 +1,24 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useDashboardData } from '../../_hooks'
 import { useFilteredEntries } from '../../_hooks/useFilteredEntries'
 import { useEarningsTrend } from '../../_hooks/useEarningsTrend'
 import { useEarningsSparkline } from '../../_hooks/useEarningsSparkline'
 import { usePeriodLabel } from '../../_hooks/usePeriodLabel'
-import { useGoal } from '../../_hooks/usePreferencesStore'
 import { useDashboardTotals } from '../../_hooks/useDashboardTotal'
-import { calculateGoalProgress } from '@/lib/finance/goal'
 import { EarningsCardBoundary } from '../errors'
-import { EarningsOverview } from '../linear'
+import { EarningsCard } from '../linear'
 import { useDashboardRange } from './DashboardRangeContext'
+
+function periodShort(label: string): string {
+  // Take first word + capitalize → e.g. "Obecny miesiąc" → "Miesiąc"
+  return label.split(' ').slice(-1)[0] ?? label
+}
 
 export function EarningsSection() {
   const { data } = useDashboardData()
   const { range, dateRange, prevRange } = useDashboardRange()
   const { workEntries, clients } = data
-  const goal = useGoal()
 
   const filtered = useFilteredEntries(workEntries, dateRange)
   const prevFiltered = useFilteredEntries(workEntries, prevRange)
@@ -26,22 +27,13 @@ export function EarningsSection() {
   const sparklineData = useEarningsSparkline(filtered, clients)
   const periodLabel = usePeriodLabel(range)
 
-  const goalProgress = useMemo(
-    () => calculateGoalProgress(goal, totals),
-    [goal, totals],
-  )
-
   return (
     <EarningsCardBoundary>
-      <EarningsOverview
+      <EarningsCard
         totalPLN={totals.totalEarningsAllPLN}
-        totalEUR={totals.earningsEUR}
         trend={trend}
         sparklineData={sparklineData}
-        periodLabel={periodLabel}
-        goalProgress={goalProgress}
-        goalAmount={goal?.amount ?? 0}
-        goalCurrency={goal?.currency ?? 'PLN'}
+        periodLabel={periodShort(periodLabel) || 'period'}
       />
     </EarningsCardBoundary>
   )
