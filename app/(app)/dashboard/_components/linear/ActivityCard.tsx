@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import {
-  ArrowUpRight,
   Briefcase,
   CalendarOff,
   Users,
@@ -50,38 +49,38 @@ export function ActivityCard({
   const tiles: StatTile[] = [
     {
       icon: Users,
-      label: 'Clients',
+      label: 'Klienci',
       value: String(clientsCount),
-      hint: `${defaultClientsCount} default`,
+      hint: `${defaultClientsCount} domyśl.`,
     },
     {
       icon: Briefcase,
-      label: 'Active jobs',
+      label: 'Aktywne zlecenia',
       value: String(activeJobs),
-      hint: `of ${totalJobs}`,
+      hint: `z ${totalJobs}`,
     },
     {
       icon: CalendarOff,
-      label: 'Absences',
+      label: 'Nieobecności',
       value: String(absences),
-      hint: 'this mo.',
+      hint: 'w mies.',
     },
   ]
 
   return (
     <section
-      aria-label="Activity"
+      aria-label="Aktywność"
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
     >
       <header className="flex items-center justify-between">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-          Activity
+          Aktywność
         </p>
         <Link
           href="/calendar"
           className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
         >
-          View all
+          Zobacz wszystkie
         </Link>
       </header>
 

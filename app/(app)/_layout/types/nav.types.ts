@@ -9,6 +9,8 @@ export interface NavItem {
 }
 
 export interface PinnedItem {
+  /** Identyfikator projektu/zasobu (używany w URL `/projects?id=…`) */
+  id?: string
   href: string
   label: string
   color: string

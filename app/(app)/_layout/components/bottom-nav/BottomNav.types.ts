@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 
-export interface NavItem {
+export interface BottomNavItem {
   /** Ścieżka routera */
   href:  string
   /** Etykieta wyświetlana pod ikoną */

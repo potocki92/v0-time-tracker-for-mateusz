@@ -21,23 +21,23 @@ type Action = {
 }
 
 const ACTIONS: readonly Action[] = [
-  { href: '/calendar?action=new', label: 'Start timer', icon: Play, shortcut: '⌘ T', highlight: true },
-  { href: '/invoices?action=new', label: 'New invoice', icon: FileText, shortcut: '⌘ I' },
-  { href: '/projects?action=new', label: 'New project', icon: FolderPlus, shortcut: '⌘ P' },
-  { href: '/clients?action=new', label: 'Add client', icon: UserPlus, shortcut: '⌘ U' },
-  { href: '/calendar?action=time-off', label: 'Log time off', icon: CalendarOff, shortcut: '' },
-  { href: '/invoices?action=export', label: 'Export month', icon: Download, shortcut: '' },
+  { href: '/calendar?action=new', label: 'Uruchom timer', icon: Play, shortcut: '⌘ T', highlight: true },
+  { href: '/invoices?action=new', label: 'Nowa faktura', icon: FileText, shortcut: '⌘ I' },
+  { href: '/projects?action=new', label: 'Nowy projekt', icon: FolderPlus, shortcut: '⌘ P' },
+  { href: '/clients?action=new', label: 'Dodaj klienta', icon: UserPlus, shortcut: '⌘ U' },
+  { href: '/calendar?action=time-off', label: 'Dodaj nieobecność', icon: CalendarOff, shortcut: '' },
+  { href: '/invoices?action=export', label: 'Eksport miesiąca', icon: Download, shortcut: '' },
 ] as const
 
 export function QuickActions() {
   return (
     <section
-      aria-label="Quick actions"
+      aria-label="Szybkie akcje"
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
     >
       <header className="flex items-center justify-between">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-          Quick actions
+          Szybkie akcje
         </p>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-500">
           <Command className="h-3.5 w-3.5" aria-hidden />

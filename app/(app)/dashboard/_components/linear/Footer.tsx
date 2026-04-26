@@ -11,14 +11,14 @@ type Props = {
 function relative(now: Date, then: Date): string {
   const diff = Math.max(0, now.getTime() - then.getTime())
   const m = Math.floor(diff / 60_000)
-  if (m < 1) return 'just now'
-  if (m === 1) return '1 m ago'
-  if (m < 60) return `${m} m ago`
+  if (m < 1) return 'przed chwilą'
+  if (m === 1) return '1 min temu'
+  if (m < 60) return `${m} min temu`
   const h = Math.floor(m / 60)
-  if (h === 1) return '1 h ago'
-  if (h < 24) return `${h} h ago`
+  if (h === 1) return '1 godz. temu'
+  if (h < 24) return `${h} godz. temu`
   const d = Math.floor(h / 24)
-  return `${d} d ago`
+  return `${d} dni temu`
 }
 
 export function Footer({
@@ -32,9 +32,9 @@ export function Footer({
     return () => clearInterval(t)
   }, [])
 
-  const today = now.toLocaleDateString('en-US', {
-    month: 'short',
+  const today = now.toLocaleDateString('pl-PL', {
     day: '2-digit',
+    month: 'short',
     year: 'numeric',
   })
 
@@ -43,7 +43,7 @@ export function Footer({
   return (
     <p className="px-2 pt-2 text-center font-mono text-[10px] tracking-wider text-zinc-600">
       {appName}
-      {synced && <> · synced {synced}</>}
+      {synced && <> · zsynchronizowano {synced}</>}
       {' '}· {today} · {version}
     </p>
   )

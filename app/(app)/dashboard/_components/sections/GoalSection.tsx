@@ -28,7 +28,7 @@ function findReachedDate(
     cumulative += hours * (c.rate ?? 0)
     if (cumulative >= target) {
       const d = new Date(e.date)
-      return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })
+      return d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short' })
     }
   }
   return null

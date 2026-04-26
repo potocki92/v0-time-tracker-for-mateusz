@@ -168,7 +168,7 @@ function PinnedGroup() {
   return (
     <SidebarGroup className="py-1">
       <SidebarGroupLabel className="px-3 text-[10.5px] font-medium uppercase tracking-[0.08em] text-sidebar-foreground/45">
-        Pinned
+        Przypięte
       </SidebarGroupLabel>
 
       <SidebarGroupContent>

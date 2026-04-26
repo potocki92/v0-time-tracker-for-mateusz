@@ -28,8 +28,8 @@ export function UpcomingSection() {
         date: d,
         title:
           e.status === 'vacation'
-            ? `PTO · ${e.notes ?? 'Vacation'}`
-            : `Sick leave · ${e.notes ?? ''}`,
+            ? `Urlop · ${e.notes ?? ''}`.trimEnd().replace(/·\s*$/, '').trim()
+            : `Zwolnienie lekarskie · ${e.notes ?? ''}`.trimEnd().replace(/·\s*$/, '').trim(),
         category: 'vacation',
       })
     }
@@ -42,7 +42,7 @@ export function UpcomingSection() {
       out.push({
         id: `inv:${inv.id}`,
         date: d,
-        title: `${inv.invoice_number ?? inv.name} due`,
+        title: `Termin faktury ${inv.invoice_number ?? inv.name}`,
         category: 'billing',
       })
     }

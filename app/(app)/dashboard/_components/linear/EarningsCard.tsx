@@ -18,6 +18,7 @@ import type { SparklinePoint } from '../../_hooks/useEarningsSparkline'
 
 type Props = {
   totalPLN: number
+  totalEUR: number
   trend: EarningsTrendData
   sparklineData: SparklinePoint[]
   periodLabel: string
@@ -33,7 +34,6 @@ type SeriesPoint = {
 
 function buildSeries(points: SparklinePoint[]): SeriesPoint[] {
   if (points.length === 0) return []
-  // Build cumulative line + linear forecast through the rest of the period.
   const sorted = [...points].sort((a, b) => a.date.localeCompare(b.date))
   let acc = 0
   const series: SeriesPoint[] = sorted.map((p) => {
@@ -41,14 +41,13 @@ function buildSeries(points: SparklinePoint[]): SeriesPoint[] {
     const d = new Date(p.date)
     return {
       date: p.date,
-      label: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-      short: d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+      label: d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+      short: d.toLocaleDateString('pl-PL', { month: 'short', day: '2-digit' }),
       cumulative: Math.round(acc * 100) / 100,
       forecast: null,
     }
   })
 
-  // Light projection: extrapolate cumulative through end of current month.
   const last = series[series.length - 1]
   const lastDate = new Date(last.date)
   const dayOfMonth = lastDate.getDate()
@@ -63,9 +62,9 @@ function buildSeries(points: SparklinePoint[]): SeriesPoint[] {
     const iso = cursor.toISOString().slice(0, 10)
     series.push({
       date: iso,
-      label: cursor.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
-      short: cursor.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
-      cumulative: Number.NaN as unknown as number, // recharts: gap so the line stops
+      label: cursor.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+      short: cursor.toLocaleDateString('pl-PL', { month: 'short', day: '2-digit' }),
+      cumulative: Number.NaN as unknown as number,
       forecast: projected,
     })
   }
@@ -79,9 +78,9 @@ function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
   return (
     <div className="rounded-lg border border-[#1f1f1f] bg-[#0a0a0a] px-2.5 py-1.5 text-xs shadow-2xl">
       <p className="font-medium text-white">{row.label}</p>
-      <p className="text-zinc-400">{formatCurrency(value, 'EUR')}</p>
+      <p className="text-zinc-400">{formatCurrency(value, 'PLN')}</p>
       {row.forecast !== null && Number.isFinite(row.forecast) && !Number.isFinite(row.cumulative) && (
-        <p className="text-[10px] uppercase tracking-wide text-zinc-500">forecast</p>
+        <p className="text-[10px] uppercase tracking-wide text-zinc-500">prognoza</p>
       )}
     </div>
   )
@@ -94,6 +93,7 @@ function getTrendIcon(percent: number | null) {
 
 export const EarningsCard = memo(function EarningsCard({
   totalPLN,
+  totalEUR,
   trend,
   sparklineData,
   periodLabel,
@@ -118,7 +118,6 @@ export const EarningsCard = memo(function EarningsCard({
   const diffSign = trend.diff >= 0 ? '+' : '−'
   const diffAbs = Math.abs(trend.diff)
 
-  // X-axis ticks: choose ~6 evenly spaced points
   const ticks = useMemo(() => {
     if (series.length < 2) return []
     const count = Math.min(6, series.length)
@@ -128,7 +127,7 @@ export const EarningsCard = memo(function EarningsCard({
 
   return (
     <section
-      aria-label="Earnings"
+      aria-label="Zarobki"
       className="relative overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
     >
       <div
@@ -140,7 +139,7 @@ export const EarningsCard = memo(function EarningsCard({
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-              Earnings · {periodLabel}
+              Zarobki · {periodLabel}
             </p>
             {trend.percent !== null && (
               <span
@@ -154,29 +153,27 @@ export const EarningsCard = memo(function EarningsCard({
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-3xl font-bold tracking-tight tabular-nums text-white sm:text-4xl">
-              {formatCurrency(totalPLN, 'EUR')}
+              {formatCurrency(totalPLN, 'PLN')}
             </span>
-            {trend.prevTotal > 0 && (
-              <span className="text-xs text-zinc-500">
-                vs {formatCurrency(trend.prevTotal, 'EUR')} prev
-              </span>
-            )}
           </div>
+          <p className="mt-1 text-sm text-gray-500 tabular-nums">
+            ≈ {formatCurrency(totalEUR, 'EUR')}
+          </p>
           <p className="mt-1 text-xs text-zinc-500">
             {trend.prevTotal > 0 && (
               <>
                 <span className={isUp ? 'text-emerald-400' : 'text-red-400'}>
                   {diffSign}
-                  {formatCurrency(diffAbs, 'EUR')}
+                  {formatCurrency(diffAbs, 'PLN')}
                 </span>
                 {' '}
-                {isUp ? 'above' : 'below'} last period
+                {isUp ? 'powyżej' : 'poniżej'} poprzedniego okresu
               </>
             )}
             {forecastValue !== null && (
               <>
                 {trend.prevTotal > 0 && <span className="mx-1">·</span>}
-                <span>Forecast {formatCurrency(forecastValue, 'EUR')}</span>
+                <span>Prognoza {formatCurrency(forecastValue, 'PLN')}</span>
               </>
             )}
           </p>
@@ -184,7 +181,7 @@ export const EarningsCard = memo(function EarningsCard({
 
         <button
           type="button"
-          aria-label="Earnings options"
+          aria-label="Opcje zarobków"
           className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400 transition hover:bg-[#141414] hover:text-white"
         >
           <MoreHorizontal className="h-4 w-4" aria-hidden />
@@ -208,7 +205,7 @@ export const EarningsCard = memo(function EarningsCard({
                 ticks={ticks}
                 tickFormatter={(iso: string) => {
                   const d = new Date(iso)
-                  return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })
+                  return d.toLocaleDateString('pl-PL', { month: 'short', day: '2-digit' })
                 }}
                 stroke="#3f3f46"
                 tickLine={false}
