@@ -1,11 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { LogOut, Settings, User } from 'lucide-react'
+import { LogOut, Settings, User, Monitor, Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu'
 import { useOpenModal } from '@/hooks/stores/useUiStore'
 import { Avatar } from './Avatar'
@@ -26,6 +31,11 @@ export function UserMenuPanel({
   onLogout,
 }: UserMenuPanelProps) {
   const openModal = useOpenModal()
+  const { theme, setTheme } = useTheme()
+
+  const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor
+  const themeLabel =
+    theme === 'dark' ? 'Tryb ciemny' : theme === 'light' ? 'Tryb jasny' : 'Tryb systemowy'
 
   return (
     <>
@@ -61,6 +71,26 @@ export function UserMenuPanel({
           Profil
         </Link>
       </DropdownMenuItem>
+
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger className="gap-2">
+          <ThemeIcon className="h-4 w-4" />
+          {themeLabel}
+        </DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem onClick={() => setTheme('light')} className="gap-2">
+              <Sun className="h-4 w-4" /> Jasny
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme('dark')} className="gap-2">
+              <Moon className="h-4 w-4" /> Ciemny
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme('system')} className="gap-2">
+              <Monitor className="h-4 w-4" /> System
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub>
 
       <DropdownMenuSeparator />
 

@@ -1,55 +1,60 @@
 'use client'
 
 /**
- * SidebarHeader.tsx
+ * SidebarHeader.tsx — Claude-style brand block.
  *
- * Logo z animacją scrolla (tekst znika przy scrollowaniu) + SidebarTrigger.
- * Kliknięcie ikony logo = toggle sidebar (zgodnie z wymaganiem).
+ * Wyrafinowane, minimalistyczne logo (mini bar-chart w neutralnych tonach
+ * z jednym akcentowym paskiem) + nazwa workspace'u + podtytuł "Workspace · Developer".
+ * Kliknięcie = toggle sidebar, tooltip działa w trybie zwiniętym.
  */
 
-import { motion } from 'framer-motion'
-import { SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar } from '@/components/ui/sidebar'
-import { BRAND, Logo } from '@/components/brand/logo'
-import { useLogoScroll } from '../../hooks'
+import {
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  useSidebar,
+} from '@/components/ui/sidebar'
 
 export function AppSidebarHeader() {
-  const { toggleSidebar, open } = useSidebar()
-  const { opacity, scale, maxWidth, gapOpacity } = useLogoScroll({
-    scrollStart: 0,
-    scrollEnd:   100,
-  })
+  const { toggleSidebar } = useSidebar()
 
   return (
-    <SidebarHeader>
+    <SidebarHeader className="px-2 pt-2 pb-1">
       <SidebarMenu>
         <SidebarMenuItem>
-          {/*
-           * SidebarMenuButton jako trigger — pasuje semantycznie,
-           * bo shadcn traktuje header jako pierwszą pozycję menu.
-           */}
           <SidebarMenuButton
             size="lg"
             onClick={toggleSidebar}
-            tooltip="Otwórz / zamknij menu"
-            className="gap-3"
+            tooltip="TimeTracker — Workspace"
+            className="gap-2.5 hover:bg-sidebar-accent/60"
           >
-            <Logo />
+            <BrandMark />
 
-            <motion.div
-              style={{ maxWidth, overflow: 'hidden' }}
-              className="group-data-[collapsible=icon]:hidden"
-            >
-              <motion.span
-                style={{ opacity, scale, transformOrigin: 'left center', display: 'block', whiteSpace: 'nowrap' }}
-                className="text-base font-semibold tracking-tight"
-                aria-hidden="true"
-              >
-                {BRAND.name}
-              </motion.span>
-            </motion.div>
+            <div className="flex min-w-0 flex-col leading-tight group-data-[collapsible=icon]:hidden">
+              <span className="truncate text-[13.5px] font-semibold tracking-tight">
+                TimeTracker
+              </span>
+              <span className="truncate text-[10.5px] font-normal text-sidebar-foreground/55">
+                Workspace · Developer
+              </span>
+            </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
+  )
+}
+
+function BrandMark() {
+  return (
+    <div
+      aria-hidden
+      className="relative flex aspect-square size-7 shrink-0 items-end justify-center gap-[3px] rounded-md border border-sidebar-border/80 bg-sidebar-accent/40 p-1.5"
+    >
+      <span className="h-1.5 w-[3px] rounded-[1.5px] bg-sidebar-foreground/40" />
+      <span className="h-2.5 w-[3px] rounded-[1.5px] bg-sidebar-foreground/70" />
+      <span className="h-3.5 w-[3px] rounded-[1.5px] bg-sidebar-primary" />
+    </div>
   )
 }

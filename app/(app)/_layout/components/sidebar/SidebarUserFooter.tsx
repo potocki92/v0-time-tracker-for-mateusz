@@ -23,7 +23,12 @@ interface SidebarUserFooterProps {
 }
 
 /**
- * WAŻNE: komponent NIE zawiera <SidebarFooter> — ten wrapper jest w AppSidebar.
+ * Stopka użytkownika w stylu Claude:
+ * - kompaktowy, płaski przycisk (brak ramki, brak gradientu),
+ * - awatar 28×28, nazwa + email w drobnej hierarchii,
+ * - hover: subtelne `bg-sidebar-accent` zamiast jaskrawego akcentu.
+ *
+ * Wrapper <SidebarFooter> jest w AppSidebar — ten plik dostarcza tylko zawartość.
  */
 export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
   const { isMobile } = useSidebar()
@@ -37,30 +42,37 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
             <SidebarMenuButton
               size="lg"
               tooltip={displayName}
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="h-11 gap-2.5 rounded-md px-2 text-sidebar-foreground/85 hover:bg-sidebar-accent/60 data-[state=open]:bg-sidebar-accent/70"
             >
               <Avatar
                 avatarUrl={avatarUrl}
                 displayName={displayName}
                 initials={initials}
-                className="size-8"
-                fallbackClassName="text-xs"
+                className="size-7 shadow-none"
+                fallbackClassName="text-[10.5px] font-semibold"
               />
 
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{displayName}</span>
-                <span className="truncate text-xs text-muted-foreground">{email}</span>
+              <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
+                <span className="truncate text-[12.5px] font-medium text-sidebar-foreground">
+                  {displayName}
+                </span>
+                <span className="truncate text-[10.5px] text-sidebar-foreground/55">
+                  {email}
+                </span>
               </div>
 
-              <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0" />
+              <ChevronsUpDown
+                className="ml-auto size-3.5 shrink-0 text-sidebar-foreground/45 group-data-[collapsible=icon]:hidden"
+                strokeWidth={1.75}
+              />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
             side={isMobile ? 'bottom' : 'right'}
             align="end"
-            sideOffset={4}
-            className="w-56"
+            sideOffset={8}
+            className="w-60"
           >
             <UserMenuPanel
               displayName={displayName}
