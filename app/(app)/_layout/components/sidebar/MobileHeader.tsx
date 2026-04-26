@@ -1,18 +1,18 @@
 'use client'
 
 /**
- * MobileHeader.tsx — uproszczona wersja po migracji do sidebara.
+ * MobileHeader.tsx — pasek na urządzeniach mobilnych.
  *
- * Na mobile sidebar wysuwa się z lewej (sheet/drawer).
- * Header zawiera tylko trigger do otwarcia + akcje po prawej.
- *
- * MobileBottomNav zostaje usunięty — sidebar zastępuje go całkowicie.
+ * Hamburger otwiera sidebar (drawer), obok wyświetlamy etykietę aktualnej
+ * podstrony (np. "Pulpit"). Po prawej: theme toggle + user menu.
+ * Na desktopie ukryty (`md:hidden`) — pełen sidebar zastępuje ten pasek.
  */
 
 import type { User } from '@supabase/supabase-js'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ThemeToggle } from '../theme/ThemeToggle'
 import { UserMenu } from '../user/UserMenu'
+import { usePageLabel } from '../../hooks'
 
 interface Props {
   user: User | null
@@ -20,13 +20,15 @@ interface Props {
 }
 
 export function MobileHeader({ user, onLogout }: Props) {
+  const { page } = usePageLabel()
+
   return (
-    <header className="z-40 border-b border-border bg-background">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md md:hidden">
       <div className="flex items-center justify-between px-[var(--header-inline-padding)] py-[var(--header-y-padding)]">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <SidebarTrigger className="-ml-1" />
-          <span className="text-xs font-semibold tracking-wide uppercase text-foreground/90">
-            Time Tracker
+          <span className="text-[15px] font-semibold tracking-tight text-foreground">
+            {page}
           </span>
         </div>
 

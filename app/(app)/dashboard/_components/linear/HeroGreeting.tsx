@@ -57,10 +57,14 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
         {dateline}
       </p>
       <div>
-        <h1 className="text-[22px] font-normal leading-[1.25] tracking-tight text-white sm:text-[28px] sm:font-semibold">
+        {/* Mobile: stacked.  Desktop (sm+): inline „— here's how April is shaping up." */}
+        <h1 className="text-[22px] font-semibold leading-[1.25] tracking-tight text-white sm:text-[28px]">
           {greetingByHour()}{name ? `, ${name}` : ''}
+          <span className="ml-2 hidden font-normal text-zinc-500 sm:inline">
+            — {shapingCopy(now)}
+          </span>
         </h1>
-        <p className="mt-1 text-[12.5px] leading-[1.4] text-zinc-500 sm:text-sm">
+        <p className="mt-1 text-[12.5px] leading-[1.4] text-zinc-500 sm:hidden">
           {shapingCopy(now)}
         </p>
       </div>
