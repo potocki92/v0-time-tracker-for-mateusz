@@ -3,8 +3,8 @@
  *
  * W odróżnieniu od `usePreferencesStore` (który syncuje się z Supabase
  * `user_metadata`), tutaj trzymamy stany związane z prezentacją: tryb
- * porównania, tryb prywatności, expand/collapse sekcji itd. Persist do
- * localStorage daje zachowanie między sesjami bez round-tripu po sieci.
+ * porównania, tryb prywatności itd. Persist do localStorage daje
+ * zachowanie między sesjami bez round-tripu po sieci.
  */
 
 import { create } from 'zustand'
@@ -54,8 +54,14 @@ export const useDashboardUiStore = create<DashboardUiStore>()(
 export const usePrivacyMode = () => useDashboardUiStore((s) => s.privacyMode)
 export const useCompareMode = () => useDashboardUiStore((s) => s.compareMode)
 
-/** Maskuje liczby/kwoty, gdy aktywny tryb prywatności. */
+/**
+ * Maskuje napis z kwotą. W odróżnieniu od pseudo-blura wykonuje
+ * fizyczne zastąpienie cyfr i separatorów znakiem `•`, dzięki czemu
+ * wartość jest niewidoczna nawet po zaznaczeniu / screenshotcie.
+ * Symbol waluty zostaje, żeby utrzymać kontekst.
+ */
 export function maskValue(value: string, masked: boolean): string {
   if (!masked) return value
-  return value.replace(/[\d.,\s]/g, '•').replace(/•+/g, '••••••')
+  // np. "12 345,67 zł" → "•••••• zł"
+  return value.replace(/[\d.,\s ]+/g, '•••••• ').trim()
 }

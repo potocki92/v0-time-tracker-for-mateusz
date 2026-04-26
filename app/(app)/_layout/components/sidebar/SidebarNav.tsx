@@ -154,9 +154,7 @@ function NavRow({
               <BadgePill badge={item.badge!} />
             )}
 
-            {showCount && (
-              <CountBadge count={count!} variant={item.badge?.variant ?? 'muted'} />
-            )}
+            {showCount && <CountBadge count={count!} />}
 
             {item.shortcut && !hasQuickAction && (
               <Kbd className="h-4 min-w-[18px] rounded border border-sidebar-border/80 bg-transparent px-1 text-[10.5px] font-medium text-sidebar-foreground/55">
@@ -176,67 +174,27 @@ function NavRow({
 
 /* ─────────────────────────── badges ─────────────────────────── */
 
-function CountBadge({
-  count,
-  variant,
-}: {
-  count: number
-  variant: NonNullable<NavBadge['variant']>
-}) {
+/**
+ * CountBadge / BadgePill mają jeden, spójny styl: subtelny pill na tle
+ * `sidebar-accent`, identyczny dla nieopłaconych faktur, dla "Beta",
+ * dla "Slack · Trello" i dla "Nowość". Wariant koloru został świadomie
+ * usunięty — sidebar nie powinien krzyczeć neonem o liczbach.
+ */
+const BADGE_BASE =
+  'inline-flex h-[18px] items-center justify-center rounded-md bg-sidebar-accent/60 px-1.5 text-[10px] font-semibold tabular-nums tracking-wide text-sidebar-foreground/65 ring-1 ring-sidebar-border/70'
+
+function CountBadge({ count }: { count: number }) {
   const display = count > 99 ? '99+' : String(count)
-
-  if (variant === 'primary') {
-    return (
-      <span
-        aria-label={`${count} nieprzeczytane`}
-        className="inline-flex h-[18px] min-w-[20px] items-center justify-center rounded-full bg-primary/15 px-1.5 text-[10.5px] font-semibold tabular-nums text-primary ring-1 ring-primary/30"
-      >
-        {display}
-      </span>
-    )
-  }
-
-  if (variant === 'warning') {
-    return (
-      <span className="inline-flex h-[18px] min-w-[20px] items-center justify-center rounded-full bg-warning/15 px-1.5 text-[10.5px] font-semibold tabular-nums text-warning-foreground ring-1 ring-warning/30">
-        {display}
-      </span>
-    )
-  }
-
   return (
-    <span className="text-[11px] tabular-nums text-sidebar-foreground/45">
+    <span aria-label={`${count}`} className={cn(BADGE_BASE, 'min-w-[20px]')}>
       {display}
     </span>
   )
 }
 
 function BadgePill({ badge }: { badge: NavBadge }) {
-  const variant = badge.variant ?? 'muted'
-  const base =
-    'inline-flex h-[18px] items-center rounded-full px-1.5 text-[10px] font-semibold uppercase tracking-wide'
-
-  if (variant === 'primary') {
-    return (
-      <span className={cn(base, 'bg-primary/15 text-primary ring-1 ring-primary/30')}>
-        {badge.label}
-      </span>
-    )
-  }
-  if (variant === 'warning') {
-    return (
-      <span className={cn(base, 'bg-warning/15 text-warning-foreground ring-1 ring-warning/30')}>
-        {badge.label}
-      </span>
-    )
-  }
   return (
-    <span
-      className={cn(
-        base,
-        'bg-sidebar-accent/60 text-sidebar-foreground/70 ring-1 ring-sidebar-border/80',
-      )}
-    >
+    <span className={cn(BADGE_BASE, 'uppercase')}>
       {badge.label}
     </span>
   )
