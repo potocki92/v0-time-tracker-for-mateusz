@@ -1,21 +1,15 @@
 'use client'
 
-import * as React from "react"
+import * as React from 'react'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarSeparator,
 } from '@/components/ui/sidebar'
 import { SidebarNav } from './SidebarNav'
 import { SidebarUserFooter } from './SidebarUserFooter'
-import { AppSidebarHeader } from './SidebarHeader' // Używamy Twojej wersji z animacją
-import { Moon, Sun, Monitor } from 'lucide-react'
-import { useTheme } from 'next-themes'
+import { AppSidebarHeader } from './SidebarHeader'
+import { SidebarTracker } from './SidebarTracker'
 import type { User } from '@supabase/supabase-js'
 
 interface AppSidebarProps {
@@ -24,54 +18,45 @@ interface AppSidebarProps {
   badges?: Partial<Record<string, number>>
 }
 
-function ThemeItem() {
-  const { theme, setTheme } = useTheme()
-
-  const icon =
-    theme === 'dark' ? <Moon className="h-4 w-4" /> :
-    theme === 'light' ? <Sun className="h-4 w-4" /> :
-    <Monitor className="h-4 w-4" />
-
-  const next =
-    theme === 'dark' ? 'light' :
-    theme === 'light' ? 'system' :
-    'dark'
-
-  const label =
-    theme === 'dark' ? 'Tryb ciemny' :
-    theme === 'light' ? 'Tryb jasny' :
-    'Tryb systemowy'
-
-  return (
-    <SidebarMenuItem>
-      <SidebarMenuButton
-        onClick={() => setTheme(next)}
-        tooltip={label}
-      >
-        {icon}
-        <span>{label}</span>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  )
-}
-
-export function AppSidebar({ user, onLogout, badges, ...props }: AppSidebarProps & React.ComponentProps<typeof Sidebar>) {
+/**
+ * Sidebar w stylu Claude / Linear:
+ *  ┌──────────────────────────────┐
+ *  │ Logo + Workspace · Developer │  ← Header
+ *  │ ⌕ Szukaj…              ⌘K    │  ← Search
+ *  │ WORKSPACE                    │
+ *  │   Dashboard               D  │
+ *  │   Kalendarz               C  │
+ *  │   Projekty                P  │
+ *  │   Klienci                    │
+ *  │   Faktury                 I  │
+ *  │ INSIGHTS                     │
+ *  │   Raporty / Cele / Zarobki   │
+ *  │ PINNED                       │
+ *  │   • Hans-Böckler-Str. 284    │
+ *  │   • Im Winkel 51             │
+ *  │   • Gustavsburger 25–35      │
+ *  │ ──────────────────────────── │
+ *  │ Tracking · Im Winkel 51      │  ← Footer (tracker + profile)
+ *  │ 02:14:08              [Stop] │
+ *  │ MP  Mateusz Potocki     ⌃⌄  │
+ *  └──────────────────────────────┘
+ */
+export function AppSidebar({
+  user,
+  onLogout,
+  badges,
+  ...props
+}: AppSidebarProps & React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" variant="sidebar" {...props}>
-      {/* 1. Header z Logo i Toggle */}
       <AppSidebarHeader />
 
-      {/* 2. Główna nawigacja (Przewijana) */}
-      <SidebarContent>
+      <SidebarContent className="gap-0">
         <SidebarNav badges={badges} />
       </SidebarContent>
 
-      {/* 3. Stopka z motywem i profilem */}
-      <SidebarFooter>
-        <SidebarMenu>
-          <ThemeItem />
-        </SidebarMenu>
-        <SidebarSeparator />
+      <SidebarFooter className="gap-2 border-t border-sidebar-border/60 px-2 pt-2 pb-2">
+        <SidebarTracker />
         <SidebarUserFooter user={user} onLogout={onLogout} />
       </SidebarFooter>
     </Sidebar>
