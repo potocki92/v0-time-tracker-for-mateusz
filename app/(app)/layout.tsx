@@ -2,6 +2,7 @@
 
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { useAuth }    from './_layout/hooks/useAuth'
+import { useSidebarBadges } from './_layout/hooks/useSidebarBadges'
 import { AppSidebar } from './_layout/components/sidebar/AppSidebar'
 import { MobileHeader } from './_layout/components/sidebar/MobileHeader'
 import { BottomNav } from './_layout/components/bottom-nav'
@@ -9,6 +10,7 @@ import { SettingsDrawer } from './settings/_components'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth()
+  const badges = useSidebarBadges()
 
   if (loading) return null
 
@@ -17,7 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <a href="#main-content" className="skip-link">
         Przejdź do treści
       </a>
-      <AppSidebar user={user} onLogout={logout} />
+      <AppSidebar user={user} onLogout={logout} badges={badges} />
       {/* SidebarInset: wypycha content gdy sidebar rozwinięty */}
       <SidebarInset>
         <MobileHeader user={user} onLogout={logout} />

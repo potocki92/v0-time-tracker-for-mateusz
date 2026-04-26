@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { useClientsData } from '../_hooks/useClientsData'
 import { useClientsFilters } from '../_hooks/useClientsFilters'
@@ -90,6 +91,22 @@ export function ClientsContent() {
   }, [setSearch, setWorkTypeFilter, setCurrencyFilter])
 
   const allClients = useMemo(() => data.clients, [data.clients])
+
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const quickAddTriggered = useRef(false)
+
+  // Quick Action z sidebara (`/clients?new=1`) — auto-otwarcie formularza nowego klienta.
+  useEffect(() => {
+    if (quickAddTriggered.current) return
+    if (searchParams.get('new') !== '1') return
+    quickAddTriggered.current = true
+    openCreate()
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('new')
+    const query = params.toString()
+    router.replace(query ? `/clients?${query}` : '/clients', { scroll: false })
+  }, [searchParams, openCreate, router])
 
   return (
     <div className="container space-y-6 px-4 py-6">

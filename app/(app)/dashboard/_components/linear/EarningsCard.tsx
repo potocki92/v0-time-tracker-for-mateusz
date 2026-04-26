@@ -11,10 +11,12 @@ import {
   XAxis,
   type TooltipProps,
 } from 'recharts'
-import { ArrowUpRight, ArrowDownRight, Minus, MoreHorizontal } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react'
 import { formatCurrency } from '@/lib/helpers'
+import { maskValue } from '../../_hooks/useDashboardUiStore'
 import type { EarningsTrendData } from '../../_hooks/useEarningsTrend'
 import type { SparklinePoint } from '../../_hooks/useEarningsSparkline'
+import { EarningsMenu } from './EarningsMenu'
 
 type Props = {
   totalPLN: number
@@ -22,6 +24,16 @@ type Props = {
   trend: EarningsTrendData
   sparklineData: SparklinePoint[]
   periodLabel: string
+  privacyMode: boolean
+  compareMode: boolean
+  isExporting?: boolean
+  onTogglePrivacy: () => void
+  onToggleCompare: () => void
+  onExportCsv: () => void
+  onExportPdf: () => void
+  onOpenAnalytics: () => void
+  onSetGoal: () => void
+  onCopyAmount: () => void
 }
 
 type SeriesPoint = {
@@ -71,19 +83,21 @@ function buildSeries(points: SparklinePoint[]): SeriesPoint[] {
   return series
 }
 
-function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
-  if (!active || !payload?.[0]) return null
-  const row = payload[0].payload as SeriesPoint
-  const value = Number.isFinite(row.cumulative) ? row.cumulative : row.forecast ?? 0
-  return (
-    <div className="rounded-lg border border-[#1f1f1f] bg-[#0a0a0a] px-2.5 py-1.5 text-xs shadow-2xl">
-      <p className="font-medium text-white">{row.label}</p>
-      <p className="text-zinc-400">{formatCurrency(value, 'PLN')}</p>
-      {row.forecast !== null && Number.isFinite(row.forecast) && !Number.isFinite(row.cumulative) && (
-        <p className="text-[10px] uppercase tracking-wide text-zinc-500">prognoza</p>
-      )}
-    </div>
-  )
+function makeChartTooltip(privacyMode: boolean) {
+  return function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
+    if (!active || !payload?.[0]) return null
+    const row = payload[0].payload as SeriesPoint
+    const value = Number.isFinite(row.cumulative) ? row.cumulative : row.forecast ?? 0
+    return (
+      <div className="rounded-lg border border-[#1f1f1f] bg-[#0a0a0a] px-2.5 py-1.5 text-xs shadow-2xl">
+        <p className="font-medium text-white">{row.label}</p>
+        <p className="text-zinc-400">{maskValue(formatCurrency(value, 'PLN'), privacyMode)}</p>
+        {row.forecast !== null && Number.isFinite(row.forecast) && !Number.isFinite(row.cumulative) && (
+          <p className="text-[10px] uppercase tracking-wide text-zinc-500">prognoza</p>
+        )}
+      </div>
+    )
+  }
 }
 
 function getTrendIcon(percent: number | null) {
@@ -97,6 +111,16 @@ export const EarningsCard = memo(function EarningsCard({
   trend,
   sparklineData,
   periodLabel,
+  privacyMode,
+  compareMode,
+  isExporting = false,
+  onTogglePrivacy,
+  onToggleCompare,
+  onExportCsv,
+  onExportPdf,
+  onOpenAnalytics,
+  onSetGoal,
+  onCopyAmount,
 }: Props) {
   const series = useMemo(() => buildSeries(sparklineData), [sparklineData])
   const TrendIcon = getTrendIcon(trend.percent)
@@ -117,6 +141,7 @@ export const EarningsCard = memo(function EarningsCard({
   const forecastValue = lastForecastPoint?.forecast ?? null
   const diffSign = trend.diff >= 0 ? '+' : '−'
   const diffAbs = Math.abs(trend.diff)
+  const showCompare = compareMode && trend.prevTotal > 0
 
   const ticks = useMemo(() => {
     if (series.length < 2) return []
@@ -152,19 +177,28 @@ export const EarningsCard = memo(function EarningsCard({
             )}
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-[26px] font-semibold tracking-tight tabular-nums leading-[1.15] text-white sm:text-[34px] sm:font-bold sm:leading-tight md:text-4xl">
+            <span
+              className={`text-[26px] font-semibold tracking-tight tabular-nums leading-[1.15] text-white sm:text-[34px] sm:font-bold sm:leading-tight md:text-4xl ${
+                privacyMode ? 'select-none blur-[6px] transition' : 'transition'
+              }`}
+              aria-label={privacyMode ? 'Kwota ukryta' : undefined}
+            >
               {formatCurrency(totalPLN, 'PLN')}
             </span>
           </div>
-          <p className="mt-1 text-[12.5px] leading-[1.4] text-gray-500 tabular-nums">
+          <p
+            className={`mt-1 text-[12.5px] leading-[1.4] text-gray-500 tabular-nums ${
+              privacyMode ? 'select-none blur-[5px]' : ''
+            }`}
+          >
             ≈ {formatCurrency(totalEUR, 'EUR')}
           </p>
           <p className="mt-1 text-[11.5px] leading-[1.4] text-zinc-500 sm:text-xs">
-            {trend.prevTotal > 0 && (
+            {showCompare && (
               <>
                 <span className={isUp ? 'text-emerald-400' : 'text-red-400'}>
                   {diffSign}
-                  {formatCurrency(diffAbs, 'PLN')}
+                  {maskValue(formatCurrency(diffAbs, 'PLN'), privacyMode)}
                 </span>
                 {' '}
                 {isUp ? 'powyżej' : 'poniżej'} poprzedniego okresu
@@ -172,20 +206,25 @@ export const EarningsCard = memo(function EarningsCard({
             )}
             {forecastValue !== null && (
               <>
-                {trend.prevTotal > 0 && <span className="mx-1">·</span>}
-                <span>Prognoza {formatCurrency(forecastValue, 'PLN')}</span>
+                {showCompare && <span className="mx-1">·</span>}
+                <span>Prognoza {maskValue(formatCurrency(forecastValue, 'PLN'), privacyMode)}</span>
               </>
             )}
           </p>
         </div>
 
-        <button
-          type="button"
-          aria-label="Opcje zarobków"
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400 transition hover:bg-[#141414] hover:text-white"
-        >
-          <MoreHorizontal className="h-4 w-4" aria-hidden />
-        </button>
+        <EarningsMenu
+          privacyMode={privacyMode}
+          compareMode={compareMode}
+          onTogglePrivacy={onTogglePrivacy}
+          onToggleCompare={onToggleCompare}
+          onExportCsv={onExportCsv}
+          onExportPdf={onExportPdf}
+          onOpenAnalytics={onOpenAnalytics}
+          onSetGoal={onSetGoal}
+          onCopyAmount={onCopyAmount}
+          isExporting={isExporting}
+        />
       </header>
 
       {hasSeries && (
@@ -212,7 +251,10 @@ export const EarningsCard = memo(function EarningsCard({
                 axisLine={false}
                 tick={{ fill: '#71717a', fontSize: 10 }}
               />
-              <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#22c55e', strokeOpacity: 0.3 }} />
+              <Tooltip
+                content={makeChartTooltip(privacyMode)}
+                cursor={{ stroke: '#22c55e', strokeOpacity: 0.3 }}
+              />
               <Area
                 type="monotone"
                 dataKey="forecast"

@@ -24,7 +24,7 @@ export function MobileHeader({ user, onLogout }: Props) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md md:hidden">
-      <div className="flex items-center justify-between px-[var(--header-inline-padding)] py-[var(--header-y-padding)]">
+      <div className="flex h-[var(--app-bar-height)] items-center justify-between px-[var(--header-inline-padding)]">
         <div className="flex items-center gap-2">
           <SidebarTrigger className="-ml-1" />
           <span className="text-[15px] font-semibold tracking-tight text-foreground">
