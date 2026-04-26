@@ -71,7 +71,7 @@ export function QuickActions() {
               <Icon className="h-4 w-4" aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white">{label}</p>
+              <p className="text-[13px] font-semibold leading-[1.3] text-white sm:text-sm">{label}</p>
               {shortcut && (
                 <kbd className="mt-1 inline-block font-mono text-[10px] tracking-wider text-zinc-500">
                   {shortcut}

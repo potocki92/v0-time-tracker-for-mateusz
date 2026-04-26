@@ -71,13 +71,13 @@ export function UpcomingCard({ items, onAdd }: Props) {
             return (
               <li key={it.id} className="flex items-center gap-3 px-4 py-3 sm:px-5">
                 <div className="flex w-10 flex-col items-center text-center">
-                  <span className="text-base font-bold tabular-nums text-white">{day}</span>
+                  <span className="text-[15px] font-semibold tabular-nums leading-[1.15] text-white sm:text-base sm:font-bold">{day}</span>
                   <span className="text-[10px] font-semibold tracking-wider text-zinc-500">
                     {month}
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-white">{it.title}</p>
+                  <p className="truncate text-[13px] font-medium leading-[1.35] text-white sm:text-sm">{it.title}</p>
                   <span
                     className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${CATEGORY_PILL[it.category]}`}
                   >

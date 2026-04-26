@@ -30,7 +30,7 @@ export function BottomNav() {
                 onMouseEnter={prefetch ? prefetchOnHover : undefined}
                 onFocus={prefetch ? prefetchOnHover : undefined}
                 className={cn(
-                  'flex h-full flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors',
+                  'flex h-full flex-col items-center justify-center gap-1 text-[10.5px] font-medium leading-[1.2] transition-colors',
                   isActive
                     ? 'text-emerald-400'
                     : 'text-zinc-500 hover:text-zinc-200',

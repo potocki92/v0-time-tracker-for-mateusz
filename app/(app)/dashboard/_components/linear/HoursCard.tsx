@@ -102,13 +102,13 @@ export function HoursCard({
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Godziny · {periodLabel}
           </p>
-          <p className="mt-2 text-3xl font-bold tracking-tight tabular-nums text-white">
+          <p className="mt-2 text-[26px] font-semibold tracking-tight tabular-nums leading-[1.15] text-white sm:text-3xl sm:font-bold">
             {totalHours.toFixed(1)}{' '}
-            <span className="text-sm font-medium text-zinc-500">
+            <span className="text-[12.5px] font-medium text-zinc-500 sm:text-sm">
               / {targetHours} h
             </span>
           </p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-[11.5px] leading-[1.4] text-zinc-500 sm:text-xs">
             Średnio {avgPerDay.toFixed(1)} h/dzień
             {overtime > 0 && <> · {overtime.toFixed(0)} h nadgodzin</>}
           </p>

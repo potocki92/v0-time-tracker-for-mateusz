@@ -86,7 +86,7 @@ export function ProjectsCard({ projects, totalActive }: Props) {
                     }}
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white">{p.name}</p>
+                    <p className="truncate text-[13px] font-medium leading-[1.35] text-white sm:text-sm">{p.name}</p>
                     <div className="mt-1 flex items-center gap-2">
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${pill.className}`}
@@ -94,7 +94,7 @@ export function ProjectsCard({ projects, totalActive }: Props) {
                         <pill.icon className="h-3 w-3" aria-hidden />
                         {pill.label}
                       </span>
-                      <span className="text-xs tabular-nums text-zinc-400">
+                      <span className="text-[11.5px] tabular-nums text-zinc-400 sm:text-xs">
                         {p.progress}%
                       </span>
                     </div>

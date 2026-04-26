@@ -119,7 +119,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-sm font-medium text-white">{inv.name}</p>
+                      <p className="truncate text-[13px] font-medium leading-[1.35] text-white sm:text-sm">{inv.name}</p>
                       <span
                         className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${pill.className}`}
                       >
@@ -128,10 +128,10 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
                       </span>
                     </div>
                     {subtitle && (
-                      <p className="mt-0.5 truncate text-xs text-zinc-500">{subtitle}</p>
+                      <p className="mt-0.5 truncate text-[11.5px] text-zinc-500 sm:text-xs">{subtitle}</p>
                     )}
                   </div>
-                  <span className="shrink-0 text-sm font-semibold tabular-nums text-white">
+                  <span className="shrink-0 text-[13px] font-semibold tabular-nums text-white sm:text-sm">
                     {formatCurrency(inv.amount, inv.currency)}
                   </span>
                 </Link>

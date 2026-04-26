@@ -57,10 +57,12 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
         {dateline}
       </p>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+        <h1 className="text-[22px] font-normal leading-[1.25] tracking-tight text-white sm:text-[28px] sm:font-semibold">
           {greetingByHour()}{name ? `, ${name}` : ''}
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">{shapingCopy(now)}</p>
+        <p className="mt-1 text-[12.5px] leading-[1.4] text-zinc-500 sm:text-sm">
+          {shapingCopy(now)}
+        </p>
       </div>
 
       <div
@@ -79,8 +81,8 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
               onClick={() => onChangeRange(t.value)}
               className={
                 active
-                  ? 'rounded-lg bg-[#161616] px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)]'
-                  : 'rounded-lg px-3.5 py-1.5 text-xs font-medium text-zinc-500 transition hover:text-zinc-200'
+                  ? 'rounded-lg bg-[#161616] px-3 py-1.5 text-[11.5px] font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)] sm:px-3.5 sm:text-xs'
+                  : 'rounded-lg px-3 py-1.5 text-[11.5px] font-medium text-zinc-500 transition hover:text-zinc-200 sm:px-3.5 sm:text-xs'
               }
             >
               {t.label}
