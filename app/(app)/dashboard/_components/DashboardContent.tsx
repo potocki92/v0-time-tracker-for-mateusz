@@ -45,7 +45,7 @@ export function DashboardContent() {
   return (
     <DashboardRangeProvider>
       <div className="min-h-screen bg-black text-white">
-        <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4">
+        <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
           <Suspense fallback={<HeaderSkeleton />}>
             <HeaderSection />
           </Suspense>

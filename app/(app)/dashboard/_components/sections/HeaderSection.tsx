@@ -10,7 +10,7 @@ export function HeaderSection() {
 
   return (
     <>
-      <LinearTopBar title="Dashboard" />
+      <LinearTopBar />
       <HeroGreeting userName={data.userName} range={range} onChangeRange={setRange} />
     </>
   )
