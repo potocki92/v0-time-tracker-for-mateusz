@@ -21,11 +21,11 @@ export function LinearTopBar({
     <header className="sticky top-0 z-40 -mx-3 border-b border-[#1a1a1a] bg-black/80 px-3 pb-3 pt-3 backdrop-blur-md sm:-mx-4 sm:px-4">
       <div className="flex items-center justify-between">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
+          <h1 className="text-[18px] font-medium tracking-tight leading-[1.25] text-white sm:text-2xl sm:font-semibold">
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-0.5 truncate text-xs text-zinc-500">{subtitle}</p>
+            <p className="mt-0.5 truncate text-[11.5px] text-zinc-500 sm:text-xs">{subtitle}</p>
           )}
         </div>
 

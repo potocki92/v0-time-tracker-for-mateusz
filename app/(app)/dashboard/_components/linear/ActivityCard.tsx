@@ -94,8 +94,8 @@ export function ActivityCard({
               <Icon className="h-3.5 w-3.5" aria-hidden />
               <span className="text-[10px] font-medium">{hint}</span>
             </div>
-            <p className="mt-2 text-2xl font-bold tabular-nums text-white">{value}</p>
-            <p className="text-[11px] text-zinc-500">{label}</p>
+            <p className="mt-2 text-[20px] font-semibold tabular-nums leading-[1.15] text-white sm:text-2xl sm:font-bold">{value}</p>
+            <p className="text-[10.5px] text-zinc-500 sm:text-[11px]">{label}</p>
           </div>
         ))}
       </div>
@@ -111,8 +111,8 @@ export function ActivityCard({
                 aria-hidden
                 className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${TONE[item.tone]}`}
               />
-              <p className="min-w-0 flex-1 text-sm text-white">{item.text}</p>
-              <span className="shrink-0 text-[11px] text-zinc-500">{item.ago}</span>
+              <p className="min-w-0 flex-1 text-[12.5px] leading-[1.45] text-white sm:text-sm">{item.text}</p>
+              <span className="shrink-0 text-[10.5px] text-zinc-500 sm:text-[11px]">{item.ago}</span>
             </li>
           ))}
         </ul>

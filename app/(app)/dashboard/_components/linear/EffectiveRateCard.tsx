@@ -41,12 +41,12 @@ export function EffectiveRateCard({
       </header>
 
       <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-3xl font-bold tabular-nums text-white">
+        <span className="text-[26px] font-semibold tabular-nums leading-[1.15] text-white sm:text-3xl sm:font-bold">
           {formatCurrency(blendedRate, currency)}
         </span>
-        <span className="text-sm text-zinc-500">/ h</span>
+        <span className="text-[12.5px] text-zinc-500 sm:text-sm">/ h</span>
       </div>
-      <p className="mt-1 text-xs text-zinc-500">
+      <p className="mt-1 text-[11.5px] leading-[1.4] text-zinc-500 sm:text-xs">
         Średnia ważona ·{' '}
         {clientsCount === 1 ? '1 klient' : `${clientsCount} klientów`}
       </p>

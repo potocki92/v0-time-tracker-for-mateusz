@@ -152,14 +152,14 @@ export const EarningsCard = memo(function EarningsCard({
             )}
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-bold tracking-tight tabular-nums text-white sm:text-4xl">
+            <span className="text-[26px] font-semibold tracking-tight tabular-nums leading-[1.15] text-white sm:text-[34px] sm:font-bold sm:leading-tight md:text-4xl">
               {formatCurrency(totalPLN, 'PLN')}
             </span>
           </div>
-          <p className="mt-1 text-sm text-gray-500 tabular-nums">
+          <p className="mt-1 text-[12.5px] leading-[1.4] text-gray-500 tabular-nums">
             ≈ {formatCurrency(totalEUR, 'EUR')}
           </p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-[11.5px] leading-[1.4] text-zinc-500 sm:text-xs">
             {trend.prevTotal > 0 && (
               <>
                 <span className={isUp ? 'text-emerald-400' : 'text-red-400'}>

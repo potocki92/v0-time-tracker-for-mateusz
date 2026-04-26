@@ -91,18 +91,18 @@ export function MonthlyGoalCard({
       <div className="mt-4 flex items-center gap-4">
         <CircularProgress value={progress} />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-white">{headline}</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-white">
+          <p className="text-[13px] font-medium leading-[1.3] text-white sm:text-sm">{headline}</p>
+          <p className="mt-1 text-[20px] font-semibold tabular-nums leading-[1.2] text-white sm:text-2xl sm:font-bold">
             {formatCurrency(target, currency)}
           </p>
           {reachedDate && reached ? (
-            <p className="text-xs text-zinc-500">Osiągnięty {reachedDate}</p>
+            <p className="text-[11.5px] leading-[1.35] text-zinc-500 sm:text-xs">Osiągnięty {reachedDate}</p>
           ) : (
-            <p className="text-xs text-zinc-500">
+            <p className="text-[11.5px] leading-[1.35] text-zinc-500 sm:text-xs">
               Aktualnie {formatCurrency(current, currency)}
             </p>
           )}
-          <p className="mt-1 text-[11px] text-zinc-600">z {formatCurrency(target, currency)}</p>
+          <p className="mt-1 text-[10.5px] leading-[1.35] text-zinc-600 sm:text-[11px]">z {formatCurrency(target, currency)}</p>
         </div>
       </div>
 
