@@ -30,7 +30,7 @@ function CircularProgress({ value }: { value: number }) {
         viewBox={`0 0 ${size} ${size}`}
         className="-rotate-90"
         role="img"
-        aria-label={`${clamped.toFixed(0)} percent of monthly goal`}
+        aria-label={`${clamped.toFixed(0)}% celu miesięcznego`}
       >
         <circle cx={size / 2} cy={size / 2} r={radius} stroke="#1a1a1a" strokeWidth={stroke} fill="none" />
         <circle
@@ -67,20 +67,20 @@ export function MonthlyGoalCard({
 }: Props) {
   const reached = progress >= 100
   const surplus = Math.max(0, current - target)
-  const headline = reached ? 'Goal achieved' : 'Goal in progress'
+  const headline = reached ? 'Cel osiągnięty' : 'Cel w trakcie realizacji'
 
   return (
     <section
-      aria-label="Monthly goal"
+      aria-label="Cel miesięczny"
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
     >
       <header className="flex items-center justify-between">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-          Monthly goal
+          Cel miesięczny
         </p>
         <button
           type="button"
-          aria-label="Edit monthly goal"
+          aria-label="Edytuj cel miesięczny"
           onClick={onEdit}
           className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-500 transition hover:bg-[#141414] hover:text-white"
         >
@@ -96,27 +96,27 @@ export function MonthlyGoalCard({
             {formatCurrency(target, currency)}
           </p>
           {reachedDate && reached ? (
-            <p className="text-xs text-zinc-500">Reached on {reachedDate}</p>
+            <p className="text-xs text-zinc-500">Osiągnięty {reachedDate}</p>
           ) : (
             <p className="text-xs text-zinc-500">
-              {formatCurrency(current, currency)} so far
+              Aktualnie {formatCurrency(current, currency)}
             </p>
           )}
-          <p className="mt-1 text-[11px] text-zinc-600">of {formatCurrency(target, currency)}</p>
+          <p className="mt-1 text-[11px] text-zinc-600">z {formatCurrency(target, currency)}</p>
         </div>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-3">
         <div className="rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] px-3 py-2.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Surplus</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Nadwyżka</p>
           <p className="mt-1 text-base font-semibold tabular-nums text-emerald-400">
             +{formatCurrency(surplus, currency)}
           </p>
         </div>
         <div className="rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] px-3 py-2.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Streak</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Seria</p>
           <p className="mt-1 text-base font-semibold tabular-nums text-white">
-            {streakDays} d
+            {streakDays} dni
           </p>
         </div>
       </div>

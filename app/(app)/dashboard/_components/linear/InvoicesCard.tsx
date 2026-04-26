@@ -36,22 +36,22 @@ const STATUS_PILL: Record<
   { label: string; className: string; icon: LucideIcon }
 > = {
   paid: {
-    label: 'Paid',
+    label: 'Opłacone',
     className: 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30',
     icon: Check,
   },
   open: {
-    label: 'Open',
+    label: 'Otwarte',
     className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
     icon: Clock,
   },
   overdue: {
-    label: 'Overdue',
+    label: 'Zaległe',
     className: 'bg-red-500/15 text-red-400 ring-1 ring-red-500/30',
     icon: Clock,
   },
   draft: {
-    label: 'Draft',
+    label: 'Szkic',
     className: 'bg-zinc-500/15 text-zinc-300 ring-1 ring-zinc-500/30',
     icon: Pencil,
   },
@@ -61,7 +61,7 @@ function shortDue(due: string | null | undefined): string {
   if (!due) return ''
   const d = new Date(due)
   if (Number.isNaN(d.getTime())) return ''
-  return `due ${d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}`
+  return `termin ${d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short' })}`
 }
 
 export function InvoicesCard({ invoices, periodShort }: Props) {
@@ -71,13 +71,13 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
 
   return (
     <section
-      aria-label="Invoices"
+      aria-label="Faktury"
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
         <div className="flex items-center gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-            Invoices
+            Faktury
           </p>
           <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[11px] text-zinc-300">
             {invoices.length} · {periodShort}
@@ -87,14 +87,14 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
           href="/invoices"
           className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
         >
-          View all
+          Zobacz wszystkie
           <ArrowUpRight className="h-3 w-3" aria-hidden />
         </Link>
       </header>
 
       {visible.length === 0 ? (
         <div className="px-4 py-6 text-center text-sm text-zinc-500 sm:px-5">
-          No invoices yet.
+          Brak faktur.
         </div>
       ) : (
         <ul role="list" className="divide-y divide-[#161616]">
@@ -143,7 +143,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
 
       <footer className="flex items-center justify-between border-t border-[#161616] px-4 py-3 sm:px-5">
         <p className="text-xs text-zinc-500">
-          Total billed ·{' '}
+          Łącznie wystawione ·{' '}
           <span className="font-semibold text-white">
             {formatCurrency(totalBilled, baseCurrency)}
           </span>
@@ -153,7 +153,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
           className="inline-flex items-center gap-1 rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] px-2.5 py-1.5 text-xs font-semibold text-white transition hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300"
         >
           <Plus className="h-3.5 w-3.5" aria-hidden />
-          New
+          Nowa
         </Link>
       </footer>
     </section>

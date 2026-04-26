@@ -22,7 +22,6 @@ import {
   KpiSkeleton,
   StatsSkeleton,
 } from './skeletons'
-import { BottomNav } from './navigation/BottomNav'
 import { Footer, SectionHeader } from './linear'
 
 /**
@@ -71,7 +70,7 @@ export function DashboardContent() {
             <ActivitySection />
           </Suspense>
 
-          <SectionHeader label="Schedule & billing" />
+          <SectionHeader label="Harmonogram i rozliczenia" />
 
           <Suspense fallback={<InvoicesSkeleton />}>
             <ProjectsSection />
@@ -81,7 +80,7 @@ export function DashboardContent() {
             <InvoicesSection />
           </Suspense>
 
-          <SectionHeader label="Up next" />
+          <SectionHeader label="Wkrótce" />
 
           <Suspense fallback={<InvoicesSkeleton />}>
             <UpcomingSection />
@@ -95,7 +94,6 @@ export function DashboardContent() {
 
           <Footer />
         </div>
-        <BottomNav />
       </div>
     </DashboardRangeProvider>
   )

@@ -14,14 +14,14 @@ function relTime(iso: string): string {
   if (Number.isNaN(t)) return ''
   const diff = Math.max(0, Date.now() - t)
   const m = Math.floor(diff / 60_000)
-  if (m < 1) return 'just now'
-  if (m < 60) return `${m} m ago`
+  if (m < 1) return 'przed chwilą'
+  if (m < 60) return `${m} min temu`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h} h ago`
+  if (h < 24) return `${h} godz. temu`
   const d = Math.floor(h / 24)
-  if (d === 1) return 'Yesterday'
-  if (d < 7) return `${d} d ago`
-  return new Date(t).toLocaleDateString('en-US', { month: 'short', day: '2-digit' })
+  if (d === 1) return 'wczoraj'
+  if (d < 7) return `${d} dni temu`
+  return new Date(t).toLocaleDateString('pl-PL', { day: '2-digit', month: 'short' })
 }
 
 function buildFeed(
@@ -47,9 +47,9 @@ function buildFeed(
       ago: relTime(e.created_at ?? e.date),
       text: (
         <span>
-          <span className="font-medium">{c.name}</span> logged{' '}
+          <span className="font-medium">{c.name}</span> · zarejestrowano{' '}
           <span className="font-semibold">{e.hours?.toFixed(1)} h</span>
-          {e.notes ? <> on <span className="text-zinc-300">{e.notes}</span></> : null}
+          {e.notes ? <> przy <span className="text-zinc-300">{e.notes}</span></> : null}
         </span>
       ),
     })
@@ -71,10 +71,10 @@ function buildFeed(
       ago: relTime(inv.invoice_date ?? inv.issue_date ?? new Date().toISOString()),
       text: (
         <span>
-          {inv.is_paid ? 'Paid invoice ' : 'Sent invoice '}
+          {inv.is_paid ? 'Opłacona faktura ' : 'Wystawiona faktura '}
           <span className="font-medium">{inv.invoice_number ?? inv.name}</span>{' '}
           <span className="text-zinc-400">
-            ({Intl.NumberFormat('en-US', { style: 'currency', currency: inv.currency }).format(inv.amount)})
+            ({Intl.NumberFormat('pl-PL', { style: 'currency', currency: inv.currency }).format(inv.amount)})
           </span>
         </span>
       ),

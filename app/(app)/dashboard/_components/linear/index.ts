@@ -9,6 +9,5 @@ export { ProjectsCard, type ProjectItem, type ProjectStatus } from './ProjectsCa
 export { InvoicesCard } from './InvoicesCard'
 export { UpcomingCard, type UpcomingItem, type UpcomingCategory } from './UpcomingCard'
 export { QuickActions } from './QuickActions'
-export { WeeklyGlanceCard, type WeeklyDay } from './WeeklyGlanceCard'
 export { SectionHeader } from './SectionHeader'
 export { Footer } from './Footer'

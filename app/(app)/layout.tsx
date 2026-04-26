@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { useAuth }    from './_layout/hooks/useAuth'
 import { AppSidebar } from './_layout/components/sidebar/AppSidebar'
 import { MobileHeader } from './_layout/components/sidebar/MobileHeader'
+import { BottomNav } from './_layout/components/bottom-nav'
 import { SettingsDrawer } from './settings/_components'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -25,6 +26,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
       </SidebarInset>
       <SettingsDrawer />
+      <BottomNav />
     </SidebarProvider>
   )
 }

@@ -94,13 +94,13 @@ export function HoursCard({
 
   return (
     <section
-      aria-label="Hours"
+      aria-label="Godziny"
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
     >
       <header className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-            Hours · {periodLabel}
+            Godziny · {periodLabel}
           </p>
           <p className="mt-2 text-3xl font-bold tracking-tight tabular-nums text-white">
             {totalHours.toFixed(1)}{' '}
@@ -109,14 +109,14 @@ export function HoursCard({
             </span>
           </p>
           <p className="mt-1 text-xs text-zinc-500">
-            Avg {avgPerDay.toFixed(1)} h/day
-            {overtime > 0 && <> · {overtime.toFixed(0)} h overtime</>}
+            Średnio {avgPerDay.toFixed(1)} h/dzień
+            {overtime > 0 && <> · {overtime.toFixed(0)} h nadgodzin</>}
           </p>
         </div>
         {reached && (
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400 ring-1 ring-emerald-500/30">
             <Check className="h-3 w-3" aria-hidden />
-            Goal hit
+            Cel osiągnięty
           </span>
         )}
       </header>
@@ -133,7 +133,7 @@ export function HoursCard({
         </div>
         <div className="mt-1.5 flex justify-between text-[10px] text-zinc-500">
           <span>0</span>
-          <span>Target {targetHours}</span>
+          <span>Cel {targetHours}</span>
           <span className={reached ? 'font-semibold text-emerald-400' : ''}>
             {totalHours.toFixed(0)}
           </span>
@@ -146,8 +146,8 @@ export function HoursCard({
             {row.map((cell) => (
               <div
                 key={cell.date}
-                title={`${cell.date} · ${cell.hours.toFixed(1)}h`}
-                aria-label={`${cell.date}: ${cell.hours.toFixed(1)} hours`}
+                title={`${cell.date} · ${cell.hours.toFixed(1)} h`}
+                aria-label={`${cell.date}: ${cell.hours.toFixed(1)} godzin`}
                 className={`aspect-square rounded-md ${LEVEL_CLASSES[cell.level]}`}
               />
             ))}

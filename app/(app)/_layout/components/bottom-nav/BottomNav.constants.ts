@@ -5,33 +5,33 @@ import {
   Users,
   Receipt,
 } from 'lucide-react'
-import type { NavItem } from './BottomNav.types'
+import type { BottomNavItem } from './BottomNav.types'
 
-export const NAV_ITEMS: readonly NavItem[] = [
+export const BOTTOM_NAV_ITEMS: readonly BottomNavItem[] = [
   {
     href:     '/dashboard',
-    label:    'Home',
+    label:    'Pulpit',
     icon:     Home,
     prefetch: true,
   },
   {
     href:  '/calendar',
-    label: 'Calendar',
+    label: 'Kalendarz',
     icon:  Calendar,
   },
   {
     href:  '/projects',
-    label: 'Work',
+    label: 'Projekty',
     icon:  Briefcase,
   },
   {
     href:  '/clients',
-    label: 'Clients',
+    label: 'Klienci',
     icon:  Users,
   },
   {
     href:  '/invoices',
-    label: 'Bills',
+    label: 'Faktury',
     icon:  Receipt,
   },
 ] as const

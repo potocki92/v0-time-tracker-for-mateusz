@@ -9,26 +9,26 @@ type Props = {
 }
 
 const TABS: { value: TimeRange; label: string }[] = [
-  { value: 'current_week', label: 'Week' },
-  { value: 'current_month', label: 'Month' },
-  { value: 'current_quarter', label: 'Quarter' },
-  { value: 'current_year', label: 'Year' },
+  { value: 'current_week', label: 'Tydzień' },
+  { value: 'current_month', label: 'Miesiąc' },
+  { value: 'current_quarter', label: 'Kwartał' },
+  { value: 'current_year', label: 'Rok' },
 ]
 
 function greetingByHour(): string {
   const h = new Date().getHours()
-  if (h < 5) return 'Good night'
-  if (h < 12) return 'Good morning'
-  if (h < 18) return 'Good afternoon'
-  return 'Good evening'
+  if (h < 5) return 'Dobranoc'
+  if (h < 12) return 'Dzień dobry'
+  if (h < 18) return 'Miłego popołudnia'
+  return 'Dobry wieczór'
 }
 
 function formatDateline(d: Date): string {
-  const weekday = d.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()
-  const month = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
+  const weekday = d.toLocaleDateString('pl-PL', { weekday: 'long' }).toUpperCase()
+  const month = d.toLocaleDateString('pl-PL', { month: 'short' }).toUpperCase()
   const day = String(d.getDate()).padStart(2, '0')
   const year = d.getFullYear()
-  return `${weekday} · ${month} ${day}, ${year}`
+  return `${weekday} · ${day} ${month} ${year}`
 }
 
 function isoWeekNumber(d: Date): number {
@@ -42,14 +42,14 @@ function isoWeekNumber(d: Date): number {
 }
 
 function shapingCopy(d: Date): string {
-  const monthName = d.toLocaleDateString('en-US', { month: 'long' })
-  return `Here's how ${monthName} is shaping up.`
+  const monthName = d.toLocaleDateString('pl-PL', { month: 'long' })
+  return `Tak prezentuje się ${monthName}.`
 }
 
 export function HeroGreeting({ userName, range, onChangeRange }: Props) {
   const now = new Date()
-  const dateline = `${formatDateline(now)} · WEEK ${isoWeekNumber(now)}`
-  const name = userName?.split(' ')[0] ?? 'there'
+  const dateline = `${formatDateline(now)} · TYDZIEŃ ${isoWeekNumber(now)}`
+  const name = userName?.split(' ')[0] ?? ''
 
   return (
     <section className="space-y-3">
@@ -58,14 +58,14 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
       </p>
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-          {greetingByHour()}, {name}
+          {greetingByHour()}{name ? `, ${name}` : ''}
         </h1>
         <p className="mt-1 text-sm text-zinc-500">{shapingCopy(now)}</p>
       </div>
 
       <div
         role="tablist"
-        aria-label="Period"
+        aria-label="Okres"
         className="inline-flex rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] p-1"
       >
         {TABS.map((t) => {

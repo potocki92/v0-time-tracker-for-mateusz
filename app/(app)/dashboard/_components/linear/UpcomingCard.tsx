@@ -26,29 +26,29 @@ const CATEGORY_PILL: Record<UpcomingCategory, string> = {
 }
 
 const CATEGORY_LABEL: Record<UpcomingCategory, string> = {
-  vacation: 'Vacation',
-  billing: 'Billing',
-  project: 'Project',
-  finance: 'Finance',
-  event: 'Event',
+  vacation: 'Urlop',
+  billing: 'Płatność',
+  project: 'Projekt',
+  finance: 'Finanse',
+  event: 'Wydarzenie',
 }
 
 function dayLabel(d: Date): { day: string; month: string } {
   return {
     day: String(d.getDate()).padStart(2, '0'),
-    month: d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+    month: d.toLocaleDateString('pl-PL', { month: 'short' }).toUpperCase(),
   }
 }
 
 export function UpcomingCard({ items, onAdd }: Props) {
   return (
     <section
-      aria-label="Upcoming"
+      aria-label="Nadchodzące"
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-          Upcoming
+          Nadchodzące
         </p>
         <button
           type="button"
@@ -56,13 +56,13 @@ export function UpcomingCard({ items, onAdd }: Props) {
           className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
         >
           <Plus className="h-3 w-3" aria-hidden />
-          Add
+          Dodaj
         </button>
       </header>
 
       {items.length === 0 ? (
         <div className="px-4 py-6 text-center text-sm text-zinc-500 sm:px-5">
-          Nothing scheduled.
+          Brak zaplanowanych wydarzeń.
         </div>
       ) : (
         <ul role="list" className="divide-y divide-[#161616]">

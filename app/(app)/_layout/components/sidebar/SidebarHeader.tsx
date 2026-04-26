@@ -3,9 +3,9 @@
 /**
  * SidebarHeader.tsx — Claude-style brand block.
  *
- * Wyrafinowane, minimalistyczne logo (mini bar-chart w neutralnych tonach
- * z jednym akcentowym paskiem) + nazwa workspace'u + podtytuł "Workspace · Developer".
- * Kliknięcie = toggle sidebar, tooltip działa w trybie zwiniętym.
+ * Korzysta z dedykowanego komponentu <Logo />; ramka i akcent tła
+ * są zachowane (border + bg-sidebar-accent), żeby nie zmieniać wyglądu
+ * po podmianie ikony.
  */
 
 import {
@@ -15,6 +15,7 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { Logo } from '@/components/brand/logo'
 
 export function AppSidebarHeader() {
   const { toggleSidebar } = useSidebar()
@@ -50,11 +51,9 @@ function BrandMark() {
   return (
     <div
       aria-hidden
-      className="relative flex aspect-square size-7 shrink-0 items-end justify-center gap-[3px] rounded-md border border-sidebar-border/80 bg-sidebar-accent/40 p-1.5"
+      className="relative flex aspect-square size-7 shrink-0 items-center justify-center rounded-md border border-sidebar-border/80 bg-sidebar-accent/40 p-1"
     >
-      <span className="h-1.5 w-[3px] rounded-[1.5px] bg-sidebar-foreground/40" />
-      <span className="h-2.5 w-[3px] rounded-[1.5px] bg-sidebar-foreground/70" />
-      <span className="h-3.5 w-[3px] rounded-[1.5px] bg-sidebar-primary" />
+      <Logo size="sm" className="size-5" />
     </div>
   )
 }
