@@ -42,6 +42,7 @@ export function EarningsSection() {
   const totals = useDashboardTotals(filtered, clients)
   const trend = useEarningsTrend(filtered, prevFiltered, clients)
   const sparklineData = useEarningsSparkline(filtered, clients)
+  const prevSparklineData = useEarningsSparkline(prevFiltered, clients)
   const periodLabel = usePeriodLabel(range)
   const eurRate = useEffectiveEurRate()
   const eurRateForExport = usePreferencesStore(selectEurRate)
@@ -112,6 +113,7 @@ export function EarningsSection() {
           totalEUR={totalEUR}
           trend={trend}
           sparklineData={sparklineData}
+          prevSparklineData={prevSparklineData}
           periodLabel={periodShort(periodLabel) || 'okres'}
           privacyMode={privacyMode}
           compareMode={compareMode}

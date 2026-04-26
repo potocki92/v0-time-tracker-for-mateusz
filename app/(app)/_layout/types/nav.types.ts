@@ -8,9 +8,7 @@ export interface NavQuickAction {
 }
 
 export interface NavBadge {
-  /** Wariant wizualny — paleta tokenów design systemu. */
-  variant?: 'primary' | 'warning' | 'muted'
-  /** Statyczny tekst (np. "Beta") wyświetlany zamiast liczby. */
+  /** Statyczny tekst (np. "Beta", "Slack · Trello"). Liczbę przekaż przez `count`. */
   label?: string
 }
 

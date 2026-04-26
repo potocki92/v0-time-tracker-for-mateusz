@@ -49,7 +49,7 @@ function buildFeed(
         <span>
           <span className="font-medium">{c.name}</span> · zarejestrowano{' '}
           <span className="font-semibold">{e.hours?.toFixed(1)} h</span>
-          {e.notes ? <> przy <span className="text-foreground/80">{e.notes}</span></> : null}
+          {e.notes ? <> przy <span className="text-zinc-300">{e.notes}</span></> : null}
         </span>
       ),
     })
@@ -73,7 +73,7 @@ function buildFeed(
         <span>
           {inv.is_paid ? 'Opłacona faktura ' : 'Wystawiona faktura '}
           <span className="font-medium">{inv.invoice_number ?? inv.name}</span>{' '}
-          <span className="text-muted-foreground">
+          <span className="text-zinc-400">
             ({Intl.NumberFormat('pl-PL', { style: 'currency', currency: inv.currency }).format(inv.amount)})
           </span>
         </span>
