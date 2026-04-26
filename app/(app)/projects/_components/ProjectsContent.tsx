@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { Project } from '@/lib/types'
 import {
   useProjectForm,
@@ -25,6 +26,22 @@ export function ProjectsContent() {
   const { save, remove } = useProjectMutations()
 
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
+
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const quickAddTriggered = useRef(false)
+
+  // Quick Action z sidebara (`/projects?new=1`) — automatycznie otwórz formularz.
+  useEffect(() => {
+    if (quickAddTriggered.current) return
+    if (searchParams.get('new') !== '1') return
+    quickAddTriggered.current = true
+    form.openCreate()
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('new')
+    const query = params.toString()
+    router.replace(query ? `/projects?${query}` : '/projects', { scroll: false })
+  }, [searchParams, form, router])
 
   const handleSubmit = () => {
     save.mutate(

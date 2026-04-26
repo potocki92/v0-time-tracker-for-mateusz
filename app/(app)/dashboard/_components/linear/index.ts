@@ -1,6 +1,7 @@
 export { LinearTopBar } from './LinearTopBar'
 export { HeroGreeting } from './HeroGreeting'
 export { EarningsCard } from './EarningsCard'
+export { EarningsMenu } from './EarningsMenu'
 export { MonthlyGoalCard } from './MonthlyGoalCard'
 export { HoursCard } from './HoursCard'
 export { EffectiveRateCard, type ClientRate } from './EffectiveRateCard'

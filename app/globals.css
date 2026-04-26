@@ -477,6 +477,9 @@
 
   --header-inline-padding: clamp(1rem, 0.75rem + 1vw, 1.5rem);
   --header-y-padding: clamp(0.5rem, 0.45rem + 0.2vw, 0.75rem);
+  /* Wspólna wysokość paska górnego (MobileHeader) i dolnego (BottomNav).
+   * Zapewnia 1:1 parytet wizualny między obiema krawędziami aplikacji. */
+  --app-bar-height: 3.5rem;
   --shadow-avatar-ring: 0 0 0 1px rgba(47, 47, 50, 0.2);
   --color-background: var(--background);
   --color-foreground: var(--foreground);

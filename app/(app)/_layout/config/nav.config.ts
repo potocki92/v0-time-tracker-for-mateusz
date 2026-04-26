@@ -7,9 +7,26 @@ import {
   LineChart,
   Target,
   Wallet,
+  Plug,
+  Workflow,
+  Sparkles,
 } from 'lucide-react'
 import { NavSection, PinnedItem } from '../types/nav.types'
 
+/**
+ * Konfiguracja nawigacji bocznej.
+ *
+ * Sekcje:
+ *  • Workspace  — codzienna praca (Pulpit, Kalendarz, Projekty, Klienci, Faktury)
+ *  • Insights   — analityka (Raporty, Cele, Zarobki, Asystent AI)
+ *  • Automation — moduły zwiększające postrzeganą wartość produktu (Integracje,
+ *    Automatyzacje). Tutaj projektant aplikacji "obiecuje" auto-fakturowanie,
+ *    Slack/Trello sync etc. — to są dźwignie do up-sellu.
+ *
+ * Każdy element może mieć:
+ *  • `quickAction` — szybki "+" na hover (Projekty, Klienci),
+ *  • `badge`       — wskaźnik (np. nieopłacone faktury, "Beta", "Nowość").
+ */
 export const NAV_SECTIONS: NavSection[] = [
   {
     id: 'workspace',
@@ -17,9 +34,26 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: '/dashboard', label: 'Pulpit',    icon: LayoutDashboard, shortcut: 'D' },
       { href: '/calendar',  label: 'Kalendarz', icon: Calendar,        shortcut: 'C' },
-      { href: '/projects',  label: 'Projekty',  icon: FolderKanban,    shortcut: 'P' },
-      { href: '/clients',   label: 'Klienci',   icon: Users },
-      { href: '/invoices',  label: 'Faktury',   icon: FileText,        shortcut: 'I' },
+      {
+        href: '/projects',
+        label: 'Projekty',
+        icon: FolderKanban,
+        shortcut: 'P',
+        quickAction: { href: '/projects?new=1', label: 'Dodaj projekt' },
+      },
+      {
+        href: '/clients',
+        label: 'Klienci',
+        icon: Users,
+        quickAction: { href: '/clients?new=1', label: 'Dodaj klienta' },
+      },
+      {
+        href: '/invoices',
+        label: 'Faktury',
+        icon: FileText,
+        shortcut: 'I',
+        badge: { variant: 'primary' },
+      },
     ],
   },
   {
@@ -29,6 +63,30 @@ export const NAV_SECTIONS: NavSection[] = [
       { href: '#reports',  label: 'Raporty', icon: LineChart },
       { href: '#goals',    label: 'Cele',    icon: Target },
       { href: '#earnings', label: 'Zarobki', icon: Wallet },
+      {
+        href: '#ai-assistant',
+        label: 'Asystent AI',
+        icon: Sparkles,
+        badge: { variant: 'primary', label: 'Beta' },
+      },
+    ],
+  },
+  {
+    id: 'automation',
+    label: 'Automatyzacja',
+    items: [
+      {
+        href: '#integrations',
+        label: 'Integracje',
+        icon: Plug,
+        badge: { variant: 'muted', label: 'Slack · Trello' },
+      },
+      {
+        href: '#automations',
+        label: 'Automatyzacje',
+        icon: Workflow,
+        badge: { variant: 'muted', label: 'Nowość' },
+      },
     ],
   },
 ]
