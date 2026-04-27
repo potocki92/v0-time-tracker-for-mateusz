@@ -4,14 +4,12 @@ import {
   QueryClient,
   dehydrate,
 } from '@tanstack/react-query'
-import { DashboardContent } from './_components/DashboardContent'
-import { DashboardSkeleton } from './_components/DashboardSkeleton'
+import { DashboardContent, DashboardSkeleton, getDashboardDataServer } from '@/features/dashboard'
 // import { DashboardErrorBoundary } from './_components/DashboardErrorBoundary'
 import { QUERY_KEYS } from '@/lib/query/queryKeys'
 import { QUERY_CONFIG } from '@/lib/query/queryConfig'
 // import { getDashboardData } from './_services/dashboard.service'
-import { getDashboardDataServer } from './_services/dashboard.service.server'
-import { DashboardContentBoundary } from './_components/errors'
+import { DashboardContentBoundary } from '@/features/dashboard/components/errors'
 
 // Server Component — bez 'use client'
 export default async function DashboardPage() {
