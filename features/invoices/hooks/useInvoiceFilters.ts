@@ -42,12 +42,12 @@ export const useInvoiceFiltersStore = create<InvoiceFiltersState>()(
           filters: {
             ...state.filters,
             ...next,
-            dateRange: next.dateRange
-              ? {
-                  ...state.filters.dateRange,
-                  ...next.dateRange,
-                }
-              : state.filters.dateRange,
+            dateRange: {
+              ...state.filters.dateRange,
+              ...(next.dateRange ?? {}),
+            },
+            searchPhrase: next.searchPhrase ?? state.filters.searchPhrase,
+            status: next.status ?? state.filters.status,
           },
         })),
       setStatus: (status) =>
@@ -82,12 +82,5 @@ export const useInvoiceFiltersStore = create<InvoiceFiltersState>()(
 )
 
 export const useInvoiceFilters = () => useInvoiceFiltersStore((state) => state.filters)
-
-export const useInvoiceFiltersActions = () =>
-  useInvoiceFiltersStore((state) => ({
-    setFilters: state.setFilters,
-    setStatus: state.setStatus,
-    setDateRange: state.setDateRange,
-    setSearchPhrase: state.setSearchPhrase,
-    resetFilters: state.resetFilters,
-  }))
+export const useSetInvoiceFilters = () => useInvoiceFiltersStore((state) => state.setFilters)
+export const useResetInvoiceFilters = () => useInvoiceFiltersStore((state) => state.resetFilters)

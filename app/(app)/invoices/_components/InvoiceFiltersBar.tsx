@@ -1,19 +1,18 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useMemo } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { InvoiceStatus, INVOICE_STATUS_LABELS_PL } from '@/lib/finance/invoice-status'
 import {
-  InvoiceStatus,
-  INVOICE_STATUS_LABELS_PL,
-} from '@/lib/finance/invoice-status'
-import {
+  DEFAULT_INVOICE_FILTERS,
   useInvoiceFilters,
-  useInvoiceFiltersActions,
+  useResetInvoiceFilters,
+  useSetInvoiceFilters,
   type InvoiceFilters,
   type InvoiceStatusFilter,
 } from '@/features/invoices/hooks/useInvoiceFilters'
@@ -29,17 +28,40 @@ const STATUS_FILTER_OPTIONS: { value: InvoiceStatusFilter; label: string }[] = [
 
 export function InvoiceFiltersBar() {
   const filters = useInvoiceFilters()
-  const { setFilters, resetFilters } = useInvoiceFiltersActions()
+  const setFilters = useSetInvoiceFilters()
+  const resetFilters = useResetInvoiceFilters()
 
   const form = useForm<InvoiceFilters>({
     defaultValues: filters,
   })
 
-  const values = form.watch()
+  const status = useWatch({ control: form.control, name: 'status', defaultValue: filters.status })
+  const searchPhrase = useWatch({
+    control: form.control,
+    name: 'searchPhrase',
+    defaultValue: filters.searchPhrase,
+  })
+  const dateFrom = useWatch({
+    control: form.control,
+    name: 'dateRange.from',
+    defaultValue: filters.dateRange.from,
+  })
+  const dateTo = useWatch({
+    control: form.control,
+    name: 'dateRange.to',
+    defaultValue: filters.dateRange.to,
+  })
 
   useEffect(() => {
     const subscription = form.watch((nextValues) => {
-      setFilters(nextValues as Partial<InvoiceFilters>)
+      setFilters({
+        status: nextValues.status ?? DEFAULT_INVOICE_FILTERS.status,
+        searchPhrase: nextValues.searchPhrase ?? '',
+        dateRange: {
+          from: nextValues.dateRange?.from ?? null,
+          to: nextValues.dateRange?.to ?? null,
+        },
+      })
     })
 
     return () => subscription.unsubscribe()
@@ -50,18 +72,18 @@ export function InvoiceFiltersBar() {
     const isDifferent =
       currentValues.status !== filters.status ||
       currentValues.searchPhrase !== filters.searchPhrase ||
-      currentValues.dateRange.from !== filters.dateRange.from ||
-      currentValues.dateRange.to !== filters.dateRange.to
+      currentValues.dateRange?.from !== filters.dateRange.from ||
+      currentValues.dateRange?.to !== filters.dateRange.to
 
     if (isDifferent) {
       form.reset(filters)
     }
   }, [filters, form])
 
-  const hasActiveFilters =
-    values.status !== 'all' ||
-    values.searchPhrase.trim().length > 0 ||
-    Boolean(values.dateRange.from || values.dateRange.to)
+  const hasActiveFilters = useMemo(
+    () => status !== 'all' || (searchPhrase ?? '').trim().length > 0 || Boolean(dateFrom || dateTo),
+    [dateFrom, dateTo, searchPhrase, status],
+  )
 
   return (
     <Form {...form}>
@@ -124,7 +146,7 @@ export function InvoiceFiltersBar() {
 
         <div className="flex flex-wrap items-center gap-1.5">
           {STATUS_FILTER_OPTIONS.map((option) => {
-            const active = values.status === option.value
+            const active = status === option.value
             return (
               <button
                 key={option.value}
@@ -150,7 +172,7 @@ export function InvoiceFiltersBar() {
               className="ml-auto h-8 text-xs"
               onClick={() => {
                 resetFilters()
-                form.reset()
+                form.reset(DEFAULT_INVOICE_FILTERS)
               }}
             >
               Wyczyść filtry
