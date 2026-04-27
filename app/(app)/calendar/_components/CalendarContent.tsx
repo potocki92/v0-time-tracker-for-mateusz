@@ -116,7 +116,7 @@ export function CalendarContent() {
         totalEntries={monthEntries.length}
       />
 
-      <div className="container space-y-4 px-4 py-4 sm:space-y-5 sm:py-6">
+      <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
         <CalendarStatsErrorBoundary>
           <CalendarStats
             {...stats}
