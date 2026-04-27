@@ -1,4 +1,4 @@
-import type { Client, CURRENCY, Invoice } from '@/lib/types'
+import type { Client, CURRENCY, Invoice, InvoiceLifecycleStatus } from '@/lib/types'
 
 export type BillingQuarter = 'Q1' | 'Q2' | 'Q3' | 'Q4'
 
@@ -6,6 +6,16 @@ export interface InvoicesData {
   invoices: Invoice[]
   clients: Client[]
   settings: InvoiceSettings
+}
+
+
+export interface InvoiceQueryFilters {
+  status: 'all' | InvoiceLifecycleStatus
+  dateRange: {
+    from: string | null
+    to: string | null
+  }
+  searchPhrase: string
 }
 
 export type InvoiceTemplateKey = 'classic' | 'modern' | 'minimal'
