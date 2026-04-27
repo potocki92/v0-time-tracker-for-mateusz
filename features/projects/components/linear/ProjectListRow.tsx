@@ -1,20 +1,32 @@
 'use client'
 
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { formatCurrency } from '@/lib/helpers'
+import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { PROJECT_PRIORITY_PILL, PROJECT_STATUS_PILL } from '../../types/projects.constants'
 import type { ProjectListRow as ProjectListRowType } from '../../types/projects.types'
 
 type ProjectListRowProps = {
   row: ProjectListRowType
+  onEdit?: (project: Project) => void
+  onDelete?: (project: Project) => void
 }
 
 function formatDue(date: string | null): string {
   if (!date) return '—'
   const d = new Date(date)
   if (Number.isNaN(d.getTime())) return '—'
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 function clientInitials(name: string): string {
@@ -24,15 +36,26 @@ function clientInitials(name: string): string {
   return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
 }
 
-export function ProjectListRow({ row }: ProjectListRowProps) {
-  const { project, clientName, clientColor, progressPct, hoursLogged, budget, budgetUtilization, dueDate, isAtRisk } = row
+export function ProjectListRow({ row, onEdit, onDelete }: ProjectListRowProps) {
+  const {
+    project,
+    clientName,
+    clientColor,
+    progressPct,
+    hoursLogged,
+    budget,
+    budgetUtilization,
+    dueDate,
+    isAtRisk,
+  } = row
   const statusPill = PROJECT_STATUS_PILL[project.status]
   const priorityPill = PROJECT_PRIORITY_PILL[project.priority]
+  const hasActions = Boolean(onEdit || onDelete)
 
   return (
     <li
       className={cn(
-        'rounded-xl border bg-[#0c0c0c] p-3.5 transition hover:border-zinc-700/60',
+        'group rounded-xl border bg-[#0c0c0c] p-3.5 transition hover:border-zinc-700/60',
         'border-[#161616]',
       )}
     >
@@ -60,12 +83,44 @@ export function ProjectListRow({ row }: ProjectListRowProps) {
           >
             {priorityPill.label}
           </span>
+          {hasActions && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-zinc-400 opacity-60 transition hover:bg-[#161616] hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
+                  aria-label={`Akcje projektu ${project.name}`}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[10rem]">
+                {onEdit && (
+                  <DropdownMenuItem onClick={() => onEdit(project)}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edytuj
+                  </DropdownMenuItem>
+                )}
+                {onEdit && onDelete && <DropdownMenuSeparator />}
+                {onDelete && (
+                  <DropdownMenuItem
+                    onClick={() => onDelete(project)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Usuń
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
       <div className="mt-3 space-y-1.5">
         <div className="flex items-center justify-between text-[11px] text-zinc-500">
-          <span>Progress</span>
+          <span>Postęp</span>
           <span className="tabular-nums text-zinc-300">{Math.round(progressPct)}%</span>
         </div>
         <div className="h-1 w-full overflow-hidden rounded-full bg-[#161616]">
@@ -81,13 +136,13 @@ export function ProjectListRow({ row }: ProjectListRowProps) {
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-3 border-t border-[#161616] pt-3">
-        <Stat label="Hours" value={`${Math.round(hoursLogged)}h`} />
+        <Stat label="Godziny" value={`${Math.round(hoursLogged)}h`} />
         <Stat
-          label="Budget"
+          label="Budżet"
           value={budget > 0 ? `${Math.round(budgetUtilization * 100)}%` : '—'}
           danger={isAtRisk}
         />
-        <Stat label="Due" value={formatDue(dueDate)} danger={isAtRisk} />
+        <Stat label="Termin" value={formatDue(dueDate)} danger={isAtRisk} />
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-2">

@@ -3,10 +3,10 @@ import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query
 import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
 import {
   ProjectsContent,
+  ProjectsContentBoundary,
   ProjectsSkeleton,
   getProjectsDataServer,
 } from '@/features/projects'
-import { ProjectsContentBoundary } from './_components/errors'
 
 // Server Component — bez 'use client'.
 // Prefetch po stronie serwera + hydracja React Query → user dostaje

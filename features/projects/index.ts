@@ -9,12 +9,19 @@ export { ProjectsContent } from './components/ProjectsContent'
 export { ProjectsSkeleton } from './components/ProjectsSkeleton'
 export { getProjectsDataServer } from './services/projects.service.server'
 export {
+  ProjectsContentBoundary,
+  ProjectsListBoundary,
+  ProjectsStatsBoundary,
+} from './components/errors'
+export {
   useProjectsData,
   useProjectsKpis,
   useStatusBreakdown,
   useBudgetUtilization,
   useFeaturedProject,
   useProjectsFilters,
+  useProjectForm,
+  useProjectMutations,
   useClientProjectAggregate,
   useClientProjectAggregates,
 } from './hooks'
