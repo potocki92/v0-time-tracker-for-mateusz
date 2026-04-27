@@ -43,7 +43,7 @@ export function HoursPerWeekChart({
     <Card className="border-border/60 py-0 shadow-sm">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between gap-2">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px]">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             Godziny tygodniowo
           </h3>
           <span className="rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] font-medium capitalize text-muted-foreground">
