@@ -16,7 +16,7 @@ import { getInvoicesData } from '@/app/(app)/invoices/_services'
 export function useSidebarBadges(): Partial<Record<string, number>> {
   const { data } = useQuery<InvoicesData>({
     queryKey: INVOICES_MANAGER_QUERY_KEY,
-    queryFn: getInvoicesData,
+    queryFn: () => getInvoicesData(),
     staleTime: 60_000,
     refetchOnWindowFocus: false,
   })
