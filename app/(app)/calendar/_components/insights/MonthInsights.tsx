@@ -28,7 +28,7 @@ export function MonthInsights({ monthName, insights, onViewAllEntries }: Props) 
           id="month-insights-heading"
           className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
         >
-          Month insights
+          Podsumowanie miesiąca
         </h2>
         <span className="text-[10px] capitalize text-muted-foreground/70">
           {monthName}

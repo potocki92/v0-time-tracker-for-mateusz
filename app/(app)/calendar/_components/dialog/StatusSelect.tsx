@@ -19,7 +19,7 @@ export function StatusSelect({ value, onChange }: Props) {
   return (
     <div className="space-y-1.5">
       <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        Status
+        Status dnia
       </Label>
       <Select value={value} onValueChange={(v) => onChange(v as WorkStatus)}>
         <SelectTrigger className="h-10 sm:h-9">

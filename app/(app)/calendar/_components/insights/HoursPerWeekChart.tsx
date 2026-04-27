@@ -44,7 +44,7 @@ export function HoursPerWeekChart({
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between gap-2">
           <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-[11px]">
-            Hours per week
+            Godziny tygodniowo
           </h3>
           <span className="rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] font-medium capitalize text-muted-foreground">
             {monthName}
@@ -101,7 +101,7 @@ export function HoursPerWeekChart({
         <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/50 pt-3 text-[11px] sm:gap-3">
           <Stat label="Łącznie" value={`${totalHours} h`} />
           <Stat label="Śr./tydzień" value={`${avgHours} h`} />
-          <Stat label="Peak" value={peakLabel} />
+          <Stat label="Szczyt" value={peakLabel} />
         </div>
 
         <p className="sr-only">

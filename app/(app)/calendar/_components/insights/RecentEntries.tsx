@@ -21,7 +21,7 @@ export function RecentEntries({ entries, onViewAll }: Props) {
         <header className="flex items-center justify-between">
           <div>
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Recent entries
+              Ostatnie wpisy
             </h3>
             <p className="text-[10px] text-muted-foreground/70">Ostatnie 7 wpisów</p>
           </div>

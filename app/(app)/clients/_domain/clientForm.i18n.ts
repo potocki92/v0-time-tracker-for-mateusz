@@ -81,7 +81,7 @@ export const COUNTRIES: readonly CountryMeta[] = [
     timezone:   'Europe/London',
     postalCode: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i,
     postalHint: 'SW1A 1AA',
-    taxIdLabel: 'VAT Number',
+    taxIdLabel: 'Numer VAT',
     taxIdRules: [/^GB\d{9}$/i, /^GB\d{12}$/i],
     taxIdHint:  'GB123456789',
   },
@@ -208,8 +208,8 @@ export const CURRENCIES: readonly { code: CurrencyCode; label: string }[] = [
 
 export const LOCALES: readonly { code: string; label: string }[] = [
   { code: 'pl-PL', label: 'Polski (PL)' },
-  { code: 'en-GB', label: 'English (UK)' },
-  { code: 'en-US', label: 'English (US)' },
+  { code: 'en-GB', label: 'Angielski (UK)' },
+  { code: 'en-US', label: 'Angielski (US)' },
   { code: 'de-DE', label: 'Deutsch (DE)' },
   { code: 'fr-FR', label: 'Français (FR)' },
   { code: 'it-IT', label: 'Italiano (IT)' },
