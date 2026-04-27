@@ -10,13 +10,18 @@ import {
   fetchCurrentUser,
   toProjectPayload,
   updateProject,
-} from '../_services/projects.fetchers'
+} from '../services/projects.fetchers'
 
 type SaveArgs = {
   editingId: string | null
   formData: ProjectFormData
 }
 
+/**
+ * Save (create / update) and remove mutations for a project.
+ * Both invalidate QUERY_KEYS.projectsData() so derived KPIs and
+ * lists re-compute automatically after a successful round-trip.
+ */
 export function useProjectMutations() {
   const queryClient = useQueryClient()
 

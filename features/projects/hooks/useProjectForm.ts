@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import type { Client, Project, ProjectFormData } from '@/lib/types'
-import { PROJECT_COLOR_OPTIONS } from '../_domain/projects.constants'
+import { PROJECT_COLOR_OPTIONS } from '../types/projects.constants'
 
 function randomColor(): string {
   return PROJECT_COLOR_OPTIONS[Math.floor(Math.random() * PROJECT_COLOR_OPTIONS.length)]
@@ -40,6 +40,11 @@ function toFormData(project: Project): ProjectFormData {
   }
 }
 
+/**
+ * Owns the create/edit modal state for a project. Decouples
+ * form state from mutation state so dialogs can be re-opened
+ * mid-flight without losing user input.
+ */
 export function useProjectForm(clients: Client[]) {
   const [isOpen, setIsOpen] = useState(false)
   const [editing, setEditing] = useState<Project | null>(null)

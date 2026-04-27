@@ -1,7 +1,14 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { AppFooter } from '@/components/common/AppFooter'
+import type { Project } from '@/lib/types'
+import { useProjectForm } from '../hooks/useProjectForm'
+import { useProjectMutations } from '../hooks/useProjectMutations'
 import { useProjectsData } from '../hooks/useProjectsData'
+import { ProjectsListBoundary, ProjectsStatsBoundary } from './errors'
+import { ProjectDeleteDialog, ProjectFormDialog } from './form'
 import {
   AllProjectsSection,
   BudgetUtilizationSection,
@@ -14,35 +21,99 @@ import {
 /**
  * Linear-style dark composition for the Projects module.
  *
- * Structure (mobile-first, single column up to md):
- *   - Header (period eyebrow, count badge, primary CTA)
- *   - KPI grid (4 tiles: All / Active / Done / Total budget)
- *   - Featured project (top priority active card with Track CTA)
- *   - Status breakdown (cross-status mix)
- *   - Budget utilisation (per-project burn vs contracted budget)
- *   - All projects (filterable list with pill tabs)
+ * Stack (mobile-first, single column up to md):
+ *   - HeaderSection ─ slim action bar (Export · Nowy projekt)
+ *   - KpiSection ─ KPI grid (All / Active / Done / Total budget)
+ *   - FeaturedSection ─ top priority active project, opens edit dialog
+ *   - StatusBreakdownSection
+ *   - BudgetUtilizationSection ─ portfolio burn vs contracted budget
+ *   - AllProjectsSection ─ filterable list with row-level edit/delete
+ *   - AppFooter
  *
- * Each section is a thin client wrapper around `useProjectsData()` so
- * Suspense fallback (page.tsx → <ProjectsSkeleton />) covers initial load
- * and per-section memoisation isolates re-renders.
+ * Modal state lives here (single source of truth):
+ *   - useProjectForm() ─ open/close + formData (create | edit)
+ *   - useProjectMutations() ─ save + remove with toast feedback
+ *
+ * Quick action `/projects?new=1` (sidebar) auto-opens the create form
+ * once and strips the param so deep-linking stays idempotent.
  */
 export function ProjectsContent() {
   const { data } = useProjectsData()
+  const { clients } = data
+
+  const form = useProjectForm(clients)
+  const { save, remove } = useProjectMutations()
+
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
+
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const quickAddTriggered = useRef(false)
+
+  useEffect(() => {
+    if (quickAddTriggered.current) return
+    if (searchParams.get('new') !== '1') return
+    quickAddTriggered.current = true
+    form.openCreate()
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('new')
+    const query = params.toString()
+    router.replace(query ? `/projects?${query}` : '/projects', { scroll: false })
+  }, [searchParams, form, router])
+
+  const handleSubmit = () => {
+    save.mutate(
+      { editingId: form.editing?.id ?? null, formData: form.formData },
+      { onSuccess: () => form.close() },
+    )
+  }
+
+  const handleDeleteConfirm = () => {
+    if (!projectToDelete) return
+    remove.mutate(projectToDelete.id, {
+      onSuccess: () => setProjectToDelete(null),
+    })
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
-        <HeaderSection
-          total={data.projects.length}
-          onCreate={() => router.push('/projects?new=1')}
-        />
+        <HeaderSection onCreate={form.openCreate} />
 
-        <KpiSection />
-        <FeaturedSection />
+        <ProjectsStatsBoundary>
+          <KpiSection />
+        </ProjectsStatsBoundary>
+
+        <FeaturedSection onEditProject={form.openEdit} />
         <StatusBreakdownSection />
         <BudgetUtilizationSection />
-        <AllProjectsSection />
+
+        <ProjectsListBoundary>
+          <AllProjectsSection
+            onEditProject={form.openEdit}
+            onDeleteProject={setProjectToDelete}
+          />
+        </ProjectsListBoundary>
+
+        <ProjectFormDialog
+          open={form.isOpen}
+          isSaving={save.isPending}
+          editing={form.editing}
+          clients={clients}
+          formData={form.formData}
+          onOpenChange={form.setIsOpen}
+          onChange={form.setFormData}
+          onSubmit={handleSubmit}
+        />
+
+        <ProjectDeleteDialog
+          project={projectToDelete}
+          isDeleting={remove.isPending}
+          onCancel={() => setProjectToDelete(null)}
+          onConfirm={handleDeleteConfirm}
+        />
+
+        <AppFooter />
       </div>
     </div>
   )

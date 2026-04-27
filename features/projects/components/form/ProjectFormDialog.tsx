@@ -11,7 +11,13 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import {
   PRIORITY_LABELS,
@@ -26,7 +32,7 @@ import {
   PROJECT_COLOR_OPTIONS,
   PROJECT_PRIORITY_OPTIONS,
   PROJECT_STATUS_OPTIONS,
-} from '../../_domain/projects.constants'
+} from '../../types/projects.constants'
 
 type Props = {
   open: boolean

@@ -4,6 +4,8 @@ export { useStatusBreakdown } from './useStatusBreakdown'
 export { useBudgetUtilization } from './useBudgetUtilization'
 export { useFeaturedProject } from './useFeaturedProject'
 export { useProjectsFilters } from './useProjectsFilters'
+export { useProjectForm } from './useProjectForm'
+export { useProjectMutations } from './useProjectMutations'
 export {
   useClientProjectAggregate,
   useClientProjectAggregates,

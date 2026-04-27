@@ -1,3 +1,6 @@
+import type {
+  Project,
+} from '@/lib/types'
 import type { ProjectPriority, ProjectStatus, ProjectStatusFilter } from './projects.types'
 
 export const PROJECT_STATUS_FILTER_OPTIONS: Array<{ value: ProjectStatusFilter; label: string }> = [
@@ -6,6 +9,34 @@ export const PROJECT_STATUS_FILTER_OPTIONS: Array<{ value: ProjectStatusFilter; 
   { value: 'completed', label: 'Done' },
   { value: 'planned', label: 'Planned' },
 ]
+
+export const PROJECT_STATUS_OPTIONS: ProjectStatus[] = [
+  'planned',
+  'in_progress',
+  'completed',
+  'on_hold',
+]
+
+export const PROJECT_PRIORITY_OPTIONS: ProjectPriority[] = ['low', 'medium', 'high']
+
+export const PROJECT_BUDGET_OPTIONS: Project['budget_type'][] = ['hourly', 'fixed', 'per_unit']
+
+export const PROJECT_BUDGET_LABELS: Record<Project['budget_type'], string> = {
+  hourly: 'Godzinowy',
+  fixed: 'Ryczałtowy',
+  per_unit: 'Za jednostkę',
+}
+
+export const PROJECT_COLOR_OPTIONS = [
+  '#3b82f6',
+  '#10b981',
+  '#8b5cf6',
+  '#f59e0b',
+  '#ef4444',
+  '#06b6d4',
+  '#ec4899',
+  '#64748b',
+] as const
 
 export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   planned: 'Planned',

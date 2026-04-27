@@ -1,9 +1,10 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Pin, Play } from 'lucide-react'
+import { Pencil, Pin } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatCurrency } from '@/lib/helpers'
+import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { PROJECT_PRIORITY_PILL, PROJECT_STATUS_PILL } from '../../types/projects.constants'
 import type { FeaturedProject } from '../../types/projects.types'
@@ -11,7 +12,7 @@ import { LINEAR } from './linear.tokens'
 
 type FeaturedProjectCardProps = {
   featured: FeaturedProject
-  onTrack?: (projectId: string) => void
+  onEdit?: (project: Project) => void
 }
 
 function formatStartedAt(date: string | null): string {
@@ -28,7 +29,7 @@ function clientInitials(name: string): string {
   return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
 }
 
-export function FeaturedProjectCard({ featured, onTrack }: FeaturedProjectCardProps) {
+export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardProps) {
   const { project, clientName, progressPct, hoursLogged, hoursTarget, budget, budgetSpent, tasksDone, tasksTotal, isAtRisk } = featured
   const statusPill = PROJECT_STATUS_PILL[project.status]
   const priorityPill = PROJECT_PRIORITY_PILL[project.priority]
@@ -76,10 +77,10 @@ export function FeaturedProjectCard({ featured, onTrack }: FeaturedProjectCardPr
           </span>
         </div>
 
-        {onTrack && (
+        {onEdit && (
           <button
             type="button"
-            onClick={() => onTrack(project.id)}
+            onClick={() => onEdit(project)}
             className={cn(
               'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold text-white transition',
               LINEAR.border,
@@ -87,8 +88,8 @@ export function FeaturedProjectCard({ featured, onTrack }: FeaturedProjectCardPr
               'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300',
             )}
           >
-            <Play className="h-3.5 w-3.5" aria-hidden />
-            Track
+            <Pencil className="h-3.5 w-3.5" aria-hidden />
+            Edytuj
           </button>
         )}
       </header>
