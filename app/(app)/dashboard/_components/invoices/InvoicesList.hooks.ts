@@ -14,7 +14,7 @@
 
 import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { updateInvoicePaid } from '@/app/(app)/dashboard/_services/dashboard.fetchers'
+import { updateInvoicePaidStatusAction } from '@/app/(app)/invoices/_services/invoices.service.server'
 import { QUERY_KEYS } from '@/lib/query'
 import { useHaptic } from '@/hooks/useHaptic'
 import { useUndoableAction } from '@/hooks/useUndoableAction'
@@ -86,7 +86,7 @@ export function useMarkInvoicePaid(
 
   const { execute } = useUndoableAction<string>({
     action: async (invoiceId) => {
-      await updateInvoicePaid(invoiceId)
+      await updateInvoicePaidStatusAction(invoiceId, true)
       // Granularny invalidate po potwierdzeniu z serwera
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.invoices() })
       pendingSetRef.current.delete(invoiceId)

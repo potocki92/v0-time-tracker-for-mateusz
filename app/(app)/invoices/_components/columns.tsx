@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, CheckCircle2, Clock3, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import type { Column, ColumnDef, FilterFn } from '@tanstack/react-table'
 import type { Client, Invoice } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
@@ -25,6 +25,7 @@ export interface InvoicesTableMeta {
   clientsById: Map<string, Client>
   onEdit: (invoice: Invoice) => void
   onDelete: (invoice: Invoice) => void
+  onTogglePaid: (invoice: Invoice) => void
 }
 
 function formatInvoiceDate(date: string | null | undefined) {
@@ -193,6 +194,10 @@ export const columns: ColumnDef<Invoice>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => meta?.onTogglePaid(row.original)}>
+                {row.original.is_paid ? <Clock3 className="size-4" /> : <CheckCircle2 className="size-4" />}
+                {row.original.is_paid ? 'Oznacz jako nieopłaconą' : 'Oznacz jako opłaconą'}
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => meta?.onEdit(row.original)}>
                 <Pencil className="size-4" />
                 Edytuj

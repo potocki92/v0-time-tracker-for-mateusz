@@ -462,3 +462,19 @@ export async function deleteInvoiceAction(invoiceId: string) {
   revalidatePath('/invoices')
   revalidatePath('/dashboard')
 }
+
+export async function updateInvoicePaidStatusAction(invoiceId: string, isPaid: boolean) {
+  const userId = await fetchCurrentUserId()
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('invoices')
+    .update({ is_paid: isPaid })
+    .eq('id', invoiceId)
+    .eq('user_id', userId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/invoices')
+  revalidatePath('/dashboard')
+}

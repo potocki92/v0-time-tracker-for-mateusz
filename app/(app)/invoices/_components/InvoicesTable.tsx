@@ -13,6 +13,7 @@ interface InvoicesTableProps {
   clients: Client[]
   onEdit: (invoice: Invoice) => void
   onDelete: (invoice: Invoice) => void
+  onTogglePaid: (invoice: Invoice) => void
   onBulkDelete?: (invoices: Invoice[]) => void
   onCreate?: () => void
 }
@@ -22,6 +23,7 @@ export function InvoicesTable({
   clients,
   onEdit,
   onDelete,
+  onTogglePaid,
   onBulkDelete,
   onCreate,
 }: InvoicesTableProps) {
@@ -29,8 +31,8 @@ export function InvoicesTable({
   const clientsById = useMemo(() => new Map(clients.map((client) => [client.id, client])), [clients])
 
   const tableMeta = useMemo<InvoicesTableMeta>(
-    () => ({ clientsById, onEdit, onDelete }),
-    [clientsById, onDelete, onEdit],
+    () => ({ clientsById, onEdit, onDelete, onTogglePaid }),
+    [clientsById, onDelete, onEdit, onTogglePaid],
   )
 
   const filters = useMemo<DataTableFilter[]>(
@@ -64,6 +66,7 @@ export function InvoicesTable({
         clients={clients}
         onEdit={onEdit}
         onDelete={onDelete}
+        onTogglePaid={onTogglePaid}
       />
     )
   }

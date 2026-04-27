@@ -8,6 +8,7 @@ import {
   deleteInvoiceAction,
   runAutoIssueInvoicesAction,
   saveInvoiceAction,
+  updateInvoicePaidStatusAction,
 } from '../_services/invoices.service.server'
 
 function useInvalidateInvoices() {
@@ -68,6 +69,23 @@ export function useRunAutoIssueInvoices() {
     },
     onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : 'Auto-fakturowanie nie powiodło się')
+    },
+  })
+}
+
+export function useSetInvoicePaidStatus() {
+  const invalidate = useInvalidateInvoices()
+
+  return useMutation({
+    mutationKey: MUTATION_KEYS.invoice.markPaid,
+    mutationFn: ({ invoiceId, isPaid }: { invoiceId: string; isPaid: boolean }) =>
+      updateInvoicePaidStatusAction(invoiceId, isPaid),
+    onSuccess: (_, variables) => {
+      toast.success(variables.isPaid ? 'Faktura oznaczona jako opłacona' : 'Faktura oznaczona jako nieopłacona')
+      invalidate()
+    },
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Nie udało się zaktualizować statusu faktury')
     },
   })
 }

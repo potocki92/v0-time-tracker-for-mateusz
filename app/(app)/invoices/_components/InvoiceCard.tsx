@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Download, ExternalLink, MoreHorizontal, Pencil, Send, Trash2 } from 'lucide-react'
+import { CheckCircle2, Clock3, Download, ExternalLink, MoreHorizontal, Pencil, Send, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -20,6 +20,7 @@ interface InvoiceCardProps {
   client: Client | null
   onEdit: (invoice: Invoice) => void
   onDelete: (invoice: Invoice) => void
+  onTogglePaid: (invoice: Invoice) => void
 }
 
 /**
@@ -28,7 +29,7 @@ interface InvoiceCardProps {
  * — middle: client
  * — bottom: bold amount + trigger for the bottom-sheet with secondary actions
  */
-export function InvoiceCard({ invoice, client, onEdit, onDelete }: InvoiceCardProps) {
+export function InvoiceCard({ invoice, client, onEdit, onDelete, onTogglePaid }: InvoiceCardProps) {
   const [actionsOpen, setActionsOpen] = useState(false)
   const status = deriveInvoiceStatus(invoice)
   const invoiceLabel = displayInvoiceNumber(invoice)
@@ -69,6 +70,11 @@ export function InvoiceCard({ invoice, client, onEdit, onDelete }: InvoiceCardPr
               <SheetTitle className="text-base">{invoiceLabel}</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col">
+              <ActionItem
+                icon={invoice.is_paid ? <Clock3 className="size-4" /> : <CheckCircle2 className="size-4" />}
+                label={invoice.is_paid ? 'Oznacz jako nieopłaconą' : 'Oznacz jako opłaconą'}
+                onClick={withClose(() => onTogglePaid(invoice))}
+              />
               <ActionItem
                 icon={<Pencil className="size-4" />}
                 label="Edytuj fakturę"
