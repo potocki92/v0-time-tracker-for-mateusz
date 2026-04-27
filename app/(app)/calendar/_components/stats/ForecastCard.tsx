@@ -1,32 +1,34 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { TrendingUp } from 'lucide-react'
 import { formatCurrency } from '@/lib/helpers'
+import { KPICard } from './KPICard'
 
 interface Props {
   forecastPLN: number
+  workDays: number
 }
 
-export function ForecastCard({ forecastPLN }: Props) {
+export function ForecastCard({ forecastPLN, workDays }: Props) {
   return (
-    <Card className="border-border/60 shadow-sm">
-      <CardContent className="p-3 sm:p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground sm:text-[11px]">
-              Prognoza zarobków
-            </p>
-            <p className="mt-1 truncate text-xl font-bold tabular-nums tracking-tight sm:text-2xl">
-              {formatCurrency(forecastPLN, 'PLN')}
-            </p>
-          </div>
-          <div className="rounded-lg bg-emerald-500/10 p-2">
-            <TrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-          </div>
-        </div>
-        <p className="mt-3 text-[10px] text-muted-foreground sm:text-[11px]">
-          Na podstawie przepracowanych dni
-        </p>
-      </CardContent>
-    </Card>
+    <KPICard
+      label="Prognoza zarobków"
+      icon={<TrendingUp className="h-4 w-4" />}
+      accent="emerald"
+      ariaLabel={`Prognoza zarobków: ${formatCurrency(forecastPLN, 'PLN')}`}
+    >
+      <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight sm:text-[26px]">
+        {formatCurrency(forecastPLN, 'PLN')}
+      </p>
+      <p className="mt-3 text-[10px] text-muted-foreground sm:text-[11px]">
+        Na podstawie {workDays} {pluralizeDays(workDays)}
+      </p>
+    </KPICard>
   )
+}
+
+function pluralizeDays(n: number): string {
+  if (n === 1) return 'przepracowanego dnia'
+  if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) {
+    return 'przepracowanych dni'
+  }
+  return 'przepracowanych dni'
 }

@@ -32,7 +32,7 @@ export function CalendarGrid({
           <div
             key={`empty-${i}`}
             className={cn(
-              'h-16 sm:h-24 rounded-lg',
+              'h-16 rounded-lg sm:h-24',
               isWeekend ? 'bg-muted/20' : '',
             )}
             aria-hidden
@@ -48,20 +48,17 @@ export function CalendarGrid({
         const isWeekend = dayOfWeek >= 5
 
         return (
-          <div
+          <DayCell
             key={day}
-            className={cn(isWeekend ? 'rounded-lg bg-muted/15 p-px' : '')}
-          >
-            <DayCell
-              day={day}
-              month={currentMonth}
-              year={currentYear}
-              entry={entry}
-              clients={clients}
-              eurToPln={eurToPln}
-              onClick={onOpenDay}
-            />
-          </div>
+            day={day}
+            month={currentMonth}
+            year={currentYear}
+            entry={entry}
+            isWeekend={isWeekend}
+            clients={clients}
+            eurToPln={eurToPln}
+            onClick={onOpenDay}
+          />
         )
       })}
     </div>

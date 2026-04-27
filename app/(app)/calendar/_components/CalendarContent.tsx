@@ -8,6 +8,7 @@ import { useEffectiveEurRate } from '@/app/(app)/dashboard/_hooks/usePreferences
 import { getDateString, isFutureDate } from '@/lib/helpers'
 import {
   useCalendarData,
+  useCalendarInsights,
   useCalendarNavigation,
   useCalendarStats,
   useDayDialog,
@@ -26,8 +27,9 @@ import { CalendarPageHeader } from './CalendarPageHeader'
 import { CalendarStats } from './stats'
 import { CalendarGrid, CalendarMonthNav, StatusLegend } from './grid'
 import { CalendarList } from './list'
+import { MonthInsights } from './insights'
 import { DayEntryDialog } from './dialog'
-import type { WorkEntry } from '@/lib/types'
+import { MONTH_NAMES, type WorkEntry } from '@/lib/types'
 
 export function CalendarContent() {
   const { data } = useCalendarData()
@@ -43,6 +45,15 @@ export function CalendarContent() {
     nav.currentMonth,
   )
   const stats = useCalendarStats(monthEntries, clients, eurRate)
+  const insights = useCalendarInsights({
+    allEntries: workEntries,
+    monthEntries,
+    clients,
+    eurRate,
+    year: nav.currentYear,
+    month: nav.currentMonth,
+    daysInMonth: nav.daysInMonth,
+  })
 
   const form = useEntryForm(clients, projects, defaultClient)
   const [view, setView] = useState<CalendarView>('month')
@@ -106,7 +117,11 @@ export function CalendarContent() {
 
       <div className="container space-y-4 px-4 py-4 sm:space-y-5 sm:py-6">
         <CalendarStatsErrorBoundary>
-          <CalendarStats {...stats} />
+          <CalendarStats
+            {...stats}
+            streakCurrent={insights.activeStreak.current}
+            streakLongest={insights.activeStreak.longestThisYear}
+          />
         </CalendarStatsErrorBoundary>
 
         <Tabs value={view} onValueChange={(v) => setView(v as CalendarView)} className="space-y-3">
@@ -164,6 +179,12 @@ export function CalendarContent() {
             </CalendarListErrorBoundary>
           </TabsContent>
         </Tabs>
+
+        <MonthInsights
+          monthName={MONTH_NAMES[nav.currentMonth]}
+          insights={insights}
+          onViewAllEntries={() => setView('list')}
+        />
       </div>
 
       <DayEntryDialog
