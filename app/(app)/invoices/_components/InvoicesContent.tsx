@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
+import { InvoiceFiltersBar } from './InvoiceFiltersBar'
 import {
   InvoiceBuilderDialog,
   builderValuesToFormValues,
@@ -176,6 +177,8 @@ export function InvoicesContent() {
         className="hidden"
         onChange={(event) => void handleImportChange(event)}
       />
+
+      <InvoiceFiltersBar />
 
       {!hasInvoices ? (
         <Empty>

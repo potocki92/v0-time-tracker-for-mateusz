@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { uploadInvoicePdf } from '@/services/invoices'
 import type { Client, Invoice } from '@/lib/types'
-import type { ImportInvoiceCsvRow, InvoiceFormValues, InvoiceSettings } from '../_domain'
+import type { ImportInvoiceCsvRow, InvoiceFormValues, InvoiceSettings, InvoiceQueryFilters } from '../_domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   userPrefix: 'FV',
@@ -33,13 +33,43 @@ async function fetchCurrentUserId(supabase = createClient()) {
   return user
 }
 
-export async function fetchInvoicesAndClients(): Promise<{ invoices: Invoice[]; clients: Client[]; settings: InvoiceSettings }> {
+export async function fetchInvoicesAndClients(filters?: InvoiceQueryFilters): Promise<{ invoices: Invoice[]; clients: Client[]; settings: InvoiceSettings }> {
   const supabase = createClient()
   const user = await fetchCurrentUserId(supabase)
   const userId = user.id
 
+  let invoicesQuery = supabase
+    .from('invoices')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (filters?.status && filters.status !== 'all') {
+    invoicesQuery = invoicesQuery.eq('status', filters.status)
+  }
+
+  if (filters?.dateRange?.from) {
+    invoicesQuery = invoicesQuery.gte('issue_date', filters.dateRange.from)
+  }
+
+  if (filters?.dateRange?.to) {
+    invoicesQuery = invoicesQuery.lte('issue_date', filters.dateRange.to)
+  }
+
+  const searchPhrase = filters?.searchPhrase?.trim()
+  if (searchPhrase) {
+    const escaped = searchPhrase.replace(/[%_]/g, '\\$&')
+    invoicesQuery = invoicesQuery.or(
+      [
+        `name.ilike.%${escaped}%`,
+        `invoice_number.ilike.%${escaped}%`,
+        `recipient.ilike.%${escaped}%`,
+        `billing_period.ilike.%${escaped}%`,
+      ].join(','),
+    )
+  }
+
   const [invoicesRes, clientsRes] = await Promise.all([
-    supabase.from('invoices').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+    invoicesQuery.order('created_at', { ascending: false }),
     supabase.from('clients').select('*').eq('user_id', userId).order('name', { ascending: true }),
   ])
 
