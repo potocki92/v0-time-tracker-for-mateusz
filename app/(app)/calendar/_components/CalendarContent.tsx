@@ -29,6 +29,7 @@ import { CalendarGrid, CalendarMonthNav, StatusLegend } from './grid'
 import { CalendarList } from './list'
 import { MonthInsights } from './insights'
 import { DayEntryDialog } from './dialog'
+import { AppFooter } from '@/components/common/AppFooter'
 import { MONTH_NAMES, type WorkEntry } from '@/lib/types'
 
 export function CalendarContent() {
@@ -124,35 +125,48 @@ export function CalendarContent() {
           />
         </CalendarStatsErrorBoundary>
 
-        <Tabs value={view} onValueChange={(v) => setView(v as CalendarView)} className="space-y-3">
-          <div className="flex items-center justify-between">
-            <TabsList className="h-8 rounded-lg p-0.5">
-              <TabsTrigger value="month" className="h-7 gap-1.5 px-3 text-xs">
-                <LayoutGrid className="h-3.5 w-3.5" />
-                Miesiąc
-              </TabsTrigger>
-              <TabsTrigger value="list" className="h-7 gap-1.5 px-3 text-xs">
-                <List className="h-3.5 w-3.5" />
-                Lista
-              </TabsTrigger>
-            </TabsList>
-            <p className="hidden text-[11px] text-muted-foreground sm:block">
-              {stats.workDays} dni pracy • {monthEntries.length} wpisów
-            </p>
-          </div>
+        <Tabs
+          value={view}
+          onValueChange={(v) => setView(v as CalendarView)}
+          className="space-y-3"
+        >
+          <Card className="overflow-hidden border-border/60 shadow-sm">
+            <CardContent className="space-y-3 p-3 sm:p-4">
+              <CalendarMonthNav
+                currentMonth={nav.currentMonth}
+                currentYear={nav.currentYear}
+                isCurrentMonth={nav.isCurrentMonth}
+                onPrev={nav.prevMonth}
+                onNext={nav.nextMonth}
+                onToday={nav.goToToday}
+              />
 
-          <TabsContent value="month" className="mt-0 space-y-3">
-            <CalendarGridErrorBoundary>
-              <Card className="overflow-hidden border-border/60 shadow-sm">
-                <CardContent className="space-y-3 p-3 sm:p-4">
-                  <CalendarMonthNav
-                    currentMonth={nav.currentMonth}
-                    currentYear={nav.currentYear}
-                    isCurrentMonth={nav.isCurrentMonth}
-                    onPrev={nav.prevMonth}
-                    onNext={nav.nextMonth}
-                    onToday={nav.goToToday}
-                  />
+              {/* Segmentowany przełącznik widoku — wewnątrz karty, wycentrowany,
+                  spójny ze wzorcem "Today / Month / Week / List" z designu. */}
+              <div className="flex justify-center">
+                <TabsList
+                  aria-label="Widok kalendarza"
+                  className="h-9 rounded-full border border-border/60 bg-muted/40 p-0.5 shadow-inner"
+                >
+                  <TabsTrigger
+                    value="month"
+                    className="h-8 gap-1.5 rounded-full px-4 text-xs data-[state=active]:shadow-sm"
+                  >
+                    <LayoutGrid className="h-3.5 w-3.5" />
+                    Miesiąc
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="list"
+                    className="h-8 gap-1.5 rounded-full px-4 text-xs data-[state=active]:shadow-sm"
+                  >
+                    <List className="h-3.5 w-3.5" />
+                    Lista
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="month" className="mt-0 space-y-3">
+                <CalendarGridErrorBoundary>
                   <CalendarGrid
                     daysInMonth={nav.daysInMonth}
                     firstDayOfMonth={nav.firstDayOfMonth}
@@ -164,20 +178,20 @@ export function CalendarContent() {
                     onOpenDay={dialog.openDay}
                   />
                   <StatusLegend />
-                </CardContent>
-              </Card>
-            </CalendarGridErrorBoundary>
-          </TabsContent>
+                </CalendarGridErrorBoundary>
+              </TabsContent>
 
-          <TabsContent value="list" className="mt-0">
-            <CalendarListErrorBoundary>
-              <CalendarList
-                entries={monthEntries}
-                clients={clients}
-                onSelectEntry={handleSelectEntry}
-              />
-            </CalendarListErrorBoundary>
-          </TabsContent>
+              <TabsContent value="list" className="mt-0">
+                <CalendarListErrorBoundary>
+                  <CalendarList
+                    entries={monthEntries}
+                    clients={clients}
+                    onSelectEntry={handleSelectEntry}
+                  />
+                </CalendarListErrorBoundary>
+              </TabsContent>
+            </CardContent>
+          </Card>
         </Tabs>
 
         <MonthInsights
@@ -185,6 +199,8 @@ export function CalendarContent() {
           insights={insights}
           onViewAllEntries={() => setView('list')}
         />
+
+        <AppFooter />
       </div>
 
       <DayEntryDialog
