@@ -25,41 +25,29 @@ import {
   type ColumnFiltersState,
   type ColumnOrderState,
   type ColumnSizingState,
+  type PaginationState,
   type RowData,
   type RowSelectionState,
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
 import { Table, TableHeader, TableRow } from '@/components/ui/table'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { DataTableBody } from './data-table-body'
 import { DataTableHeaderCell } from './data-table-header-cell'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableToolbar } from './data-table-toolbar'
 import type { DataTableProps } from './types'
 import { useDataTableLayoutStorage } from './use-data-table-layout-storage'
-
-const DISABLED_FILTERS_KEY = '__data-table-filters_disabled'
+import { useDataTableState } from './use-data-table-state'
 
 function resolveStorageKey(storageKey: DataTableProps<RowData>['storageKey']) {
   if (!storageKey) {
-    return {
-      filtersKey: DISABLED_FILTERS_KEY,
-      layoutKey: undefined,
-    }
+    return { filtersKey: undefined, layoutKey: undefined }
   }
-
   if (typeof storageKey === 'string') {
-    return {
-      filtersKey: storageKey,
-      layoutKey: storageKey,
-    }
+    return { filtersKey: storageKey, layoutKey: storageKey }
   }
-
-  return {
-    filtersKey: storageKey.filters,
-    layoutKey: storageKey.layout,
-  }
+  return { filtersKey: storageKey.filters, layoutKey: storageKey.layout }
 }
 
 export function DataTable<TData extends RowData>({
@@ -69,6 +57,7 @@ export function DataTable<TData extends RowData>({
   emptyLabel = 'No records found.',
   filters = [],
   storageKey,
+  urlStateKey,
   initialVisibility,
   onAddRow,
   onDeleteRows,
@@ -77,23 +66,15 @@ export function DataTable<TData extends RowData>({
   meta,
 }: DataTableProps<TData>) {
   const { filtersKey, layoutKey } = resolveStorageKey(storageKey)
+
+  const { state: persistedState, setGlobalFilter, setColumnFilters, setPageIndex } =
+    useDataTableState({ urlStateKey, storageKey: filtersKey })
+
   const [sorting, setSorting] = useState<SortingState>([])
-  const [persistedFilters, setPersistedFilters] = useLocalStorage<{
-    globalFilter: string
-    columnFilters: ColumnFiltersState
-  }>(
-    filtersKey,
-    { globalFilter: '', columnFilters: [] },
-  )
-  const [globalFilter, setGlobalFilterState] = useState(filtersKey !== DISABLED_FILTERS_KEY ? persistedFilters.globalFilter : '')
-  const [columnFilters, setColumnFiltersState] = useState<ColumnFiltersState>(
-    filtersKey !== DISABLED_FILTERS_KEY ? persistedFilters.columnFilters : [],
-  )
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialVisibility ?? {})
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const { layoutState, persistLayout } = useDataTableLayoutStorage(layoutKey)
-
   const [columnSizing, setColumnSizingState] = useState<ColumnSizingState>(layoutState.columnSizing)
   const [columnOrder, setColumnOrderState] = useState<ColumnOrderState>(layoutState.columnOrder)
 
@@ -102,56 +83,76 @@ export function DataTable<TData extends RowData>({
     setColumnOrderState(layoutState.columnOrder)
   }, [layoutState.columnOrder, layoutState.columnSizing])
 
-  useEffect(() => {
-    if (filtersKey === DISABLED_FILTERS_KEY) return
-    setGlobalFilterState(persistedFilters.globalFilter)
-    setColumnFiltersState(persistedFilters.columnFilters)
-  }, [filtersKey, persistedFilters.columnFilters, persistedFilters.globalFilter])
+  const setColumnSizing = useCallback(
+    (value: ColumnSizingState | ((old: ColumnSizingState) => ColumnSizingState)) => {
+      setColumnSizingState((prev) => {
+        const next = typeof value === 'function' ? value(prev) : value
+        persistLayout?.((current) => ({ ...current, columnSizing: next }))
+        return next
+      })
+    },
+    [persistLayout],
+  )
 
-  const setGlobalFilter = useCallback((value: string) => {
-    setGlobalFilterState(value)
-    if (filtersKey !== DISABLED_FILTERS_KEY) {
-      setPersistedFilters((prev) => ({ ...prev, globalFilter: value }))
-    }
-  }, [filtersKey, setPersistedFilters])
+  const setColumnOrder = useCallback(
+    (value: ColumnOrderState | ((old: ColumnOrderState) => ColumnOrderState)) => {
+      setColumnOrderState((prev) => {
+        const next = typeof value === 'function' ? value(prev) : value
+        persistLayout?.((current) => ({ ...current, columnOrder: next }))
+        return next
+      })
+    },
+    [persistLayout],
+  )
 
-  const setColumnFilters = useCallback((value: ColumnFiltersState | ((prev: ColumnFiltersState) => ColumnFiltersState)) => {
-    setColumnFiltersState((prev) => {
-      const next = typeof value === 'function' ? value(prev) : value
-      if (filtersKey !== DISABLED_FILTERS_KEY) {
-        setPersistedFilters((persisted) => ({ ...persisted, columnFilters: next }))
+  const [currentPageSize, setCurrentPageSize] = useState(pageSize)
+
+  const pagination: PaginationState = useMemo(
+    () => ({ pageIndex: persistedState.pageIndex, pageSize: currentPageSize }),
+    [persistedState.pageIndex, currentPageSize],
+  )
+
+  const handlePaginationChange = useCallback(
+    (updater: PaginationState | ((prev: PaginationState) => PaginationState)) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater
+      if (next.pageSize !== pagination.pageSize) {
+        setCurrentPageSize(next.pageSize)
       }
-      return next
-    })
-  }, [filtersKey, setPersistedFilters])
+      if (next.pageIndex !== pagination.pageIndex) {
+        setPageIndex(next.pageIndex)
+      }
+    },
+    [pagination, setPageIndex],
+  )
 
-  const setColumnSizing = useCallback((value: ColumnSizingState | ((old: ColumnSizingState) => ColumnSizingState)) => {
-    setColumnSizingState((prev) => {
-      const next = typeof value === 'function' ? value(prev) : value
-      persistLayout?.((current) => ({ ...current, columnSizing: next }))
-      return next
-    })
-  }, [persistLayout])
-
-  const setColumnOrder = useCallback((value: ColumnOrderState | ((old: ColumnOrderState) => ColumnOrderState)) => {
-    setColumnOrderState((prev) => {
-      const next = typeof value === 'function' ? value(prev) : value
-      persistLayout?.((current) => ({ ...current, columnOrder: next }))
-      return next
-    })
-  }, [persistLayout])
+  const handleColumnFiltersChange = useCallback(
+    (updater: ColumnFiltersState | ((prev: ColumnFiltersState) => ColumnFiltersState)) => {
+      setColumnFilters(updater)
+    },
+    [setColumnFilters],
+  )
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter, columnFilters, columnVisibility, columnSizing, rowSelection, columnOrder },
+    state: {
+      sorting,
+      globalFilter: persistedState.globalFilter,
+      columnFilters: persistedState.columnFilters,
+      columnVisibility,
+      columnSizing,
+      rowSelection,
+      columnOrder,
+      pagination,
+    },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: handleColumnFiltersChange,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnSizingChange: setColumnSizing,
     onColumnOrderChange: setColumnOrder,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: handlePaginationChange,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -160,11 +161,22 @@ export function DataTable<TData extends RowData>({
     columnResizeMode: 'onChange',
     enableColumnResizing: true,
     enableRowSelection: Boolean(onDeleteRows),
-    initialState: { pagination: { pageSize } },
     meta,
   })
 
-  const selectedRows = useMemo(() => table.getFilteredSelectedRowModel().rows.map((row) => row.original), [table, rowSelection])
+  // Clamp pageIndex if filters reduce the visible row count below current page.
+  const totalPages = table.getPageCount()
+  useEffect(() => {
+    if (totalPages > 0 && pagination.pageIndex >= totalPages) {
+      setPageIndex(Math.max(0, totalPages - 1))
+    }
+  }, [totalPages, pagination.pageIndex, setPageIndex])
+
+  const selectedRows = useMemo(
+    () => table.getFilteredSelectedRowModel().rows.map((row) => row.original),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [table, rowSelection],
+  )
   const headerGroups = table.getHeaderGroups()
 
   const sensors = useSensors(
@@ -174,28 +186,32 @@ export function DataTable<TData extends RowData>({
 
   const columnIds = useMemo(
     () => table.getVisibleLeafColumns().map((column) => column.id),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [table, columnOrder, columnVisibility],
   )
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
 
-    setColumnOrder((current) => {
-      const baseOrder = current.length ? current : table.getAllLeafColumns().map((column) => column.id)
-      const oldIndex = baseOrder.indexOf(String(active.id))
-      const newIndex = baseOrder.indexOf(String(over.id))
+      setColumnOrder((current) => {
+        const baseOrder = current.length ? current : table.getAllLeafColumns().map((column) => column.id)
+        const oldIndex = baseOrder.indexOf(String(active.id))
+        const newIndex = baseOrder.indexOf(String(over.id))
 
-      if (oldIndex < 0 || newIndex < 0) return baseOrder
-      return arrayMove(baseOrder, oldIndex, newIndex)
-    })
-  }, [setColumnOrder, table])
+        if (oldIndex < 0 || newIndex < 0) return baseOrder
+        return arrayMove(baseOrder, oldIndex, newIndex)
+      })
+    },
+    [setColumnOrder, table],
+  )
 
   return (
     <div className="space-y-3">
       <DataTableToolbar
         table={table}
-        globalFilter={globalFilter}
+        globalFilter={persistedState.globalFilter}
         onGlobalFilterChange={setGlobalFilter}
         filters={filters}
         searchPlaceholder={searchPlaceholder}

@@ -13,9 +13,18 @@ interface InvoicesTableProps {
   clients: Client[]
   onEdit: (invoice: Invoice) => void
   onDelete: (invoice: Invoice) => void
+  onBulkDelete?: (invoices: Invoice[]) => void
+  onCreate?: () => void
 }
 
-export function InvoicesTable({ invoices, clients, onEdit, onDelete }: InvoicesTableProps) {
+export function InvoicesTable({
+  invoices,
+  clients,
+  onEdit,
+  onDelete,
+  onBulkDelete,
+  onCreate,
+}: InvoicesTableProps) {
   const isMobile = useIsMobile()
   const clientsById = useMemo(() => new Map(clients.map((client) => [client.id, client])), [clients])
 
@@ -39,6 +48,11 @@ export function InvoicesTable({ invoices, clients, onEdit, onDelete }: InvoicesT
           { label: INVOICE_STATUS_LABELS_PL.CANCELLED, value: InvoiceStatus.CANCELLED },
         ],
       },
+      {
+        columnId: 'invoice_date',
+        label: 'Okres wystawienia',
+        type: 'dateRange',
+      },
     ],
     [],
   )
@@ -61,6 +75,9 @@ export function InvoicesTable({ invoices, clients, onEdit, onDelete }: InvoicesT
       meta={tableMeta}
       filters={filters}
       storageKey={{ filters: 'invoices-table-filters-v2', layout: 'invoices-table-layout-v2' }}
+      urlStateKey="inv"
+      onAddRow={onCreate}
+      onDeleteRows={onBulkDelete ? (rows) => onBulkDelete(rows) : undefined}
       searchPlaceholder="Szukaj po numerze, kliencie lub okresie..."
       emptyLabel="Brak faktur spełniających kryteria."
       initialVisibility={{ billing_period: false }}
