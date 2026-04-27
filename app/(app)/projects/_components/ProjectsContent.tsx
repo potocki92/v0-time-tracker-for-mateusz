@@ -15,6 +15,7 @@ import { ProjectsDataTable } from './list/ProjectsDataTable'
 import { ProjectsEmpty } from './list/ProjectsEmpty'
 import { ProjectFormDialog } from './form/ProjectFormDialog'
 import { ProjectDeleteDialog } from './form/ProjectDeleteDialog'
+import { AppFooter } from '@/components/common/AppFooter'
 import { ProjectsListBoundary, ProjectsStatsBoundary } from './errors'
 
 export function ProjectsContent() {
@@ -60,7 +61,7 @@ export function ProjectsContent() {
   }
 
   return (
-    <div className="container space-y-6 px-4 py-6">
+    <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
       <ProjectsHeader total={projects.length} onCreate={form.openCreate} />
 
       <ProjectsStatsBoundary>
@@ -104,6 +105,7 @@ export function ProjectsContent() {
         onCancel={() => setProjectToDelete(null)}
         onConfirm={handleDeleteConfirm}
       />
+      <AppFooter />
     </div>
   )
 }
