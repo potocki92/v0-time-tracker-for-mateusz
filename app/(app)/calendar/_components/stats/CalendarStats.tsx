@@ -1,25 +1,39 @@
 import type { CalendarStats as CalendarStatsData } from '../../_domain/calendar.types'
+import { ActiveStreakCard } from './ActiveStreakCard'
 import { DaysCard } from './DaysCard'
 import { ForecastCard } from './ForecastCard'
 import { HoursCard } from './HoursCard'
 
+interface Props extends CalendarStatsData {
+  streakCurrent: number
+  streakLongest: number
+}
+
 /**
- * Agregat trzech kart statystyk miesiąca. Mobile: stack 2-kolumnowy (hours+forecast),
- * dni pod spodem w pełnej szerokości. Desktop: 3 kolumny.
+ * Bento-grid z 4 KPI-kartami. Mobile: 2×2, desktop: 4×1.
  */
-export function CalendarStats(props: CalendarStatsData) {
+export function CalendarStats({
+  totalHours,
+  forecastPLN,
+  workDays,
+  freeDays,
+  progressPercent,
+  baselineHours,
+  isAhead,
+  streakCurrent,
+  streakLongest,
+}: Props) {
   return (
-    <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
       <HoursCard
-        totalHours={props.totalHours}
-        baselineHours={props.baselineHours}
-        progressPercent={props.progressPercent}
-        isAhead={props.isAhead}
+        totalHours={totalHours}
+        baselineHours={baselineHours}
+        progressPercent={progressPercent}
+        isAhead={isAhead}
       />
-      <ForecastCard forecastPLN={props.forecastPLN} />
-      <div className="col-span-2 sm:col-span-1">
-        <DaysCard workDays={props.workDays} freeDays={props.freeDays} />
-      </div>
+      <ForecastCard forecastPLN={forecastPLN} workDays={workDays} />
+      <DaysCard workDays={workDays} freeDays={freeDays} />
+      <ActiveStreakCard current={streakCurrent} longestThisYear={streakLongest} />
     </div>
   )
 }

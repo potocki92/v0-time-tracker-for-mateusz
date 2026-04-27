@@ -1,4 +1,5 @@
 export * from './useCalendarData'
+export * from './useCalendarInsights'
 export * from './useCalendarNavigation'
 export * from './useCalendarStats'
 export * from './useMonthEntries'
