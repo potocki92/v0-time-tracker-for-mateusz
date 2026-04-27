@@ -131,12 +131,12 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
       {/* ── Dane kontaktowe ─────────────────────────────────────────── */}
       <FormSection
         title="Dane kontaktowe"
-        description="Email, telefon z kierunkiem kraju i strona WWW."
+        description="E-mail, telefon z kierunkiem kraju i strona WWW."
       >
         <FormInput<ClientFormValues>
           name="email"
           type="email"
-          label="Email"
+          label="E-mail"
           placeholder="kontakt@example.com"
           autoComplete="email"
         />

@@ -19,7 +19,7 @@ export function TimeByProject({ projects }: Props) {
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            Time by project
+            Czas wg projektu
           </h3>
           <span className="text-[11px] font-semibold tabular-nums text-foreground/80">
             {formatCurrency(total, 'PLN')}

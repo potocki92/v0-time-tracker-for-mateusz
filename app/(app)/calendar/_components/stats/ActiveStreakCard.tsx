@@ -14,7 +14,7 @@ interface Props {
 export function ActiveStreakCard({ current, longestThisYear }: Props) {
   return (
     <KPICard
-      label="Active streak"
+      label="Aktywna seria"
       icon={<Flame className="h-4 w-4" />}
       accent="amber"
       ariaLabel={`Aktualny streak: ${current} dni, najdłuższy w tym roku: ${longestThisYear} dni`}

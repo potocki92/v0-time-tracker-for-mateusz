@@ -1,9 +1,9 @@
 import {
-  Home,
+  LayoutDashboard,
   Calendar,
-  Briefcase,
+  FolderKanban,
   Users,
-  Receipt,
+  FileText,
 } from 'lucide-react'
 import type { BottomNavItem } from './BottomNav.types'
 
@@ -11,7 +11,7 @@ export const BOTTOM_NAV_ITEMS: readonly BottomNavItem[] = [
   {
     href:     '/dashboard',
     label:    'Pulpit',
-    icon:     Home,
+    icon:     LayoutDashboard,
     prefetch: true,
   },
   {
@@ -22,7 +22,7 @@ export const BOTTOM_NAV_ITEMS: readonly BottomNavItem[] = [
   {
     href:  '/projects',
     label: 'Projekty',
-    icon:  Briefcase,
+    icon:  FolderKanban,
   },
   {
     href:  '/clients',
@@ -32,6 +32,6 @@ export const BOTTOM_NAV_ITEMS: readonly BottomNavItem[] = [
   {
     href:  '/invoices',
     label: 'Faktury',
-    icon:  Receipt,
+    icon:  FileText,
   },
 ] as const
