@@ -272,7 +272,11 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
         // Keep existing file_url if no new PDF was uploaded.
         file_url: uploaded?.publicUrl ?? previousFileUrl,
       }
-      const { error } = await supabase.from('invoices').update(updatePayload).eq('id', invoiceId)
+      const { error } = await supabase
+        .from('invoices')
+        .update(updatePayload)
+        .eq('id', invoiceId)
+        .eq('user_id', userId)
       if (error) throw new Error(error.message)
     } else {
       const { error } = await supabase.from('invoices').insert(payload)
@@ -441,6 +445,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
 }
 
 export async function deleteInvoiceAction(invoiceId: string) {
+  const userId = await fetchCurrentUserId()
   const supabase = await createClient()
 
   // Fetch file_url first so we can clean up Storage after the DB row is gone.
@@ -448,10 +453,16 @@ export async function deleteInvoiceAction(invoiceId: string) {
     .from('invoices')
     .select('file_url')
     .eq('id', invoiceId)
+    .eq('user_id', userId)
     .maybeSingle()
   if (fetchError) throw new Error(fetchError.message)
+  if (!existing) throw new Error('Nie znaleziono faktury do usunięcia')
 
-  const { error } = await supabase.from('invoices').delete().eq('id', invoiceId)
+  const { error } = await supabase
+    .from('invoices')
+    .delete()
+    .eq('id', invoiceId)
+    .eq('user_id', userId)
   if (error) throw new Error(error.message)
 
   const storagePath = extractInvoicePdfPath(existing?.file_url ?? null)
