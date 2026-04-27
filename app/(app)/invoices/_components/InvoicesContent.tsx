@@ -21,6 +21,7 @@ import {
   useInvoicesData,
   useRunAutoIssueInvoices,
   useSaveInvoice,
+  useSetInvoicePaidStatus,
 } from '../_hooks'
 import type { InvoiceFormValues } from '../_domain'
 
@@ -56,6 +57,7 @@ export function InvoicesContent() {
   const saveMutation = useSaveInvoice()
   const deleteMutation = useDeleteInvoice()
   const autoIssueMutation = useRunAutoIssueInvoices()
+  const setPaidStatusMutation = useSetInvoicePaidStatus()
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
@@ -157,6 +159,13 @@ export function InvoicesContent() {
     })
   }
 
+  function handleTogglePaid(invoice: Invoice) {
+    void setPaidStatusMutation.mutateAsync({
+      invoiceId: invoice.id,
+      isPaid: !invoice.is_paid,
+    })
+  }
+
   function handleImportClick() {
     importInputRef.current?.click()
   }
@@ -214,6 +223,7 @@ export function InvoicesContent() {
           onCreate={openCreate}
           onEdit={openEdit}
           onDelete={setDeletingInvoice}
+          onTogglePaid={handleTogglePaid}
           onBulkDelete={handleBulkDelete}
         />
       )}

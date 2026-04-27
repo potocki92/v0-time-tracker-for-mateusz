@@ -9,9 +9,10 @@ interface InvoicesMobileListProps {
   clients: Client[]
   onEdit: (invoice: Invoice) => void
   onDelete: (invoice: Invoice) => void
+  onTogglePaid: (invoice: Invoice) => void
 }
 
-export function InvoicesMobileList({ invoices, clients, onEdit, onDelete }: InvoicesMobileListProps) {
+export function InvoicesMobileList({ invoices, clients, onEdit, onDelete, onTogglePaid }: InvoicesMobileListProps) {
   const clientsById = useMemo(() => new Map(clients.map((client) => [client.id, client])), [clients])
 
   if (invoices.length === 0) {
@@ -33,6 +34,7 @@ export function InvoicesMobileList({ invoices, clients, onEdit, onDelete }: Invo
               client={client}
               onEdit={onEdit}
               onDelete={onDelete}
+              onTogglePaid={onTogglePaid}
             />
           </li>
         )
