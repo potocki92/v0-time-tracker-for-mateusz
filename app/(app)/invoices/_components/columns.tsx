@@ -1,7 +1,7 @@
 'use client'
 
 import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
-import type { Column, ColumnDef } from '@tanstack/react-table'
+import type { Column, ColumnDef, FilterFn } from '@tanstack/react-table'
 import type { Client, Invoice } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
 import { displayInvoiceNumber } from '@/lib/finance/invoice-number'
@@ -12,7 +12,6 @@ import {
 } from '@/lib/finance/invoice-status'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ClientDisplay } from '@/components/common/ClientDisplay'
+import { createSelectionColumn } from '@/components/common/data-table'
 
 export interface InvoicesTableMeta {
   clientsById: Map<string, Client>
@@ -60,30 +60,26 @@ function SortableHeader({ column, label }: { column: Column<Invoice, unknown>; l
   )
 }
 
-function createSelectionColumn<TData>(): ColumnDef<TData, unknown> {
-  return {
-    id: 'select',
-    enableHiding: false,
-    enableSorting: false,
-    enableResizing: false,
-    size: 42,
-    minSize: 42,
-    maxSize: 42,
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(Boolean(value))}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(Boolean(value))}
-        aria-label="Select row"
-      />
-    ),
+// Date column stores epoch ms via accessorFn. The toolbar's date-range filter
+// passes [from, to] as ISO strings, so we coerce to ms and run an inclusive check.
+const dateRangeFilterFn: FilterFn<Invoice> = (row, columnId, value) => {
+  if (!Array.isArray(value)) return true
+  const [fromIso, toIso] = value as [string | null, string | null]
+  if (!fromIso && !toIso) return true
+
+  const cell = row.getValue<number>(columnId)
+  if (!Number.isFinite(cell)) return false
+
+  if (fromIso) {
+    const fromMs = Date.parse(fromIso)
+    if (Number.isFinite(fromMs) && cell < fromMs) return false
   }
+  if (toIso) {
+    const toMs = Date.parse(toIso)
+    // include the entire "to" day (24h window)
+    if (Number.isFinite(toMs) && cell > toMs + 24 * 60 * 60 * 1000 - 1) return false
+  }
+  return true
 }
 
 export const COLUMN_LABELS: Record<string, string> = {
@@ -135,6 +131,7 @@ export const columns: ColumnDef<Invoice>[] = [
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.invoice_date} />,
     meta: { label: COLUMN_LABELS.invoice_date },
     cell: ({ row }) => formatInvoiceDate(row.original.invoice_date || row.original.issue_date),
+    filterFn: dateRangeFilterFn,
     size: 140,
     minSize: 110,
     maxSize: 240,
@@ -154,6 +151,7 @@ export const columns: ColumnDef<Invoice>[] = [
     accessorFn: (row) => deriveInvoiceStatus(row),
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.payment_status} />,
     meta: { label: COLUMN_LABELS.payment_status },
+    filterFn: 'equalsString',
     cell: ({ row }) => {
       const status = deriveInvoiceStatus(row.original)
       return (

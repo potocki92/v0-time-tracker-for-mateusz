@@ -11,13 +11,21 @@ export type DataTableFilterOption = {
   value: string
 }
 
-export type DataTableFilter = {
+export type DataTableSelectFilter = {
   columnId: string
   label: string
   type?: 'chips' | 'select'
   options: DataTableFilterOption[]
   allLabel?: string
 }
+
+export type DataTableDateRangeFilter = {
+  columnId: string
+  label: string
+  type: 'dateRange'
+}
+
+export type DataTableFilter = DataTableSelectFilter | DataTableDateRangeFilter
 
 export type DataTableStorageKey = string | {
   filters: string
@@ -31,8 +39,16 @@ export type DataTableProps<TData extends RowData> = {
   emptyLabel?: string
   filters?: DataTableFilter[]
   storageKey?: DataTableStorageKey
+  /**
+   * URL search-param namespace for filter/pagination state. When set, the
+   * table syncs `globalFilter`, `columnFilters`, and `pageIndex` with
+   * `?{key}_q`, `?{key}_f`, `?{key}_p` so the view is bookmarkable.
+   */
+  urlStateKey?: string
   initialVisibility?: VisibilityState
   pageSize?: number
+  /** Debounce (ms) applied to the global search input. Defaults to 300ms. */
+  searchDebounceMs?: number
   onAddRow?: () => void
   onDeleteRows?: (rows: TData[]) => void
   enableColumnDnd?: boolean

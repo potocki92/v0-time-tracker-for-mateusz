@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { InvoicesHeader } from './InvoicesHeader'
 import { InvoicesTable } from './InvoicesTable'
-import { InvoiceFiltersBar } from './InvoiceFiltersBar'
 import {
   InvoiceBuilderDialog,
   builderValuesToFormValues,
@@ -119,6 +118,23 @@ export function InvoicesContent() {
     setDeletingInvoice(null)
   }
 
+  async function handleBulkDelete(invoices: Invoice[]) {
+    if (invoices.length === 0) return
+    const confirmed =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm(`Usunąć ${invoices.length} ${invoices.length === 1 ? 'fakturę' : 'faktur'}?`)
+    if (!confirmed) return
+
+    const results = await Promise.allSettled(
+      invoices.map((invoice) => deleteMutation.mutateAsync(invoice.id)),
+    )
+    const failed = results.filter((result) => result.status === 'rejected').length
+    if (failed > 0) {
+      toast.error(`Nie udało się usunąć ${failed} ${failed === 1 ? 'faktury' : 'faktur'}.`)
+    }
+  }
+
   async function handleCreateTestInvoice() {
     const now = new Date()
     const dateTag = formatTestInvoiceDateTag(now)
@@ -178,8 +194,6 @@ export function InvoicesContent() {
         onChange={(event) => void handleImportChange(event)}
       />
 
-      <InvoiceFiltersBar />
-
       {!hasInvoices ? (
         <Empty>
           <EmptyHeader>
@@ -197,8 +211,10 @@ export function InvoicesContent() {
         <InvoicesTable
           invoices={data.invoices}
           clients={data.clients}
+          onCreate={openCreate}
           onEdit={openEdit}
           onDelete={setDeletingInvoice}
+          onBulkDelete={handleBulkDelete}
         />
       )}
 
