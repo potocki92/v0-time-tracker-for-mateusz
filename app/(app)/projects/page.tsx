@@ -1,18 +1,21 @@
 import { Suspense } from 'react'
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
 import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
-import { ProjectsContent } from './_components/ProjectsContent'
-import { ProjectsSkeleton } from './_components/ProjectsSkeleton'
+import {
+  ProjectsContent,
+  ProjectsSkeleton,
+  getProjectsDataServer,
+} from '@/features/projects'
 import { ProjectsContentBoundary } from './_components/errors'
-import { getProjectsDataServer } from './_services/projects.service.server'
 
-// Server Component — bez 'use client'
+// Server Component — bez 'use client'.
+// Prefetch po stronie serwera + hydracja React Query → user dostaje
+// dane od razu, a sekcje renderują się synchronicznie po hydracji.
 export default async function ProjectsPage() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: QUERY_CONFIG.projects },
   })
 
-  // Prefetch na serwerze — user dostanie dane od razu
   await queryClient.prefetchQuery({
     queryKey: QUERY_KEYS.projectsData(),
     queryFn: getProjectsDataServer,

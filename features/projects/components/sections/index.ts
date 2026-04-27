@@ -1,0 +1,6 @@
+export { HeaderSection } from './HeaderSection'
+export { KpiSection } from './KpiSection'
+export { FeaturedSection } from './FeaturedSection'
+export { StatusBreakdownSection } from './StatusBreakdownSection'
+export { BudgetUtilizationSection } from './BudgetUtilizationSection'
+export { AllProjectsSection } from './AllProjectsSection'
