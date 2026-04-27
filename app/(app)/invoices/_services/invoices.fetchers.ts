@@ -137,6 +137,7 @@ export async function saveInvoice({ invoiceId, values }: { invoiceId?: string; v
       .from('invoices')
       .update({ ...payload, file_url: pdfUrl ?? undefined })
       .eq('id', invoiceId)
+      .eq('user_id', userId)
 
     if (error) throw new Error(error.message)
     return
@@ -148,7 +149,12 @@ export async function saveInvoice({ invoiceId, values }: { invoiceId?: string; v
 
 export async function deleteInvoice(invoiceId: string) {
   const supabase = createClient()
-  const { error } = await supabase.from('invoices').delete().eq('id', invoiceId)
+  const userId = (await fetchCurrentUserId(supabase)).id
+  const { error } = await supabase
+    .from('invoices')
+    .delete()
+    .eq('id', invoiceId)
+    .eq('user_id', userId)
   if (error) throw new Error(error.message)
 }
 
@@ -160,13 +166,23 @@ export async function importInvoicesFromCsv(rows: ImportInvoiceCsvRow[]) {
 
   const payload = []
 
+  const clientIdCache = new Map<string, string | null>()
+
   for (const row of rows) {
-    const resolvedClientId = row.client_name
-      ? await createClientIfNeeded(row.client_name, {
+    const normalizedClientName = row.client_name.trim().toLocaleLowerCase('pl-PL')
+    let resolvedClientId: string | null = null
+
+    if (normalizedClientName) {
+      if (clientIdCache.has(normalizedClientName)) {
+        resolvedClientId = clientIdCache.get(normalizedClientName) ?? null
+      } else {
+        resolvedClientId = await createClientIfNeeded(row.client_name, {
           userId,
           supabase,
         })
-      : null
+        clientIdCache.set(normalizedClientName, resolvedClientId)
+      }
+    }
 
     payload.push({
       user_id: userId,

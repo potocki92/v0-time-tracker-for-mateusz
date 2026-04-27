@@ -90,10 +90,13 @@ export async function fetchWorkEntriesPage(userId: string, page: number, pageSiz
 // ── Mutacje ───────────────────────────────────────────────────────────────────
 
 export async function updateInvoicePaid(invoiceId: string): Promise<void> {
+  const user = await fetchCurrentUser()
+  const paidDate = new Date().toISOString().slice(0, 10)
   const { error } = await getSupabase()
     .from('invoices')
-    .update({ is_paid: true })
+    .update({ is_paid: true, status: 'PAID', paid_date: paidDate })
     .eq('id', invoiceId)
+    .eq('user_id', user.id)
 
   if (error) throw new Error(`updateInvoicePaid: ${error.message}`)
 }
