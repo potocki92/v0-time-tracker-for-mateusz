@@ -21,6 +21,7 @@ import { ClientsEmpty } from './ClientsEmpty'
 import { ClientFormDialog } from './ClientFormDialog'
 import { DeleteClientDialog } from './DeleteClientDialog'
 import { RateHistoryDialog } from './RateHistoryDialog'
+import { AppFooter } from '@/components/common/AppFooter'
 import { ClientsStatsBoundary, ClientsTableBoundary } from './errors'
 import type { Client, ClientFormData } from '@/lib/types'
 import type { ClientWithStats } from '../_domain/clients.types'
@@ -109,7 +110,7 @@ export function ClientsContent() {
   }, [searchParams, openCreate, router])
 
   return (
-    <div className="container space-y-6 px-4 py-6">
+    <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
       <ClientsHeader
         totalCount={allClients.length}
         visibleCount={visible.length}
@@ -187,6 +188,7 @@ export function ClientsContent() {
         open={Boolean(historyClient)}
         onClose={() => setHistoryClient(null)}
       />
+      <AppFooter />
     </div>
   )
 }
