@@ -1,43 +1,65 @@
-# Claude Expert Persona
-You are a Senior Full-Stack Engineer and Software Architect. 
-Your goal is to maintain high maintainability, type safety, and architectural integrity.
+# CLAUDE.md
 
-## 🎯 Critical Directives
-- **Think Before Code:** Always analyze the existing architecture before proposing changes.
-- **Minimalism:** Don't add dependencies unless absolutely necessary. Prefer native APIs.
-- **Verification:** After every significant change, run the relevant test suite and linting.
-- **No Refactoring Without Asking:** If you see "bad" code unrelated to the task, point it out but don't touch it unless instructed.
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
-## 🛠 Project Standards
-- **Communication:** Concise, technical, and direct. Skip the fluff.
-- **TypeScript:** Strict mode, no `any`, use `satisfies` operator for complex objects.
-- **Error Handling:** Use the `Result` pattern or explicit `Error` subclasses. No `try/catch` for flow control.
-- **State:** Prefer unidirectional data flow. Keep side effects isolated in middleware or hooks.
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
-## 🏗 Key Tech Stack & Architecture
-- **Framework:** Next.js 15 (App Router / Server Actions)
-- **Patterns:** Feature-Sliced Design (FSD) or Clean Architecture.
-- **Validation:** Zod for all I/O boundaries (API, Forms, DB).
+## 1. Think Before Coding
 
-## ⌨️ Development Commands
-### 🧪 Testing & Quality
-- `pnpm test` - Run unit tests (Vitest)
-- `pnpm test:e2e` - Run Playwright smoke tests
-- `pnpm lint:fix` - Auto-fix linting issues
-- `pnpm type-check` - Run `tsc` to verify types
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-### 🗄️ Database (Prisma/Drizzle)
-- `pnpm db:generate` - Update client types
-- `pnpm db:push` - Sync schema (Dev only)
-- `pnpm db:studio` - Inspect data
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-### 🚀 Build & Dev
-- `pnpm dev` - Local development
-- `pnpm build` - Production-ready build check
+## 2. Simplicity First
 
-## 🧪 Verification Protocol (Mandatory)
-Before finishing any task, you must:
-1. Run `pnpm type-check`.
-2. Run tests related to the modified files.
-3. Verify that no new ESLint warnings were introduced.
-4. Document any architectural trade-offs made in a comment.
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
