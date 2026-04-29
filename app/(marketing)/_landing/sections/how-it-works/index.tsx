@@ -1,4 +1,4 @@
-import { SectionIntro } from '@/app/_landing/ui/SectionIntro'
+import { SectionIntro } from '@/app/(marketing)/_landing/ui/SectionIntro'
 
 import { HOW_IT_WORKS_STEPS } from './data'
 import { HowItWorksStep } from './HowItWorksStep'

@@ -1,7 +1,7 @@
 import { CheckCircle2, Sparkles } from 'lucide-react'
 
-import { MotionReveal } from '@/app/_landing/ui/MotionReveal'
-import { ParallaxLayer } from '@/app/_landing/ui/ParallaxLayer'
+import { MotionReveal } from '@/app/(marketing)/_landing/ui/MotionReveal'
+import { ParallaxLayer } from '@/app/(marketing)/_landing/ui/ParallaxLayer'
 
 import { HERO_USP_ITEMS } from './data'
 import { HeroActions } from './HeroActions'

@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react'
 
-import { MotionReveal } from '@/app/_landing/ui/MotionReveal'
-import { ParallaxLayer } from '@/app/_landing/ui/ParallaxLayer'
+import { MotionReveal } from '@/app/(marketing)/_landing/ui/MotionReveal'
+import { ParallaxLayer } from '@/app/(marketing)/_landing/ui/ParallaxLayer'
 import { cn } from '@/lib/utils'
 
 import type { ShowcaseBlock } from './data'

@@ -1,5 +1,5 @@
 import { Accordion } from '@/components/ui/accordion'
-import { SectionIntro } from '@/app/_landing/ui/SectionIntro'
+import { SectionIntro } from '@/app/(marketing)/_landing/ui/SectionIntro'
 
 import { FAQ_ITEMS } from './data'
 import { FaqItem } from './FaqItem'
