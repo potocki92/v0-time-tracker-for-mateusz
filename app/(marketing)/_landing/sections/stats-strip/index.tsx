@@ -1,4 +1,4 @@
-import { MotionItem, MotionStagger } from '@/app/_landing/ui/MotionReveal'
+import { MotionItem, MotionStagger } from '@/app/(marketing)/_landing/ui/MotionReveal'
 
 import { STATS_STRIP_ITEMS } from './data'
 

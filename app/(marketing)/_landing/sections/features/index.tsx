@@ -1,5 +1,5 @@
-import { MotionItem, MotionReveal, MotionStagger } from '@/app/_landing/ui/MotionReveal'
-import { SectionIntro } from '@/app/_landing/ui/SectionIntro'
+import { MotionItem, MotionReveal, MotionStagger } from '@/app/(marketing)/_landing/ui/MotionReveal'
+import { SectionIntro } from '@/app/(marketing)/_landing/ui/SectionIntro'
 
 import { FeatureCard } from './FeatureCard'
 import { FEATURE_ITEMS } from './data'

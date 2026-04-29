@@ -1,4 +1,4 @@
-import { LANDING_NAV_LINKS } from '@/app/_landing/logic/navigation'
+import { LANDING_NAV_LINKS } from '@/app/(marketing)/_landing/logic/navigation'
 
 interface NavbarLinksProps {
   mobile?: boolean

@@ -1,5 +1,5 @@
-import { MotionReveal } from '@/app/_landing/ui/MotionReveal'
-import { ParallaxLayer } from '@/app/_landing/ui/ParallaxLayer'
+import { MotionReveal } from '@/app/(marketing)/_landing/ui/MotionReveal'
+import { ParallaxLayer } from '@/app/(marketing)/_landing/ui/ParallaxLayer'
 
 import { FinalCtaActions } from './FinalCtaActions'
 
