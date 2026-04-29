@@ -10,25 +10,25 @@ export const QUERY_CONFIG = {
     staleTime: MINUTE * 5,
     gcTime:    MINUTE * 30,
     retry:     1,
-    refetchOnWindowFocus: 'always' as const, // dane finansowe — zawsze świeże
+    refetchOnWindowFocus: true, // odśwież tylko gdy dane są nieświeże
   },
   calendar: {
     staleTime: MINUTE * 5,
     gcTime:    MINUTE * 30,
     retry:     1,
-    refetchOnWindowFocus: 'always' as const,
+    refetchOnWindowFocus: true,
   },
   invoices: {
     staleTime: MINUTE * 2,
     gcTime:    MINUTE * 15,
     retry:     1,
-    refetchOnWindowFocus: 'always' as const,
+    refetchOnWindowFocus: true,
   },
   workEntries: {
     staleTime: MINUTE * 5,
     gcTime:    MINUTE * 30,
     retry:     1,
-    refetchOnWindowFocus: 'always' as const,
+    refetchOnWindowFocus: true,
   },
   clients: {
     staleTime: MINUTE * 15,
@@ -40,7 +40,7 @@ export const QUERY_CONFIG = {
     staleTime: MINUTE * 5,
     gcTime:    MINUTE * 30,
     retry:     1,
-    refetchOnWindowFocus: 'always' as const,
+    refetchOnWindowFocus: true,
   },
   eurRate: {
     staleTime: MINUTE * 60,

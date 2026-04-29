@@ -16,11 +16,34 @@ function getSupabase() {
 
 // ── Resource fetchers ─────────────────────────────────────────────────────────
 
+const INVOICE_COLUMNS = [
+  'id', 'user_id', 'client_id', 'name', 'issue_date', 'invoice_date', 'due_date',
+  'invoice_number', 'recipient', 'description', 'billing_period', 'amount',
+  'net_amount', 'vat_amount', 'gross_amount', 'currency', 'is_paid', 'paid_date',
+  'status', 'file_url', 'notes', 'template_key', 'template_accent_color',
+  'template_footer', 'auto_generated', 'period_start', 'period_end', 'note',
+  'month', 'year', 'created_at',
+].join(', ')
+
+const WORK_ENTRY_COLUMNS = [
+  'id', 'user_id', 'client_id', 'project_id', 'date', 'status', 'hours', 'quantity',
+  'quantity_from', 'quantity_to', 'category', 'tags', 'notes', 'billing_rate',
+  'billing_currency', 'billing_work_type', 'billing_unit', 'created_at',
+].join(', ')
+
+const CLIENT_COLUMNS = [
+  'id', 'user_id', 'name', 'nip', 'regon', 'address', 'city', 'postal_code',
+  'region', 'country_code', 'phone', 'email', 'website', 'locale', 'timezone',
+  'work_type', 'rate', 'currency', 'unit', 'is_default', 'auto_invoice_enabled',
+  'auto_invoice_frequency', 'color', 'created_at',
+].join(', ')
+
 export async function fetchInvoices(userId: string): Promise<Invoice[]> {
   const { data, error } = await getSupabase()
     .from('invoices')
-    .select('*')
+    .select(INVOICE_COLUMNS)
     .eq('user_id', userId)
+    .order('created_at', { ascending: false })
 
   if (error) throw new Error(`fetchInvoices: ${error.message}`)
   return data ?? []
@@ -29,7 +52,7 @@ export async function fetchInvoices(userId: string): Promise<Invoice[]> {
 export async function fetchWorkEntries(userId: string, filter?: WorkEntriesFilter): Promise<WorkEntry[]> {
   let query = getSupabase()
     .from('work_entries')
-    .select('*')
+    .select(WORK_ENTRY_COLUMNS)
     .eq('user_id', userId)
 
   if (filter?.from) {
@@ -46,6 +69,8 @@ export async function fetchWorkEntries(userId: string, filter?: WorkEntriesFilte
   }
 
   const { data, error } = await query
+    .order('date', { ascending: false })
+    .order('created_at', { ascending: false })
 
   if (error) throw new Error(`fetchWorkEntries: ${error.message}`)
   return data ?? []
@@ -54,8 +79,9 @@ export async function fetchWorkEntries(userId: string, filter?: WorkEntriesFilte
 export async function fetchClients(userId: string): Promise<Client[]> {
   const { data, error } = await getSupabase()
     .from('clients')
-    .select('*')
+    .select(CLIENT_COLUMNS)
     .eq('user_id', userId)
+    .order('name', { ascending: true })
 
   if (error) throw new Error(`fetchClients: ${error.message}`)
   return data ?? []
