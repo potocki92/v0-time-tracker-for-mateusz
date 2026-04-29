@@ -1,3 +1,4 @@
+import { MotionItem, MotionReveal, MotionStagger } from '@/app/_landing/ui/MotionReveal'
 import { SectionIntro } from '@/app/_landing/ui/SectionIntro'
 
 import { FeatureCard } from './FeatureCard'
@@ -5,19 +6,28 @@ import { FEATURE_ITEMS } from './data'
 
 export function FeaturesSection() {
   return (
-    <section id="funkcje" className="border-b border-border">
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-        <SectionIntro
-          eyebrow="Funkcje"
-          title="Wszystko czego potrzebujesz — w jednym panelu"
-          description="Zamiast żonglować pięcioma aplikacjami, WorkFlow Pro łączy czas pracy, klientów, projekty i fakturowanie w spójny workflow."
-        />
+    <section id="funkcje" className="relative overflow-hidden border-b border-border">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,theme(colors.primary/10),transparent_65%)]"
+      />
 
-        <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <MotionReveal>
+          <SectionIntro
+            eyebrow="Funkcje"
+            title="Cały workflow rozliczania pracy w jednym panelu"
+            description="Od pierwszej minuty pracy do faktury PDF. WorkFlow Pro łączy timer, projekty, klientów, kalendarz i raporty w jeden spójny system."
+          />
+        </MotionReveal>
+
+        <MotionStagger className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURE_ITEMS.map((feature) => (
-            <FeatureCard key={feature.title} {...feature} />
+            <MotionItem key={feature.title}>
+              <FeatureCard {...feature} />
+            </MotionItem>
           ))}
-        </ul>
+        </MotionStagger>
       </div>
     </section>
   )
