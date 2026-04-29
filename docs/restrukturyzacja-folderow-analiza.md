@@ -147,7 +147,7 @@ Najlepiej trzymać landing **poza modułami micro‑SaaS**, bo to warstwa market
 Rekomendacja:
 - `app/(marketing)/page.tsx` – główny landing,
 - `app/(marketing)/pricing/page.tsx`, `app/(marketing)/features/page.tsx` itd.,
-- sekcje UI landingu w `features/marketing/sections/*` **albo** `app/(marketing)/_sections/*`.
+- sekcje UI landingu w `features/marketing/sections/*` **albo** `app/(marketing)/_landing/*`.
 
 ### Dlaczego tak
 - Landing ma inne cele (SEO, konwersja, A/B testy) niż moduły `dashboard/clients`.
@@ -160,7 +160,8 @@ Rekomendacja:
 
 ### Minimalny praktyczny układ
 - `app/(marketing)/...` – routing i strony publiczne,
-- `features/marketing/...` – reusable sekcje landingu,
+- `app/(marketing)/_landing/...` – sekcje i komponenty landingu (zgodnie z obecną implementacją),
+- `features/marketing/...` – opcjonalnie, jeśli później wydzielisz marketing jako osobny moduł,
 - `shared/ui/...` – atomy UI współdzielone (button, card itp.).
 
 To zachowuje Twój model izolacji micro‑SaaS i jednocześnie porządkuje warstwę marketingową.
