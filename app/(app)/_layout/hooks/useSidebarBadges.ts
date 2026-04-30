@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import {
   INVOICES_MANAGER_QUERY_KEY,
   type InvoicesData,
-} from '@/app/(app)/invoices/_domain'
-import { getInvoicesData } from '@/app/(app)/invoices/_services'
+} from '../../invoices/_domain'
+import { getInvoicesData } from '../../invoices/_services'
 
 /**
  * Liczy "kontekstowe" wskaźniki widoczne w sidebarze (np. liczbę nieopłaconych
