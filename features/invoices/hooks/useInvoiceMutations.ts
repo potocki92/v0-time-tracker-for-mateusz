@@ -3,13 +3,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
-import { INVOICES_MANAGER_QUERY_KEY, type SaveInvoiceInput } from '../_domain'
+import { INVOICES_MANAGER_QUERY_KEY, type SaveInvoiceInput } from '../domain'
 import {
   deleteInvoiceAction,
   runAutoIssueInvoicesAction,
   saveInvoiceAction,
   updateInvoicePaidStatusAction,
-} from '../_services/invoices.service.server'
+} from '../services/invoices.service.server'
 
 function useInvalidateInvoices() {
   const queryClient = useQueryClient()

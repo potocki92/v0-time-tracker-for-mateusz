@@ -4,8 +4,8 @@ import { useCallback, useMemo } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { Client, Invoice } from '@/lib/types'
-import { importInvoicesFromCsv } from '../_services'
-import { INVOICES_MANAGER_QUERY_KEY, type ImportInvoiceCsvRow } from '../_domain'
+import { importInvoicesFromCsv } from '../services'
+import { INVOICES_MANAGER_QUERY_KEY, type ImportInvoiceCsvRow } from '../domain'
 
 const CSV_HEADERS = [
   'nazwa_faktury',

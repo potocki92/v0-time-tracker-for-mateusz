@@ -22,8 +22,8 @@ import {
   useRunAutoIssueInvoices,
   useSaveInvoice,
   useSetInvoicePaidStatus,
-} from '../_hooks'
-import type { InvoiceFormValues } from '../_domain'
+} from '../hooks'
+import type { InvoiceFormValues } from '../domain'
 
 const CURRENT_YEAR = new Date().getFullYear()
 

@@ -2,8 +2,8 @@
 
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { QUERY_CONFIG } from '@/lib/query'
-import { INVOICES_MANAGER_QUERY_KEY, type InvoicesData } from '../_domain'
-import { getInvoicesData } from '../_services'
+import { INVOICES_MANAGER_QUERY_KEY, type InvoicesData } from '../domain'
+import { getInvoicesData } from '../services'
 
 export function useInvoicesData() {
   return useSuspenseQuery<InvoicesData>({
