@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { uploadInvoicePdf } from '@/services/invoices'
 import type { Client, Invoice } from '@/lib/types'
-import type { ImportInvoiceCsvRow, InvoiceFormValues, InvoiceSettings } from '../_domain'
+import type { ImportInvoiceCsvRow, InvoiceFormValues, InvoiceSettings } from '../domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   userPrefix: 'FV',

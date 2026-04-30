@@ -16,7 +16,7 @@ import {
   resolveInvoiceSettings as parseInvoiceSettings,
 } from '@/lib/schemas/invoice-settings.schema'
 import { formatInvoiceNumber, sanitizeInvoicePrefix } from '@/lib/finance/invoice-number'
-import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../_domain'
+import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
 

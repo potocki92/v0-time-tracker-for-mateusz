@@ -26,7 +26,7 @@ import type {
   InvoiceFormValues,
   InvoiceSettings,
   InvoiceTemplateKey,
-} from '../../../_domain'
+} from '../../../domain'
 
 import {
   addDaysIso,
