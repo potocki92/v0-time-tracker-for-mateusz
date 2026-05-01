@@ -54,7 +54,7 @@ export const NAV_SECTIONS: NavSection[] = [
     id: 'insights',
     label: 'Statystyki',
     items: [
-      { href: '#reports',  label: 'Raporty', icon: LineChart },
+      { href: '/reports', label: 'Raporty', icon: LineChart },
       { href: '#goals',    label: 'Cele',    icon: Target },
       { href: '#earnings', label: 'Zarobki', icon: Wallet },
       {
