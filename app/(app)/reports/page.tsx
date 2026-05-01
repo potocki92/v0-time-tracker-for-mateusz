@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ComponentType } from 'react'
 import { LineChart, Download, CalendarRange, Filter, TrendingUp } from 'lucide-react'
 import { useDashboardData } from '@/features/dashboard/hooks/useDashboardData'
@@ -13,32 +13,40 @@ type ProjectUsage = {
 }
 
 const DAYS_RANGE = 30
+const DEFAULT_DAILY_HOURS = 8
 
 export default function ReportsPage() {
   const { data } = useDashboardData()
+  const [todayKey, setTodayKey] = useState<string | null>(null)
+
+  useEffect(() => {
+    setTodayKey(getLocalDateKey(new Date()))
+  }, [])
 
   const report = useMemo(() => {
-    const now = new Date()
-    const start = new Date(now)
-    start.setDate(now.getDate() - (DAYS_RANGE - 1))
+    const effectiveTodayKey = todayKey ?? getLocalDateKey(new Date())
+    const rangeStartKey = offsetDateKey(effectiveTodayKey, -(DAYS_RANGE - 1))
 
-    const entries = data.workEntries.filter((entry) => {
-      const d = new Date(entry.date)
-      return d >= start && d <= now
-    })
-
+    const entries = data.workEntries.filter((entry) => isWithinDateRange(entry.date, rangeStartKey, effectiveTodayKey))
     const workedEntries = entries.filter((entry) => entry.status === 'worked')
     const totalHours = workedEntries.reduce((sum, entry) => sum + (entry.hours ?? 0), 0)
     const activeDays = new Set(workedEntries.map((entry) => entry.date)).size
     const averagePerDay = activeDays > 0 ? totalHours / activeDays : 0
 
-    const overtimeHours = workedEntries.reduce((sum, entry) => {
-      const hours = entry.hours ?? 0
-      return sum + Math.max(hours - 8, 0)
+    const dailyHours = workedEntries.reduce<Record<string, number>>((acc, entry) => {
+      acc[entry.date] = (acc[entry.date] ?? 0) + (entry.hours ?? 0)
+      return acc
+    }, {})
+
+    const overtimeHours = Object.values(dailyHours).reduce((sum, hours) => {
+      return sum + Math.max(hours - DEFAULT_DAILY_HOURS, 0)
     }, 0)
 
-    const billableCount = workedEntries.filter(isBillable).length
-    const billableRatio = workedEntries.length > 0 ? (billableCount / workedEntries.length) * 100 : 0
+    const billableHours = workedEntries.reduce((sum, entry) => {
+      if (!isBillable(entry)) return sum
+      return sum + (entry.hours ?? 0)
+    }, 0)
+    const billableRatio = totalHours > 0 ? (billableHours / totalHours) * 100 : 0
 
     const byProject = workedEntries.reduce<Record<string, number>>((acc, entry) => {
       const key = resolveProjectLabel(entry, data.clients)
@@ -61,12 +69,12 @@ export default function ReportsPage() {
       topProject
         ? `Najwięcej czasu: ${topProject.label} (${formatPercent(topProject.share)})`
         : 'Brak danych o projektach w wybranym okresie',
-      `Wpisy billable: ${formatPercent(billableRatio)} wszystkich wpisów pracujących`,
+      `Czas billable: ${formatPercent(billableRatio)} łącznego czasu worked`,
       `${Math.max(noEntryDays, 0)} dni bez wpisów w ostatnich ${DAYS_RANGE} dniach`,
     ]
 
     return {
-      rangeLabel: `${formatDate(start)} – ${formatDate(now)}`,
+      rangeLabel: `${formatDateKey(rangeStartKey)} – ${formatDateKey(effectiveTodayKey)}`,
       kpis: [
         { label: 'Łączny czas', value: `${formatHours(totalHours)}h` },
         { label: 'Średnio / dzień', value: `${formatHours(averagePerDay)}h` },
@@ -76,7 +84,7 @@ export default function ReportsPage() {
       insights,
       projectUsage,
     }
-  }, [data.clients, data.workEntries])
+  }, [data.clients, data.workEntries, todayKey])
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -137,11 +145,15 @@ export default function ReportsPage() {
 }
 
 function resolveProjectLabel(entry: WorkEntry, clients: Array<{ id: string; name: string }>) {
-  if (entry.project_id) return `Projekt #${entry.project_id.slice(0, 8)}`
-  if (entry.client_id) {
-    const client = clients.find((item) => item.id === entry.client_id)
-    return client?.name ?? `Klient #${entry.client_id.slice(0, 8)}`
+  const client = entry.client_id ? clients.find((item) => item.id === entry.client_id) : null
+  const clientName = client?.name ?? (entry.client_id ? `Klient #${entry.client_id.slice(0, 8)}` : null)
+
+  if (entry.project_id) {
+    const projectLabel = `Projekt #${entry.project_id.slice(0, 8)}`
+    return clientName ? `${clientName} (${projectLabel})` : projectLabel
   }
+
+  if (clientName) return clientName
   return 'Bez przypisania'
 }
 
@@ -157,12 +169,31 @@ function formatPercent(value: number) {
   return `${Math.round(value)}%`
 }
 
-function formatDate(value: Date) {
-  return value.toLocaleDateString('pl-PL', {
+function formatDateKey(value: string) {
+  const [year, month, day] = value.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('pl-PL', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   })
+}
+
+function getLocalDateKey(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function offsetDateKey(dateKey: string, offsetDays: number) {
+  const [year, month, day] = dateKey.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  date.setDate(date.getDate() + offsetDays)
+  return getLocalDateKey(date)
+}
+
+function isWithinDateRange(dateKey: string, startKey: string, endKey: string) {
+  return dateKey >= startKey && dateKey <= endKey
 }
 
 function SidebarButton({ icon: Icon, label }: { icon: ComponentType<{ className?: string }>; label: string }) {
