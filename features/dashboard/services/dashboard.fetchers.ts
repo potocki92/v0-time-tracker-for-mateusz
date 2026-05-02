@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import { fetchCurrentEurRate } from '@/lib/api/eurRate'
-import type { Client, Invoice, WorkEntry } from '@/lib/types'
+import type { Client, Invoice, Project, WorkEntry } from '@/lib/types'
 import type { WorkEntriesFilter } from '@/lib/query/queryKeys'
 
 /**
@@ -48,6 +48,17 @@ export async function fetchWorkEntries(userId: string, filter?: WorkEntriesFilte
   const { data, error } = await query
 
   if (error) throw new Error(`fetchWorkEntries: ${error.message}`)
+  return data ?? []
+}
+
+
+export async function fetchProjects(userId: string): Promise<Project[]> {
+  const { data, error } = await getSupabase()
+    .from('projects')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (error) throw new Error(`fetchProjects: ${error.message}`)
   return data ?? []
 }
 

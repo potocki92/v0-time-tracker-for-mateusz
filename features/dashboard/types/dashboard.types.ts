@@ -1,4 +1,4 @@
-import { Client, Invoice, WorkEntry } from "@/lib/types"
+import { Client, Invoice, Project, WorkEntry } from "@/lib/types"
 
 export type TimeRange =
   | 'current_week'
@@ -16,6 +16,7 @@ export type DashboardData = {
   clients: Client[]
   workEntries: WorkEntry[]
   invoices: Invoice[]
+  projects: Project[]
 }
 
 export type UseDashboardDataReturn = {
