@@ -49,7 +49,7 @@ export default function ReportsPage() {
     const billableRatio = totalHours > 0 ? (billableHours / totalHours) * 100 : 0
 
     const byProject = workedEntries.reduce<Record<string, number>>((acc, entry) => {
-      const key = resolveProjectLabel(entry, data.clients)
+      const key = resolveProjectLabel(entry, data.clients, data.projects)
       acc[key] = (acc[key] ?? 0) + (entry.hours ?? 0)
       return acc
     }, {})
@@ -84,7 +84,7 @@ export default function ReportsPage() {
       insights,
       projectUsage,
     }
-  }, [data.clients, data.workEntries, todayKey])
+  }, [data.clients, data.projects, data.workEntries, todayKey])
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -144,12 +144,17 @@ export default function ReportsPage() {
   )
 }
 
-function resolveProjectLabel(entry: WorkEntry, clients: Array<{ id: string; name: string }>) {
+function resolveProjectLabel(
+  entry: WorkEntry,
+  clients: Array<{ id: string; name: string }>,
+  projects: Array<{ id: string; name: string }>,
+) {
   const client = entry.client_id ? clients.find((item) => item.id === entry.client_id) : null
   const clientName = client?.name ?? (entry.client_id ? `Klient #${entry.client_id.slice(0, 8)}` : null)
 
   if (entry.project_id) {
-    const projectLabel = `Projekt #${entry.project_id.slice(0, 8)}`
+    const project = projects.find((item) => item.id === entry.project_id)
+    const projectLabel = project?.name ?? `Projekt #${entry.project_id.slice(0, 8)}`
     return clientName ? `${clientName} (${projectLabel})` : projectLabel
   }
 

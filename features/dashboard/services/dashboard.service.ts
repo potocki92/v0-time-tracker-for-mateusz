@@ -3,6 +3,7 @@ import {
   fetchClients,
   fetchWorkEntries,
   fetchInvoices,
+  fetchProjects,
 } from './dashboard.fetchers'
 import type { DashboardData } from '@/features/dashboard/types/dashboard.types'
 
@@ -18,10 +19,11 @@ function resolveUserName(metadata: Record<string, unknown>, email?: string): str
 export async function getDashboardData(): Promise<DashboardData> {
   const user = await fetchCurrentUser()
 
-  const [clients, workEntries, invoices] = await Promise.all([
+  const [clients, workEntries, invoices, projects] = await Promise.all([
     fetchClients(user.id),
     fetchWorkEntries(user.id),
     fetchInvoices(user.id),
+    fetchProjects(user.id),
   ])
 
   const metadata = (user.user_metadata ?? {}) as Record<string, unknown>
@@ -31,5 +33,6 @@ export async function getDashboardData(): Promise<DashboardData> {
     clients,
     workEntries,
     invoices,
+    projects,
   }
 }
