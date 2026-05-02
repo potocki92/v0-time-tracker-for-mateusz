@@ -5,6 +5,7 @@ import {
   fetchClientsServer,
   fetchWorkEntriesServer,
   fetchInvoicesServer,
+  fetchProjectsServer,
   fetchEurRateServer,
 } from './dashboard.fetchers.server'
 import type { DashboardData } from '@/features/dashboard/types/dashboard.types'
@@ -35,10 +36,11 @@ export async function getDashboardDataServer(): Promise<DashboardData> {
     fetchEurRateServer(),
   ])
 
-  const [clients, workEntries, invoices] = await Promise.all([
+  const [clients, workEntries, invoices, projects] = await Promise.all([
     fetchClientsServer(user.id),
     fetchWorkEntriesServer(user.id),
     fetchInvoicesServer(user.id),
+    fetchProjectsServer(user.id),
   ])
 
   const metadata = (user.user_metadata ?? {}) as Record<string, unknown>
@@ -48,5 +50,6 @@ export async function getDashboardDataServer(): Promise<DashboardData> {
     clients,
     workEntries,
     invoices,
+    projects,
   }
 }

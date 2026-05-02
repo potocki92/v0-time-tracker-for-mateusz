@@ -2,7 +2,7 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import { fetchCurrentEurRate } from '@/lib/api/eurRate'
-import type { Client, Invoice, WorkEntry } from '@/lib/types'
+import type { Client, Invoice, Project, WorkEntry } from '@/lib/types'
 
 /**
  * Serwerowe odpowiedniki fetcherów z dashboard.fetchers.ts
@@ -48,6 +48,18 @@ export async function fetchClientsServer(userId: string): Promise<Client[]> {
     .eq('user_id', userId)
 
   if (error) throw new Error(`fetchClientsServer: ${error.message}`)
+  return data ?? []
+}
+
+
+export async function fetchProjectsServer(userId: string): Promise<Project[]> {
+  const supabase = await getSupabase()
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (error) throw new Error(`fetchProjectsServer: ${error.message}`)
   return data ?? []
 }
 
