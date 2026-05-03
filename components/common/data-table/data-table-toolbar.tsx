@@ -1,7 +1,7 @@
 'use client'
 
 import type { Column, RowData } from '@tanstack/react-table'
-import { Plus, Search, Trash2, X } from 'lucide-react'
+import { FilterX, Plus, Search, Trash2, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,12 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
 import type {
   DataTableDateRangeFilter,
   DataTableFilter,
+  DataTableNumberRangeFilter,
   DataTableSelectFilter,
   DataTableToolbarProps,
 } from './types'
+import { DataTableColumnsMenu } from './data-table-columns-menu'
 
 const SEARCH_DEBOUNCE_MS = 300
 
@@ -25,8 +28,23 @@ function isDateRangeFilter(filter: DataTableFilter): filter is DataTableDateRang
   return filter.type === 'dateRange'
 }
 
+function isNumberRangeFilter(filter: DataTableFilter): filter is DataTableNumberRangeFilter {
+  return filter.type === 'numberRange'
+}
+
 function isSelectFilter(filter: DataTableFilter): filter is DataTableSelectFilter {
-  return filter.type !== 'dateRange'
+  return filter.type !== 'dateRange' && filter.type !== 'numberRange'
+}
+
+function formatDate(iso: string | null | undefined): string {
+  if (!iso) return ''
+  const parsed = new Date(iso)
+  if (Number.isNaN(parsed.getTime())) return iso
+  return new Intl.DateTimeFormat('pl-PL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(parsed)
 }
 
 function DebouncedSearchInput({
@@ -143,7 +161,141 @@ function DateRangeColumnFilter({
   )
 }
 
-import { DataTableColumnsMenu } from './data-table-columns-menu'
+function NumberRangeColumnFilter({
+  column,
+  filter,
+}: {
+  column: Column<RowData>
+  filter: DataTableNumberRangeFilter
+}) {
+  const [min, max] =
+    (column.getFilterValue() as [number | null, number | null] | undefined) ?? [null, null]
+  const id = `dt-numrange-${column.id}`
+
+  function update(next: [number | null, number | null]) {
+    const [nMin, nMax] = next
+    if (nMin == null && nMax == null) {
+      column.setFilterValue(undefined)
+    } else {
+      column.setFilterValue(next)
+    }
+  }
+
+  function parse(raw: string): number | null {
+    if (raw === '') return null
+    const num = Number(raw)
+    return Number.isFinite(num) ? num : null
+  }
+
+  return (
+    <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <span className="text-xs font-medium text-muted-foreground" id={`${id}-label`}>
+        {filter.label}
+      </span>
+      <div className="flex items-center gap-1.5" aria-labelledby={`${id}-label`}>
+        <Input
+          type="number"
+          inputMode="decimal"
+          step={filter.step ?? 1}
+          value={min ?? ''}
+          onChange={(event) => update([parse(event.target.value), max])}
+          placeholder={filter.minPlaceholder ?? 'min'}
+          className="h-9 w-[110px]"
+          aria-label={`${filter.label} od`}
+        />
+        <span className="text-xs text-muted-foreground" aria-hidden>
+          –
+        </span>
+        <Input
+          type="number"
+          inputMode="decimal"
+          step={filter.step ?? 1}
+          value={max ?? ''}
+          onChange={(event) => update([min, parse(event.target.value)])}
+          placeholder={filter.maxPlaceholder ?? 'max'}
+          className="h-9 w-[110px]"
+          aria-label={`${filter.label} do`}
+        />
+        {filter.unit && (
+          <span className="text-xs text-muted-foreground" aria-hidden>
+            {filter.unit}
+          </span>
+        )}
+        {(min != null || max != null) && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => update([null, null])}
+            aria-label={`Wyczyść ${filter.label.toLowerCase()}`}
+          >
+            <X className="size-3.5" />
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+type ActiveFilterChip = {
+  key: string
+  label: string
+  onClear: () => void
+}
+
+function describeActiveFilters<TData extends RowData>(
+  filters: DataTableFilter[],
+  table: DataTableToolbarProps<TData>['table'],
+): ActiveFilterChip[] {
+  const chips: ActiveFilterChip[] = []
+
+  for (const filter of filters) {
+    const column = table.getColumn(filter.columnId)
+    if (!column) continue
+    const value = column.getFilterValue()
+    if (value === undefined || value === null) continue
+
+    if (isDateRangeFilter(filter)) {
+      const [from, to] = (value as [string | null, string | null]) ?? [null, null]
+      if (!from && !to) continue
+      const range = `${formatDate(from) || '—'} → ${formatDate(to) || '—'}`
+      chips.push({
+        key: `${filter.columnId}-range`,
+        label: `${filter.label}: ${range}`,
+        onClear: () => column.setFilterValue(undefined),
+      })
+      continue
+    }
+
+    if (isNumberRangeFilter(filter)) {
+      const [min, max] = (value as [number | null, number | null]) ?? [null, null]
+      if (min == null && max == null) continue
+      const minLabel = min == null ? '—' : String(min)
+      const maxLabel = max == null ? '—' : String(max)
+      const unit = filter.unit ? ` ${filter.unit}` : ''
+      chips.push({
+        key: `${filter.columnId}-numrange`,
+        label: `${filter.label}: ${minLabel} – ${maxLabel}${unit}`,
+        onClear: () => column.setFilterValue(undefined),
+      })
+      continue
+    }
+
+    if (isSelectFilter(filter)) {
+      const stringValue = String(value)
+      if (!stringValue || stringValue === 'all') continue
+      const option = filter.options.find((opt) => opt.value === stringValue)
+      chips.push({
+        key: `${filter.columnId}-${stringValue}`,
+        label: `${filter.label}: ${option?.label ?? stringValue}`,
+        onClear: () => column.setFilterValue(undefined),
+      })
+    }
+  }
+
+  return chips
+}
 
 export function DataTableToolbar<TData extends RowData>({
   table,
@@ -154,7 +306,23 @@ export function DataTableToolbar<TData extends RowData>({
   selectedCount,
   onAddRow,
   onDeleteSelected,
+  onResetAll,
 }: DataTableToolbarProps<TData>) {
+  // Recomputed every render: filter values come from `table` and aren't part
+  // of toolbar props, so memoization with stable deps would mask updates.
+  const activeChips = describeActiveFilters(filters, table)
+  const hasActiveFilters = activeChips.length > 0 || globalFilter.length > 0
+
+  function handleClearAll() {
+    if (onResetAll) {
+      onResetAll()
+      return
+    }
+    // Fallback: clear column filters + global filter individually.
+    for (const chip of activeChips) chip.onClear()
+    if (globalFilter) onGlobalFilterChange('')
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
@@ -198,6 +366,16 @@ export function DataTableToolbar<TData extends RowData>({
                 key={filter.columnId}
                 column={column as Column<RowData>}
                 label={filter.label}
+              />
+            )
+          }
+
+          if (isNumberRangeFilter(filter)) {
+            return (
+              <NumberRangeColumnFilter
+                key={filter.columnId}
+                column={column as Column<RowData>}
+                filter={filter}
               />
             )
           }
@@ -263,6 +441,64 @@ export function DataTableToolbar<TData extends RowData>({
           )
         })}
       </div>
+
+      {hasActiveFilters && (
+        <div
+          className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-border/60 bg-muted/20 px-2.5 py-2"
+          aria-live="polite"
+        >
+          <span className="text-xs font-medium text-muted-foreground">
+            Aktywne filtry
+            <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-[10px]">
+              {activeChips.length + (globalFilter ? 1 : 0)}
+            </Badge>
+          </span>
+          {globalFilter && (
+            <Badge
+              variant="outline"
+              className="h-7 gap-1 rounded-full bg-background px-2 text-xs"
+            >
+              <span className="text-muted-foreground">Szukaj:</span>
+              <span className="max-w-[180px] truncate">{globalFilter}</span>
+              <button
+                type="button"
+                onClick={() => onGlobalFilterChange('')}
+                className="ml-0.5 rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label="Wyczyść wyszukiwanie"
+              >
+                <X className="size-3" />
+              </button>
+            </Badge>
+          )}
+          {activeChips.map((chip) => (
+            <Badge
+              key={chip.key}
+              variant="outline"
+              className="h-7 gap-1 rounded-full bg-background px-2 text-xs"
+            >
+              <span className="max-w-[260px] truncate">{chip.label}</span>
+              <button
+                type="button"
+                onClick={chip.onClear}
+                className="ml-0.5 rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                aria-label={`Wyczyść: ${chip.label}`}
+              >
+                <X className="size-3" />
+              </button>
+            </Badge>
+          ))}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="ml-auto h-7 gap-1 px-2 text-xs"
+            onClick={handleClearAll}
+          >
+            <FilterX className="size-3.5" />
+            Wyczyść wszystkie
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

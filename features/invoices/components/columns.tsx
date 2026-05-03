@@ -83,6 +83,19 @@ const dateRangeFilterFn: FilterFn<Invoice> = (row, columnId, value) => {
   return true
 }
 
+const numberRangeFilterFn: FilterFn<Invoice> = (row, columnId, value) => {
+  if (!Array.isArray(value)) return true
+  const [min, max] = value as [number | null, number | null]
+  if (min == null && max == null) return true
+
+  const cell = Number(row.getValue(columnId))
+  if (!Number.isFinite(cell)) return false
+
+  if (min != null && cell < min) return false
+  if (max != null && cell > max) return false
+  return true
+}
+
 export const COLUMN_LABELS: Record<string, string> = {
   select: 'Zaznacz',
   invoice_number: 'Numer',
@@ -91,6 +104,7 @@ export const COLUMN_LABELS: Record<string, string> = {
   billing_period: 'Kwartał',
   payment_status: 'Status',
   amount: 'Kwota',
+  currency: 'Waluta',
   actions: 'Akcje',
 }
 
@@ -112,7 +126,7 @@ export const columns: ColumnDef<Invoice>[] = [
   },
   {
     id: 'client',
-    accessorFn: (row) => row.client_id ?? 'Bez klienta',
+    accessorFn: (row) => row.client_id ?? '__none__',
     header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.client} />,
     meta: { label: COLUMN_LABELS.client },
     cell: ({ row, table }) => {
@@ -121,6 +135,7 @@ export const columns: ColumnDef<Invoice>[] = [
 
       return <ClientDisplay client={client} variant="cell" size="md" />
     },
+    filterFn: 'equalsString',
     sortingFn: 'alphanumeric',
     size: 240,
     minSize: 160,
@@ -175,9 +190,26 @@ export const columns: ColumnDef<Invoice>[] = [
         {formatCurrency(row.original.amount, row.original.currency)}
       </span>
     ),
+    filterFn: numberRangeFilterFn,
     size: 140,
     minSize: 110,
     maxSize: 240,
+  },
+  {
+    id: 'currency',
+    accessorFn: (row) => row.currency ?? 'PLN',
+    header: ({ column }) => <SortableHeader column={column} label={COLUMN_LABELS.currency} />,
+    meta: { label: COLUMN_LABELS.currency },
+    filterFn: 'equalsString',
+    cell: ({ row }) => (
+      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {row.original.currency ?? 'PLN'}
+      </span>
+    ),
+    size: 90,
+    minSize: 70,
+    maxSize: 140,
+    enableSorting: false,
   },
   {
     id: 'actions',

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import type { ColumnFiltersState } from '@tanstack/react-table'
 import { parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
@@ -33,19 +33,41 @@ function isColumnFiltersState(value: unknown): value is ColumnFiltersState {
   )
 }
 
+function isPersistedState(value: unknown): value is DataTableState {
+  if (value === null || typeof value !== 'object') return false
+  const candidate = value as Partial<DataTableState>
+  return (
+    typeof candidate.globalFilter === 'string' &&
+    typeof candidate.pageIndex === 'number' &&
+    isColumnFiltersState(candidate.columnFilters)
+  )
+}
+
 const columnFiltersParser = parseAsJson<ColumnFiltersState>((raw) => {
   return isColumnFiltersState(raw) ? raw : []
 }).withDefault([])
 
+function isStateEffectivelyEmpty(state: DataTableState): boolean {
+  return (
+    state.globalFilter === '' &&
+    state.columnFilters.length === 0 &&
+    state.pageIndex === 0
+  )
+}
+
 /**
  * Owns the DataTable's persistable state (search, column filters, page index).
  *
- * - When `urlStateKey` is set, the URL is the source of truth and changes are
- *   synced via nuqs (bookmarkable, shareable). localStorage is bypassed.
- * - Otherwise, falls back to localStorage under `storageKey` (legacy behavior).
- *
- * Both backing stores are subscribed unconditionally to satisfy the rules of
- * hooks; only the active one is written to.
+ * Persistence model:
+ * - When `urlStateKey` alone is set: URL is the only source of truth.
+ *   Bookmarkable/shareable, but state is lost when navigating away and back.
+ * - When `storageKey` alone is set: localStorage holds the state. Survives
+ *   refresh and navigation, but not shareable.
+ * - When **both** are set (recommended): URL is canonical when present;
+ *   localStorage acts as a silent fallback. On mount, if the URL has no
+ *   filter params, we rehydrate them from localStorage and write back to the
+ *   URL — so users keep their view across navigations, refreshes, and even
+ *   browser restarts, while individual links remain shareable.
  */
 export function useDataTableState({
   urlStateKey,
@@ -60,12 +82,15 @@ export function useDataTableState({
     value: ColumnFiltersState | ((prev: ColumnFiltersState) => ColumnFiltersState),
   ) => void
   setPageIndex: (value: number) => void
+  resetAll: () => void
 } {
   const useUrl = Boolean(urlStateKey)
+  const useStorage = Boolean(storageKey)
 
-  const [persisted, setPersisted] = useLocalStorage<DataTableState>(
+  const [persisted, setPersisted, { isHydrated: isStorageHydrated }] = useLocalStorage<DataTableState>(
     storageKey ?? DISABLED_LS_KEY,
     DEFAULT_STATE,
+    { validate: isPersistedState },
   )
 
   // nuqs keys are namespaced via urlKeys so multiple tables on the same page
@@ -98,6 +123,39 @@ export function useDataTableState({
     }
     return persisted
   }, [useUrl, urlQuery.q, urlQuery.p, urlQuery.f, persisted])
+
+  // One-time rehydration: if URL is empty on mount but localStorage has a
+  // saved view, push it into the URL. We guard with a ref so navigations that
+  // explicitly clear the URL don't get clobbered later in the session.
+  const didRehydrateRef = useRef(false)
+  useEffect(() => {
+    if (!useUrl || !useStorage || !isStorageHydrated || didRehydrateRef.current) return
+    didRehydrateRef.current = true
+
+    const urlIsEmpty = isStateEffectivelyEmpty({
+      globalFilter: urlQuery.q,
+      columnFilters: urlQuery.f,
+      pageIndex: urlQuery.p,
+    })
+    if (!urlIsEmpty) return
+    if (isStateEffectivelyEmpty(persisted)) return
+
+    void setUrlQuery({
+      q: persisted.globalFilter,
+      p: persisted.pageIndex,
+      f: persisted.columnFilters,
+    })
+  }, [useUrl, useStorage, isStorageHydrated, urlQuery.q, urlQuery.f, urlQuery.p, persisted, setUrlQuery])
+
+  // Mirror URL state into localStorage so the next visit can rehydrate.
+  useEffect(() => {
+    if (!useUrl || !useStorage || !isStorageHydrated || !didRehydrateRef.current) return
+    setPersisted({
+      globalFilter: urlQuery.q,
+      columnFilters: urlQuery.f,
+      pageIndex: urlQuery.p,
+    })
+  }, [useUrl, useStorage, isStorageHydrated, urlQuery.q, urlQuery.f, urlQuery.p, setPersisted])
 
   const setGlobalFilter = useCallback(
     (value: string) => {
@@ -137,15 +195,14 @@ export function useDataTableState({
     [useUrl, setUrlQuery, setPersisted],
   )
 
-  // Migration path: if a user previously had filters in localStorage and the
-  // page is later opened with `urlStateKey`, we don't auto-import — the URL is
-  // canonical. We just leave localStorage alone (silently abandoned).
-  useEffect(() => {
-    if (!useUrl && storageKey && persisted.pageIndex < 0) {
-      // defensive normalisation for malformed stored values
-      setPersisted((prev) => ({ ...prev, pageIndex: 0 }))
+  const resetAll = useCallback(() => {
+    if (useUrl) {
+      void setUrlQuery({ q: '', p: 0, f: [] })
     }
-  }, [useUrl, storageKey, persisted.pageIndex, setPersisted])
+    if (useStorage) {
+      setPersisted(DEFAULT_STATE)
+    }
+  }, [useUrl, useStorage, setUrlQuery, setPersisted])
 
-  return { state, setGlobalFilter, setColumnFilters, setPageIndex }
+  return { state, setGlobalFilter, setColumnFilters, setPageIndex, resetAll }
 }
