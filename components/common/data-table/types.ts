@@ -25,7 +25,23 @@ export type DataTableDateRangeFilter = {
   type: 'dateRange'
 }
 
-export type DataTableFilter = DataTableSelectFilter | DataTableDateRangeFilter
+export type DataTableNumberRangeFilter = {
+  columnId: string
+  label: string
+  type: 'numberRange'
+  /** Optional unit suffix shown next to inputs (e.g. "PLN", "h"). */
+  unit?: string
+  /** Optional placeholders for the min/max inputs. */
+  minPlaceholder?: string
+  maxPlaceholder?: string
+  /** Step for the numeric inputs. Defaults to 1. */
+  step?: number
+}
+
+export type DataTableFilter =
+  | DataTableSelectFilter
+  | DataTableDateRangeFilter
+  | DataTableNumberRangeFilter
 
 export type DataTableStorageKey = string | {
   filters: string
@@ -43,6 +59,10 @@ export type DataTableProps<TData extends RowData> = {
    * URL search-param namespace for filter/pagination state. When set, the
    * table syncs `globalFilter`, `columnFilters`, and `pageIndex` with
    * `?{key}_q`, `?{key}_f`, `?{key}_p` so the view is bookmarkable.
+   *
+   * When combined with `storageKey`, localStorage acts as a silent fallback:
+   * if the URL has no params on mount, the saved view is rehydrated, so
+   * filters persist across navigations and refreshes.
    */
   urlStateKey?: string
   initialVisibility?: VisibilityState
@@ -64,4 +84,5 @@ export type DataTableToolbarProps<TData extends RowData> = {
   selectedCount: number
   onAddRow?: () => void
   onDeleteSelected?: () => void
+  onResetAll?: () => void
 }

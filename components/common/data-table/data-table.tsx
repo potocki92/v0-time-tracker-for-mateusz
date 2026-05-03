@@ -67,7 +67,7 @@ export function DataTable<TData extends RowData>({
 }: DataTableProps<TData>) {
   const { filtersKey, layoutKey } = resolveStorageKey(storageKey)
 
-  const { state: persistedState, setGlobalFilter, setColumnFilters, setPageIndex } =
+  const { state: persistedState, setGlobalFilter, setColumnFilters, setPageIndex, resetAll } =
     useDataTableState({ urlStateKey, storageKey: filtersKey })
 
   const [sorting, setSorting] = useState<SortingState>([])
@@ -218,6 +218,7 @@ export function DataTable<TData extends RowData>({
         selectedCount={selectedRows.length}
         onAddRow={onAddRow}
         onDeleteSelected={() => onDeleteRows?.(selectedRows)}
+        onResetAll={resetAll}
       />
 
       <div className="overflow-hidden rounded-xl border border-zinc-200/70 bg-card dark:border-zinc-800/70">
