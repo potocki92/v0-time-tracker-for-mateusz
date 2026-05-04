@@ -10,8 +10,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SubmitButton, UniversalForm } from '@/components/common/form'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
+import type { Client } from '@/lib/types'
 
 import {
   InvoiceBuilderFields,
@@ -26,6 +29,9 @@ interface InvoiceBuilderDialogProps {
   initialValues?: InvoiceBuilderValues
   /** Defaults applied when creating a new invoice (number, due days, …). */
   defaults?:      InvoiceBuilderDefaults
+  clients:        Client[]
+  selectedClientId: string | null
+  onSelectedClientIdChange: (clientId: string | null) => void
   onClose:        () => void
   onSubmit:       (values: InvoiceBuilderValues) => void | Promise<void>
 }
@@ -47,6 +53,9 @@ export function InvoiceBuilderDialog({
   isSaving,
   initialValues,
   defaults,
+  clients,
+  selectedClientId,
+  onSelectedClientIdChange,
   onClose,
   onSubmit,
 }: InvoiceBuilderDialogProps) {
@@ -86,6 +95,23 @@ export function InvoiceBuilderDialog({
           className="flex min-h-0 flex-1 flex-col gap-0 space-y-0"
         >
           <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+            <div className="mb-5 grid gap-2">
+              <Label>Klient</Label>
+              <Select
+                value={selectedClientId ?? 'none'}
+                onValueChange={(value) => onSelectedClientIdChange(value === 'none' ? null : value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Wybierz klienta" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Bez klienta</SelectItem>
+                  {clients.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <InvoiceBuilderFields isEditMode={isEditMode} />
           </div>
 
