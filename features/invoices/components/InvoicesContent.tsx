@@ -61,6 +61,7 @@ export function InvoicesContent() {
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null)
   const importInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -85,11 +86,13 @@ export function InvoicesContent() {
 
   function openCreate() {
     setEditingInvoice(null)
+    setSelectedClientId(null)
     setFormOpen(true)
   }
 
   function openEdit(invoice: Invoice) {
     setEditingInvoice(invoice)
+    setSelectedClientId(invoice.client_id)
     setFormOpen(true)
   }
 
@@ -100,7 +103,7 @@ export function InvoicesContent() {
 
   async function handleBuilderSubmit(values: InvoiceBuilderValues) {
     const payload = builderValuesToFormValues(values, {
-      clientId:    editingInvoice?.client_id ?? null,
+      clientId:    selectedClientId,
       settings:    data.settings,
       isPaid:      editingInvoice?.is_paid ?? false,
       templateKey: editingInvoice?.template_key ?? data.settings.defaultTemplate,
@@ -234,8 +237,11 @@ export function InvoicesContent() {
         initialValues={builderInitialValues}
         defaults={builderDefaults}
         onClose={closeForm}
-        onSubmit={handleBuilderSubmit}
-      />
+      onSubmit={handleBuilderSubmit}
+      clients={data.clients}
+      selectedClientId={selectedClientId}
+      onSelectedClientIdChange={setSelectedClientId}
+    />
 
       <DeleteInvoiceDialog
         invoice={deletingInvoice}
