@@ -161,5 +161,21 @@ export function builderValuesToFormValues(
     file:            null,
     client_id:       options.clientId ?? null,
     new_client_name: options.clientId ? '' : buyerName,
+    buyer: {
+      name:         buyerName,
+      tax_id:       values.buyer.tax_id ?? '',
+      country_code: (values.buyer.country_code ?? 'PL').toUpperCase(),
+      address:      values.buyer.address ?? '',
+      city:         values.buyer.city ?? '',
+      postal_code:  values.buyer.postal_code ?? '',
+      email:        values.buyer.email ?? '',
+    },
+    line_items: values.items.map((item) => ({
+      description:    item.description.trim(),
+      unit:           item.unit?.trim() || 'szt.',
+      quantity:       Number(item.quantity) || 0,
+      unit_price_net: Number(item.unit_price_net) || 0,
+      vat_rate:       item.vat_mode === 'standard' ? Number(item.vat_rate) || 0 : 0,
+    })),
   }
 }

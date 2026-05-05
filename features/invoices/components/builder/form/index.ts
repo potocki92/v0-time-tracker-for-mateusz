@@ -14,6 +14,7 @@
  * a pure container — it owns no invoice state of its own.
  */
 
+export { ClientPickerField } from './ClientPickerField'
 export { InvoiceBuilderFields } from './InvoiceBuilderFields'
 export { InvoiceLineItemsField } from './InvoiceLineItemsField'
 export { InvoiceLineItemRow } from './InvoiceLineItemRow'

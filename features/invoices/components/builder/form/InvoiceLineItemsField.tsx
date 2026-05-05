@@ -17,16 +17,18 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { Plus } from 'lucide-react'
+import { CalendarRange, Plus } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 
 import { Button } from '@/components/ui/button'
 import {
   type InvoiceBuilderValues,
 } from '@/lib/schemas/invoice-builder.schema'
+import type { WorkedWeekSummary } from '@/features/invoices/services/worked-weeks.service.server'
 
-import { emptyLineItem } from './invoice-builder.helpers'
+import { emptyLineItem, makeLineItemId } from './invoice-builder.helpers'
 import { InvoiceLineItemRow } from './InvoiceLineItemRow'
+import { WorkedWeeksPickerDialog } from './WorkedWeeksPickerDialog'
 
 /**
  * Owns the `items` array on the invoice form. Wraps everything in a
@@ -35,13 +37,39 @@ import { InvoiceLineItemRow } from './InvoiceLineItemRow'
  * inner fields — it only watches the array's identity (length / order)
  * via `useFieldArray.fields`, which keeps its render budget flat.
  */
-export function InvoiceLineItemsField() {
-  const { control, formState } = useFormContext<InvoiceBuilderValues>()
+interface InvoiceLineItemsFieldProps {
+  /** Linked client id — required to fetch worked weeks. */
+  clientId: string | null
+}
+
+function weekToLineItem(week: WorkedWeekSummary) {
+  const description =
+    week.workType === 'piecework'
+      ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${week.quantity.toLocaleString('pl-PL')} szt.`
+      : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${week.hours.toLocaleString('pl-PL')} h`
+
+  const quantity = week.workType === 'piecework' ? week.quantity || 1 : week.hours || 1
+  const unit_price_net = quantity > 0 ? Number((week.amount / quantity).toFixed(2)) : 0
+
+  return {
+    id:             makeLineItemId(),
+    description,
+    unit:           week.workType === 'piecework' ? 'szt.' : 'h',
+    quantity:       Number(quantity.toFixed(3)),
+    unit_price_net,
+    vat_mode:       'standard' as const,
+    vat_rate:       23,
+  }
+}
+
+export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) {
+  const { control, formState, getValues, setValue } = useFormContext<InvoiceBuilderValues>()
   const { fields, append, remove, move } = useFieldArray<InvoiceBuilderValues, 'items', 'fieldArrayId'>({
     control,
     name:    'items',
     keyName: 'fieldArrayId',
   })
+  const [pickerOpen, setPickerOpen] = React.useState(false)
 
   // Pointer + keyboard sensors. Pointer activates after a small distance
   // so taps on the row's inputs don't accidentally start a drag.
@@ -74,6 +102,26 @@ export function InvoiceLineItemsField() {
   const handleAdd = React.useCallback(() => {
     append(emptyLineItem(), { shouldFocus: true })
   }, [append])
+
+  const handleApplyWeeks = React.useCallback(
+    (weeks: WorkedWeekSummary[]) => {
+      const newItems = weeks.map(weekToLineItem)
+      const current = getValues('items') ?? []
+
+      // Heuristic: if the only existing item is a fresh blank one (no
+      // description, no price), replace it. Otherwise append so we don't
+      // wipe work the user already typed in.
+      const isOnlyBlank =
+        current.length === 1 &&
+        (current[0].description ?? '').trim() === '' &&
+        Number(current[0].unit_price_net ?? 0) === 0
+
+      const next = isOnlyBlank ? newItems : [...current, ...newItems]
+      setValue('items', next, { shouldDirty: true, shouldValidate: true })
+      setPickerOpen(false)
+    },
+    [getValues, setValue],
+  )
 
   const handleRemove = React.useCallback(
     (index: number) => {
@@ -127,15 +175,37 @@ export function InvoiceLineItemsField() {
         </p>
       ) : null}
 
-      <Button
-        type="button"
-        variant="outline"
-        onClick={handleAdd}
-        className="h-12 w-full justify-center gap-2 rounded-xl border-dashed border-border/70 text-sm font-medium text-muted-foreground hover:text-foreground sm:h-11"
-      >
-        <Plus className="h-4 w-4" aria-hidden="true" />
-        Dodaj pozycję
-      </Button>
+      <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleAdd}
+          className="h-12 w-full justify-center gap-2 rounded-xl border-dashed border-border/70 text-sm font-medium text-muted-foreground hover:text-foreground sm:h-11"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Dodaj pozycję
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setPickerOpen(true)}
+          disabled={!clientId}
+          title={clientId ? undefined : 'Wybierz klienta, aby wczytać przepracowane tygodnie'}
+          className="h-12 justify-center gap-2 rounded-xl text-sm font-medium sm:h-11"
+        >
+          <CalendarRange className="h-4 w-4" aria-hidden="true" />
+          Wczytaj z tygodni
+        </Button>
+      </div>
+
+      {clientId ? (
+        <WorkedWeeksPickerDialog
+          open={pickerOpen}
+          clientId={clientId}
+          onClose={() => setPickerOpen(false)}
+          onConfirm={handleApplyWeeks}
+        />
+      ) : null}
     </div>
   )
 }

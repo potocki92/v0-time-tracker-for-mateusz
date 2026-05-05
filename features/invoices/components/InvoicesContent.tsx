@@ -15,6 +15,7 @@ import {
   invoiceToBuilderValues,
 } from './builder'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
+import { QuickWeeklyInvoiceDialog } from './QuickWeeklyInvoiceDialog'
 import {
   useDeleteInvoice,
   useInvoiceAccountingCsv,
@@ -63,6 +64,7 @@ export function InvoicesContent() {
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null)
+  const [quickWeeksOpen, setQuickWeeksOpen] = useState(false)
   const importInputRef = useRef<HTMLInputElement | null>(null)
 
   const { exportAccountingCsv, importAccountingCsv } = useInvoiceAccountingCsv({
@@ -169,6 +171,11 @@ export function InvoicesContent() {
     })
   }
 
+  async function handleQuickWeeksSubmit(values: InvoiceFormValues) {
+    await saveMutation.mutateAsync({ values })
+    setQuickWeeksOpen(false)
+  }
+
   function handleImportClick() {
     importInputRef.current?.click()
   }
@@ -190,6 +197,7 @@ export function InvoicesContent() {
     <div className="container space-y-6 px-4 py-8">
       <InvoicesHeader
         onCreate={openCreate}
+        onCreateFromWeeks={() => setQuickWeeksOpen(true)}
         onExportAccounting={exportAccountingCsv}
         onImportAccounting={handleImportClick}
         onRunAutoIssue={() => void autoIssueMutation.mutateAsync()}
@@ -248,6 +256,15 @@ export function InvoicesContent() {
         isDeleting={deleteMutation.isPending}
         onClose={() => setDeletingInvoice(null)}
         onConfirm={handleDeleteInvoice}
+      />
+
+      <QuickWeeklyInvoiceDialog
+        open={quickWeeksOpen}
+        clients={data.clients}
+        settings={data.settings}
+        isSaving={saveMutation.isPending}
+        onClose={() => setQuickWeeksOpen(false)}
+        onSubmit={handleQuickWeeksSubmit}
       />
     </div>
   )
