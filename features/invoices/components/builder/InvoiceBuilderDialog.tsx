@@ -10,13 +10,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SubmitButton, UniversalForm } from '@/components/common/form'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
 import type { Client } from '@/lib/types'
 
 import {
+  ClientPickerField,
   InvoiceBuilderFields,
   useInvoiceBuilderForm,
   type InvoiceBuilderDefaults,
@@ -95,24 +94,14 @@ export function InvoiceBuilderDialog({
           className="flex min-h-0 flex-1 flex-col gap-0 space-y-0"
         >
           <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
-            <div className="mb-5 grid gap-2">
-              <Label>Klient</Label>
-              <Select
-                value={selectedClientId ?? 'none'}
-                onValueChange={(value) => onSelectedClientIdChange(value === 'none' ? null : value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Wybierz klienta" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Bez klienta</SelectItem>
-                  {clients.map((client) => (
-                    <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="mb-5">
+              <ClientPickerField
+                clients={clients}
+                selectedClientId={selectedClientId}
+                onSelectedClientIdChange={onSelectedClientIdChange}
+              />
             </div>
-            <InvoiceBuilderFields isEditMode={isEditMode} />
+            <InvoiceBuilderFields isEditMode={isEditMode} clientId={selectedClientId} />
           </div>
 
           <footer className="sticky bottom-0 z-10 flex flex-col-reverse gap-2 border-t bg-background/95 px-5 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:flex-row sm:justify-end sm:px-6 sm:py-4">

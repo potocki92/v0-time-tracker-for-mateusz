@@ -1,6 +1,6 @@
 'use client'
 
-import { Bot, Download, FlaskConical, MoreVertical, Plus, Upload } from 'lucide-react'
+import { Bot, CalendarRange, Download, FlaskConical, MoreVertical, Plus, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
 
 interface InvoicesHeaderProps {
   onCreate: () => void
+  onCreateFromWeeks: () => void
   onExportAccounting: () => void
   onImportAccounting: () => void
   onRunAutoIssue: () => void
@@ -22,6 +23,7 @@ interface InvoicesHeaderProps {
 
 export function InvoicesHeader({
   onCreate,
+  onCreateFromWeeks,
   onExportAccounting,
   onImportAccounting,
   onRunAutoIssue,
@@ -59,6 +61,10 @@ export function InvoicesHeader({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={onCreateFromWeeks}>
+              <CalendarRange className="size-4" />
+              Wystaw z tygodni
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={onRunAutoIssue} disabled={autoIssueBusy}>
               <Bot className="size-4" />
               {autoIssueBusy ? 'Generowanie...' : 'Auto-fakturowanie'}
@@ -97,6 +103,10 @@ export function InvoicesHeader({
         <Button variant="outline" onClick={onCreateTestInvoice} disabled={testBusy}>
           <FlaskConical className="mr-2 size-4" />
           {isCreatingTestInvoice ? 'Tworzenie testu...' : 'Utwórz testową fakturę'}
+        </Button>
+        <Button variant="secondary" onClick={onCreateFromWeeks}>
+          <CalendarRange className="mr-2 size-4" />
+          Wystaw z tygodni
         </Button>
         <Button onClick={onCreate}>
           <Plus className="mr-2 size-4" />

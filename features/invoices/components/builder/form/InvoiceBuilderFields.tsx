@@ -23,6 +23,12 @@ import { EnumSelectField, NumericFormInput } from './shared-fields'
 
 interface InvoiceBuilderFieldsProps {
   isEditMode: boolean
+  /**
+   * Currently linked client id. Drives the optional "load from worked
+   * weeks" affordance in the line items section — when null, the button
+   * disappears because we have no client to look up `work_entries` for.
+   */
+  clientId?: string | null
 }
 
 /**
@@ -36,7 +42,10 @@ interface InvoiceBuilderFieldsProps {
  * Conditional UI (FX rate when foreign currency, VAT-EU toggle, etc.) lives
  * inside the relevant section so context-switching cost is minimal.
  */
-export function InvoiceBuilderFields({ isEditMode: _isEditMode }: InvoiceBuilderFieldsProps) {
+export function InvoiceBuilderFields({
+  isEditMode: _isEditMode,
+  clientId,
+}: InvoiceBuilderFieldsProps) {
   const { control, setValue, formState } = useFormContext<InvoiceBuilderValues>()
 
   const currency       = useWatch({ control, name: 'currency' })
@@ -189,7 +198,7 @@ export function InvoiceBuilderFields({ isEditMode: _isEditMode }: InvoiceBuilder
         description="Każda pozycja jest przeliczana automatycznie. Możesz zmieniać kolejność (uchwyt z lewej, klawiatura: spacja + strzałki)."
         bodyClassName="space-y-3"
       >
-        <InvoiceLineItemsField />
+        <InvoiceLineItemsField clientId={clientId ?? null} />
       </FormSection>
 
       {/* ── 4. Podsumowanie ─────────────────────────────────────────── */}

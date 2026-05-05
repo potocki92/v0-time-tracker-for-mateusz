@@ -2,6 +2,24 @@ import type { Client, CURRENCY, Invoice } from '@/lib/types'
 
 export type BillingQuarter = 'Q1' | 'Q2' | 'Q3' | 'Q4'
 
+export interface InvoiceBuyerDetails {
+  name: string
+  tax_id: string
+  country_code: string
+  address: string
+  city: string
+  postal_code: string
+  email: string
+}
+
+export interface InvoiceLineItemPayload {
+  description: string
+  unit: string
+  quantity: number
+  unit_price_net: number
+  vat_rate: number
+}
+
 export interface InvoicesData {
   invoices: Invoice[]
   clients: Client[]
@@ -39,6 +57,14 @@ export interface InvoiceFormValues {
   file: File | null
   client_id: string | null
   new_client_name: string
+  /**
+   * Buyer block from the rich invoice builder. When present and
+   * `client_id` resolves to an existing client, the matching columns on
+   * `clients` are upserted so the data round-trips into the address book.
+   */
+  buyer?: InvoiceBuyerDetails
+  /** Optional structured line items persisted via `invoice_line_items`. */
+  line_items?: InvoiceLineItemPayload[]
 }
 
 export const INVOICES_MANAGER_QUERY_KEY = ['dashboard-module', 'invoices', 'manager'] as const

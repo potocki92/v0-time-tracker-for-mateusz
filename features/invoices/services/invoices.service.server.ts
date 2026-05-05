@@ -133,7 +133,20 @@ async function fetchCurrentUserId() {
   return user.id
 }
 
-async function createClientIfNeeded(name: string, userId: string): Promise<string | null> {
+type ClientUpsertExtras = Partial<{
+  nip: string | null
+  address: string | null
+  city: string | null
+  postal_code: string | null
+  country_code: string | null
+  email: string | null
+}>
+
+async function createClientIfNeeded(
+  name: string,
+  userId: string,
+  extras: ClientUpsertExtras = {},
+): Promise<string | null> {
   const trimmedName = name.trim()
   if (!trimmedName) return null
 
@@ -150,7 +163,19 @@ async function createClientIfNeeded(name: string, userId: string): Promise<strin
     throw new Error(existing.error.message)
   }
 
-  if (existing.data?.id) return existing.data.id
+  if (existing.data?.id) {
+    // Only set fields that arrived from the form — never wipe existing data.
+    const patch = pruneEmpty(extras)
+    if (Object.keys(patch).length > 0) {
+      const { error } = await supabase
+        .from('clients')
+        .update(patch)
+        .eq('id', existing.data.id)
+        .eq('user_id', userId)
+      if (error) throw new Error(error.message)
+    }
+    return existing.data.id
+  }
 
   const { data, error } = await supabase
     .from('clients')
@@ -162,12 +187,66 @@ async function createClientIfNeeded(name: string, userId: string): Promise<strin
       currency: 'PLN',
       is_default: false,
       color: '#3b82f6',
+      ...pruneEmpty(extras),
     })
     .select('id')
     .single()
 
   if (error) throw new Error(error.message)
   return data.id
+}
+
+function pruneEmpty<T extends Record<string, unknown>>(patch: T): Partial<T> {
+  const out: Partial<T> = {}
+  for (const [key, value] of Object.entries(patch) as Array<[keyof T, T[keyof T]]>) {
+    if (value === undefined) continue
+    if (typeof value === 'string' && value.trim() === '') continue
+    out[key] = value
+  }
+  return out
+}
+
+function buyerToClientPatch(buyer: SaveInvoiceInput['values']['buyer']): ClientUpsertExtras {
+  if (!buyer) return {}
+  return {
+    nip:          buyer.tax_id?.trim() || undefined,
+    address:      buyer.address?.trim() || undefined,
+    city:         buyer.city?.trim() || undefined,
+    postal_code:  buyer.postal_code?.trim() || undefined,
+    country_code: buyer.country_code?.trim() ? buyer.country_code.trim().toUpperCase() : undefined,
+    email:        buyer.email?.trim() || undefined,
+  }
+}
+
+async function persistInvoiceLineItems(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  invoiceId: string,
+  userId: string,
+  items: NonNullable<SaveInvoiceInput['values']['line_items']>,
+) {
+  // Replace strategy: clear then insert. The DB trigger keeps invoice
+  // totals in sync; we don't need to recompute on the client.
+  const { error: deleteError } = await supabase
+    .from('invoice_line_items')
+    .delete()
+    .eq('invoice_id', invoiceId)
+  if (deleteError) throw new Error(deleteError.message)
+
+  if (items.length === 0) return
+
+  const rows = items.map((item, index) => ({
+    invoice_id:     invoiceId,
+    user_id:        userId,
+    position:       index + 1,
+    description:    item.description.trim() || `Pozycja ${index + 1}`,
+    unit:           item.unit?.trim() || 'szt.',
+    quantity:       item.quantity,
+    unit_price_net: item.unit_price_net,
+    vat_rate:       item.vat_rate,
+  }))
+
+  const { error } = await supabase.from('invoice_line_items').insert(rows)
+  if (error) throw new Error(error.message)
 }
 
 const getInvoicesDataServerCached = cache(async (): Promise<InvoicesData> => {
@@ -219,7 +298,25 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     previousFileUrl = existing.file_url ?? null
   }
 
-  const resolvedClientId = values.client_id ?? (await createClientIfNeeded(values.new_client_name, userId))
+  const buyerPatch = buyerToClientPatch(values.buyer)
+  let resolvedClientId = values.client_id
+  if (resolvedClientId) {
+    // Selected an existing client: enrich it with anything the user typed
+    // into the buyer block that isn't already on the record.
+    if (Object.keys(buyerPatch).length > 0) {
+      const { error } = await supabase
+        .from('clients')
+        .update(buyerPatch)
+        .eq('id', resolvedClientId)
+        .eq('user_id', userId)
+      if (error) throw new Error(error.message)
+    }
+  } else {
+    // No client selected — fall back to the typed name. We pass the buyer
+    // patch so a freshly-created client carries NIP/address from the form
+    // instead of being a bare name shell.
+    resolvedClientId = await createClientIfNeeded(values.new_client_name, userId, buyerPatch)
+  }
 
   // Step 2: upload PDF only if the user provided one. Keep filePath handy so we
   // can delete the orphan if the DB write fails below.
@@ -265,6 +362,7 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
   }
 
   // Step 3: DB write with compensating cleanup on failure.
+  let savedInvoiceId = invoiceId ?? null
   try {
     if (invoiceId) {
       const updatePayload: typeof payload = {
@@ -279,8 +377,19 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
         .eq('user_id', userId)
       if (error) throw new Error(error.message)
     } else {
-      const { error } = await supabase.from('invoices').insert(payload)
+      const { data, error } = await supabase
+        .from('invoices')
+        .insert(payload)
+        .select('id')
+        .single()
       if (error) throw new Error(error.message)
+      savedInvoiceId = data?.id ?? null
+    }
+
+    // Step 3b: persist line items if the caller supplied them. Done inside
+    // the try/catch so a failure here still triggers the PDF cleanup path.
+    if (savedInvoiceId && values.line_items) {
+      await persistInvoiceLineItems(supabase, savedInvoiceId, userId, values.line_items)
     }
   } catch (err) {
     // DB write failed → remove the orphan PDF we just uploaded.
