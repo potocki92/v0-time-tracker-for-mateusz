@@ -1,23 +1,34 @@
 'use client'
 
-import { CheckCircle2, Clock3, Copy, Download, Mail, Pencil, Printer, Trash2 } from 'lucide-react'
-import type { Client, Invoice } from '@/lib/types'
+import { CheckCircle2, ChevronDown, Clock3, Copy, Download, Mail, Pencil, Printer, Trash2 } from 'lucide-react'
+import type { Client, Invoice, InvoiceLifecycleStatus } from '@/lib/types'
 import { formatCurrency, formatDate } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
 import { displayInvoiceNumber } from '@/lib/finance/invoice-number'
 import {
   INVOICE_STATUS_LABELS_PL,
+  INVOICE_STATUS_VALUES,
   InvoiceStatus,
   deriveInvoiceStatus,
 } from '@/lib/finance/invoice-status'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { polishMonthShort } from '../../domain/stats'
 
 interface InvoiceDetailsPanelProps {
   invoice: Invoice
   client: Client | null
   isTogglingPaid: boolean
+  isChangingStatus?: boolean
   onClose?: () => void
   onTogglePaid: () => void
+  onChangeStatus?: (status: InvoiceLifecycleStatus) => void
   onEdit: () => void
   onDelete: () => void
 }
@@ -41,7 +52,9 @@ export function InvoiceDetailsPanel({
   invoice,
   client,
   isTogglingPaid,
+  isChangingStatus,
   onTogglePaid,
+  onChangeStatus,
   onEdit,
   onDelete,
 }: InvoiceDetailsPanelProps) {
@@ -72,14 +85,55 @@ export function InvoiceDetailsPanel({
         <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
           FAKTURA
         </p>
-        <span
-          className={cn(
-            'inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold',
-            STATUS_PILL[status],
-          )}
-        >
-          {INVOICE_STATUS_LABELS_PL[status]}
-        </span>
+        {onChangeStatus ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              disabled={isChangingStatus}
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold transition',
+                STATUS_PILL[status],
+                isChangingStatus && 'opacity-60',
+              )}
+              aria-label="Zmień status faktury"
+            >
+              {INVOICE_STATUS_LABELS_PL[status]}
+              <ChevronDown className="h-3 w-3" aria-hidden />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[160px]">
+              <DropdownMenuLabel className="text-xs">Zmień status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {INVOICE_STATUS_VALUES.map((option) => (
+                <DropdownMenuItem
+                  key={option}
+                  disabled={option === status}
+                  onClick={() => onChangeStatus(option)}
+                >
+                  <span
+                    className={cn(
+                      'mr-2 inline-block h-2 w-2 rounded-full',
+                      option === InvoiceStatus.PAID && 'bg-emerald-400',
+                      option === InvoiceStatus.SENT && 'bg-amber-400',
+                      option === InvoiceStatus.OVERDUE && 'bg-red-400',
+                      option === InvoiceStatus.DRAFT && 'bg-zinc-400',
+                      option === InvoiceStatus.CANCELLED && 'bg-zinc-600',
+                    )}
+                    aria-hidden
+                  />
+                  {INVOICE_STATUS_LABELS_PL[option]}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <span
+            className={cn(
+              'inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold',
+              STATUS_PILL[status],
+            )}
+          >
+            {INVOICE_STATUS_LABELS_PL[status]}
+          </span>
+        )}
       </header>
 
       <div className="mt-2 flex items-center justify-between gap-3">

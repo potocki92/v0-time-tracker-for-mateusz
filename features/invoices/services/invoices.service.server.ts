@@ -16,6 +16,8 @@ import {
   resolveInvoiceSettings as parseInvoiceSettings,
 } from '@/lib/schemas/invoice-settings.schema'
 import { formatInvoiceNumber, sanitizeInvoicePrefix } from '@/lib/finance/invoice-number'
+import { INVOICE_STATUS_VALUES, InvoiceStatus } from '@/lib/finance/invoice-status'
+import type { InvoiceLifecycleStatus } from '@/lib/types'
 import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
@@ -284,18 +286,23 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
   const userId = await fetchCurrentUserId()
   const supabase = await createClient()
 
-  // Step 1: resolve existing invoice (needed for cleaning up the replaced PDF later).
+  // Step 1: resolve existing invoice (needed for cleaning up the replaced PDF later
+  // and for preserving the lifecycle status when the form doesn't override it).
   let previousFileUrl: string | null = null
+  let previousStatus: InvoiceLifecycleStatus | null = null
+  let previousInvoiceNumber: string | null = null
   if (invoiceId) {
     const { data: existing, error: fetchError } = await supabase
       .from('invoices')
-      .select('file_url')
+      .select('file_url, status, invoice_number')
       .eq('id', invoiceId)
       .eq('user_id', userId)
       .maybeSingle()
     if (fetchError) throw new Error(fetchError.message)
     if (!existing) throw new Error('Nie znaleziono faktury do edycji')
     previousFileUrl = existing.file_url ?? null
+    previousStatus = (existing.status as InvoiceLifecycleStatus | null) ?? null
+    previousInvoiceNumber = existing.invoice_number ?? null
   }
 
   const buyerPatch = buyerToClientPatch(values.buyer)
@@ -326,9 +333,14 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
 
   // Step 2b: resolve the business-friendly invoice number.
   // Every invoice — including drafts and legacy rows being edited — must carry a
-  // business number. We reserve one whenever the form leaves it blank, so the UI
-  // never has to fall back to the DB id.
+  // business number. On create we reserve one whenever the form leaves it blank.
+  // On edit we preserve the existing number rather than reserving a fresh sequence
+  // every save (that would burn invoice numbers each time the user opens the form
+  // and clears the field by accident).
   let resolvedInvoiceNumber: string | null = values.invoice_number.trim() || null
+  if (!resolvedInvoiceNumber && invoiceId && previousInvoiceNumber) {
+    resolvedInvoiceNumber = previousInvoiceNumber
+  }
   if (!resolvedInvoiceNumber) {
     const {
       data: { user },
@@ -344,6 +356,18 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     })
   }
 
+  // Step 2c: resolve the lifecycle status.
+  // - Form passes `status`     → honor it (user explicitly picked one).
+  // - New invoice, no override → default to SENT (manual issuance is "issued").
+  // - Edit, no override        → preserve the existing status so unrelated form
+  //                              edits don't silently regress SENT/PAID rows.
+  const requestedStatus = values.status
+  const resolvedStatus: InvoiceLifecycleStatus = requestedStatus
+    ? requestedStatus
+    : invoiceId
+      ? (previousStatus ?? InvoiceStatus.SENT)
+      : (values.is_paid ? InvoiceStatus.PAID : InvoiceStatus.SENT)
+
   const payload = {
     user_id: userId,
     client_id: resolvedClientId,
@@ -356,6 +380,7 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     amount: values.amount,
     currency: values.currency,
     is_paid: values.is_paid,
+    status: resolvedStatus,
     file_url: uploaded?.publicUrl ?? null,
     notes: values.notes.trim() || null,
     template_key: values.template_key,
@@ -511,6 +536,7 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
       amount,
       currency: invoiceCurrency,
       is_paid: false,
+      status: InvoiceStatus.SENT,
       notes: 'Wygenerowano automatycznie z przepracowanych wpisów w kalendarzu.',
       template_key: settings.defaultTemplate,
       template_accent_color: settings.templateAccentColor,
@@ -590,6 +616,34 @@ export async function updateInvoicePaidStatusAction(invoiceId: string, isPaid: b
   const { error } = await supabase
     .from('invoices')
     .update({ is_paid: isPaid })
+    .eq('id', invoiceId)
+    .eq('user_id', userId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/invoices')
+  revalidatePath('/dashboard')
+}
+
+/**
+ * Change the lifecycle status of an invoice. The DB trigger
+ * `sync_invoice_payment_flag` keeps `is_paid` and `paid_date` consistent — we
+ * only need to write `status` and the trigger handles the rest.
+ */
+export async function updateInvoiceStatusAction(
+  invoiceId: string,
+  status: InvoiceLifecycleStatus,
+) {
+  if (!(INVOICE_STATUS_VALUES as readonly string[]).includes(status)) {
+    throw new Error(`Niepoprawny status faktury: ${status}`)
+  }
+
+  const userId = await fetchCurrentUserId()
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('invoices')
+    .update({ status })
     .eq('id', invoiceId)
     .eq('user_id', userId)
 

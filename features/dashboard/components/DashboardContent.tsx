@@ -11,6 +11,7 @@ import {
   HoursSection,
   InvoicesSection,
   ProjectsSection,
+  QuarterlySummarySection,
   QuickActionsSection,
   UpcomingSection,
   WeeklyGlanceSection,
@@ -78,6 +79,10 @@ export function DashboardContent() {
 
           <Suspense fallback={<InvoicesSkeleton />}>
             <InvoicesSection />
+          </Suspense>
+
+          <Suspense fallback={<InvoicesSkeleton />}>
+            <QuarterlySummarySection />
           </Suspense>
 
           <SectionHeader label="Wkrótce" />
