@@ -9,6 +9,7 @@ export const MUTATION_KEYS = {
     update:   ['invoice', 'update']    as const,
     delete:   ['invoice', 'delete']    as const,
     autoIssue: ['invoice', 'auto-issue'] as const,
+    updateStatus: ['invoice', 'update-status'] as const,
   },
   workEntry: {
     create: ['work-entry', 'create'] as const,

@@ -3,12 +3,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
+import type { InvoiceLifecycleStatus } from '@/lib/types'
+import { INVOICE_STATUS_LABELS_PL } from '@/lib/finance/invoice-status'
 import { INVOICES_MANAGER_QUERY_KEY, type SaveInvoiceInput } from '../domain'
 import {
   deleteInvoiceAction,
   runAutoIssueInvoicesAction,
   saveInvoiceAction,
   updateInvoicePaidStatusAction,
+  updateInvoiceStatusAction,
 } from '../services/invoices.service.server'
 
 function useInvalidateInvoices() {
@@ -69,6 +72,23 @@ export function useRunAutoIssueInvoices() {
     },
     onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : 'Auto-fakturowanie nie powiodło się')
+    },
+  })
+}
+
+export function useUpdateInvoiceStatus() {
+  const invalidate = useInvalidateInvoices()
+
+  return useMutation({
+    mutationKey: MUTATION_KEYS.invoice.updateStatus,
+    mutationFn: ({ invoiceId, status }: { invoiceId: string; status: InvoiceLifecycleStatus }) =>
+      updateInvoiceStatusAction(invoiceId, status),
+    onSuccess: (_, variables) => {
+      toast.success(`Status zmieniono na: ${INVOICE_STATUS_LABELS_PL[variables.status]}`)
+      invalidate()
+    },
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Nie udało się zmienić statusu faktury')
     },
   })
 }

@@ -8,27 +8,30 @@ import {
   FileText,
   Pencil,
   Plus,
+  XCircle,
   type LucideIcon,
 } from 'lucide-react'
 import { formatCurrency } from '@/lib/helpers'
 import type { Invoice } from '@/lib/types'
+import { InvoiceStatus, deriveInvoiceStatus } from '@/lib/finance/invoice-status'
 
 type Props = {
   invoices: Invoice[]
   periodShort: string
 }
 
-type StatusKey = 'paid' | 'open' | 'overdue' | 'draft'
+type StatusKey = 'paid' | 'open' | 'overdue' | 'draft' | 'cancelled'
 
 function statusFromInvoice(inv: Invoice): StatusKey {
-  if (inv.is_paid) return 'paid'
-  if (inv.status === 'OVERDUE') return 'overdue'
-  if (inv.status === 'DRAFT') return 'draft'
-  if (inv.due_date) {
-    const t = new Date(inv.due_date).getTime()
-    if (!Number.isNaN(t) && t < Date.now()) return 'overdue'
+  const derived = deriveInvoiceStatus(inv)
+  switch (derived) {
+    case InvoiceStatus.PAID: return 'paid'
+    case InvoiceStatus.OVERDUE: return 'overdue'
+    case InvoiceStatus.DRAFT: return 'draft'
+    case InvoiceStatus.CANCELLED: return 'cancelled'
+    case InvoiceStatus.SENT:
+    default: return 'open'
   }
-  return 'open'
 }
 
 const STATUS_PILL: Record<
@@ -41,7 +44,7 @@ const STATUS_PILL: Record<
     icon: Check,
   },
   open: {
-    label: 'Otwarte',
+    label: 'Wystawiona',
     className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
     icon: Clock,
   },
@@ -54,6 +57,11 @@ const STATUS_PILL: Record<
     label: 'Szkic',
     className: 'bg-zinc-500/15 text-zinc-300 ring-1 ring-zinc-500/30',
     icon: Pencil,
+  },
+  cancelled: {
+    label: 'Anulowana',
+    className: 'bg-zinc-500/10 text-zinc-400 ring-1 ring-zinc-500/20 line-through',
+    icon: XCircle,
   },
 }
 

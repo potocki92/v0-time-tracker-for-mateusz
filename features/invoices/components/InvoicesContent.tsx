@@ -26,6 +26,7 @@ import {
   invoiceToBuilderValues,
 } from './builder'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
+import { QuickQuarterlyInvoiceDialog } from './QuickQuarterlyInvoiceDialog'
 import { QuickWeeklyInvoiceDialog } from './QuickWeeklyInvoiceDialog'
 import {
   InvoiceARAgingCard,
@@ -49,8 +50,10 @@ import {
   useRunAutoIssueInvoices,
   useSaveInvoice,
   useSetInvoicePaidStatus,
+  useUpdateInvoiceStatus,
 } from '../hooks'
 import type { InvoiceFormValues } from '../domain'
+import type { InvoiceLifecycleStatus } from '@/lib/types'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
@@ -85,12 +88,14 @@ export function InvoicesContent() {
   const deleteMutation = useDeleteInvoice()
   const autoIssueMutation = useRunAutoIssueInvoices()
   const setPaidStatusMutation = useSetInvoicePaidStatus()
+  const updateStatusMutation = useUpdateInvoiceStatus()
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null)
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null)
   const [quickWeeksOpen, setQuickWeeksOpen] = useState(false)
+  const [quickQuarterOpen, setQuickQuarterOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<InvoiceFilterTab>('all')
   const [query, setQuery] = useState('')
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
@@ -219,9 +224,19 @@ export function InvoicesContent() {
     })
   }
 
+  function handleChangeStatus(invoice: Invoice, status: InvoiceLifecycleStatus) {
+    if (invoice.status === status) return
+    void updateStatusMutation.mutateAsync({ invoiceId: invoice.id, status })
+  }
+
   async function handleQuickWeeksSubmit(values: InvoiceFormValues) {
     await saveMutation.mutateAsync({ values })
     setQuickWeeksOpen(false)
+  }
+
+  async function handleQuickQuarterSubmit(values: InvoiceFormValues) {
+    await saveMutation.mutateAsync({ values })
+    setQuickQuarterOpen(false)
   }
 
   function handleImportClick() {
@@ -278,6 +293,10 @@ export function InvoicesContent() {
             <DropdownMenuItem onClick={() => setQuickWeeksOpen(true)}>
               <CalendarRange className="size-4" />
               Wystaw z tygodni
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setQuickQuarterOpen(true)}>
+              <CalendarRange className="size-4" />
+              Wystaw z kwartału
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => void autoIssueMutation.mutateAsync()}
@@ -376,7 +395,9 @@ export function InvoicesContent() {
                 invoice={selectedInvoice}
                 client={selectedClient}
                 isTogglingPaid={setPaidStatusMutation.isPending}
+                isChangingStatus={updateStatusMutation.isPending}
                 onTogglePaid={() => handleTogglePaid(selectedInvoice)}
+                onChangeStatus={(status) => handleChangeStatus(selectedInvoice, status)}
                 onEdit={() => openEdit(selectedInvoice)}
                 onDelete={() => setDeletingInvoice(selectedInvoice)}
               />
@@ -415,6 +436,15 @@ export function InvoicesContent() {
         isSaving={saveMutation.isPending}
         onClose={() => setQuickWeeksOpen(false)}
         onSubmit={handleQuickWeeksSubmit}
+      />
+
+      <QuickQuarterlyInvoiceDialog
+        open={quickQuarterOpen}
+        clients={data.clients}
+        settings={data.settings}
+        isSaving={saveMutation.isPending}
+        onClose={() => setQuickQuarterOpen(false)}
+        onSubmit={handleQuickQuarterSubmit}
       />
     </div>
   )
