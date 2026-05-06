@@ -1,14 +1,25 @@
 'use client'
 
-import { useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import type { Invoice } from '@/lib/types'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { FileText } from 'lucide-react'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
 import { Button } from '@/components/ui/button'
+import { Bot, CalendarRange, Download, FileText, MoreHorizontal, Upload } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
-import { InvoicesHeader } from './InvoicesHeader'
-import { InvoicesTable } from './InvoicesTable'
 import {
   InvoiceBuilderDialog,
   builderValuesToFormValues,
@@ -16,6 +27,21 @@ import {
 } from './builder'
 import { DeleteInvoiceDialog } from './DeleteInvoiceDialog'
 import { QuickWeeklyInvoiceDialog } from './QuickWeeklyInvoiceDialog'
+import {
+  InvoiceARAgingCard,
+  InvoiceCashflowCard,
+  InvoiceDetailsPanel,
+  InvoiceFilterToolbar,
+  InvoiceListItem,
+  InvoiceStatsGrid,
+  InvoicesPageHeader,
+} from './redesign'
+import {
+  computeInvoicesStats,
+  filterInvoicesByTab,
+  searchInvoices,
+  type InvoiceFilterTab,
+} from '../domain/stats'
 import {
   useDeleteInvoice,
   useInvoiceAccountingCsv,
@@ -65,6 +91,9 @@ export function InvoicesContent() {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null)
   const [quickWeeksOpen, setQuickWeeksOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<InvoiceFilterTab>('all')
+  const [query, setQuery] = useState('')
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
   const importInputRef = useRef<HTMLInputElement | null>(null)
 
   const { exportAccountingCsv, importAccountingCsv } = useInvoiceAccountingCsv({
@@ -74,7 +103,43 @@ export function InvoicesContent() {
 
   const isSaving = saveMutation.isPending
 
-  const hasInvoices = useMemo(() => data.invoices.length > 0, [data.invoices.length])
+  const stats = useMemo(() => computeInvoicesStats(data.invoices), [data.invoices])
+
+  const clientsById = useMemo(
+    () => new Map(data.clients.map((client) => [client.id, client])),
+    [data.clients],
+  )
+
+  const filteredInvoices = useMemo(() => {
+    const byCurrency = data.invoices.filter(
+      (inv) => (inv.currency ?? 'PLN') === stats.currency,
+    )
+    const byTab = filterInvoicesByTab(byCurrency, activeTab)
+    return searchInvoices(byTab, query).sort((a, b) => {
+      const ad = new Date(a.invoice_date ?? a.issue_date ?? a.created_at).getTime()
+      const bd = new Date(b.invoice_date ?? b.issue_date ?? b.created_at).getTime()
+      return bd - ad
+    })
+  }, [data.invoices, stats.currency, activeTab, query])
+
+  useEffect(() => {
+    if (filteredInvoices.length === 0) {
+      setSelectedInvoiceId(null)
+      return
+    }
+    if (
+      !selectedInvoiceId ||
+      !filteredInvoices.some((inv) => inv.id === selectedInvoiceId)
+    ) {
+      setSelectedInvoiceId(filteredInvoices[0].id)
+    }
+  }, [filteredInvoices, selectedInvoiceId])
+
+  const selectedInvoice =
+    filteredInvoices.find((inv) => inv.id === selectedInvoiceId) ?? null
+  const selectedClient = selectedInvoice?.client_id
+    ? clientsById.get(selectedInvoice.client_id) ?? null
+    : null
 
   const builderInitialValues = useMemo<InvoiceBuilderValues | undefined>(
     () => (editingInvoice ? invoiceToBuilderValues(editingInvoice) : undefined),
@@ -105,15 +170,15 @@ export function InvoicesContent() {
 
   async function handleBuilderSubmit(values: InvoiceBuilderValues) {
     const payload = builderValuesToFormValues(values, {
-      clientId:    selectedClientId,
-      settings:    data.settings,
-      isPaid:      editingInvoice?.is_paid ?? false,
+      clientId: selectedClientId,
+      settings: data.settings,
+      isPaid: editingInvoice?.is_paid ?? false,
       templateKey: editingInvoice?.template_key ?? data.settings.defaultTemplate,
     })
 
     await saveMutation.mutateAsync({
       invoiceId: editingInvoice?.id,
-      values:    payload,
+      values: payload,
     })
 
     closeForm()
@@ -123,23 +188,6 @@ export function InvoicesContent() {
     if (!deletingInvoice) return
     await deleteMutation.mutateAsync(deletingInvoice.id)
     setDeletingInvoice(null)
-  }
-
-  async function handleBulkDelete(invoices: Invoice[]) {
-    if (invoices.length === 0) return
-    const confirmed =
-      typeof window === 'undefined'
-        ? true
-        : window.confirm(`Usunąć ${invoices.length} ${invoices.length === 1 ? 'fakturę' : 'faktur'}?`)
-    if (!confirmed) return
-
-    const results = await Promise.allSettled(
-      invoices.map((invoice) => deleteMutation.mutateAsync(invoice.id)),
-    )
-    const failed = results.filter((result) => result.status === 'rejected').length
-    if (failed > 0) {
-      toast.error(`Nie udało się usunąć ${failed} ${failed === 1 ? 'faktury' : 'faktur'}.`)
-    }
   }
 
   async function handleCreateTestInvoice() {
@@ -187,25 +235,19 @@ export function InvoicesContent() {
     try {
       await importAccountingCsv(file)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Nie udało się zaimportować pliku CSV.')
+      toast.error(
+        error instanceof Error ? error.message : 'Nie udało się zaimportować pliku CSV.',
+      )
     } finally {
       event.target.value = ''
     }
   }
 
-  return (
-    <div className="container space-y-6 px-4 py-8">
-      <InvoicesHeader
-        onCreate={openCreate}
-        onCreateFromWeeks={() => setQuickWeeksOpen(true)}
-        onExportAccounting={exportAccountingCsv}
-        onImportAccounting={handleImportClick}
-        onRunAutoIssue={() => void autoIssueMutation.mutateAsync()}
-        onCreateTestInvoice={() => void handleCreateTestInvoice()}
-        isAutoIssueRunning={autoIssueMutation.isPending}
-        isCreatingTestInvoice={saveMutation.isPending && !editingInvoice}
-      />
+  const autoIssueBusy = autoIssueMutation.isPending
+  const testBusy = saveMutation.isPending && !editingInvoice
 
+  return (
+    <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-6 pb-28 lg:max-w-6xl lg:pb-10">
       <input
         ref={importInputRef}
         type="file"
@@ -214,30 +256,138 @@ export function InvoicesContent() {
         onChange={(event) => void handleImportChange(event)}
       />
 
-      {!hasInvoices ? (
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <FileText className="size-5" />
-            </EmptyMedia>
-            <EmptyTitle>Nie masz jeszcze faktur</EmptyTitle>
-            <EmptyDescription>
-              Dodaj pierwszą fakturę, aby rozpocząć zarządzanie rozliczeniami.
-            </EmptyDescription>
-          </EmptyHeader>
-          <Button onClick={openCreate}>Dodaj pierwszą fakturę</Button>
-        </Empty>
-      ) : (
-        <InvoicesTable
-          invoices={data.invoices}
-          clients={data.clients}
-          onCreate={openCreate}
-          onEdit={openEdit}
-          onDelete={setDeletingInvoice}
-          onTogglePaid={handleTogglePaid}
-          onBulkDelete={handleBulkDelete}
+      <div className="flex items-start justify-between gap-3">
+        <InvoicesPageHeader
+          monthLabel={stats.monthLabel}
+          cycleLabel={stats.cycleLabel}
+          currency={stats.currency}
+          year={new Date().getFullYear()}
         />
-      )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Więcej akcji"
+              className="h-10 w-10 shrink-0 rounded-xl border-[#1a1a1a] bg-[#0a0a0a] text-zinc-300 hover:border-[#262626] hover:bg-[#0e0e0e] hover:text-white"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={() => setQuickWeeksOpen(true)}>
+              <CalendarRange className="size-4" />
+              Wystaw z tygodni
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => void autoIssueMutation.mutateAsync()}
+              disabled={autoIssueBusy}
+            >
+              <Bot className="size-4" />
+              {autoIssueBusy ? 'Generowanie...' : 'Auto-fakturowanie'}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => void handleCreateTestInvoice()}
+              disabled={testBusy}
+            >
+              <FileText className="size-4" />
+              {testBusy ? 'Tworzenie testu...' : 'Utwórz testową fakturę'}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={exportAccountingCsv}>
+              <Download className="size-4" />
+              Eksport CSV
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleImportClick}>
+              <Upload className="size-4" />
+              Import CSV
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div className="space-y-4 lg:col-span-7">
+          <InvoiceStatsGrid stats={stats} />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <InvoiceARAgingCard aging={stats.aging} currency={stats.currency} />
+            <InvoiceCashflowCard
+              cashflow={stats.cashflow}
+              total={stats.cashflowTotal}
+              trendPercent={stats.cashflowTrendPercent}
+              currency={stats.currency}
+            />
+          </div>
+
+          <InvoiceFilterToolbar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            counts={stats.counts}
+            query={query}
+            onQueryChange={setQuery}
+            onCreate={openCreate}
+          />
+
+          {filteredInvoices.length === 0 ? (
+            data.invoices.length === 0 ? (
+              <Empty className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a]">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <FileText className="size-5" />
+                  </EmptyMedia>
+                  <EmptyTitle>Nie masz jeszcze faktur</EmptyTitle>
+                  <EmptyDescription>
+                    Dodaj pierwszą fakturę, aby rozpocząć zarządzanie rozliczeniami.
+                  </EmptyDescription>
+                </EmptyHeader>
+                <Button onClick={openCreate}>Dodaj pierwszą fakturę</Button>
+              </Empty>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-500">
+                Brak faktur dopasowanych do filtrów.
+              </div>
+            )
+          ) : (
+            <ul className="space-y-2.5">
+              {filteredInvoices.map((invoice) => {
+                const client = invoice.client_id
+                  ? clientsById.get(invoice.client_id) ?? null
+                  : null
+                return (
+                  <li key={invoice.id}>
+                    <InvoiceListItem
+                      invoice={invoice}
+                      client={client}
+                      selected={invoice.id === selectedInvoiceId}
+                      onSelect={() => setSelectedInvoiceId(invoice.id)}
+                    />
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+
+        <div className="lg:col-span-5">
+          {selectedInvoice ? (
+            <div className="lg:sticky lg:top-6">
+              <InvoiceDetailsPanel
+                invoice={selectedInvoice}
+                client={selectedClient}
+                isTogglingPaid={setPaidStatusMutation.isPending}
+                onTogglePaid={() => handleTogglePaid(selectedInvoice)}
+                onEdit={() => openEdit(selectedInvoice)}
+                onDelete={() => setDeletingInvoice(selectedInvoice)}
+              />
+            </div>
+          ) : (
+            <div className="hidden rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-500 lg:block">
+              Wybierz fakturę z listy, aby zobaczyć szczegóły.
+            </div>
+          )}
+        </div>
+      </div>
 
       <InvoiceBuilderDialog
         open={formOpen}
@@ -245,11 +395,11 @@ export function InvoicesContent() {
         initialValues={builderInitialValues}
         defaults={builderDefaults}
         onClose={closeForm}
-      onSubmit={handleBuilderSubmit}
-      clients={data.clients}
-      selectedClientId={selectedClientId}
-      onSelectedClientIdChange={setSelectedClientId}
-    />
+        onSubmit={handleBuilderSubmit}
+        clients={data.clients}
+        selectedClientId={selectedClientId}
+        onSelectedClientIdChange={setSelectedClientId}
+      />
 
       <DeleteInvoiceDialog
         invoice={deletingInvoice}
