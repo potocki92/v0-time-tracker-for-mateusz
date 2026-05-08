@@ -41,17 +41,25 @@ import {
   computeInvoicesStats,
   filterInvoicesByTab,
   searchInvoices,
-  type InvoiceFilterTab,
 } from '../domain/stats'
 import {
   useDeleteInvoice,
   useInvoiceAccountingCsv,
+  useInvoiceLineItems,
   useInvoicesData,
+  useInvoicesFilters,
   useRunAutoIssueInvoices,
   useSaveInvoice,
   useSetInvoicePaidStatus,
   useUpdateInvoiceStatus,
 } from '../hooks'
+import { InvoicesPagination } from './InvoicesPagination'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import type { InvoiceFormValues } from '../domain'
 import type { InvoiceLifecycleStatus } from '@/lib/types'
 
@@ -96,10 +104,14 @@ export function InvoicesContent() {
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null)
   const [quickWeeksOpen, setQuickWeeksOpen] = useState(false)
   const [quickQuarterOpen, setQuickQuarterOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<InvoiceFilterTab>('all')
-  const [query, setQuery] = useState('')
+  const { activeTab, setActiveTab, query, setQuery, pageSize, setPageSize } =
+    useInvoicesFilters()
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
+  const [pageIndex, setPageIndex] = useState(0)
+  const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false)
   const importInputRef = useRef<HTMLInputElement | null>(null)
+
+  const { data: editingLineItems } = useInvoiceLineItems(editingInvoice?.id ?? null)
 
   const { exportAccountingCsv, importAccountingCsv } = useInvoiceAccountingCsv({
     invoices: data.invoices,
@@ -127,28 +139,53 @@ export function InvoicesContent() {
     })
   }, [data.invoices, stats.currency, activeTab, query])
 
+  const pageCount = Math.max(1, Math.ceil(filteredInvoices.length / pageSize))
+
   useEffect(() => {
-    if (filteredInvoices.length === 0) {
+    setPageIndex(0)
+  }, [activeTab, query, pageSize])
+
+  useEffect(() => {
+    if (pageIndex > pageCount - 1) setPageIndex(pageCount - 1)
+  }, [pageIndex, pageCount])
+
+  const pagedInvoices = useMemo(
+    () => filteredInvoices.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize),
+    [filteredInvoices, pageIndex, pageSize],
+  )
+
+  useEffect(() => {
+    if (pagedInvoices.length === 0) {
       setSelectedInvoiceId(null)
       return
     }
     if (
       !selectedInvoiceId ||
-      !filteredInvoices.some((inv) => inv.id === selectedInvoiceId)
+      !pagedInvoices.some((inv) => inv.id === selectedInvoiceId)
     ) {
-      setSelectedInvoiceId(filteredInvoices[0].id)
+      setSelectedInvoiceId(pagedInvoices[0].id)
     }
-  }, [filteredInvoices, selectedInvoiceId])
+  }, [pagedInvoices, selectedInvoiceId])
 
   const selectedInvoice =
-    filteredInvoices.find((inv) => inv.id === selectedInvoiceId) ?? null
+    pagedInvoices.find((inv) => inv.id === selectedInvoiceId) ?? null
   const selectedClient = selectedInvoice?.client_id
     ? clientsById.get(selectedInvoice.client_id) ?? null
     : null
 
+  const editingClient = editingInvoice?.client_id
+    ? clientsById.get(editingInvoice.client_id) ?? null
+    : null
+
   const builderInitialValues = useMemo<InvoiceBuilderValues | undefined>(
-    () => (editingInvoice ? invoiceToBuilderValues(editingInvoice) : undefined),
-    [editingInvoice],
+    () =>
+      editingInvoice
+        ? invoiceToBuilderValues(editingInvoice, {
+            lineItems: editingLineItems ?? null,
+            client:    editingClient,
+          })
+        : undefined,
+    [editingInvoice, editingLineItems, editingClient],
   )
 
   const builderDefaults = useMemo(
@@ -368,29 +405,43 @@ export function InvoicesContent() {
               </div>
             )
           ) : (
-            <ul className="space-y-2.5">
-              {filteredInvoices.map((invoice) => {
-                const client = invoice.client_id
-                  ? clientsById.get(invoice.client_id) ?? null
-                  : null
-                return (
-                  <li key={invoice.id}>
-                    <InvoiceListItem
-                      invoice={invoice}
-                      client={client}
-                      selected={invoice.id === selectedInvoiceId}
-                      onSelect={() => setSelectedInvoiceId(invoice.id)}
-                    />
-                  </li>
-                )
-              })}
-            </ul>
+            <>
+              <ul className="space-y-2.5">
+                {pagedInvoices.map((invoice) => {
+                  const client = invoice.client_id
+                    ? clientsById.get(invoice.client_id) ?? null
+                    : null
+                  return (
+                    <li key={invoice.id}>
+                      <InvoiceListItem
+                        invoice={invoice}
+                        client={client}
+                        selected={invoice.id === selectedInvoiceId}
+                        onSelect={() => {
+                          setSelectedInvoiceId(invoice.id)
+                          setMobileDetailsOpen(true)
+                        }}
+                      />
+                    </li>
+                  )
+                })}
+              </ul>
+
+              <InvoicesPagination
+                pageIndex={pageIndex}
+                pageCount={pageCount}
+                pageSize={pageSize}
+                totalCount={filteredInvoices.length}
+                onPageChange={setPageIndex}
+                onPageSizeChange={setPageSize}
+              />
+            </>
           )}
         </div>
 
-        <div className="lg:col-span-5">
+        <div className="hidden lg:col-span-5 lg:block">
           {selectedInvoice ? (
-            <div className="lg:sticky lg:top-6">
+            <div className="sticky top-6">
               <InvoiceDetailsPanel
                 invoice={selectedInvoice}
                 client={selectedClient}
@@ -403,12 +454,46 @@ export function InvoicesContent() {
               />
             </div>
           ) : (
-            <div className="hidden rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-500 lg:block">
+            <div className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-500">
               Wybierz fakturę z listy, aby zobaczyć szczegóły.
             </div>
           )}
         </div>
       </div>
+
+      <Sheet
+        open={mobileDetailsOpen && Boolean(selectedInvoice)}
+        onOpenChange={setMobileDetailsOpen}
+      >
+        <SheetContent
+          side="bottom"
+          className="max-h-[90dvh] overflow-y-auto rounded-t-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-0 lg:hidden"
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Szczegóły faktury</SheetTitle>
+          </SheetHeader>
+          {selectedInvoice && (
+            <div className="px-2 pb-[max(env(safe-area-inset-bottom),1rem)] pt-2">
+              <InvoiceDetailsPanel
+                invoice={selectedInvoice}
+                client={selectedClient}
+                isTogglingPaid={setPaidStatusMutation.isPending}
+                isChangingStatus={updateStatusMutation.isPending}
+                onTogglePaid={() => handleTogglePaid(selectedInvoice)}
+                onChangeStatus={(status) => handleChangeStatus(selectedInvoice, status)}
+                onEdit={() => {
+                  setMobileDetailsOpen(false)
+                  openEdit(selectedInvoice)
+                }}
+                onDelete={() => {
+                  setMobileDetailsOpen(false)
+                  setDeletingInvoice(selectedInvoice)
+                }}
+              />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
 
       <InvoiceBuilderDialog
         open={formOpen}

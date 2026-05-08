@@ -15,7 +15,7 @@
  * roll out the new UX without a database migration.
  */
 
-import type { CURRENCY, Invoice } from '@/lib/types'
+import type { Client, CURRENCY, Invoice, InvoiceLineItem } from '@/lib/types'
 import type {
   InvoiceBuilderCurrency,
   InvoiceBuilderValues,
@@ -70,15 +70,54 @@ function sumGross(items: ReadonlyArray<LineItemInput>): number {
   }, 0)
 }
 
+interface InvoiceToBuilderOptions {
+  /** Persisted line items from `invoice_line_items`. When provided and
+   *  non-empty, these replace the single fallback item. */
+  lineItems?: ReadonlyArray<InvoiceLineItem> | null
+  /** Linked client used to hydrate the buyer block (NIP, address, …). */
+  client?: Client | null
+}
+
 /**
  * Hydrate a legacy `Invoice` into the rich builder shape so the user can
- * keep editing without losing context. Missing columns fall back to safe
- * defaults — a single line item carrying the legacy `amount` keeps totals
- * visible while the buyer/payment blocks come up empty for the user to fill.
+ * keep editing without losing context. When the optional `lineItems` are
+ * passed in, they replace the legacy `amount` fallback so editing doesn't
+ * silently drop multi-row invoices. The buyer block prefers the linked
+ * client's data over the invoice's free-form `recipient` so existing NIP /
+ * address details survive a round-trip through the form.
  */
-export function invoiceToBuilderValues(invoice: Invoice): InvoiceBuilderValues {
+export function invoiceToBuilderValues(
+  invoice: Invoice,
+  options: InvoiceToBuilderOptions = {},
+): InvoiceBuilderValues {
   const issueDate = invoice.invoice_date ?? invoice.issue_date ?? todayIso()
   const dueDate   = invoice.due_date ?? addDaysIso(issueDate, 14)
+  const { lineItems, client } = options
+
+  const items: LineItemInput[] =
+    lineItems && lineItems.length > 0
+      ? lineItems.map((li) => ({
+          id:             li.id,
+          description:    li.description,
+          unit:           li.unit?.trim() || 'szt.',
+          quantity:       Number(li.quantity) || 0,
+          unit_price_net: Number(li.unit_price_net) || 0,
+          vat_mode:       'standard',
+          vat_rate:       Number(li.vat_rate) || 0,
+        }))
+      : [
+          {
+            ...emptyLineItem(),
+            description:    invoice.description ?? invoice.name ?? 'Pozycja faktury',
+            unit:           'szt.',
+            quantity:       1,
+            // Net is the only safe source. Falling back to `amount` (gross)
+            // would inflate the total by VAT on every save.
+            unit_price_net: Number(invoice.net_amount ?? 0),
+            vat_mode:       'standard',
+            vat_rate:       23,
+          },
+        ]
 
   return {
     invoice_number: invoice.invoice_number ?? '',
@@ -90,26 +129,16 @@ export function invoiceToBuilderValues(invoice: Invoice): InvoiceBuilderValues {
     exchange_rate_date: undefined,
     language: 'pl',
     buyer: {
-      name:         invoice.recipient ?? '',
-      tax_id:       '',
-      country_code: 'PL',
-      address:      '',
-      city:         '',
-      postal_code:  '',
-      email:        '',
+      name:         client?.name ?? invoice.recipient ?? '',
+      tax_id:       client?.nip ?? '',
+      country_code: (client?.country_code ?? 'PL').toUpperCase(),
+      address:      client?.address ?? '',
+      city:         client?.city ?? '',
+      postal_code:  client?.postal_code ?? '',
+      email:        client?.email ?? '',
       is_vat_eu:    false,
     },
-    items: [
-      {
-        ...emptyLineItem(),
-        description:    invoice.description ?? invoice.name ?? 'Pozycja faktury',
-        unit:           'szt.',
-        quantity:       1,
-        unit_price_net: Number(invoice.net_amount ?? invoice.amount ?? 0),
-        vat_mode:       'standard',
-        vat_rate:       23,
-      },
-    ],
+    items,
     payment: {
       method:       'bank_transfer',
       bank_account: '',
