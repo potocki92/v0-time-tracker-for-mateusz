@@ -89,7 +89,6 @@ export function InvoiceBuilderDialog({
           ariaLabel={isEditMode ? 'Formularz edycji faktury' : 'Formularz nowej faktury'}
           resolver={resolver}
           defaultValues={defaultValues}
-          resetOnDefaultValuesChange
           onSubmit={(values) => onSubmit(values)}
           className="flex min-h-0 flex-1 flex-col gap-0 space-y-0"
         >

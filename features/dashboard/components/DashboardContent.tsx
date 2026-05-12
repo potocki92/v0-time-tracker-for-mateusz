@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
+import { TripsSection } from '@/features/trips'
 import {
   ActivitySection,
   DashboardRangeProvider,
@@ -50,6 +51,8 @@ export function DashboardContent() {
           <Suspense fallback={<HeaderSkeleton />}>
             <HeaderSection />
           </Suspense>
+
+          <TripsSection />
 
           <Suspense fallback={<KpiSkeleton />}>
             <EarningsSection />

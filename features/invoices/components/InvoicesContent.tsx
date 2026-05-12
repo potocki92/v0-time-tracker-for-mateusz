@@ -111,7 +111,8 @@ export function InvoicesContent() {
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false)
   const importInputRef = useRef<HTMLInputElement | null>(null)
 
-  const { data: editingLineItems } = useInvoiceLineItems(editingInvoice?.id ?? null)
+  const { data: editingLineItems, isLoading: editingLineItemsLoading } =
+    useInvoiceLineItems(editingInvoice?.id ?? null)
 
   const { exportAccountingCsv, importAccountingCsv } = useInvoiceAccountingCsv({
     invoices: data.invoices,
@@ -177,16 +178,21 @@ export function InvoicesContent() {
     ? clientsById.get(editingInvoice.client_id) ?? null
     : null
 
-  const builderInitialValues = useMemo<InvoiceBuilderValues | undefined>(
-    () =>
-      editingInvoice
-        ? invoiceToBuilderValues(editingInvoice, {
-            lineItems: editingLineItems ?? null,
-            client:    editingClient,
-          })
-        : undefined,
-    [editingInvoice, editingLineItems, editingClient],
-  )
+  // Compute initial values only once line items have loaded — otherwise we'd
+  // seed the form with a single fallback row, then async-replace it once the
+  // query settles, wiping any input the user typed in the meantime.
+  const builderInitialValues = useMemo<InvoiceBuilderValues | undefined>(() => {
+    if (!editingInvoice) return undefined
+    if (editingLineItemsLoading) return undefined
+    return invoiceToBuilderValues(editingInvoice, {
+      lineItems: editingLineItems ?? null,
+      client:    editingClient,
+    })
+  }, [editingInvoice, editingLineItems, editingLineItemsLoading, editingClient])
+
+  // Hold the dialog closed until the initial values are ready in edit mode.
+  // Creation flow has no async dependency, so it opens immediately.
+  const isBuilderOpen = formOpen && (!editingInvoice || builderInitialValues !== undefined)
 
   const builderDefaults = useMemo(
     () => ({ dueDays: data.settings.dueDays }),
@@ -496,7 +502,10 @@ export function InvoicesContent() {
       </Sheet>
 
       <InvoiceBuilderDialog
-        open={formOpen}
+        // Force a fresh form instance per invoice so RHF picks up the right
+        // defaultValues on each open instead of carrying state across edits.
+        key={editingInvoice?.id ?? 'new'}
+        open={isBuilderOpen}
         isSaving={isSaving}
         initialValues={builderInitialValues}
         defaults={builderDefaults}
