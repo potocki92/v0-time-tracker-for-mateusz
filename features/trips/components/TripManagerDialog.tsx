@@ -78,12 +78,12 @@ export function TripManagerDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] gap-3 overflow-x-hidden overflow-y-auto p-4 sm:max-w-lg sm:gap-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>Wyjazdy do pracy</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <section className="space-y-3 rounded-xl border border-border/60 bg-muted/20 p-3">
             <p className="text-sm font-medium">Nowy wyjazd</p>
             <p className="text-xs text-muted-foreground">
@@ -136,7 +136,7 @@ export function TripManagerDialog({
             </Button>
           </section>
 
-          <section className="space-y-2">
+          <section className="min-w-0 space-y-2">
             <p className="text-sm font-medium">Zapisane wyjazdy</p>
             {sortedTrips.length === 0 ? (
               <p className="rounded-lg border border-dashed border-border/60 px-3 py-4 text-center text-xs text-muted-foreground">
@@ -150,8 +150,8 @@ export function TripManagerDialog({
                 {sortedTrips.map((trip) => {
                   const isEditing = editingTripId === trip.id
                   return (
-                    <li key={trip.id}>
-                      <div className="flex items-center gap-2 px-3 py-2.5">
+                    <li key={trip.id} className="min-w-0">
+                      <div className="flex min-w-0 items-center gap-1 px-2 py-2 sm:gap-2 sm:px-3">
                         <button
                           type="button"
                           onClick={() => setEditingTripId(isEditing ? null : trip.id)}
@@ -178,7 +178,7 @@ export function TripManagerDialog({
                           size="icon"
                           aria-label={isEditing ? 'Zamknij edycję' : 'Edytuj wyjazd'}
                           onClick={() => setEditingTripId(isEditing ? null : trip.id)}
-                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
@@ -188,7 +188,7 @@ export function TripManagerDialog({
                           size="icon"
                           aria-label="Usuń wyjazd"
                           onClick={() => api.removeTrip(trip.id)}
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
