@@ -16,7 +16,8 @@ import {
   useEntryMutations,
   useMonthEntries,
 } from '../_hooks'
-import { selectDefaultClient } from '../_domain/calendar.selectors'
+import { selectDefaultClient, selectTripDayMarkers } from '../_domain/calendar.selectors'
+import { useTrips } from '@/features/trips'
 import type { CalendarView } from '../_domain/calendar.types'
 import {
   CalendarGridErrorBoundary,
@@ -44,6 +45,18 @@ export function CalendarContent() {
     workEntries,
     nav.currentYear,
     nav.currentMonth,
+  )
+  const { trips } = useTrips()
+  const tripDayMarkers = useMemo(
+    () =>
+      selectTripDayMarkers(
+        trips,
+        nav.currentYear,
+        nav.currentMonth,
+        nav.daysInMonth,
+        nav.firstDayOfMonth,
+      ),
+    [trips, nav.currentYear, nav.currentMonth, nav.daysInMonth, nav.firstDayOfMonth],
   )
   const stats = useCalendarStats(monthEntries, clients, eurRate)
   const insights = useCalendarInsights({
@@ -173,6 +186,7 @@ export function CalendarContent() {
                     currentMonth={nav.currentMonth}
                     currentYear={nav.currentYear}
                     entriesByDate={entriesByDate}
+                    tripDayMarkers={tripDayMarkers}
                     clients={clients}
                     eurToPln={eurRate}
                     onOpenDay={dialog.openDay}

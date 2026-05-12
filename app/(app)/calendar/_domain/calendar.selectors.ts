@@ -1,6 +1,7 @@
 import { calculateEarnings } from '@/lib/finance/earnings'
 import { getMonthKey } from '@/lib/helpers'
 import type { Client, WorkEntry } from '@/lib/types'
+import { addDaysIso, type Trip } from '@/features/trips/domain'
 import { MONTHLY_BASELINE_HOURS } from './calendar.constants'
 import type {
   ActiveStreak,
@@ -10,6 +11,13 @@ import type {
   RecentEntry,
   WeeklyHoursBar,
 } from './calendar.types'
+
+export type TripDayMarker = {
+  tripId: string
+  destination?: string
+  roundLeft: boolean
+  roundRight: boolean
+}
 
 /**
  * Selektory — pure functions operujące na surowych danych.
@@ -301,6 +309,57 @@ export function selectDayComposition(
   }
 
   return { totalDays: daysInMonth, worked, pto, sick, off, weekend }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Wyjazdy w siatce kalendarza
+ * ───────────────────────────────────────────────────────────────────────── */
+
+function isoForDay(year: number, month: number, day: number): string {
+  const m = String(month + 1).padStart(2, '0')
+  const d = String(day).padStart(2, '0')
+  return `${year}-${m}-${d}`
+}
+
+/**
+ * Dla danego miesiąca zwraca informację, które dni należą do jakiegoś wyjazdu
+ * i czy ich lewa/prawa krawędź ma być zaokrąglona (czyli: jest pierwsza/ostatnia
+ * w widocznym pasmie wyjazdu, gdzie pasmo łamie się również na końcu/początku
+ * tygodnia w siatce 7-kolumnowej PN..ND).
+ */
+export function selectTripDayMarkers(
+  trips: ReadonlyArray<Trip>,
+  year: number,
+  month: number,
+  daysInMonth: number,
+  firstDayOfMonth: number,
+): Map<number, TripDayMarker> {
+  const result = new Map<number, TripDayMarker>()
+  if (!trips.length) return result
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const iso = isoForDay(year, month, day)
+    const trip = trips.find((t) => t.startDate <= iso && iso <= t.endDate)
+    if (!trip) continue
+
+    const prev = addDaysIso(iso, -1)
+    const next = addDaysIso(iso, 1)
+    const prevInSameTrip = trip.startDate <= prev && prev <= trip.endDate
+    const nextInSameTrip = trip.startDate <= next && next <= trip.endDate
+
+    const column = (firstDayOfMonth + day - 1) % 7
+    const roundLeft = column === 0 || !prevInSameTrip
+    const roundRight = column === 6 || !nextInSameTrip
+
+    result.set(day, {
+      tripId: trip.id,
+      destination: trip.destination,
+      roundLeft,
+      roundRight,
+    })
+  }
+
+  return result
 }
 
 export function selectRecentEntries(
