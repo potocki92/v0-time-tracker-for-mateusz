@@ -16,25 +16,39 @@ const trip = (start: string, end: string, destination?: string): Trip => ({
 })
 
 describe('computeTripCountdown', () => {
-  it('odlicza dni do powrotu, gdy dziś jest w środku wyjazdu', () => {
+  it('na 12.05 dla wyjazdu 11.05 → 30.05 pokazuje 18 dni do powrotu', () => {
+    // endDate (30.05) to dzień powrotu — Mateusz pracuje w sobotę i tego
+    // samego dnia po pracy zjeżdża do Polski. Stąd 30 - 12 = 18, a nie 19.
     const state = computeTripCountdown(
       [trip('2026-05-11', '2026-05-30', 'Niemcy')],
-      '2026-05-25',
+      '2026-05-12',
     )
     expect(state.mode).toBe('away')
-    // 2026-05-31 (Sunday) is the home day → 25 → 31 = 6 days
-    expect(state.targetDate).toBe('2026-05-31')
-    expect(state.days).toBe(6)
+    expect(state.targetDate).toBe('2026-05-30')
+    expect(state.days).toBe(18)
     expect(state.trip?.destination).toBe('Niemcy')
   })
 
-  it('w ostatnim dniu wyjazdu pokazuje 1 dzień do domu', () => {
+  it('w dniu powrotu (endDate) pokazuje 0 dni', () => {
     const state = computeTripCountdown(
       [trip('2026-05-11', '2026-05-30')],
       '2026-05-30',
     )
     expect(state.mode).toBe('away')
-    expect(state.days).toBe(1)
+    expect(state.days).toBe(0)
+  })
+
+  it('dzień po endDate przełącza tryb na "home"', () => {
+    const state = computeTripCountdown(
+      [
+        trip('2026-05-11', '2026-05-30'),
+        trip('2026-06-15', '2026-07-04'),
+      ],
+      '2026-05-31',
+    )
+    expect(state.mode).toBe('home')
+    expect(state.targetDate).toBe('2026-06-15')
+    expect(state.days).toBe(15)
   })
 
   it('w domu odlicza do najbliższego wyjazdu', () => {
@@ -57,7 +71,7 @@ describe('computeTripCountdown', () => {
   it('zwraca no_trips, gdy wszystkie wyjazdy są zakończone', () => {
     const state = computeTripCountdown(
       [trip('2026-05-11', '2026-05-30')],
-      '2026-06-15',
+      '2026-07-01',
     )
     expect(state.mode).toBe('no_trips')
   })

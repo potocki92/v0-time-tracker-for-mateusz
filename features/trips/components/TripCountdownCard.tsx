@@ -52,7 +52,6 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
   const accent = isAway
     ? 'text-emerald-300 ring-emerald-500/30 bg-emerald-500/10'
     : 'text-sky-300 ring-sky-500/30 bg-sky-500/10'
-  const dayWord = pluralizeDni(state.days)
   const destination = state.trip?.destination?.trim()
   const subline = isAway
     ? destination
@@ -62,6 +61,8 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
       ? `Następny wyjazd: ${destination}`
       : 'Następny wyjazd'
 
+  const isToday = state.days === 0
+  const dayWord = pluralizeDni(state.days)
   const targetLabel = state.targetDate ? formatPlLongDate(state.targetDate) : null
 
   return (
@@ -95,12 +96,18 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
               {heading}
             </p>
-            <p className="mt-1 flex items-baseline gap-2 text-white">
-              <span className="text-[40px] font-semibold leading-none tabular-nums sm:text-[44px]">
-                {state.days}
-              </span>
-              <span className="text-base font-medium text-zinc-400">{dayWord}</span>
-            </p>
+            {isToday ? (
+              <p className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-white sm:text-[28px]">
+                {isAway ? 'Dzisiaj wracasz do domu' : 'Dzisiaj wyjeżdżasz'}
+              </p>
+            ) : (
+              <p className="mt-1 flex items-baseline gap-2 text-white">
+                <span className="text-[40px] font-semibold leading-none tabular-nums sm:text-[44px]">
+                  {state.days}
+                </span>
+                <span className="text-base font-medium text-zinc-400">{dayWord}</span>
+              </p>
+            )}
             <p className="mt-1 truncate text-[13px] text-zinc-400">{subline}</p>
             {targetLabel ? (
               <p className="mt-0.5 text-[12px] text-zinc-500">
