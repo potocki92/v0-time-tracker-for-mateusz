@@ -84,9 +84,13 @@ export function TripManagerDialog({
         <div className="space-y-5">
           <section className="space-y-3 rounded-xl border border-border/60 bg-muted/20 p-3">
             <p className="text-sm font-medium">Nowy wyjazd</p>
+            <p className="text-xs text-muted-foreground">
+              „Powrót do domu” to dzień, w którym wracasz po pracy — licznik
+              pokaże 0, gdy nadejdzie ten dzień.
+            </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="grid gap-1.5">
-                <Label htmlFor="trip-start">Wyjazd (pierwszy dzień)</Label>
+                <Label htmlFor="trip-start">Wyjazd (pierwszy dzień pracy)</Label>
                 <Input
                   id="trip-start"
                   type="date"
@@ -97,7 +101,7 @@ export function TripManagerDialog({
                 />
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="trip-end">Powrót (ostatni dzień pracy)</Label>
+                <Label htmlFor="trip-end">Powrót do domu (ostatni dzień)</Label>
                 <Input
                   id="trip-end"
                   type="date"

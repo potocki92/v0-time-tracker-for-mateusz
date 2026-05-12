@@ -42,11 +42,11 @@ export function diffDays(from: string, to: string): number {
 /**
  * Wyznacza stan licznika dla bieżącego dnia.
  *
- * - Jeśli `today` mieści się w którymkolwiek wyjeździe (start..end włącznie)
- *   → tryb `away`, cel = (endDate + 1) [pierwszy dzień w domu].
- * - W przeciwnym razie szukamy najbliższego wyjazdu w przyszłości
- *   → tryb `home`, cel = `startDate` tego wyjazdu.
- * - Brak danych historycznych/przyszłych → `no_trips`.
+ * - `endDate` interpretujemy jako dzień powrotu do domu: Mateusz pracuje
+ *   w sobotę, a wieczorem wraca do Polski. Dzięki temu licznik
+ *   "Powrót do domu" = endDate - today (na ostatnim dniu pokazujemy 0).
+ * - `startDate` to pierwszy dzień wyjazdu — "Wyjazd" = startDate - today.
+ * - Brak aktualnego/przyszłego wyjazdu → `no_trips`.
  */
 export function computeTripCountdown(
   trips: ReadonlyArray<Trip>,
@@ -58,11 +58,10 @@ export function computeTripCountdown(
 
   const current = sorted.find((t) => t.startDate <= today && today <= t.endDate)
   if (current) {
-    const homeDate = addDaysIso(current.endDate, 1)
     return {
       mode: 'away',
-      days: diffDays(today, homeDate),
-      targetDate: homeDate,
+      days: diffDays(today, current.endDate),
+      targetDate: current.endDate,
       trip: current,
     }
   }
