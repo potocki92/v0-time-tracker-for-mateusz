@@ -49,6 +49,12 @@ export const QUERY_CONFIG = {
     retryDelay: (attempt: number) => Math.min(1000 * 2 ** attempt, 30_000),
     refetchOnWindowFocus: false,
   },
+  trips: {
+    staleTime: MINUTE * 15,
+    gcTime:    MINUTE * 60,
+    retry:     1,
+    refetchOnWindowFocus: false, // wyjazdy zmieniają się rzadko
+  },
 } as const
 
 export type QueryConfigKey = keyof typeof QUERY_CONFIG

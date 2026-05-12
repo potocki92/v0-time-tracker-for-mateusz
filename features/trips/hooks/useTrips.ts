@@ -1,32 +1,21 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+import { MUTATION_KEYS, QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
+
 import type { Trip } from '../domain'
-
-const STORAGE_KEY = 'mateusz:trips:v1'
-
-function isTripArray(value: unknown): value is Trip[] {
-  if (!Array.isArray(value)) return false
-  return value.every(
-    (entry) =>
-      entry &&
-      typeof entry === 'object' &&
-      typeof (entry as Trip).id === 'string' &&
-      typeof (entry as Trip).startDate === 'string' &&
-      typeof (entry as Trip).endDate === 'string',
-  )
-}
-
-function generateId(): string {
-  if (typeof globalThis.crypto !== 'undefined' && 'randomUUID' in globalThis.crypto) {
-    return globalThis.crypto.randomUUID()
-  }
-  return `trip_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`
-}
+import {
+  deleteTripRecord,
+  fetchTrips,
+  insertTrip,
+  updateTripRecord,
+} from '../services'
 
 export interface UseTripsResult {
   trips: Trip[]
+  /** `true`, gdy serwer odpowiedział i mamy aktualną listę z bazy. */
   isHydrated: boolean
   addTrip: (input: Omit<Trip, 'id'>) => void
   updateTrip: (id: string, patch: Partial<Omit<Trip, 'id'>>) => void
@@ -34,42 +23,61 @@ export interface UseTripsResult {
 }
 
 /**
- * Trwałe (localStorage) CRUD na wyjazdach. Świadomie nie idzie do bazy —
- * dla jednego użytkownika to nadmiarowa złożoność, a localStorage daje
- * natychmiastową synchronizację UI bez round-tripów do Supabase.
+ * CRUD na wyjazdach trzymanych w Supabase (tabela `public.trips`, RLS na user_id).
+ * Cache jest globalny po stronie TanStack Query — kalendarz i dashboard widzą
+ * tę samą listę i każda mutacja invaliduje key `trips`.
  */
 export function useTrips(): UseTripsResult {
-  const [trips, setTrips, { isHydrated }] = useLocalStorage<Trip[]>(
-    STORAGE_KEY,
-    [],
-    { validate: isTripArray },
+  const queryClient = useQueryClient()
+
+  const { data, isSuccess } = useQuery<Trip[]>({
+    queryKey: QUERY_KEYS.trips(),
+    queryFn: fetchTrips,
+    ...QUERY_CONFIG.trips,
+  })
+
+  const trips = useMemo(
+    () => [...(data ?? [])].sort((a, b) => a.startDate.localeCompare(b.startDate)),
+    [data],
   )
 
-  const sorted = useMemo(
-    () => [...trips].sort((a, b) => a.startDate.localeCompare(b.startDate)),
-    [trips],
+  const invalidate = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.trips() }),
+    [queryClient],
   )
+
+  const addMutation = useMutation({
+    mutationKey: MUTATION_KEYS.trip.create,
+    mutationFn: insertTrip,
+    onSuccess: invalidate,
+  })
+
+  const updateMutation = useMutation({
+    mutationKey: MUTATION_KEYS.trip.update,
+    mutationFn: ({ id, patch }: { id: string; patch: Partial<Omit<Trip, 'id'>> }) =>
+      updateTripRecord(id, patch),
+    onSuccess: invalidate,
+  })
+
+  const removeMutation = useMutation({
+    mutationKey: MUTATION_KEYS.trip.delete,
+    mutationFn: deleteTripRecord,
+    onSuccess: invalidate,
+  })
 
   const addTrip = useCallback(
-    (input: Omit<Trip, 'id'>) => {
-      setTrips((prev) => [...prev, { ...input, id: generateId() }])
-    },
-    [setTrips],
+    (input: Omit<Trip, 'id'>) => addMutation.mutate(input),
+    [addMutation],
   )
-
   const updateTrip = useCallback(
-    (id: string, patch: Partial<Omit<Trip, 'id'>>) => {
-      setTrips((prev) => prev.map((trip) => (trip.id === id ? { ...trip, ...patch } : trip)))
-    },
-    [setTrips],
+    (id: string, patch: Partial<Omit<Trip, 'id'>>) =>
+      updateMutation.mutate({ id, patch }),
+    [updateMutation],
   )
-
   const removeTrip = useCallback(
-    (id: string) => {
-      setTrips((prev) => prev.filter((trip) => trip.id !== id))
-    },
-    [setTrips],
+    (id: string) => removeMutation.mutate(id),
+    [removeMutation],
   )
 
-  return { trips: sorted, isHydrated, addTrip, updateTrip, removeTrip }
+  return { trips, isHydrated: isSuccess, addTrip, updateTrip, removeTrip }
 }
