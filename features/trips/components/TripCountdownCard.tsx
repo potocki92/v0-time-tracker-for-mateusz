@@ -1,0 +1,116 @@
+'use client'
+
+import { Home, Plane, Plus, Settings2 } from 'lucide-react'
+import {
+  formatPlLongDate,
+  pluralizeDni,
+  type TripCountdownState,
+} from '../domain'
+
+interface TripCountdownCardProps {
+  state: TripCountdownState
+  onManage: () => void
+}
+
+/**
+ * Karta licznika "do powrotu / do wyjazdu". Trzy stany wizualne:
+ * - `away` — odlicza dni do powrotu do domu (emerald).
+ * - `home` — odlicza dni do najbliższego wyjazdu (amber/sky).
+ * - `no_trips` — pusty stan z CTA, by uniknąć martwego kafelka.
+ */
+export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
+  if (state.mode === 'no_trips') {
+    return (
+      <section
+        aria-label="Wyjazdy"
+        className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
+      >
+        <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+            Wyjazdy
+          </p>
+          <button
+            type="button"
+            onClick={onManage}
+            className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+          >
+            <Plus className="h-3 w-3" aria-hidden />
+            Dodaj
+          </button>
+        </header>
+        <div className="px-4 py-6 text-center text-sm text-zinc-500 sm:px-5">
+          Brak zaplanowanych wyjazdów. Dodaj pierwszy, aby zacząć liczyć dni do
+          powrotu.
+        </div>
+      </section>
+    )
+  }
+
+  const isAway = state.mode === 'away'
+  const Icon = isAway ? Home : Plane
+  const heading = isAway ? 'Powrót do domu' : 'Wyjazd do pracy'
+  const accent = isAway
+    ? 'text-emerald-300 ring-emerald-500/30 bg-emerald-500/10'
+    : 'text-sky-300 ring-sky-500/30 bg-sky-500/10'
+  const dayWord = pluralizeDni(state.days)
+  const destination = state.trip?.destination?.trim()
+  const subline = isAway
+    ? destination
+      ? `Wracasz z: ${destination}`
+      : 'Wracasz z trasy'
+    : destination
+      ? `Następny wyjazd: ${destination}`
+      : 'Następny wyjazd'
+
+  const targetLabel = state.targetDate ? formatPlLongDate(state.targetDate) : null
+
+  return (
+    <section
+      aria-label="Licznik wyjazdu"
+      className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
+    >
+      <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          Wyjazdy
+        </p>
+        <button
+          type="button"
+          onClick={onManage}
+          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+        >
+          <Settings2 className="h-3 w-3" aria-hidden />
+          Zarządzaj
+        </button>
+      </header>
+
+      <div className="px-4 py-5 sm:px-5">
+        <div className="flex items-start gap-4">
+          <span
+            className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ${accent}`}
+            aria-hidden
+          >
+            <Icon className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+              {heading}
+            </p>
+            <p className="mt-1 flex items-baseline gap-2 text-white">
+              <span className="text-[40px] font-semibold leading-none tabular-nums sm:text-[44px]">
+                {state.days}
+              </span>
+              <span className="text-base font-medium text-zinc-400">{dayWord}</span>
+            </p>
+            <p className="mt-1 truncate text-[13px] text-zinc-400">{subline}</p>
+            {targetLabel ? (
+              <p className="mt-0.5 text-[12px] text-zinc-500">
+                {isAway ? 'Powrót: ' : 'Wyjazd: '}
+                <span className="text-zinc-300">{targetLabel}</span>
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
