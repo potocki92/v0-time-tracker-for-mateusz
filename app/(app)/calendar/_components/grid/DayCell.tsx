@@ -5,6 +5,7 @@ import { calculateEarnings } from '@/lib/finance/earnings'
 import { cn } from '@/lib/utils'
 import { STATUS_CONFIG } from '../../_domain/calendar.constants'
 import type { WorkStatus } from '../../_domain/calendar.types'
+import type { TripDayMarker } from '../../_domain/calendar.selectors'
 import { DayCellTooltip } from './DayCellTooltip'
 import { stringToColor } from './clientColor'
 
@@ -16,6 +17,7 @@ interface Props {
   clients: Client[]
   eurToPln: number
   isWeekend?: boolean
+  tripMarker?: TripDayMarker
   onClick: (day: number) => void
 }
 
@@ -40,6 +42,7 @@ export function DayCell({
   clients,
   eurToPln,
   isWeekend,
+  tripMarker,
   onClick,
 }: Props) {
   const dateStr = getDateString(year, month, day)
@@ -52,25 +55,41 @@ export function DayCell({
   const earnings = entry && client ? calculateEarnings(entry, client, eurToPln) : null
   const cfg = entry ? STATUS_CONFIG[entry.status as WorkStatus] : null
 
+  const tripRounding = tripMarker
+    ? cn(
+        tripMarker.roundLeft ? 'rounded-l-lg' : 'rounded-l-none',
+        tripMarker.roundRight ? 'rounded-r-lg' : 'rounded-r-none',
+      )
+    : 'rounded-lg'
+
   const cellButton = (
     <button
       disabled={isFuture}
       onClick={() => onClick(day)}
-      aria-label={`Dzień ${day}${entry ? `, ${cfg?.label}` : ''}`}
+      aria-label={`Dzień ${day}${entry ? `, ${cfg?.label}` : ''}${
+        tripMarker ? `, wyjazd${tripMarker.destination ? ` ${tripMarker.destination}` : ''}` : ''
+      }`}
       className={cn(
-        'group relative flex h-16 w-full flex-col overflow-hidden rounded-lg border bg-card p-1.5 text-left sm:h-24 sm:p-2',
+        'group relative isolate flex h-16 w-full flex-col overflow-hidden border bg-card p-1.5 text-left sm:h-24 sm:p-2',
+        tripRounding,
         'transition-all duration-200 motion-reduce:transition-none',
         entry
           ? `border-l-[3px] ${cfg?.border} border-y border-r border-border/50 ${cfg?.bg}`
           : 'border-border/50 hover:border-border/80 hover:bg-muted/40',
         isToday &&
-          'border-primary/60 ring-2 ring-primary/40 ring-offset-1 ring-offset-background shadow-[0_0_0_1px_var(--primary)] before:absolute before:inset-0 before:rounded-lg before:bg-primary/5 before:pointer-events-none',
+          'border-primary/60 ring-2 ring-primary/40 ring-offset-1 ring-offset-background shadow-[0_0_0_1px_var(--primary)] before:absolute before:inset-0 before:rounded-[inherit] before:bg-primary/5 before:pointer-events-none',
         isWeekend && !entry && 'bg-muted/30',
         isFuture
           ? 'cursor-not-allowed opacity-40'
           : 'cursor-pointer hover:shadow-sm hover:-translate-y-px active:scale-[0.97]',
       )}
     >
+      {tripMarker && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 bg-emerald-500/15 dark:bg-emerald-500/[0.10]"
+        />
+      )}
       <div className="flex items-center justify-between">
         <span
           className={cn(

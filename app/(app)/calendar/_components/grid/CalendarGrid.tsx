@@ -1,6 +1,7 @@
 import type { Client, WorkEntry } from '@/lib/types'
 import { getDateString } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
+import type { TripDayMarker } from '../../_domain/calendar.selectors'
 import { DayCell } from './DayCell'
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
   currentMonth: number
   currentYear: number
   entriesByDate: Map<string, WorkEntry>
+  tripDayMarkers?: Map<number, TripDayMarker>
   clients: Client[]
   eurToPln: number
   onOpenDay: (day: number) => void
@@ -20,6 +22,7 @@ export function CalendarGrid({
   currentMonth,
   currentYear,
   entriesByDate,
+  tripDayMarkers,
   clients,
   eurToPln,
   onOpenDay,
@@ -55,6 +58,7 @@ export function CalendarGrid({
             year={currentYear}
             entry={entry}
             isWeekend={isWeekend}
+            tripMarker={tripDayMarkers?.get(day)}
             clients={clients}
             eurToPln={eurToPln}
             onClick={onOpenDay}
