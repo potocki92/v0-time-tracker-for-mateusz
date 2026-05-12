@@ -37,4 +37,9 @@ export const MUTATION_KEYS = {
     login:  ['auth', 'login']   as const,
     signUp: ['auth', 'sign-up'] as const,
   },
+  trip: {
+    create: ['trip', 'create'] as const,
+    update: ['trip', 'update'] as const,
+    delete: ['trip', 'delete'] as const,
+  },
 } as const
