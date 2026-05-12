@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -43,11 +43,13 @@ export function TripManagerDialog({
 }: TripManagerDialogProps) {
   const [draft, setDraft] = useState<DraftTrip>(() => emptyDraft())
   const [error, setError] = useState<string | null>(null)
+  const [editingTripId, setEditingTripId] = useState<string | null>(null)
 
   useEffect(() => {
     if (open) {
       setDraft(emptyDraft())
       setError(null)
+      setEditingTripId(null)
     }
   }, [open])
 
@@ -141,63 +143,108 @@ export function TripManagerDialog({
                 Lista jest pusta — dodaj swój pierwszy wyjazd powyżej.
               </p>
             ) : (
-              <ul className="space-y-2" role="list">
-                {sortedTrips.map((trip) => (
-                  <li
-                    key={trip.id}
-                    className="rounded-xl border border-border/60 bg-background/60 p-3"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <p className="truncate text-sm font-medium">
-                          {trip.destination?.trim() || 'Wyjazd'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatPlLongDate(trip.startDate)} → {formatPlLongDate(trip.endDate)}
-                        </p>
+              <ul
+                role="list"
+                className="divide-y divide-border/50 overflow-hidden rounded-xl border border-border/60 bg-background/40"
+              >
+                {sortedTrips.map((trip) => {
+                  const isEditing = editingTripId === trip.id
+                  return (
+                    <li key={trip.id}>
+                      <div className="flex items-center gap-2 px-3 py-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setEditingTripId(isEditing ? null : trip.id)}
+                          aria-expanded={isEditing}
+                          aria-controls={`trip-edit-${trip.id}`}
+                          className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                        >
+                          <ChevronDown
+                            className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${isEditing ? 'rotate-180' : ''}`}
+                            aria-hidden
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium">
+                              {trip.destination?.trim() || 'Wyjazd'}
+                            </p>
+                            <p className="truncate text-[11px] text-muted-foreground">
+                              {formatPlLongDate(trip.startDate)} → {formatPlLongDate(trip.endDate)}
+                            </p>
+                          </div>
+                        </button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label={isEditing ? 'Zamknij edycję' : 'Edytuj wyjazd'}
+                          onClick={() => setEditingTripId(isEditing ? null : trip.id)}
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Usuń wyjazd"
+                          onClick={() => api.removeTrip(trip.id)}
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Usuń wyjazd"
-                        onClick={() => api.removeTrip(trip.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
 
-                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                      <div className="grid gap-1">
-                        <Label htmlFor={`start-${trip.id}`} className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                          Wyjazd
-                        </Label>
-                        <Input
-                          id={`start-${trip.id}`}
-                          type="date"
-                          value={trip.startDate}
-                          onChange={(event) =>
-                            api.updateTrip(trip.id, { startDate: event.target.value })
-                          }
-                        />
-                      </div>
-                      <div className="grid gap-1">
-                        <Label htmlFor={`end-${trip.id}`} className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                          Powrót
-                        </Label>
-                        <Input
-                          id={`end-${trip.id}`}
-                          type="date"
-                          value={trip.endDate}
-                          onChange={(event) =>
-                            api.updateTrip(trip.id, { endDate: event.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-                  </li>
-                ))}
+                      {isEditing ? (
+                        <div
+                          id={`trip-edit-${trip.id}`}
+                          className="grid gap-2 border-t border-border/50 bg-muted/20 px-3 py-3 sm:grid-cols-2"
+                        >
+                          <div className="grid gap-1">
+                            <Label htmlFor={`start-${trip.id}`} className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                              Wyjazd
+                            </Label>
+                            <Input
+                              id={`start-${trip.id}`}
+                              type="date"
+                              value={trip.startDate}
+                              onChange={(event) =>
+                                api.updateTrip(trip.id, { startDate: event.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="grid gap-1">
+                            <Label htmlFor={`end-${trip.id}`} className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                              Powrót
+                            </Label>
+                            <Input
+                              id={`end-${trip.id}`}
+                              type="date"
+                              value={trip.endDate}
+                              onChange={(event) =>
+                                api.updateTrip(trip.id, { endDate: event.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="grid gap-1 sm:col-span-2">
+                            <Label htmlFor={`destination-${trip.id}`} className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                              Miejsce
+                            </Label>
+                            <Input
+                              id={`destination-${trip.id}`}
+                              placeholder="np. Niemcy — Berlin"
+                              value={trip.destination ?? ''}
+                              onChange={(event) =>
+                                api.updateTrip(trip.id, {
+                                  destination: event.target.value || undefined,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </section>
