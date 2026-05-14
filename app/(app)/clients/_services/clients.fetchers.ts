@@ -70,9 +70,6 @@ export type ClientMutationInput = Omit<ClientFormData, 'rate'> & {
   user_id: string
 }
 
-// NOTE: `region`, `country_code`, `locale`, `timezone` require a DB migration
-// adding those columns to `public.clients`. Until then, those keys will be
-// silently rejected by Supabase (or included when the migration lands).
 function toClientRow(input: ClientMutationInput) {
   return {
     user_id:      input.user_id,

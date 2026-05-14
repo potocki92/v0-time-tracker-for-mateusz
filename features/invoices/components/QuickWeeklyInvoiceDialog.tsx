@@ -185,7 +185,11 @@ export function QuickWeeklyInvoiceDialog({
       buyer: {
         name:         selectedClient.name,
         tax_id:       selectedClient.nip ?? '',
-        country_code: (selectedClient.country_code ?? 'PL').toUpperCase(),
+        // Pass through whatever the client has — empty when unset — so the
+        // save action doesn't force-overwrite a foreign client's country with
+        // a default 'PL'. The PDF / JPK fallback to 'PL' is applied later,
+        // only when the value is genuinely missing on the row.
+        country_code: selectedClient.country_code?.toUpperCase() ?? '',
         address:      selectedClient.address ?? '',
         city:         selectedClient.city ?? '',
         postal_code:  selectedClient.postal_code ?? '',

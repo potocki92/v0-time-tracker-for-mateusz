@@ -148,7 +148,10 @@ export async function exportInvoicesJpkFaAction(
       buyer: {
         nip: client?.nip ?? null,
         name: invoice.recipient ?? client?.name ?? null,
-        country_code: 'PL',
+        // KodKraju (P_4A) — fall back to PL only when the client row genuinely
+        // doesn't have one. Hard-coding 'PL' here would mis-classify foreign
+        // (e.g. German) clients in JPK_FA as a domestic sale.
+        country_code: client?.country_code ?? 'PL',
       },
       lineItems: linesByInvoice.get(invoice.id) ?? [],
     }

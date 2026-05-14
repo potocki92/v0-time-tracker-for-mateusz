@@ -136,7 +136,8 @@ export function QuickQuarterlyInvoiceDialog({
       buyer: {
         name:         selectedClient.name,
         tax_id:       selectedClient.nip ?? '',
-        country_code: (selectedClient.country_code ?? 'PL').toUpperCase(),
+        // See QuickWeeklyInvoiceDialog — pass through, don't force 'PL'.
+        country_code: selectedClient.country_code?.toUpperCase() ?? '',
         address:      selectedClient.address ?? '',
         city:         selectedClient.city ?? '',
         postal_code:  selectedClient.postal_code ?? '',
