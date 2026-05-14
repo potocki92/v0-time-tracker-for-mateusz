@@ -135,12 +135,15 @@ async function fetchCurrentUserId() {
   return user.id
 }
 
+// NOTE: `country_code` is intentionally omitted — the production `public.clients`
+// table doesn't carry that column yet (see clients.fetchers.ts:73). Writing it
+// here caused PostgREST to reject the buyer-sync UPDATE on every Quick weekly /
+// quarterly invoice, which surfaced to the user as the opaque RSC error.
 type ClientUpsertExtras = Partial<{
   nip: string | null
   address: string | null
   city: string | null
   postal_code: string | null
-  country_code: string | null
   email: string | null
 }>
 
@@ -210,14 +213,18 @@ function pruneEmpty<T extends Record<string, unknown>>(patch: T): Partial<T> {
 
 function buyerToClientPatch(buyer: SaveInvoiceInput['values']['buyer']): ClientUpsertExtras {
   if (!buyer) return {}
-  return {
-    nip:          buyer.tax_id?.trim() || undefined,
-    address:      buyer.address?.trim() || undefined,
-    city:         buyer.city?.trim() || undefined,
-    postal_code:  buyer.postal_code?.trim() || undefined,
-    country_code: buyer.country_code?.trim() ? buyer.country_code.trim().toUpperCase() : undefined,
-    email:        buyer.email?.trim() || undefined,
-  }
+  const patch: ClientUpsertExtras = {}
+  const nip = buyer.tax_id?.trim()
+  if (nip) patch.nip = nip
+  const address = buyer.address?.trim()
+  if (address) patch.address = address
+  const city = buyer.city?.trim()
+  if (city) patch.city = city
+  const postalCode = buyer.postal_code?.trim()
+  if (postalCode) patch.postal_code = postalCode
+  const email = buyer.email?.trim()
+  if (email) patch.email = email
+  return patch
 }
 
 async function persistInvoiceLineItems(
