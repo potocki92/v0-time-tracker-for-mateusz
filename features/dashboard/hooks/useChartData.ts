@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import { calculateEarnings } from '@/lib/finance/earnings'
+import { calculateEntryMoney, fallbackFromClient } from '@/lib/finance/entry-calculations'
+import { add, convert, toMajor, zero } from '@/lib/finance/money'
 import { Client, WorkEntry, MONTH_NAMES } from '@/lib/types'
 import { ChartDataItem, ChartGrouping } from '../types/dashboard.types'
 import { toDateKey } from '@/lib/date/format'           // ← z @/lib
@@ -20,8 +21,16 @@ export function useChartData(
     if (!entries.length || !dateRange.from || !dateRange.to) return []
 
     const clientMap = new Map(clients.map((c) => [c.id, c]))
-    type GroupedDataItem = ChartDataItem & { earningsEUR: number; sortDate: Date }
-    const grouped   = new Map<string, GroupedDataItem>()
+    // Akumulacja w Money (bigint grosze) zamiast float, by uniknąć dryfu
+    // przy sumowaniu wielu pozycji (np. 10× 0.03 ≠ 0.30 w IEEE 754).
+    type GroupedDataItem = {
+      label: string
+      earningsPLN: ReturnType<typeof zero>
+      earningsEUR: ReturnType<typeof zero>
+      hours: number
+      sortDate: Date
+    }
+    const grouped = new Map<string, GroupedDataItem>()
 
     const cursor = new Date(dateRange.from)
     cursor.setHours(0, 0, 0, 0)
@@ -57,7 +66,13 @@ export function useChartData(
       }
 
       if (!grouped.has(key)) {
-        grouped.set(key, { label, earningsPLN: 0, earningsEUR: 0, hours: 0, sortDate })
+        grouped.set(key, {
+          label,
+          earningsPLN: zero('PLN'),
+          earningsEUR: zero('EUR'),
+          hours:       0,
+          sortDate,
+        })
       }
     }
 
@@ -75,18 +90,25 @@ export function useChartData(
       if (!bucket) continue
 
       if (entry.status === 'worked') bucket.hours += entry.hours ?? 0
-      const client   = entry.client_id ? clientMap.get(entry.client_id) : undefined
-      const earnings = calculateEarnings(entry, client, eurRate)
-      bucket.earningsPLN += earnings.amountInPLN
-      bucket.earningsEUR += earnings.amountInEUR
+      const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
+      const fallback = client
+        ? fallbackFromClient(client)
+        : { rate: 0, currency: 'PLN' as const, workType: 'hourly' as const }
+      const money = calculateEntryMoney(entry, fallback)
+      if (money.currency === 'EUR') {
+        bucket.earningsEUR = add(bucket.earningsEUR, money)
+        bucket.earningsPLN = add(bucket.earningsPLN, convert(money, 'PLN', eurRate))
+      } else {
+        bucket.earningsPLN = add(bucket.earningsPLN, money)
+      }
     }
 
     return Array.from(grouped.values())
       .sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime())
       .map(({ label, earningsPLN, earningsEUR, hours, sortDate }) => ({
         label,
-        earningsPLN: Number(earningsPLN.toFixed(2)),
-        earningsEUR: Number(earningsEUR.toFixed(2)),
+        earningsPLN: toMajor(earningsPLN),
+        earningsEUR: toMajor(earningsEUR),
         hours:       Number(hours.toFixed(1)),
         date: sortDate.toISOString(),
       }))
