@@ -16,7 +16,7 @@
  * Mniej zapytań niż klasyczne optimistic update + rollback.
  */
 
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 interface UseUndoableActionOptions<T> {
@@ -46,6 +46,18 @@ export function useUndoableAction<T>({
   const pendingTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
   // Mapa "czy cofnięto" — sprawdzamy przed wysłaniem do serwera
   const undoneActions = useRef(new Set<string>())
+
+  // Po unmount: anuluj wszystkie pending timery, by nie wołać action()/onUndo()
+  // na zombie-callbackach (które domykają stary state komponentu).
+  useEffect(() => {
+    const timers = pendingTimers.current
+    const undone = undoneActions.current
+    return () => {
+      timers.forEach((t) => clearTimeout(t))
+      timers.clear()
+      undone.clear()
+    }
+  }, [])
 
   const execute = useCallback(
     (payload: T, actionId: string = String(Date.now())) => {

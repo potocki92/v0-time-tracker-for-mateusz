@@ -73,11 +73,16 @@ export function usePushNotifications(): UsePushNotificationsReturn {
   useEffect(() => {
     if (!isSupported) return
 
+    let cancelled = false
     void (async () => {
       const registration = await navigator.serviceWorker.ready
       const existing     = await registration.pushManager.getSubscription()
-      setIsSubscribed(Boolean(existing))
+      if (!cancelled) setIsSubscribed(Boolean(existing))
     })()
+
+    return () => {
+      cancelled = true
+    }
   }, [isSupported])
 
   const subscribe = useCallback(async () => {

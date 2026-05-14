@@ -62,8 +62,12 @@ export const useUiStore = create<UiState & UiActions>()(
     })),
     {
       name: 'ui-state',
-      // sessionStorage — UI state nie powinien przeżywać zamknięcia karty
-      storage: createJSONStorage(() => sessionStorage),
+      // sessionStorage — UI state nie powinien przeżywać zamknięcia karty.
+      // Guard SSR: na serwerze `sessionStorage` rzuca ReferenceError —
+      // wracamy do `undefined`, co skutkuje noop-storage w zustand/persist.
+      storage: createJSONStorage(() =>
+        typeof window !== 'undefined' ? window.sessionStorage : (undefined as never),
+      ),
       partialize: (s) => ({
         dashboardRange: s.dashboardRange,
         filters: s.filters,
