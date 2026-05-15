@@ -70,6 +70,38 @@ export interface InvoiceBuilderDefaults {
   buyer?: Partial<InvoiceBuilderValues['buyer']>
 }
 
+const TAX_ID_COUNTRY_PATTERNS: ReadonlyArray<{
+  code: string
+  patterns: ReadonlyArray<RegExp>
+}> = [
+  { code: 'PL', patterns: [/^\d{10}$/, /^PL\d{10}$/i] },
+  { code: 'DE', patterns: [/^DE\d{9}$/i, /^\d{2}\/\d{3}\/\d{5}$/] },
+  { code: 'GB', patterns: [/^GB\d{9}$/i, /^GB\d{12}$/i] },
+  { code: 'FR', patterns: [/^FR[A-HJ-NP-Z0-9]{2}\d{9}$/i] },
+  { code: 'NL', patterns: [/^NL\d{9}B\d{2}$/i] },
+  { code: 'CZ', patterns: [/^CZ\d{8,10}$/i] },
+  { code: 'SE', patterns: [/^SE\d{12}$/i] },
+  { code: 'CH', patterns: [/^CHE-\d{3}\.\d{3}\.\d{3}( (MWST|TVA|IVA))?$/i] },
+]
+
+export function inferCountryCodeFromTaxId(taxId: string | null | undefined): string | null {
+  const normalized = taxId?.trim()
+  if (!normalized) return null
+
+  const match = TAX_ID_COUNTRY_PATTERNS.find((country) =>
+    country.patterns.some((pattern) => pattern.test(normalized)),
+  )
+  return match?.code ?? null
+}
+
+export function resolveBuyerCountryCode(
+  countryCode: string | null | undefined,
+  taxId: string | null | undefined,
+): string {
+  const normalized = countryCode?.trim().toUpperCase()
+  return normalized || inferCountryCodeFromTaxId(taxId) || 'PL'
+}
+
 /**
  * Builds the empty/blank values used to seed the form for a new invoice.
  * Edit mode should produce its values from existing persisted data and
@@ -94,7 +126,10 @@ export function createDefaultInvoiceBuilderValues(
     buyer: {
       name:         defaults.buyer?.name ?? '',
       tax_id:       defaults.buyer?.tax_id ?? '',
-      country_code: (defaults.buyer?.country_code ?? 'PL').toUpperCase(),
+      country_code: resolveBuyerCountryCode(
+        defaults.buyer?.country_code,
+        defaults.buyer?.tax_id,
+      ),
       address:      defaults.buyer?.address ?? '',
       city:         defaults.buyer?.city ?? '',
       postal_code:  defaults.buyer?.postal_code ?? '',

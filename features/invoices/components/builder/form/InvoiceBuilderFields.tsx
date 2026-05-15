@@ -2,10 +2,13 @@
 
 import * as React from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
+import { useQuery } from '@tanstack/react-query'
 
 import { FormInput, FormSection } from '@/components/common/form'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import { fetchCurrentEurRate } from '@/lib/api/eurRate'
+import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
 import {
   INVOICE_BUILDER_CURRENCIES,
   INVOICE_LANGUAGES,
@@ -15,6 +18,7 @@ import {
   type InvoiceLanguage,
   type PaymentMethod,
 } from '@/lib/schemas/invoice-builder.schema'
+import { useEffectiveEurRate } from '@/features/dashboard/hooks/usePreferencesStore'
 
 import { InvoiceLineItemsField } from './InvoiceLineItemsField'
 import { InvoiceTotalsSummary } from './InvoiceTotalsSummary'
@@ -52,9 +56,18 @@ export function InvoiceBuilderFields({
   const buyerCountry   = useWatch({ control, name: 'buyer.country_code' })
   const isVatEu        = useWatch({ control, name: 'buyer.is_vat_eu' })
   const exchangeRate   = useWatch({ control, name: 'exchange_rate' })
+  const preferredEurRate = useEffectiveEurRate()
+  const autoSeededEurRateRef = React.useRef<number | null>(null)
+  const { data: liveEurRate } = useQuery({
+    queryKey: QUERY_KEYS.eurRate(),
+    queryFn: fetchCurrentEurRate,
+    enabled: currency === 'EUR',
+    ...QUERY_CONFIG.eurRate,
+  })
 
   const country = COUNTRIES.find((c) => c.code === (buyerCountry ?? 'PL').toUpperCase()) ?? COUNTRIES[0]
   const requiresFx = isForeignCurrency(currency as InvoiceBuilderCurrency)
+  const eurRate = liveEurRate ?? preferredEurRate
 
   // When the user switches to a foreign currency, eagerly seed today's
   // FX rate date so the field is meaningful even before they type a rate.
@@ -64,6 +77,30 @@ export function InvoiceBuilderFields({
       setValue('exchange_rate_date', todayIso(), { shouldDirty: false })
     }
   }, [requiresFx, formState.dirtyFields.exchange_rate_date, setValue])
+
+  React.useEffect(() => {
+    if (currency !== 'EUR') {
+      autoSeededEurRateRef.current = null
+      return
+    }
+    if (formState.dirtyFields.exchange_rate) return
+    if (!Number.isFinite(eurRate) || eurRate <= 0) return
+
+    const currentRate = Number(exchangeRate)
+    const wasAutoSeeded =
+      autoSeededEurRateRef.current !== null &&
+      Number.isFinite(currentRate) &&
+      Math.abs(currentRate - autoSeededEurRateRef.current) < 0.00005
+
+    if (Number.isFinite(currentRate) && currentRate > 0 && !wasAutoSeeded) return
+
+    const nextRate = Number(eurRate.toFixed(4))
+    autoSeededEurRateRef.current = nextRate
+    setValue('exchange_rate', nextRate, {
+      shouldDirty: false,
+      shouldValidate: true,
+    })
+  }, [currency, eurRate, exchangeRate, formState.dirtyFields.exchange_rate, setValue])
 
   return (
     <div className="space-y-5">

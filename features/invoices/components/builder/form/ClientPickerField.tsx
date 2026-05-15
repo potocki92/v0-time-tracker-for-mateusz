@@ -19,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ClientDisplay } from '@/components/common/ClientDisplay'
 import type { Client } from '@/lib/types'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
+import { resolveBuyerCountryCode } from './invoice-builder.helpers'
 
 interface ClientPickerFieldProps {
   clients: Client[]
@@ -79,11 +80,9 @@ export function ClientPickerField({
       if (!buyer.email && client.email) {
         setValue('buyer.email', client.email, { shouldDirty: true })
       }
-      if (client.country_code) {
-        setValue('buyer.country_code', client.country_code.toUpperCase(), {
-          shouldDirty: true,
-        })
-      }
+      setValue('buyer.country_code', resolveBuyerCountryCode(client.country_code, client.nip), {
+        shouldDirty: true,
+      })
 
       setOpen(false)
     },

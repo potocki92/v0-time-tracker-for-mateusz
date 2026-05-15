@@ -14,10 +14,12 @@ export {
   builderValuesToFormValues,
   createDefaultInvoiceBuilderValues,
   emptyLineItem,
+  inferCountryCodeFromTaxId,
   invoiceToBuilderValues,
   isForeignCurrency,
   isInvoiceBuilderCurrency,
   makeLineItemId,
+  resolveBuyerCountryCode,
   todayIso,
   type InvoiceBuilderDefaults,
 } from './form'

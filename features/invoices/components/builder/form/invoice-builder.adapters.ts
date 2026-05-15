@@ -32,6 +32,7 @@ import {
   addDaysIso,
   emptyLineItem,
   isInvoiceBuilderCurrency,
+  resolveBuyerCountryCode,
   todayIso,
 } from './invoice-builder.helpers'
 
@@ -131,7 +132,7 @@ export function invoiceToBuilderValues(
     buyer: {
       name:         client?.name ?? invoice.recipient ?? '',
       tax_id:       client?.nip ?? '',
-      country_code: (client?.country_code ?? 'PL').toUpperCase(),
+      country_code: resolveBuyerCountryCode(client?.country_code, client?.nip),
       address:      client?.address ?? '',
       city:         client?.city ?? '',
       postal_code:  client?.postal_code ?? '',
@@ -193,7 +194,7 @@ export function builderValuesToFormValues(
     buyer: {
       name:         buyerName,
       tax_id:       values.buyer.tax_id ?? '',
-      country_code: (values.buyer.country_code ?? 'PL').toUpperCase(),
+      country_code: resolveBuyerCountryCode(values.buyer.country_code, values.buyer.tax_id),
       address:      values.buyer.address ?? '',
       city:         values.buyer.city ?? '',
       postal_code:  values.buyer.postal_code ?? '',

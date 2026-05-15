@@ -33,13 +33,13 @@ const isoDate = z
 
 /**
  * VAT IDs vary dramatically across jurisdictions. We enforce a coarse shape
- * here (letters/digits/space/dash only, 4–20 chars) and leave country-specific
+ * here (letters/digits/space/dash/slash/dot only, 4-30 chars) and leave country-specific
  * checksum validation to a future library (`vat-number-validator`, etc).
  */
 const taxId = z
   .string()
   .trim()
-  .regex(/^[A-Z0-9 -]{4,20}$/i, 'Niepoprawny NIP / VAT ID')
+  .regex(/^[A-Z0-9 ./-]{4,30}$/i, 'Niepoprawny NIP / VAT ID')
 
 export const counterpartySchema = z.object({
   name: z.string().trim().min(1, 'Nazwa nabywcy jest wymagana').max(200),
