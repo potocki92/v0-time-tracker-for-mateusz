@@ -1,12 +1,13 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { TripsSection } from '@/features/trips'
 import {
   ActivitySection,
   DashboardRangeProvider,
   EarningsSection,
   EffectiveRateSection,
+  Footer,
   GoalSection,
   HeaderSection,
   HoursSection,
@@ -14,6 +15,7 @@ import {
   ProjectsSection,
   QuarterlySummarySection,
   QuickActionsSection,
+  SectionHeader,
   UpcomingSection,
   WeeklyGlanceSection,
 } from './sections'
@@ -24,85 +26,76 @@ import {
   KpiSkeleton,
   StatsSkeleton,
 } from './skeletons'
-import { Footer, SectionHeader } from './sections'
 
-/**
- * Linear-style dark dashboard, mobile-first, single column.
- *
- * Order (top → bottom):
- *   - TopBar + HeroGreeting + period tabs
- *   - Earnings (area chart + forecast)
- *   - Monthly goal (circular + surplus + streak)
- *   - Hours (progress + heatmap grid)
- *   - Effective rate (per-client bars)
- *   - Activity (stat tiles + recent feed)
- *   - SCHEDULE & BILLING ─ Projects, Invoices
- *   - UP NEXT ─ Upcoming
- *   - Quick actions (6 tiles)
- *   - This week at a glance (bar chart)
- *   - Footer (synced/version)
- *   - Bottom nav (sticky)
- */
+type DashboardSectionProps = {
+  fallback: ReactNode
+  children: ReactNode
+}
+
+function DashboardSection({ fallback, children }: DashboardSectionProps) {
+  return <Suspense fallback={fallback}>{children}</Suspense>
+}
+
 export function DashboardContent() {
   return (
     <DashboardRangeProvider>
-      <div className="min-h-screen bg-black text-white">
-        <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
-          <Suspense fallback={<HeaderSkeleton />}>
+      <main className="min-h-screen bg-black text-white">
+        <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3">
+          <DashboardSection fallback={<HeaderSkeleton />}>
             <HeaderSection />
-          </Suspense>
+          </DashboardSection>
 
           <TripsSection />
 
-          <Suspense fallback={<KpiSkeleton />}>
+          <DashboardSection fallback={<KpiSkeleton />}>
             <EarningsSection />
-          </Suspense>
+          </DashboardSection>
 
-          <Suspense fallback={<KpiSkeleton />}>
+          <DashboardSection fallback={<KpiSkeleton />}>
             <GoalSection />
-          </Suspense>
+          </DashboardSection>
 
-          <Suspense fallback={<ChartSkeleton />}>
+          <DashboardSection fallback={<ChartSkeleton />}>
             <HoursSection />
-          </Suspense>
+          </DashboardSection>
 
-          <Suspense fallback={<StatsSkeleton />}>
+          <DashboardSection fallback={<StatsSkeleton />}>
             <EffectiveRateSection />
-          </Suspense>
+          </DashboardSection>
 
-          <Suspense fallback={<StatsSkeleton />}>
+          <DashboardSection fallback={<StatsSkeleton />}>
             <ActivitySection />
-          </Suspense>
+          </DashboardSection>
 
           <SectionHeader label="Harmonogram i rozliczenia" />
 
-          <Suspense fallback={<InvoicesSkeleton />}>
+          <DashboardSection fallback={<InvoicesSkeleton />}>
             <ProjectsSection />
-          </Suspense>
+          </DashboardSection>
 
-          <Suspense fallback={<InvoicesSkeleton />}>
+          <DashboardSection fallback={<InvoicesSkeleton />}>
             <InvoicesSection />
-          </Suspense>
+          </DashboardSection>
 
-          <Suspense fallback={<InvoicesSkeleton />}>
+          <DashboardSection fallback={<InvoicesSkeleton />}>
             <QuarterlySummarySection />
-          </Suspense>
+          </DashboardSection>
 
           <SectionHeader label="Wkrótce" />
 
-          <Suspense fallback={<InvoicesSkeleton />}>
+          <DashboardSection fallback={<InvoicesSkeleton />}>
             <UpcomingSection />
-          </Suspense>
+          </DashboardSection>
 
           <QuickActionsSection />
 
-          <Suspense fallback={<ChartSkeleton />}>
+          <DashboardSection fallback={<ChartSkeleton />}>
             <WeeklyGlanceSection />
-          </Suspense>
+          </DashboardSection>
 
           <Footer />
         </div>
-      </div>
+      </main>
     </DashboardRangeProvider>
   )
 }

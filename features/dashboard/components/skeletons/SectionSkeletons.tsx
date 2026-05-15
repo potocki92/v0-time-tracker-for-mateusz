@@ -14,7 +14,7 @@ function DarkBox({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5 ${className ?? ''}`}
+      className={`rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4 ${className ?? ''}`}
     >
       {children}
     </div>
@@ -23,7 +23,7 @@ function DarkBox({
 
 export function HeaderSkeleton() {
   return (
-    <div className="sticky top-0 z-40 -mx-3 border-b border-[#1a1a1a] bg-black/80 px-3 pb-3 pt-3 backdrop-blur-md sm:-mx-4 sm:px-4">
+    <div className="sticky top-0 z-40 -mx-3 border-b border-[#1a1a1a] bg-black/85 px-3 py-2 backdrop-blur-md sm:-mx-4 sm:px-4">
       <div className="flex items-center justify-between">
         <div className="space-y-1.5">
           <SkeletonBlock height={24} className="w-32" />
@@ -86,8 +86,8 @@ export function ChartSkeleton() {
 
 export function InvoicesSkeleton() {
   return (
-    <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]">
-      <div className="flex items-center justify-between border-b border-[#1a1a1a] px-4 py-3 sm:px-5">
+    <div className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]">
+      <div className="flex items-center justify-between border-b border-[#1a1a1a] px-4 py-3">
         <div className="space-y-1.5">
           <SkeletonBlock height={14} className="w-20" />
           <SkeletonBlock height={10} className="w-24" />
@@ -98,7 +98,7 @@ export function InvoicesSkeleton() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="flex items-center gap-3 border-b border-[#161616] px-4 py-3 last:border-b-0 sm:px-5"
+            className="flex items-center gap-3 border-b border-[#161616] px-4 py-3 last:border-b-0"
           >
             <div className="flex-1 space-y-1.5">
               <SkeletonBlock height={14} className="w-40" />

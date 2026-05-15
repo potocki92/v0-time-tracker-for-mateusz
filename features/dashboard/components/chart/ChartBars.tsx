@@ -49,8 +49,8 @@ export function ChartBars({ data, avgHours, isYearDaily }: Props) {
   const showBrush = data.length > 14
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-linear-to-b from-white/10 via-white/[0.03] to-transparent p-2 shadow-[0_10px_30px_-16px_rgba(80,130,255,0.45)] backdrop-blur-sm">
-      <ChartContainer config={chartConfig} className="h-[260px] w-full">
+    <div className="rounded-lg border border-white/10 bg-linear-to-b from-white/10 via-white/[0.03] to-transparent p-2 shadow-[0_10px_30px_-16px_rgba(80,130,255,0.35)] backdrop-blur-sm">
+      <ChartContainer config={chartConfig} className="h-[220px] w-full">
         <ComposedChart data={enriched} margin={{ top: 14, right: 8, left: -2, bottom: 0 }} barCategoryGap={isYearDaily ? '15%' : '30%'}>
           <defs>
             <linearGradient id="hoursFill" x1="0" x2="0" y1="0" y2="1">
