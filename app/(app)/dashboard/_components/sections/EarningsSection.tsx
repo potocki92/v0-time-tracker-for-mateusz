@@ -41,10 +41,12 @@ export function EarningsSection() {
 
   const filtered = useFilteredEntries(workEntries, dateRange)
   const prevFiltered = useFilteredEntries(workEntries, prevRange)
-  const totals = useDashboardTotals(filtered, clients)
-  const trend = useEarningsTrend(filtered, prevFiltered, clients)
-  const sparklineData = useEarningsSparkline(filtered, clients)
-  const prevSparklineData = useEarningsSparkline(prevFiltered, clients)
+  const realFiltered = filtered.filter((entry) => (entry.entry_kind ?? 'real') === 'real')
+  const prevRealFiltered = prevFiltered.filter((entry) => (entry.entry_kind ?? 'real') === 'real')
+  const totals = useDashboardTotals(realFiltered, clients)
+  const trend = useEarningsTrend(realFiltered, prevRealFiltered, clients)
+  const sparklineData = useEarningsSparkline(realFiltered, clients)
+  const prevSparklineData = useEarningsSparkline(prevRealFiltered, clients)
   const periodLabel = usePeriodLabel(range)
   const eurRate = useEffectiveEurRate()
   const eurRateForExport = usePreferencesStore(selectEurRate)
@@ -56,7 +58,7 @@ export function EarningsSection() {
   const toggleCompare = useDashboardUiStore((s) => s.toggleCompare)
 
   const { exportCSV, exportPDF, isExporting } = useExportData({
-    entries: filtered,
+    entries: realFiltered,
     clients,
     eurRate: eurRateForExport,
     periodLabel,
@@ -66,13 +68,22 @@ export function EarningsSection() {
 
   const totalEUR = eurRate > 0 ? totals.totalEarningsAllPLN / eurRate : 0
   const todayIso = getTodayLocalDateString()
-  const realizedPLN = filtered
+  const realizedPLN = realFiltered
     .filter((entry) => entry.status === 'worked' && entry.date <= todayIso)
     .reduce((sum, entry) => {
       const client = clients.find((c) => c.id === entry.client_id)
       return sum + calculateEarnings(entry, client, eurRate).amountInPLN
     }, 0)
-  const predictedPLN = Math.max(totals.totalEarningsAllPLN - realizedPLN, 0)
+  const predictedPLN = filtered
+    .filter((entry) => {
+      if (entry.status !== 'worked') return false
+      const kind = entry.entry_kind ?? 'real'
+      return kind === 'predicted' || (kind === 'real' && entry.date > todayIso)
+    })
+    .reduce((sum, entry) => {
+      const client = clients.find((c) => c.id === entry.client_id)
+      return sum + calculateEarnings(entry, client, eurRate).amountInPLN
+    }, 0)
 
   const handleExportCsv = useCallback(() => {
     try {
@@ -140,7 +151,7 @@ export function EarningsSection() {
       <div className="mt-2 rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
         Realnie na dziś: <span className="font-medium text-foreground">{formatCurrency(realizedPLN, 'PLN')}</span>
         {' · '}
-        Z predykcji na ten miesiąc: <span className="font-medium text-foreground">{formatCurrency(predictedPLN, 'PLN')}</span>
+        Prognoza na ten miesiąc: <span className="font-medium text-foreground">{formatCurrency(predictedPLN, 'PLN')}</span>
       </div>
 
       <GoalEditDialog

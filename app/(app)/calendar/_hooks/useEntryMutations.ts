@@ -28,15 +28,16 @@ export function useEntryMutations({ onSuccess }: { onSuccess?: () => void } = {}
     mutationKey: MUTATION_KEYS.workEntry.update,
     mutationFn: async ({ date, form, workType, existingId }: SavePayload) => {
       const user = await fetchCurrentUser()
+      const status = form.entryKind === 'predicted' ? 'worked' : form.status
 
-      const isWorked = form.status === 'worked'
+      const isWorked = status === 'worked'
       const isHourly = isWorked && workType === 'hourly'
       const isPiecework = isWorked && workType === 'piecework'
 
       const payload = {
         user_id: user.id,
         date,
-        status: form.status,
+        status,
         entry_kind: form.entryKind,
         client_id: isWorked ? form.clientId || null : null,
         project_id:

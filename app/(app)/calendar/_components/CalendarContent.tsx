@@ -120,12 +120,23 @@ export function CalendarContent() {
   }
 
   const handleClonePrevious = () => {
-    if (dialog.selectedDay === null) return
+    if (dialog.selectedDay === null || !dialog.selectedDateStr) return
     const prev = new Date(nav.currentYear, nav.currentMonth, dialog.selectedDay - 1)
     const key = getDateString(prev.getFullYear(), prev.getMonth(), prev.getDate())
-    if (isFutureDate(key)) return
-    const prevEntry = entriesByDate.get(key)?.find((entry) => (entry.entry_kind ?? 'real') === 'real')
-    if (prevEntry) form.populateForm(prevEntry)
+    const prevEntry = workEntries.find(
+      (entry) =>
+        entry.date === key &&
+        (entry.entry_kind ?? 'real') === form.values.entryKind,
+    )
+    const targetEntry = workEntries.find(
+      (entry) =>
+        entry.date === dialog.selectedDateStr &&
+        (entry.entry_kind ?? 'real') === form.values.entryKind,
+    )
+    if (prevEntry) {
+      form.populateForm(prevEntry)
+      setSelectedEntryId(targetEntry?.id)
+    }
   }
 
   const handleSelectEntry = useCallback(
