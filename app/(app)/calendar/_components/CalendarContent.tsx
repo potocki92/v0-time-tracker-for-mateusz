@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutGrid, List } from 'lucide-react'
 import { useEffectiveEurRate } from '@/app/(app)/dashboard/_hooks/usePreferencesStore'
-import { getDateString, isFutureDate } from '@/lib/helpers'
+import { getDateString, getTodayLocalDateString, isFutureDate } from '@/lib/helpers'
 import {
   useCalendarData,
   useCalendarInsights,
@@ -73,8 +73,13 @@ export function CalendarContent() {
   const [view, setView] = useState<CalendarView>('month')
 
   const onDialogOpen = useCallback(
-    (existing: WorkEntry | undefined) => {
-      existing ? form.populateForm(existing) : form.resetForm()
+    (existing: WorkEntry | undefined, dateStr: string) => {
+      if (existing) {
+        form.populateForm(existing)
+        return
+      }
+      const isFutureSelection = dateStr > getTodayLocalDateString()
+      form.resetForm(isFutureSelection ? 'predicted' : 'real')
     },
     [form],
   )
@@ -225,6 +230,8 @@ export function CalendarContent() {
         currentYear={nav.currentYear}
         existingEntry={dialog.existingEntry}
         status={form.values.status}
+        entryKind={form.values.entryKind}
+        isFutureDate={Boolean(dialog.selectedDateStr && dialog.selectedDateStr > getTodayLocalDateString())}
         clientId={form.values.clientId}
         projectId={form.values.projectId}
         hours={form.values.hours}
@@ -235,6 +242,7 @@ export function CalendarContent() {
         clientProjects={form.clientProjects}
         selectedClient={form.selectedClient}
         onChangeStatus={form.setStatus}
+        onChangeEntryKind={form.setEntryKind}
         onChangeClientId={form.setClientId}
         onChangeProjectId={form.setProjectId}
         onChangeHours={form.setHours}

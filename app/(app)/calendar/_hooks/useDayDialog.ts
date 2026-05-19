@@ -8,7 +8,7 @@ interface UseDayDialogArgs {
   currentYear: number
   currentMonth: number
   entriesByDate: Map<string, WorkEntry>
-  onOpen: (existing: WorkEntry | undefined) => void
+  onOpen: (existing: WorkEntry | undefined, dateStr: string) => void
 }
 
 /**
@@ -29,7 +29,7 @@ export function useDayDialog({
       const dateStr = getDateString(currentYear, currentMonth, day)
       const existing = entriesByDate.get(dateStr)
       setSelectedDay(day)
-      onOpen(existing)
+      onOpen(existing, dateStr)
       setIsOpen(true)
     },
     [currentYear, currentMonth, entriesByDate, onOpen],

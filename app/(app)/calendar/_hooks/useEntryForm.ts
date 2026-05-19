@@ -15,6 +15,7 @@ export function useEntryForm(
   projects: Project[],
   defaultClient: Client | undefined,
 ) {
+  const [entryKind, setEntryKind] = useState<'real' | 'predicted'>('real')
   const [status, setStatus] = useState<WorkStatus>('worked')
   const [clientId, setClientId] = useState('')
   const [projectId, setProjectId] = useState('')
@@ -34,6 +35,7 @@ export function useEntryForm(
   )
 
   const populateForm = useCallback((entry: WorkEntry) => {
+    setEntryKind(entry.entry_kind ?? 'real')
     setStatus(entry.status as WorkStatus)
     setClientId(entry.client_id ?? '')
     setProjectId(entry.project_id ?? '')
@@ -43,7 +45,8 @@ export function useEntryForm(
     setNotes(entry.notes ?? '')
   }, [])
 
-  const resetForm = useCallback(() => {
+  const resetForm = useCallback((nextEntryKind: 'real' | 'predicted' = 'real') => {
+    setEntryKind(nextEntryKind)
     setStatus('worked')
     setClientId(defaultClient?.id ?? '')
     setProjectId('')
@@ -54,10 +57,11 @@ export function useEntryForm(
   }, [defaultClient?.id])
 
   return {
-    values: { status, clientId, projectId, hours, quantityFrom, quantityTo, notes },
+    values: { entryKind, status, clientId, projectId, hours, quantityFrom, quantityTo, notes },
     selectedClient,
     clientProjects,
     setStatus,
+    setEntryKind,
     setClientId,
     setProjectId,
     setHours,

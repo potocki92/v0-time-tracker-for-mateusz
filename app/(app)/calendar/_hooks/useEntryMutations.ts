@@ -37,6 +37,7 @@ export function useEntryMutations({ onSuccess }: { onSuccess?: () => void } = {}
         user_id: user.id,
         date,
         status: form.status,
+        entry_kind: form.entryKind,
         client_id: isWorked ? form.clientId || null : null,
         project_id:
           isWorked && form.projectId && form.projectId !== 'none'

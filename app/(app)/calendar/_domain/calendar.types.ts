@@ -102,6 +102,7 @@ export type CalendarInsights = {
 }
 
 export type EntryFormValues = {
+  entryKind: 'real' | 'predicted'
   status: WorkStatus
   clientId: string
   projectId: string
