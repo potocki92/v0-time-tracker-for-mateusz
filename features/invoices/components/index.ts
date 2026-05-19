@@ -1,1 +1,1 @@
-export * from './InvoicesContent'
+export * from './layout/InvoicesContent'

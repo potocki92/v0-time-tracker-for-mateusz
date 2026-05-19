@@ -3,7 +3,7 @@
 import {
   getWorkedWeeksForClient,
   type WorkedWeekSummary,
-} from './worked-weeks.service.server'
+} from '../server/worked-weeks.service.server'
 
 interface FetchInput {
   clientId: string

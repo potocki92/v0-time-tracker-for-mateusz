@@ -9,7 +9,7 @@ import {
   type BillingQuarter,
   quarterDateRange,
   quarterFromMonthNumber,
-} from '../domain'
+} from '../../domain'
 
 export interface WorkedQuarterSummary {
   /** Composite id `YYYY-Q#` for stable React keys and form values. */

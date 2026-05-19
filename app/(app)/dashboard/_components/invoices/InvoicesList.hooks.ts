@@ -14,7 +14,7 @@
 
 import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { updateInvoicePaidStatusAction } from '@/features/invoices/services/invoices.service.server'
+import { updateInvoicePaidStatusAction } from '@/features/invoices/services/server/invoices.service.server'
 import { QUERY_KEYS } from '@/lib/query'
 import { useHaptic } from '@/hooks/useHaptic'
 import { useUndoableAction } from '@/hooks/useUndoableAction'
