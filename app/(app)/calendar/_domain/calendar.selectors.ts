@@ -1,5 +1,5 @@
 import { calculateEarnings } from '@/lib/finance/earnings'
-import { getMonthKey } from '@/lib/helpers'
+import { getMonthKey, getTodayLocalDateString } from '@/lib/helpers'
 import type { Client, WorkEntry } from '@/lib/types'
 import { addDaysIso, type Trip } from '@/features/trips/domain'
 import { MONTHLY_BASELINE_HOURS } from './calendar.constants'
@@ -56,7 +56,7 @@ export function selectCalendarStats(
   eurRate: number,
 ): CalendarStats {
   const workedEntries = monthEntries.filter((e) => e.status === 'worked')
-  const todayIso = new Date().toISOString().slice(0, 10)
+  const todayIso = getTodayLocalDateString()
   const workDays = workedEntries.length
   const freeDays = monthEntries.length - workDays
 

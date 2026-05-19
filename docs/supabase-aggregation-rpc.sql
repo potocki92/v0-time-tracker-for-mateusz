@@ -28,6 +28,7 @@ as $$
     select
       we.date,
       we.status,
+      coalesce(p.eur_to_pln, 0) as eur_to_pln,
       coalesce(we.hours, 0) as hours,
       coalesce(
         case
@@ -40,6 +41,8 @@ as $$
       ) as amount_native,
       coalesce(we.billing_currency, 'PLN') as billing_currency
     from public.work_entries we
+    left join public.profiles p
+      on p.id = we.user_id
     where we.user_id = p_user_id
       and we.date >= p_month_start
       and we.date < p_month_end
@@ -51,7 +54,7 @@ as $$
       hours,
       case
         when billing_currency = 'EUR'
-          then amount_native * coalesce((select p.eur_to_pln from public.profiles p where p.id = p_user_id), 0)
+          then amount_native * eur_to_pln
         else amount_native
       end as amount_pln
     from scoped_entries
@@ -64,4 +67,3 @@ as $$
     coalesce(sum(amount_pln) filter (where status = 'worked'), 0) as total_earnings_pln
   from normalized;
 $$;
-

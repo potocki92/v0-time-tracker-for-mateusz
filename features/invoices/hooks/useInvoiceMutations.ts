@@ -12,7 +12,7 @@ import {
   saveInvoiceAction,
   updateInvoicePaidStatusAction,
   updateInvoiceStatusAction,
-} from '../services/invoices.service.server'
+} from '../services/server/invoices.service.server'
 
 function useInvalidateInvoices() {
   const queryClient = useQueryClient()

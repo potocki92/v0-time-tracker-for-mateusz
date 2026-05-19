@@ -12,7 +12,7 @@ export function PredictedEarningsCard({ predictedEarningsPLN, realizedEarningsPL
     <KPICard
       label="Przewidywany zarobek"
       icon={<Wallet className="h-4 w-4" />}
-      accent="violet"
+      accent="sky"
       ariaLabel={`Przewidywany zarobek: ${formatCurrency(realizedEarningsPLN + predictedEarningsPLN, 'PLN')}`}
     >
       <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight sm:text-[26px]">

@@ -22,6 +22,8 @@ import {
 } from '../../_hooks/useDashboardUiStore'
 import { useExportData } from '@/hooks/useExportData'
 import { formatCurrency } from '@/lib/helpers'
+import { getTodayLocalDateString } from '@/lib/helpers'
+import { calculateEarnings } from '@/lib/finance/earnings'
 import { GoalEditDialog } from '../card/GoalEditDialog'
 import { EarningsCardBoundary } from '../errors'
 import { EarningsCard } from '../linear'
@@ -63,16 +65,12 @@ export function EarningsSection() {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false)
 
   const totalEUR = eurRate > 0 ? totals.totalEarningsAllPLN / eurRate : 0
-  const todayIso = new Date().toISOString().slice(0, 10)
+  const todayIso = getTodayLocalDateString()
   const realizedPLN = filtered
     .filter((entry) => entry.status === 'worked' && entry.date <= todayIso)
     .reduce((sum, entry) => {
       const client = clients.find((c) => c.id === entry.client_id)
-      const rate = entry.billing_rate ?? client?.rate ?? 0
-      if (entry.billing_work_type === 'piecework') {
-        return sum + rate * (entry.quantity ?? 0) * (entry.billing_currency === 'EUR' ? eurRate : 1)
-      }
-      return sum + rate * (entry.hours ?? 0) * (entry.billing_currency === 'EUR' ? eurRate : 1)
+      return sum + calculateEarnings(entry, client, eurRate).amountInPLN
     }, 0)
   const predictedPLN = Math.max(totals.totalEarningsAllPLN - realizedPLN, 0)
 
