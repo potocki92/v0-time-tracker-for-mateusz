@@ -41,7 +41,7 @@ import {
   computeInvoicesStats,
   filterInvoicesByTab,
   searchInvoices,
-} from '../domain/stats'
+} from '../../domain/stats'
 import {
   useDeleteInvoice,
   useInvoiceAccountingCsv,
@@ -52,7 +52,7 @@ import {
   useSaveInvoice,
   useSetInvoicePaidStatus,
   useUpdateInvoiceStatus,
-} from '../hooks'
+} from '../../hooks'
 import { InvoicesPagination } from './InvoicesPagination'
 import {
   Sheet,
@@ -60,7 +60,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { InvoiceFormValues } from '../domain'
+import type { InvoiceFormValues } from '../../domain'
 import type { InvoiceLifecycleStatus } from '@/lib/types'
 
 const CURRENT_YEAR = new Date().getFullYear()

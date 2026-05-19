@@ -25,10 +25,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { fetchWorkedWeeksAction } from '../services/worked-weeks.actions'
-import type { WorkedWeekSummary } from '../services/worked-weeks.service.server'
+import { fetchWorkedWeeksAction } from '../../services/actions/worked-weeks.actions'
+import type { WorkedWeekSummary } from '../../services/server/worked-weeks.service.server'
 import type { Client } from '@/lib/types'
-import type { InvoiceFormValues, InvoiceSettings } from '../domain'
+import type { InvoiceFormValues, InvoiceSettings } from '../../domain'
 
 interface QuickWeeklyInvoiceDialogProps {
   open: boolean

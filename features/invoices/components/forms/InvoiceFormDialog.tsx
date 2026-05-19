@@ -3,7 +3,7 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
 import { ArrowDownAZ, ArrowUpAZ, Check, CheckCircle2, ChevronsUpDown, Clock3, Upload } from 'lucide-react'
 import type { Client, Invoice } from '@/lib/types'
-import type { BillingQuarter, InvoiceFormValues, InvoiceTemplateKey } from '../domain'
+import type { BillingQuarter, InvoiceFormValues, InvoiceTemplateKey } from '../../domain'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
