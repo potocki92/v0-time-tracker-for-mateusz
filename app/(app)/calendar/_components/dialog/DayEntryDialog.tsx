@@ -103,7 +103,8 @@ export function DayEntryDialog({
   onClonePrevious,
   isSaving,
 }: Props) {
-  const isWorked = status === 'worked'
+  const isPredicted = entryKind === 'predicted'
+  const isWorked = isPredicted || status === 'worked'
   const saveDisabled = isSaving || (isWorked && !clientId)
 
   return (
@@ -139,7 +140,7 @@ export function DayEntryDialog({
             )}
           </div>
 
-          <StatusSelect value={status} onChange={onChangeStatus} />
+          {!isPredicted && <StatusSelect value={status} onChange={onChangeStatus} />}
 
           {isWorked && (
             <>

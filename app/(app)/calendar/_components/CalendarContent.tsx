@@ -123,9 +123,13 @@ export function CalendarContent() {
     if (dialog.selectedDay === null) return
     const prev = new Date(nav.currentYear, nav.currentMonth, dialog.selectedDay - 1)
     const key = getDateString(prev.getFullYear(), prev.getMonth(), prev.getDate())
-    if (isFutureDate(key)) return
-    const prevEntry = entriesByDate.get(key)?.find((entry) => (entry.entry_kind ?? 'real') === 'real')
-    if (prevEntry) form.populateForm(prevEntry)
+    const prevEntry = entriesByDate
+      .get(key)
+      ?.find((entry) => (entry.entry_kind ?? 'real') === form.values.entryKind)
+    if (prevEntry) {
+      form.populateForm(prevEntry)
+      setSelectedEntryId(undefined)
+    }
   }
 
   const handleSelectEntry = useCallback(
