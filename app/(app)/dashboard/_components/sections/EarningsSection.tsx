@@ -22,6 +22,8 @@ import {
 } from '../../_hooks/useDashboardUiStore'
 import { useExportData } from '@/hooks/useExportData'
 import { formatCurrency } from '@/lib/helpers'
+import { getTodayLocalDateString } from '@/lib/helpers'
+import { calculateEarnings } from '@/lib/finance/earnings'
 import { GoalEditDialog } from '../card/GoalEditDialog'
 import { EarningsCardBoundary } from '../errors'
 import { EarningsCard } from '../linear'
@@ -63,6 +65,14 @@ export function EarningsSection() {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false)
 
   const totalEUR = eurRate > 0 ? totals.totalEarningsAllPLN / eurRate : 0
+  const todayIso = getTodayLocalDateString()
+  const realizedPLN = filtered
+    .filter((entry) => entry.status === 'worked' && entry.date <= todayIso)
+    .reduce((sum, entry) => {
+      const client = clients.find((c) => c.id === entry.client_id)
+      return sum + calculateEarnings(entry, client, eurRate).amountInPLN
+    }, 0)
+  const predictedPLN = Math.max(totals.totalEarningsAllPLN - realizedPLN, 0)
 
   const handleExportCsv = useCallback(() => {
     try {
@@ -127,6 +137,11 @@ export function EarningsSection() {
           onCopyAmount={handleCopyAmount}
         />
       </EarningsCardBoundary>
+      <div className="mt-2 rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        Realnie na dziś: <span className="font-medium text-foreground">{formatCurrency(realizedPLN, 'PLN')}</span>
+        {' · '}
+        Z predykcji na ten miesiąc: <span className="font-medium text-foreground">{formatCurrency(predictedPLN, 'PLN')}</span>
+      </div>
 
       <GoalEditDialog
         open={goalDialogOpen}

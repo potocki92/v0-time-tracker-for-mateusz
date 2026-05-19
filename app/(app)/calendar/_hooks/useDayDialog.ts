@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { getDateString, isFutureDate } from '@/lib/helpers'
+import { getDateString } from '@/lib/helpers'
 import type { WorkEntry } from '@/lib/types'
 
 interface UseDayDialogArgs {
@@ -27,7 +27,6 @@ export function useDayDialog({
   const openDay = useCallback(
     (day: number) => {
       const dateStr = getDateString(currentYear, currentMonth, day)
-      if (isFutureDate(dateStr)) return
       const existing = entriesByDate.get(dateStr)
       setSelectedDay(day)
       onOpen(existing)

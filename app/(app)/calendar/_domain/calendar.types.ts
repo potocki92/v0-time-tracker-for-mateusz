@@ -23,6 +23,8 @@ export type UseCalendarDataReturn = {
 export type CalendarStats = {
   totalHours: number
   forecastPLN: number
+  predictedEarningsPLN: number
+  realizedEarningsPLN: number
   workDays: number
   freeDays: number
   absences: number

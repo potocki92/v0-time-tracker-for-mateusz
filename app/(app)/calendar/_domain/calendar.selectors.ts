@@ -1,5 +1,5 @@
 import { calculateEarnings } from '@/lib/finance/earnings'
-import { getMonthKey } from '@/lib/helpers'
+import { getMonthKey, getTodayLocalDateString } from '@/lib/helpers'
 import type { Client, WorkEntry } from '@/lib/types'
 import { addDaysIso, type Trip } from '@/features/trips/domain'
 import { MONTHLY_BASELINE_HOURS } from './calendar.constants'
@@ -56,11 +56,14 @@ export function selectCalendarStats(
   eurRate: number,
 ): CalendarStats {
   const workedEntries = monthEntries.filter((e) => e.status === 'worked')
+  const todayIso = getTodayLocalDateString()
   const workDays = workedEntries.length
   const freeDays = monthEntries.length - workDays
 
   let totalHours = 0
   let forecastPLN = 0
+  let predictedEarningsPLN = 0
+  let realizedEarningsPLN = 0
   let absences = 0
 
   const clientMap = new Map(clients.map((c) => [c.id, c]))
@@ -68,7 +71,10 @@ export function selectCalendarStats(
   for (const entry of workedEntries) {
     totalHours += entry.hours ?? 0
     const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
-    forecastPLN += calculateEarnings(entry, client, eurRate).amountInPLN
+    const amountInPLN = calculateEarnings(entry, client, eurRate).amountInPLN
+    forecastPLN += amountInPLN
+    if (entry.date > todayIso) predictedEarningsPLN += amountInPLN
+    else realizedEarningsPLN += amountInPLN
   }
 
   for (const entry of monthEntries) {
@@ -80,6 +86,8 @@ export function selectCalendarStats(
   return {
     totalHours,
     forecastPLN,
+    predictedEarningsPLN,
+    realizedEarningsPLN,
     workDays,
     freeDays,
     absences,
