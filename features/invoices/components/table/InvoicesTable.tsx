@@ -6,7 +6,7 @@ import { DataTable, type DataTableFilter } from '@/components/common/data-table'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { INVOICE_STATUS_LABELS_PL, InvoiceStatus } from '@/lib/finance/invoice-status'
 import { columns, type InvoicesTableMeta } from './columns'
-import { InvoicesMobileList } from './InvoicesMobileList'
+import { InvoicesMobileList } from '../mobile/InvoicesMobileList'
 
 interface InvoicesTableProps {
   invoices: Invoice[]

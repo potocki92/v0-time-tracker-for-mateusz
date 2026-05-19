@@ -22,10 +22,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { fetchWorkedQuartersAction } from '../services/worked-quarters.actions'
-import type { WorkedQuarterSummary } from '../services/worked-quarters.service.server'
+import { fetchWorkedQuartersAction } from '../../services/actions/worked-quarters.actions'
+import type { WorkedQuarterSummary } from '../../services/server/worked-quarters.service.server'
 import type { Client } from '@/lib/types'
-import type { InvoiceFormValues, InvoiceSettings } from '../domain'
+import type { InvoiceFormValues, InvoiceSettings } from '../../domain'
 
 interface QuickQuarterlyInvoiceDialogProps {
   open: boolean

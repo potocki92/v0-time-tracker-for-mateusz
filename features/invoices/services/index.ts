@@ -1,2 +1,2 @@
-export * from './invoices.fetchers'
-export * from './invoices.service'
+export * from './client/invoices.fetchers'
+export * from './client/invoices.service'

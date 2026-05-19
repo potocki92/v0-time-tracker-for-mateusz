@@ -18,7 +18,7 @@ import {
 import { formatInvoiceNumber, sanitizeInvoicePrefix } from '@/lib/finance/invoice-number'
 import { INVOICE_STATUS_VALUES, InvoiceStatus } from '@/lib/finance/invoice-status'
 import type { InvoiceLifecycleStatus } from '@/lib/types'
-import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../domain'
+import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../../domain'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
 

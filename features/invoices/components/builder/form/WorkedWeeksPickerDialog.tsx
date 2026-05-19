@@ -18,8 +18,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { fetchWorkedWeeksAction } from '@/features/invoices/services/worked-weeks.actions'
-import type { WorkedWeekSummary } from '@/features/invoices/services/worked-weeks.service.server'
+import { fetchWorkedWeeksAction } from '@/features/invoices/services/actions/worked-weeks.actions'
+import type { WorkedWeekSummary } from '@/features/invoices/services/server/worked-weeks.service.server'
 
 interface WorkedWeeksPickerDialogProps {
   open: boolean

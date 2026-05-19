@@ -64,7 +64,7 @@ export function InvoiceCard({ invoice, client, onEdit, onDelete, onTogglePaid }:
           </SheetTrigger>
           <SheetContent
             side="bottom"
-            className="rounded-t-2xl px-0 pb-[max(env(safe-area-inset-bottom),1rem)]"
+            className="rounded-t-2xl px-0 pb-[max(env(safe-area-inset-bottom),1rem)] pt-2"
           >
             <SheetHeader className="pb-2">
               <SheetTitle className="text-base">{invoiceLabel}</SheetTitle>
@@ -143,7 +143,7 @@ interface ActionItemProps {
 
 function ActionItem({ icon, label, onClick, href, external, destructive }: ActionItemProps) {
   const className =
-    'flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-muted/60 ' +
+    'flex w-full items-center gap-3 min-h-11 px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-muted/60 ' +
     (destructive ? 'text-destructive' : 'text-foreground')
 
   if (href) {

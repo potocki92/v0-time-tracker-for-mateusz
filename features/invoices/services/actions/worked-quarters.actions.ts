@@ -5,7 +5,7 @@ import {
   getWorkedQuartersForClient,
   type OverallQuarterSummary,
   type WorkedQuarterSummary,
-} from './worked-quarters.service.server'
+} from '../server/worked-quarters.service.server'
 
 export async function fetchWorkedQuartersAction(input: {
   clientId: string
