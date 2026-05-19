@@ -2,13 +2,11 @@
 
 import { useCallback, useState } from 'react'
 import { getDateString } from '@/lib/helpers'
-import type { WorkEntry } from '@/lib/types'
 
 interface UseDayDialogArgs {
   currentYear: number
   currentMonth: number
-  entriesByDate: Map<string, WorkEntry>
-  onOpen: (existing: WorkEntry | undefined, dateStr: string) => void
+  onOpen: (dateStr: string) => void
 }
 
 /**
@@ -18,7 +16,6 @@ interface UseDayDialogArgs {
 export function useDayDialog({
   currentYear,
   currentMonth,
-  entriesByDate,
   onOpen,
 }: UseDayDialogArgs) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
@@ -27,12 +24,11 @@ export function useDayDialog({
   const openDay = useCallback(
     (day: number) => {
       const dateStr = getDateString(currentYear, currentMonth, day)
-      const existing = entriesByDate.get(dateStr)
       setSelectedDay(day)
-      onOpen(existing, dateStr)
+      onOpen(dateStr)
       setIsOpen(true)
     },
-    [currentYear, currentMonth, entriesByDate, onOpen],
+    [currentYear, currentMonth, onOpen],
   )
 
   const close = useCallback(() => setIsOpen(false), [])
@@ -42,14 +38,9 @@ export function useDayDialog({
       ? getDateString(currentYear, currentMonth, selectedDay)
       : null
 
-  const existingEntry = selectedDateStr
-    ? entriesByDate.get(selectedDateStr)
-    : undefined
-
   return {
     selectedDay,
     selectedDateStr,
-    existingEntry,
     isOpen,
     setIsOpen,
     openDay,
