@@ -24,9 +24,13 @@ export type TripDayMarker = {
  * Analogia do dashboard.selectors.ts: żadnej React-owej logiki.
  */
 
-export function selectEntriesByDate(entries: WorkEntry[]): Map<string, WorkEntry> {
-  const map = new Map<string, WorkEntry>()
-  for (const entry of entries) map.set(entry.date, entry)
+export function selectEntriesByDate(entries: WorkEntry[]): Map<string, WorkEntry[]> {
+  const map = new Map<string, WorkEntry[]>()
+  for (const entry of entries) {
+    const dateEntries = map.get(entry.date) ?? []
+    dateEntries.push(entry)
+    map.set(entry.date, dateEntries)
+  }
   return map
 }
 

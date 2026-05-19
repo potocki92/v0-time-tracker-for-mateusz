@@ -71,20 +71,36 @@ export function CalendarContent() {
 
   const form = useEntryForm(clients, projects, defaultClient)
   const [view, setView] = useState<CalendarView>('month')
+  const [selectedEntryId, setSelectedEntryId] = useState<string | undefined>(undefined)
 
   const onDialogOpen = useCallback(
-    (existing: WorkEntry | undefined) => {
-      existing ? form.populateForm(existing) : form.resetForm()
+    (dateStr: string) => {
+      const isFutureSelection = isFutureDate(dateStr)
+      const dayEntries = entriesByDate.get(dateStr) ?? []
+      const preferredKind: 'real' | 'predicted' = isFutureSelection ? 'predicted' : 'real'
+      const existing = dayEntries.find((entry) => (entry.entry_kind ?? 'real') === preferredKind)
+
+      setSelectedEntryId(existing?.id)
+      if (existing) form.populateForm(existing)
+      else form.resetForm(preferredKind)
     },
-    [form],
+    [entriesByDate, form],
   )
 
   const dialog = useDayDialog({
     currentYear: nav.currentYear,
     currentMonth: nav.currentMonth,
-    entriesByDate,
     onOpen: onDialogOpen,
   })
+
+  const selectedDateEntries = useMemo(
+    () => (dialog.selectedDateStr ? entriesByDate.get(dialog.selectedDateStr) ?? [] : []),
+    [dialog.selectedDateStr, entriesByDate],
+  )
+  const existingEntry = useMemo(
+    () => selectedDateEntries.find((entry) => entry.id === selectedEntryId),
+    [selectedDateEntries, selectedEntryId],
+  )
 
   const mutations = useEntryMutations({ onSuccess: dialog.close })
 
@@ -94,13 +110,13 @@ export function CalendarContent() {
       date: dialog.selectedDateStr,
       form: form.values,
       workType: form.selectedClient?.work_type,
-      existingId: dialog.existingEntry?.id,
+      existingId: existingEntry?.id,
     })
   }
 
   const handleDelete = () => {
-    if (!dialog.existingEntry) return
-    mutations.deleteEntry(dialog.existingEntry.id)
+    if (!existingEntry) return
+    mutations.deleteEntry(existingEntry.id)
   }
 
   const handleClonePrevious = () => {
@@ -108,7 +124,7 @@ export function CalendarContent() {
     const prev = new Date(nav.currentYear, nav.currentMonth, dialog.selectedDay - 1)
     const key = getDateString(prev.getFullYear(), prev.getMonth(), prev.getDate())
     if (isFutureDate(key)) return
-    const prevEntry = entriesByDate.get(key)
+    const prevEntry = entriesByDate.get(key)?.find((entry) => (entry.entry_kind ?? 'real') === 'real')
     if (prevEntry) form.populateForm(prevEntry)
   }
 
@@ -118,6 +134,21 @@ export function CalendarContent() {
       dialog.openDay(day)
     },
     [dialog],
+  )
+
+  const handleChangeEntryKind = useCallback(
+    (nextKind: 'real' | 'predicted') => {
+      form.setEntryKind(nextKind)
+      const match = selectedDateEntries.find((entry) => (entry.entry_kind ?? 'real') === nextKind)
+      if (match) {
+        setSelectedEntryId(match.id)
+        form.populateForm(match)
+        return
+      }
+      setSelectedEntryId(undefined)
+      form.resetForm(nextKind)
+    },
+    [form, selectedDateEntries],
   )
 
   return (
@@ -223,8 +254,10 @@ export function CalendarContent() {
         selectedDay={dialog.selectedDay}
         currentMonth={nav.currentMonth}
         currentYear={nav.currentYear}
-        existingEntry={dialog.existingEntry}
+        existingEntry={existingEntry}
         status={form.values.status}
+        entryKind={form.values.entryKind}
+        isFutureDate={Boolean(dialog.selectedDateStr && isFutureDate(dialog.selectedDateStr))}
         clientId={form.values.clientId}
         projectId={form.values.projectId}
         hours={form.values.hours}
@@ -235,6 +268,7 @@ export function CalendarContent() {
         clientProjects={form.clientProjects}
         selectedClient={form.selectedClient}
         onChangeStatus={form.setStatus}
+        onChangeEntryKind={handleChangeEntryKind}
         onChangeClientId={form.setClientId}
         onChangeProjectId={form.setProjectId}
         onChangeHours={form.setHours}

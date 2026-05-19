@@ -9,7 +9,7 @@ interface Props {
   firstDayOfMonth: number
   currentMonth: number
   currentYear: number
-  entriesByDate: Map<string, WorkEntry>
+  entriesByDate: Map<string, WorkEntry[]>
   tripDayMarkers?: Map<number, TripDayMarker>
   clients: Client[]
   eurToPln: number
@@ -46,7 +46,10 @@ export function CalendarGrid({
       {Array.from({ length: daysInMonth }).map((_, i) => {
         const day = i + 1
         const dateStr = getDateString(currentYear, currentMonth, day)
-        const entry = entriesByDate.get(dateStr)
+        const dayEntries = entriesByDate.get(dateStr) ?? []
+        const entry =
+          dayEntries.find((dayEntry) => (dayEntry.entry_kind ?? 'real') === 'real')
+          ?? dayEntries[0]
         const dayOfWeek = (firstDayOfMonth + i) % 7
         const isWeekend = dayOfWeek >= 5
 

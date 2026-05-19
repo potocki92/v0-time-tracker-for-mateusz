@@ -86,6 +86,7 @@ export interface WorkEntry {
   project_id: string | null
   date: string
   status: 'worked' | 'not_worked' | 'vacation' | 'sick_leave' | 'day_off'
+  entry_kind?: 'real' | 'predicted'
   hours: number | null
   quantity: number | null
   quantity_from: number | null
@@ -206,6 +207,7 @@ export interface WorkEntryFormData {
   project_id?: string
   date: string
   status: 'worked' | 'not_worked' | 'vacation' | 'sick_leave' | 'day_off'
+  entry_kind?: 'real' | 'predicted'
   hours?: number
   quantity?: number
   quantity_from?: number

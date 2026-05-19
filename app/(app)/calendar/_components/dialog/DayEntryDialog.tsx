@@ -9,8 +9,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Copy, Trash2 } from 'lucide-react'
 import type { Client, Project, WorkEntry } from '@/lib/types'
 import { MONTH_NAMES } from '@/lib/types'
@@ -33,6 +35,8 @@ interface Props {
 
   // Form state
   status: WorkStatus
+  entryKind: 'real' | 'predicted'
+  isFutureDate: boolean
   clientId: string
   projectId: string
   hours: number
@@ -47,6 +51,7 @@ interface Props {
 
   // Handlers
   onChangeStatus: (value: WorkStatus) => void
+  onChangeEntryKind: (value: 'real' | 'predicted') => void
   onChangeClientId: (value: string) => void
   onChangeProjectId: (value: string) => void
   onChangeHours: (value: number) => void
@@ -74,6 +79,8 @@ export function DayEntryDialog({
   currentYear,
   existingEntry,
   status,
+  entryKind,
+  isFutureDate,
   clientId,
   projectId,
   hours,
@@ -84,6 +91,7 @@ export function DayEntryDialog({
   clientProjects,
   selectedClient,
   onChangeStatus,
+  onChangeEntryKind,
   onChangeClientId,
   onChangeProjectId,
   onChangeHours,
@@ -108,9 +116,29 @@ export function DayEntryDialog({
           {existingEntry && (
             <p className="mt-0.5 text-[11px] text-muted-foreground">Edycja istniejącego wpisu</p>
           )}
+          {entryKind === 'predicted' && (
+            <Badge variant="secondary" className="mt-2 w-fit text-[11px]">
+              Planujesz przewidywane godziny dla tej daty
+            </Badge>
+          )}
         </DialogHeader>
 
         <div className="space-y-4 overflow-y-auto px-4 py-4 sm:px-5">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Tryb wpisu
+            </Label>
+            <Tabs value={entryKind} onValueChange={(v) => onChangeEntryKind(v as 'real' | 'predicted')}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="real">Realne</TabsTrigger>
+                <TabsTrigger value="predicted">Przewidywane</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            {isFutureDate && (
+              <p className="text-[11px] text-muted-foreground">Dla przyszłych dat domyślnie ustawiamy tryb przewidywany.</p>
+            )}
+          </div>
+
           <StatusSelect value={status} onChange={onChangeStatus} />
 
           {isWorked && (
