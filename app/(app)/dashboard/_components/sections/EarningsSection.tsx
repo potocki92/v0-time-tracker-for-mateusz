@@ -75,7 +75,11 @@ export function EarningsSection() {
       return sum + calculateEarnings(entry, client, eurRate).amountInPLN
     }, 0)
   const predictedPLN = filtered
-    .filter((entry) => (entry.entry_kind ?? 'real') === 'predicted' && entry.status === 'worked')
+    .filter((entry) => {
+      if (entry.status !== 'worked') return false
+      const kind = entry.entry_kind ?? 'real'
+      return kind === 'predicted' || (kind === 'real' && entry.date > todayIso)
+    })
     .reduce((sum, entry) => {
       const client = clients.find((c) => c.id === entry.client_id)
       return sum + calculateEarnings(entry, client, eurRate).amountInPLN
