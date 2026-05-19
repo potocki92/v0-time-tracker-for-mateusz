@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import type { InvoiceLineItem } from '@/lib/types'
-import { listInvoiceLineItems } from '../services/invoice-line-items.service.server'
+import { listInvoiceLineItems } from '../services/server/invoice-line-items.service.server'
 
 /**
  * Pobiera pozycje danej faktury z serwera. Włącza się dopiero przy
