@@ -64,7 +64,6 @@ export function DayCell({
 
   const cellButton = (
     <button
-      disabled={isFuture}
       onClick={() => onClick(day)}
       aria-label={`Dzień ${day}${entry ? `, ${cfg?.label}` : ''}${
         tripMarker ? `, wyjazd${tripMarker.destination ? ` ${tripMarker.destination}` : ''}` : ''
@@ -79,9 +78,8 @@ export function DayCell({
         isToday &&
           'border-primary/60 ring-2 ring-primary/40 ring-offset-1 ring-offset-background shadow-[0_0_0_1px_var(--primary)] before:absolute before:inset-0 before:rounded-[inherit] before:bg-primary/5 before:pointer-events-none',
         isWeekend && !entry && 'bg-muted/30',
-        isFuture
-          ? 'cursor-not-allowed opacity-40'
-          : 'cursor-pointer hover:shadow-sm hover:-translate-y-px active:scale-[0.97]',
+        'cursor-pointer hover:shadow-sm hover:-translate-y-px active:scale-[0.97]',
+        isFuture && 'opacity-70',
       )}
     >
       {tripMarker && (
