@@ -106,11 +106,17 @@ export function CalendarContent() {
 
   const handleSave = () => {
     if (!dialog.selectedDateStr) return
+    const shouldOverwritePredictedWithReal =
+      !isFutureDate(dialog.selectedDateStr) && form.values.entryKind === 'real'
+    const fallbackExistingId = shouldOverwritePredictedWithReal
+      ? selectedDateEntries.find((entry) => (entry.entry_kind ?? 'real') === 'predicted')?.id
+      : undefined
+
     mutations.saveEntry({
       date: dialog.selectedDateStr,
       form: form.values,
       workType: form.selectedClient?.work_type,
-      existingId: existingEntry?.id,
+      existingId: existingEntry?.id ?? fallbackExistingId,
     })
   }
 

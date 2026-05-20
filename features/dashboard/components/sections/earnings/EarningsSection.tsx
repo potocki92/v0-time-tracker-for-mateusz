@@ -39,10 +39,12 @@ export function EarningsSection() {
 
   const filtered = useFilteredEntries(workEntries, dateRange)
   const prevFiltered = useFilteredEntries(workEntries, prevRange)
-  const totals = useDashboardTotals(filtered, clients)
-  const trend = useEarningsTrend(filtered, prevFiltered, clients)
-  const sparklineData = useEarningsSparkline(filtered, clients)
-  const prevSparklineData = useEarningsSparkline(prevFiltered, clients)
+  const realFiltered = filtered.filter((entry) => (entry.entry_kind ?? 'real') === 'real')
+  const realPrevFiltered = prevFiltered.filter((entry) => (entry.entry_kind ?? 'real') === 'real')
+  const totals = useDashboardTotals(realFiltered, clients)
+  const trend = useEarningsTrend(realFiltered, realPrevFiltered, clients)
+  const sparklineData = useEarningsSparkline(realFiltered, clients)
+  const prevSparklineData = useEarningsSparkline(realPrevFiltered, clients)
   const periodLabel = usePeriodLabel(range)
   const eurRate = useEffectiveEurRate()
   const eurRateForExport = usePreferencesStore(selectEurRate)
@@ -63,6 +65,8 @@ export function EarningsSection() {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false)
 
   const totalEUR = eurRate > 0 ? totals.totalEarningsAllPLN / eurRate : 0
+  const projectedEntries = filtered.filter((entry) => (entry.entry_kind ?? 'real') === 'predicted')
+  const projectedTotals = useDashboardTotals(projectedEntries, clients)
 
   const handleExportCsv = useCallback(() => {
     try {
@@ -127,6 +131,9 @@ export function EarningsSection() {
           onCopyAmount={handleCopyAmount}
         />
       </EarningsCardBoundary>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Przewidywane zarobki: <span className="font-medium text-foreground">{formatCurrency(projectedTotals.totalEarningsAllPLN, 'PLN')}</span>
+      </p>
 
       <GoalEditDialog
         open={goalDialogOpen}
