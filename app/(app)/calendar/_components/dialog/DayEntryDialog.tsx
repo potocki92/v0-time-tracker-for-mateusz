@@ -129,14 +129,20 @@ export function DayEntryDialog({
             <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Tryb wpisu
             </Label>
-            <Tabs value={entryKind} onValueChange={(v) => onChangeEntryKind(v as 'real' | 'predicted')}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="real">Realne</TabsTrigger>
-                <TabsTrigger value="predicted">Przewidywane</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            {isFutureDate && (
-              <p className="text-[11px] text-muted-foreground">Dla przyszłych dat domyślnie ustawiamy tryb przewidywany.</p>
+            {isFutureDate ? (
+              <Badge variant="secondary" className="w-fit text-[11px]">
+                Przewidywane (dla przyszłych dat)
+              </Badge>
+            ) : (
+              <Tabs
+                value={entryKind}
+                onValueChange={(v) => onChangeEntryKind(v as 'real' | 'predicted')}
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="real">Realne</TabsTrigger>
+                  <TabsTrigger value="predicted">Przewidywane</TabsTrigger>
+                </TabsList>
+              </Tabs>
             )}
           </div>
 
