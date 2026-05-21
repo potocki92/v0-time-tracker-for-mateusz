@@ -1,9 +1,9 @@
 import type { CalendarStats as CalendarStatsData } from '../../_domain/calendar.types'
 import { ActiveStreakCard } from './ActiveStreakCard'
 import { DaysCard } from './DaysCard'
-import { ForecastCard } from './ForecastCard'
 import { HoursCard } from './HoursCard'
 import { PredictedEarningsCard } from './PredictedEarningsCard'
+import { RealizedEarningsCard } from './RealizedEarningsCard'
 
 interface Props extends CalendarStatsData {
   streakCurrent: number
@@ -11,14 +11,19 @@ interface Props extends CalendarStatsData {
 }
 
 /**
- * Bento-grid z 4 KPI-kartami. Mobile: 2×2, desktop: 4×1.
+ * Bento-grid z 5 KPI-kartami. Mobile: 2 kolumny, desktop: 5×1.
  */
 export function CalendarStats({
   totalHours,
-  forecastPLN,
+  realizedHours,
+  predictedHours,
+  totalEarningsPLN,
   predictedEarningsPLN,
   realizedEarningsPLN,
+  realizedSharePercent,
   workDays,
+  realizedDays,
+  predictedDays,
   freeDays,
   progressPercent,
   baselineHours,
@@ -34,10 +39,18 @@ export function CalendarStats({
         progressPercent={progressPercent}
         isAhead={isAhead}
       />
-      <ForecastCard forecastPLN={forecastPLN} workDays={workDays} />
-      <PredictedEarningsCard
-        predictedEarningsPLN={predictedEarningsPLN}
+      <RealizedEarningsCard
         realizedEarningsPLN={realizedEarningsPLN}
+        realizedHours={realizedHours}
+        realizedDays={realizedDays}
+      />
+      <PredictedEarningsCard
+        totalEarningsPLN={totalEarningsPLN}
+        realizedEarningsPLN={realizedEarningsPLN}
+        predictedEarningsPLN={predictedEarningsPLN}
+        predictedHours={predictedHours}
+        predictedDays={predictedDays}
+        realizedSharePercent={realizedSharePercent}
       />
       <DaysCard workDays={workDays} freeDays={freeDays} />
       <ActiveStreakCard current={streakCurrent} longestThisYear={streakLongest} />
