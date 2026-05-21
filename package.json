@@ -9,7 +9,8 @@
     "start": "next start",
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
-    "test:rls": "vitest run --config vitest.rls.config.ts"
+    "test:rls": "vitest run --config vitest.rls.config.ts",
+    "perf:budget": "node scripts/check-performance-budgets.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

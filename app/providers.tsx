@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { QUERY_CLIENT_DEFAULTS } from '@/lib/query/queryConfig'
+import { WebVitalsReporter } from './web-vitals-reporter'
 
 const ReactQueryDevtools = dynamic(
   () => import('@tanstack/react-query-devtools').then((mod) => mod.ReactQueryDevtools),
@@ -34,6 +35,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         {children}
         {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+        {process.env.NODE_ENV === 'production' && <WebVitalsReporter />}
       </QueryClientProvider>
     </NuqsAdapter>
   )
