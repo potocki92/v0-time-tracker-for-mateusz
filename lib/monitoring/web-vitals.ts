@@ -1,5 +1,14 @@
-import type { Metric } from 'next/web-vitals'
 import * as Sentry from '@sentry/nextjs'
+
+export interface WebVitalMetric {
+  name: 'CLS' | 'FCP' | 'INP' | 'LCP' | 'TTFB' | (string & {})
+  value: number
+  rating: 'good' | 'needs-improvement' | 'poor'
+  id: string
+  delta: number
+  entries: PerformanceEntry[]
+  navigationType: string
+}
 
 export const WEB_VITALS_BUDGETS = {
   LCP: 2500,
@@ -15,14 +24,14 @@ function isWebVitalName(name: string): name is WebVitalName {
   return name in WEB_VITALS_BUDGETS
 }
 
-export function isWebVitalOverBudget(metric: Metric): boolean {
+export function isWebVitalOverBudget(metric: WebVitalMetric): boolean {
   if (!isWebVitalName(metric.name)) return false
   return metric.value > WEB_VITALS_BUDGETS[metric.name]
 }
 
 const reportedMetricIds = new Set<string>()
 
-export function reportWebVital(metric: Metric): void {
+export function reportWebVital(metric: WebVitalMetric): void {
   if (process.env.NODE_ENV !== 'production') return
   if (!isWebVitalName(metric.name)) return
   if (!isWebVitalOverBudget(metric)) return
