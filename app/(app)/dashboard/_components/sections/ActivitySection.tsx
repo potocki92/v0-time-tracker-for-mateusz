@@ -32,19 +32,11 @@ function buildFeed(
   const clientMap = new Map(clients.map((c) => [c.id, c]))
   const items: ActivityItem[] = []
 
-  // Recent worked entries (without full sort)
-  const recentEntries = workEntries
+  // Recent worked entries (sorted by created_at)
+  const recentEntries = [...workEntries]
     .filter((e) => e.status === 'worked' && (e.hours ?? 0) > 0)
-    .reduce<WorkEntry[]>((acc, entry) => {
-      const stamp = entry.created_at ?? ''
-      let i = 0
-      while (i < acc.length && (acc[i].created_at ?? '') >= stamp) i += 1
-      if (i < 4) {
-        acc.splice(i, 0, entry)
-        if (acc.length > 4) acc.pop()
-      }
-      return acc
-    }, [])
+    .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
+    .slice(0, 4)
 
   for (const e of recentEntries) {
     const c = e.client_id ? clientMap.get(e.client_id) : undefined
@@ -63,21 +55,14 @@ function buildFeed(
     })
   }
 
-  // Recent invoices (without full sort)
-  const recentInvoices = invoices.reduce<Invoice[]>((acc, invoice) => {
-    const stamp = new Date(invoice.invoice_date ?? invoice.issue_date ?? 0).getTime()
-    let i = 0
-    while (i < acc.length) {
-      const current = new Date(acc[i].invoice_date ?? acc[i].issue_date ?? 0).getTime()
-      if (stamp > current) break
-      i += 1
-    }
-    if (i < 2) {
-      acc.splice(i, 0, invoice)
-      if (acc.length > 2) acc.pop()
-    }
-    return acc
-  }, [])
+  // Recent invoices (any state)
+  const recentInvoices = [...invoices]
+    .sort((a, b) => {
+      const ta = new Date(a.invoice_date ?? a.issue_date ?? 0).getTime()
+      const tb = new Date(b.invoice_date ?? b.issue_date ?? 0).getTime()
+      return tb - ta
+    })
+    .slice(0, 2)
 
   for (const inv of recentInvoices) {
     items.push({
