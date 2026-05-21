@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { Metric } from 'next/web-vitals'
+import type { WebVitalMetric } from '@/lib/monitoring/web-vitals'
 import { WEB_VITALS_BUDGETS, isWebVitalOverBudget } from '@/lib/monitoring/web-vitals'
 
-function metric(name: Metric['name'], value: number): Metric {
+function metric(name: WebVitalMetric['name'], value: number): WebVitalMetric {
   return {
     name,
     value,
