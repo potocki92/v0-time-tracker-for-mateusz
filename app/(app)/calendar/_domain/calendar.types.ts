@@ -22,10 +22,23 @@ export type UseCalendarDataReturn = {
 
 export type CalendarStats = {
   totalHours: number
-  forecastPLN: number
+  /** Godziny już zrealizowane (wpisy `real` do dziś włącznie). */
+  realizedHours: number
+  /** Godziny zaplanowane (wpisy `predicted` lub przyszłe). */
+  predictedHours: number
+  /** Suma zarobków: zrealizowane + zaplanowane. */
+  totalEarningsPLN: number
+  /** Zaplanowany zarobek (przyszłe / `predicted`). */
   predictedEarningsPLN: number
+  /** Zrealizowany zarobek (wpisy `real` do dziś). */
   realizedEarningsPLN: number
+  /** Udział zrealizowanego zarobku w sumie, 0..100. */
+  realizedSharePercent: number
   workDays: number
+  /** Dni już zrealizowane. */
+  realizedDays: number
+  /** Dni zaplanowane (przyszłe / `predicted`). */
+  predictedDays: number
   freeDays: number
   absences: number
   progressPercent: number

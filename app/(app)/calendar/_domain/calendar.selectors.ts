@@ -58,41 +58,81 @@ export function selectCalendarStats(
   monthEntries: WorkEntry[],
   clients: Client[],
   eurRate: number,
+  todayIso: string = getTodayLocalDateString(),
 ): CalendarStats {
-  const workedEntries = monthEntries.filter((e) => e.status === 'worked')
-  const todayIso = getTodayLocalDateString()
-  const workDays = workedEntries.length
-  const freeDays = monthEntries.length - workDays
-
-  let totalHours = 0
-  let forecastPLN = 0
-  let predictedEarningsPLN = 0
-  let realizedEarningsPLN = 0
-  let absences = 0
-
   const clientMap = new Map(clients.map((c) => [c.id, c]))
 
-  for (const entry of workedEntries) {
-    totalHours += entry.hours ?? 0
-    const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
-    const amountInPLN = calculateEarnings(entry, client, eurRate).amountInPLN
-    forecastPLN += amountInPLN
-    if (entry.date > todayIso) predictedEarningsPLN += amountInPLN
-    else realizedEarningsPLN += amountInPLN
+  // Jeden "efektywny" wpis na dzień — gdy dla tej samej daty istnieje wpis
+  // real i predicted, real ma pierwszeństwo (eliminuje podwójne liczenie).
+  const effectiveByDate = new Map<string, WorkEntry>()
+  for (const entry of monthEntries) {
+    if (entry.status !== 'worked') continue
+    const existing = effectiveByDate.get(entry.date)
+    if (!existing) {
+      effectiveByDate.set(entry.date, entry)
+      continue
+    }
+    const existingKind = existing.entry_kind ?? 'real'
+    const kind = entry.entry_kind ?? 'real'
+    if (existingKind === 'predicted' && kind === 'real') {
+      effectiveByDate.set(entry.date, entry)
+    }
   }
 
+  let totalHours = 0
+  let realizedHours = 0
+  let predictedHours = 0
+  let predictedEarningsPLN = 0
+  let realizedEarningsPLN = 0
+  let realizedDays = 0
+  let predictedDays = 0
+
+  for (const entry of effectiveByDate.values()) {
+    const hours = entry.hours ?? 0
+    totalHours += hours
+    const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
+    const amountInPLN = calculateEarnings(entry, client, eurRate).amountInPLN
+    const kind = entry.entry_kind ?? 'real'
+    // Zrealizowane = potwierdzony wpis `real` z datą do dziś włącznie.
+    // Reszta (wpisy `predicted` oraz przyszłe daty) to plan.
+    const isRealized = kind === 'real' && entry.date <= todayIso
+    if (isRealized) {
+      realizedEarningsPLN += amountInPLN
+      realizedHours += hours
+      realizedDays += 1
+    } else {
+      predictedEarningsPLN += amountInPLN
+      predictedHours += hours
+      predictedDays += 1
+    }
+  }
+
+  let absences = 0
+  let freeDays = 0
   for (const entry of monthEntries) {
+    if (entry.status === 'worked') continue
+    freeDays += 1
     if (entry.status === 'vacation' || entry.status === 'sick_leave') absences++
   }
 
+  const totalEarningsPLN = realizedEarningsPLN + predictedEarningsPLN
+  const realizedSharePercent =
+    totalEarningsPLN > 0
+      ? Math.round((realizedEarningsPLN / totalEarningsPLN) * 100)
+      : 0
   const progressPercent = Math.min(100, (totalHours / MONTHLY_BASELINE_HOURS) * 100)
 
   return {
     totalHours,
-    forecastPLN,
+    realizedHours,
+    predictedHours,
+    totalEarningsPLN,
     predictedEarningsPLN,
     realizedEarningsPLN,
-    workDays,
+    realizedSharePercent,
+    workDays: effectiveByDate.size,
+    realizedDays,
+    predictedDays,
     freeDays,
     absences,
     progressPercent,
