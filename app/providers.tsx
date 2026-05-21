@@ -18,8 +18,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
               if (error?.status >= 400 && error?.status < 500) return false
               return failureCount < 2
             },
-            refetchOnWindowFocus: 'always',
-            refetchOnReconnect:   'always',
+            refetchOnWindowFocus: true,
+            refetchOnReconnect:   true,
           },
           mutations: {
             retry: 0,
