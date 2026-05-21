@@ -2,8 +2,15 @@
 
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import dynamic from 'next/dynamic'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { QUERY_CLIENT_DEFAULTS } from '@/lib/query/queryConfig'
+import { WebVitalsReporter } from './web-vitals-reporter'
+
+const ReactQueryDevtools = dynamic(
+  () => import('@tanstack/react-query-devtools').then((mod) => mod.ReactQueryDevtools),
+  { ssr: false },
+)
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -11,19 +18,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 5,
-            gcTime:    1000 * 60 * 30,
+            ...QUERY_CLIENT_DEFAULTS.queries,
             retry: (failureCount, error: any) => {
               // Nie retry-uj 4xx (błędy klienta)
               if (error?.status >= 400 && error?.status < 500) return false
               return failureCount < 2
             },
-            refetchOnWindowFocus: 'always',
-            refetchOnReconnect:   'always',
           },
-          mutations: {
-            retry: 0,
-          },
+          mutations: QUERY_CLIENT_DEFAULTS.mutations,
         },
       }),
   )
@@ -33,6 +35,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         {children}
         {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+        {process.env.NODE_ENV === 'production' && <WebVitalsReporter />}
       </QueryClientProvider>
     </NuqsAdapter>
   )

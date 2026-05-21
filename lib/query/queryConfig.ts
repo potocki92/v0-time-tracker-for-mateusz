@@ -5,55 +5,68 @@
 
 const MINUTE = 1_000 * 60
 
+const QUERY_PROFILES = {
+  hot: {
+    staleTime: MINUTE * 2,
+    gcTime: MINUTE * 15,
+    retry: 1,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  },
+  warm: {
+    staleTime: MINUTE * 5,
+    gcTime: MINUTE * 30,
+    retry: 1,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  },
+  cold: {
+    staleTime: MINUTE * 15,
+    gcTime: MINUTE * 60,
+    retry: 1,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+  },
+} as const
+
 export const QUERY_CONFIG = {
   dashboard: {
-    staleTime: MINUTE * 5,
-    gcTime:    MINUTE * 30,
-    retry:     1,
-    refetchOnWindowFocus: true, // odśwież tylko gdy dane są nieświeże
+    ...QUERY_PROFILES.warm,
   },
   calendar: {
-    staleTime: MINUTE * 5,
-    gcTime:    MINUTE * 30,
-    retry:     1,
-    refetchOnWindowFocus: true,
+    ...QUERY_PROFILES.warm,
   },
   invoices: {
-    staleTime: MINUTE * 2,
-    gcTime:    MINUTE * 15,
-    retry:     1,
-    refetchOnWindowFocus: true,
+    ...QUERY_PROFILES.hot,
   },
   workEntries: {
-    staleTime: MINUTE * 5,
-    gcTime:    MINUTE * 30,
-    retry:     1,
-    refetchOnWindowFocus: true,
+    ...QUERY_PROFILES.warm,
   },
   clients: {
-    staleTime: MINUTE * 15,
-    gcTime:    MINUTE * 60,
-    retry:     1,
-    refetchOnWindowFocus: false, // klienci się rzadko zmieniają
+    ...QUERY_PROFILES.cold,
   },
   projects: {
-    staleTime: MINUTE * 5,
-    gcTime:    MINUTE * 30,
-    retry:     1,
-    refetchOnWindowFocus: true,
+    ...QUERY_PROFILES.warm,
   },
   eurRate: {
     staleTime: MINUTE * 60,
-    gcTime:    MINUTE * 120,
-    retry:     2,
+    gcTime: MINUTE * 120,
+    retry: 2,
     retryDelay: (attempt: number) => Math.min(1000 * 2 ** attempt, 30_000),
     refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
   },
   trips: {
-    staleTime: MINUTE * 15,
-    gcTime:    MINUTE * 60,
-    retry:     1,
-    refetchOnWindowFocus: false, // wyjazdy zmieniają się rzadko
+    ...QUERY_PROFILES.cold,
+  },
+} as const
+
+export const QUERY_CLIENT_DEFAULTS = {
+  queries: {
+    ...QUERY_PROFILES.warm,
+  },
+  mutations: {
+    retry: 0,
   },
 } as const
 
