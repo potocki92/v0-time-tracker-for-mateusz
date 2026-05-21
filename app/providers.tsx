@@ -23,7 +23,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
               if (error?.status >= 400 && error?.status < 500) return false
               return failureCount < 2
             },
-          },
           mutations: QUERY_CLIENT_DEFAULTS.mutations,
         },
       }),
