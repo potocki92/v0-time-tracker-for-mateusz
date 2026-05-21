@@ -1,7 +1,7 @@
 import type { Metric } from 'next/web-vitals'
 import * as Sentry from '@sentry/nextjs'
 
-const WEB_VITALS_BUDGETS = {
+export const WEB_VITALS_BUDGETS = {
   LCP: 2500,
   INP: 200,
   CLS: 0.1,
@@ -20,9 +20,15 @@ export function isWebVitalOverBudget(metric: Metric): boolean {
   return metric.value > WEB_VITALS_BUDGETS[metric.name]
 }
 
+const reportedMetricIds = new Set<string>()
+
 export function reportWebVital(metric: Metric): void {
+  if (process.env.NODE_ENV !== 'production') return
   if (!isWebVitalName(metric.name)) return
   if (!isWebVitalOverBudget(metric)) return
+  if (reportedMetricIds.has(metric.id)) return
+
+  reportedMetricIds.add(metric.id)
 
   Sentry.captureMessage('web_vital_over_budget', {
     level: 'warning',
