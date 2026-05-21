@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { motion } from 'framer-motion'
 import {
   FormProvider,
   useForm,
@@ -88,14 +87,11 @@ export function UniversalForm<TValues extends FieldValues>({
 
   return (
     <FormProvider {...methods}>
-      <motion.form
+      <form
         id={id}
         aria-label={ariaLabel}
         noValidate
         onSubmit={methods.handleSubmit(onSubmit)}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className={cn('space-y-6', className)}
       >
         <FormSubmittingFieldset enabled={disableOnSubmit}>
@@ -104,7 +100,7 @@ export function UniversalForm<TValues extends FieldValues>({
           ))}
           {typeof children === 'function' ? children(methods) : children}
         </FormSubmittingFieldset>
-      </motion.form>
+      </form>
     </FormProvider>
   )
 }
@@ -183,11 +179,7 @@ export const SubmitButton = React.forwardRef<
       )}
       {...rest}
     >
-      <motion.span
-        key={isSubmitting ? 'pending' : 'idle'}
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.18 }}
+      <span
         className="inline-flex items-center gap-2"
       >
         {isSubmitting ? (
@@ -198,7 +190,7 @@ export const SubmitButton = React.forwardRef<
         ) : (
           children
         )}
-      </motion.span>
+      </span>
     </button>
   )
 })
