@@ -326,6 +326,7 @@
   background: linear-gradient(180deg, #0E0F11, #0A0B0D);
   border: 1px solid var(--hair);
   border-radius: 18px;
+  padding: 20px;
   transition: border-color .3s ease;
 }
 .landing-root .bento:hover { border-color: var(--hair-2); }
@@ -437,6 +438,9 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 500;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--ink-2);
 }
 .landing-root .chip-emerald {
   background: rgba(34,224,122,0.12);
@@ -455,8 +459,12 @@
 }
 .landing-root .live-dot {
   display: inline-block;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
+  background: #22E07A;
   animation: pulseDot 1.6s ease-in-out infinite;
+  flex-shrink: 0;
 }
 .landing-root .day-empty {
   opacity: 0;
