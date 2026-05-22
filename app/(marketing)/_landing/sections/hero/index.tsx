@@ -138,7 +138,7 @@ export function HeroSection() {
           <button className='cta-primary'>Start tracking free →</button>
           <button className='cta-ghost'>
             <Play size={14} className='mr-1.5 inline-block' />
-            Watch demo ▶
+            Watch demo
           </button>
         </motion.div>
 
@@ -163,7 +163,7 @@ export function HeroSection() {
 
         {/* Floating chip LEFT */}
         <motion.div
-          className='panel absolute -left-2 top-[120px] hidden w-[220px] md:block lg:left-6'
+          className='panel absolute -left-2 top-[120px] hidden w-[220px] xl:block xl:left-6'
           initial={{ opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
@@ -184,7 +184,7 @@ export function HeroSection() {
 
         {/* Floating chip RIGHT */}
         <motion.div
-          className='panel absolute -right-2 top-[260px] hidden w-[240px] md:block'
+          className='panel absolute -right-2 top-[260px] hidden w-[240px] xl:block'
           initial={{ opacity: 0, x: 24 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.75 }}
