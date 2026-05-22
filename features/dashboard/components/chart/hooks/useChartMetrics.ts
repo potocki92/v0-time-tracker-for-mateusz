@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { calculateEarnings } from '@/lib/finance/earnings'
 import { Client, WorkEntry } from '@/lib/types'
 import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
+import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
 import { useChartData } from '../../../hooks/useChartData'
 import type { Grouping, DateRange } from './useChartState'
 
@@ -13,9 +14,12 @@ export function useChartMetrics(
   dateRange: DateRange,
   prevRange: DateRange,
 ) {
-  // Używamy istniejącego hooka zamiast duplikować logikę
-  const filteredEntries = useFilteredEntries(workEntries, dateRange)
-  const prevEntries     = useFilteredEntries(workEntries, prevRange)
+  // Używamy istniejącego hooka zamiast duplikować logikę.
+  // Wykres pokazuje wartości zrealizowane (bez wpisów planowanych/przyszłych).
+  const filtered = useFilteredEntries(workEntries, dateRange)
+  const prevFiltered = useFilteredEntries(workEntries, prevRange)
+  const { realized: filteredEntries } = useRealizedEntries(filtered)
+  const { realized: prevEntries }     = useRealizedEntries(prevFiltered)
 
   const barData     = useChartData(filteredEntries, clients, grouping, eurToPlnRate, dateRange)
   const prevBarData = useChartData(prevEntries,     clients, grouping, eurToPlnRate, prevRange)

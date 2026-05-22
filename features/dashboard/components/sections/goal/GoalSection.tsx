@@ -1,56 +1,43 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { calculateGoalProgress } from '@/lib/finance/goal'
+import {
+  calculateGoalProgress,
+  findGoalReachedDate,
+  getCurrentEarningsForGoal,
+} from '@/lib/finance/goal'
+import { isRealizedEntry } from '@/lib/finance/realization'
+import { formatCurrency, getTodayLocalDateString } from '@/lib/helpers'
+import type { WorkEntry } from '@/lib/types'
 import { useDashboardData } from '../../../hooks'
 import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
+import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
 import { useDashboardTotals } from '../../../hooks/useDashboardTotal'
-import { useGoal } from '../../../hooks/usePreferencesStore'
+import { useEffectiveEurRate, useGoal } from '../../../hooks/usePreferencesStore'
 import { GoalCardBoundary } from '../../errors'
 import { GoalEditDialog } from '../../card/GoalEditDialog'
 import { MonthlyGoalCard } from './MonthlyGoalCard'
 import { useDashboardRange } from '../shared/DashboardRangeContext'
 
-function findReachedDate(
-  entries: ReturnType<typeof useFilteredEntries>,
-  clients: ReturnType<typeof useDashboardData>['data']['clients'],
-  target: number,
-): string | null {
-  if (!target || entries.length === 0) return null
-  const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date))
-  let cumulative = 0
-  const clientMap = new Map(clients.map((c) => [c.id, c]))
-  for (const e of sorted) {
-    if (e.status !== 'worked') continue
-    const c = e.client_id ? clientMap.get(e.client_id) : null
-    if (!c) continue
-    const hours = e.hours ?? 0
-    cumulative += hours * (c.rate ?? 0)
-    if (cumulative >= target) {
-      const d = new Date(e.date)
-      return d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short' })
-    }
-  }
-  return null
-}
-
-function calcStreak(entries: ReturnType<typeof useFilteredEntries>): number {
-  // Count consecutive days backward from today with worked entries.
+function calcStreak(entries: WorkEntry[], todayIso: string): number {
+  // Count consecutive realized worked days backward from today.
   const worked = new Set(
-    entries.filter((e) => e.status === 'worked' && (e.hours ?? 0) > 0).map((e) => e.date),
+    entries
+      .filter(
+        (e) => e.status === 'worked' && (e.hours ?? 0) > 0 && isRealizedEntry(e, todayIso),
+      )
+      .map((e) => e.date),
   )
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+      d.getDate(),
+    ).padStart(2, '0')}`
+  const [y, m, d] = todayIso.split('-').map(Number)
+  const cursor = new Date(y, m - 1, d)
   let streak = 0
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const cursor = new Date(today)
-  while (true) {
-    const iso = cursor.toISOString().slice(0, 10)
-    if (worked.has(iso)) {
-      streak += 1
-      cursor.setDate(cursor.getDate() - 1)
-    } else {
-      break
-    }
+  while (worked.has(fmt(cursor))) {
+    streak += 1
+    cursor.setDate(cursor.getDate() - 1)
   }
   return streak
 }
@@ -59,8 +46,11 @@ export function GoalSection() {
   const { data } = useDashboardData()
   const { dateRange } = useDashboardRange()
   const goal = useGoal()
+  const eurRate = useEffectiveEurRate()
   const filtered = useFilteredEntries(data.workEntries, dateRange)
-  const totals = useDashboardTotals(filtered, data.clients)
+  const { realized, predicted } = useRealizedEntries(filtered)
+  const totals = useDashboardTotals(realized, data.clients)
+  const predictedTotals = useDashboardTotals(predicted, data.clients)
   const [editing, setEditing] = useState(false)
 
   const progress = useMemo(
@@ -69,19 +59,20 @@ export function GoalSection() {
   )
 
   const reachedDate = useMemo(
-    () => findReachedDate(filtered, data.clients, goal?.amount ?? 0),
-    [filtered, data.clients, goal?.amount],
+    () => findGoalReachedDate(realized, data.clients, goal, eurRate),
+    [realized, data.clients, goal, eurRate],
   )
 
-  // Streak across last 60 days of all entries (not just filtered range)
+  // Seria liczona po wszystkich zrealizowanych wpisach (nie tylko z zakresu).
   const streakDays = useMemo(
-    () => calcStreak(data.workEntries),
+    () => calcStreak(data.workEntries, getTodayLocalDateString()),
     [data.workEntries],
   )
 
   const target = goal?.amount ?? 0
   const currency = goal?.currency ?? 'EUR'
-  const current = currency === 'EUR' ? totals.earningsEUR : totals.totalEarningsAllPLN
+  const current = getCurrentEarningsForGoal(goal, totals)
+  const predictedCurrent = getCurrentEarningsForGoal(goal, predictedTotals)
 
   return (
     <>
@@ -96,6 +87,15 @@ export function GoalSection() {
           onEdit={() => setEditing(true)}
         />
       </GoalCardBoundary>
+
+      {predictedCurrent > 0 && (
+        <p className="mt-2 text-sm text-muted-foreground">
+          W planie:{' '}
+          <span className="font-medium text-foreground">
+            {formatCurrency(predictedCurrent, currency)}
+          </span>
+        </p>
+      )}
 
       <GoalEditDialog
         open={editing}

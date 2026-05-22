@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useDashboardData } from '../../../hooks'
 import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
+import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
 import { ProjectsCard, type ProjectItem, type ProjectStatus } from './ProjectsCard'
 import { useDashboardRange } from '../shared/DashboardRangeContext'
 
@@ -12,6 +13,8 @@ export function ProjectsSection() {
   const { data } = useDashboardData()
   const { dateRange } = useDashboardRange()
   const filtered = useFilteredEntries(data.workEntries, dateRange)
+  const { realized: realizedAll } = useRealizedEntries(data.workEntries)
+  const { realized: realizedFiltered } = useRealizedEntries(filtered)
 
   const projects = useMemo<ProjectItem[]>(() => {
     // The data model doesn't expose explicit projects. We approximate
@@ -26,7 +29,7 @@ export function ProjectsSection() {
     }
     const map = new Map<string, Acc>()
 
-    for (const e of data.workEntries) {
+    for (const e of realizedAll) {
       const id = e.project_id ?? e.notes ?? e.client_id
       if (!id) continue
       const acc = map.get(id) ?? {
@@ -42,7 +45,7 @@ export function ProjectsSection() {
     }
 
     const filteredIds = new Set(
-      filtered
+      realizedFiltered
         .map((e) => e.project_id ?? e.notes ?? e.client_id)
         .filter(Boolean) as string[],
     )
@@ -65,7 +68,7 @@ export function ProjectsSection() {
         color: c?.color || STATUS_PALETTE[i % STATUS_PALETTE.length],
       }
     })
-  }, [data.workEntries, data.clients, filtered])
+  }, [realizedAll, data.clients, realizedFiltered])
 
   const totalActive = projects.filter((p) => p.status === 'in_progress').length
 

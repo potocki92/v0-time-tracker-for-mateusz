@@ -1,4 +1,5 @@
 import { calculateEarnings } from '@/lib/finance/earnings'
+import { isRealizedEntry } from '@/lib/finance/realization'
 import { getMonthKey, getTodayLocalDateString } from '@/lib/helpers'
 import type { Client, WorkEntry } from '@/lib/types'
 import { addDaysIso, type Trip } from '@/features/trips/domain'
@@ -92,11 +93,9 @@ export function selectCalendarStats(
     totalHours += hours
     const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
     const amountInPLN = calculateEarnings(entry, client, eurRate).amountInPLN
-    const kind = entry.entry_kind ?? 'real'
     // Zrealizowane = potwierdzony wpis `real` z datą do dziś włącznie.
     // Reszta (wpisy `predicted` oraz przyszłe daty) to plan.
-    const isRealized = kind === 'real' && entry.date <= todayIso
-    if (isRealized) {
+    if (isRealizedEntry(entry, todayIso)) {
       realizedEarningsPLN += amountInPLN
       realizedHours += hours
       realizedDays += 1

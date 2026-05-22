@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { fallbackFromClient } from '@/lib/finance/entry-calculations'
 import { useDashboardData } from '../../../hooks'
 import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
+import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
 import { usePeriodLabel } from '../../../hooks/usePeriodLabel'
 import { EffectiveRateCard, type ClientRate } from './EffectiveRateCard'
 import { useDashboardRange } from '../shared/DashboardRangeContext'
@@ -31,6 +32,7 @@ export function EffectiveRateSection() {
   const { data } = useDashboardData()
   const { range, dateRange } = useDashboardRange()
   const filtered = useFilteredEntries(data.workEntries, dateRange)
+  const { realized } = useRealizedEntries(filtered)
   const periodLabel = usePeriodLabel(range)
 
   const { rates, blendedRate } = useMemo(() => {
@@ -41,7 +43,7 @@ export function EffectiveRateSection() {
     let eurHours = 0
     let eurEarnings = 0
 
-    for (const e of filtered) {
+    for (const e of realized) {
       if (e.status !== 'worked') continue
       if (!e.client_id) continue
       const c = clientMap.get(e.client_id)
@@ -80,7 +82,7 @@ export function EffectiveRateSection() {
 
     const blended = eurHours > 0 ? eurEarnings / eurHours : 0
     return { rates: list, blendedRate: blended }
-  }, [filtered, data.clients])
+  }, [realized, data.clients])
 
   return (
     <EffectiveRateCard

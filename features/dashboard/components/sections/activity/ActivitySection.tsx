@@ -2,8 +2,11 @@
 
 import { useMemo } from 'react'
 import type { Client, Invoice, WorkEntry } from '@/lib/types'
+import { isRealizedEntry } from '@/lib/finance/realization'
+import { getTodayLocalDateString } from '@/lib/helpers'
 import { useDashboardData } from '../../../hooks'
 import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
+import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
 import { useDashboardTotals } from '../../../hooks/useDashboardTotal'
 import { StatsErrorBoundary } from '../../errors'
 import { ActivityCard, type ActivityItem } from './ActivityCard'
@@ -28,13 +31,14 @@ function buildFeed(
   workEntries: WorkEntry[],
   invoices: Invoice[],
   clients: Client[],
+  todayIso: string,
 ): ActivityItem[] {
   const clientMap = new Map(clients.map((c) => [c.id, c]))
   const items: ActivityItem[] = []
 
-  // Recent worked entries (sorted by created_at)
+  // Recent realized worked entries (sorted by created_at) — bez wpisów planowanych.
   const recentEntries = [...workEntries]
-    .filter((e) => e.status === 'worked' && (e.hours ?? 0) > 0)
+    .filter((e) => e.status === 'worked' && (e.hours ?? 0) > 0 && isRealizedEntry(e, todayIso))
     .sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
     .slice(0, 4)
 
@@ -89,11 +93,12 @@ export function ActivitySection() {
   const { data } = useDashboardData()
   const { dateRange } = useDashboardRange()
   const filtered = useFilteredEntries(data.workEntries, dateRange)
-  const totals = useDashboardTotals(filtered, data.clients)
+  const { realized } = useRealizedEntries(filtered)
+  const totals = useDashboardTotals(realized, data.clients)
 
   const clientsInPeriod = useMemo(
-    () => new Set(filtered.map((e) => e.client_id).filter(Boolean)).size,
-    [filtered],
+    () => new Set(realized.map((e) => e.client_id).filter(Boolean)).size,
+    [realized],
   )
 
   const defaultClientsCount = useMemo(
@@ -102,9 +107,9 @@ export function ActivitySection() {
   )
 
   const activeJobs = useMemo(() => {
-    const ids = new Set(filtered.map((e) => e.project_id).filter(Boolean))
+    const ids = new Set(realized.map((e) => e.project_id).filter(Boolean))
     return ids.size
-  }, [filtered])
+  }, [realized])
 
   const totalJobs = useMemo(() => {
     const ids = new Set(data.workEntries.map((e) => e.project_id).filter(Boolean))
@@ -112,7 +117,7 @@ export function ActivitySection() {
   }, [data.workEntries, activeJobs])
 
   const feed = useMemo(
-    () => buildFeed(data.workEntries, data.invoices, data.clients),
+    () => buildFeed(data.workEntries, data.invoices, data.clients, getTodayLocalDateString()),
     [data.workEntries, data.invoices, data.clients],
   )
 

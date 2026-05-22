@@ -2,6 +2,7 @@
 
 import { useDashboardData } from '../../../hooks'
 import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
+import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
 import { useDashboardTotals } from '../../../hooks/useDashboardTotal'
 import { usePeriodLabel } from '../../../hooks/usePeriodLabel'
 import { ChartErrorBoundary } from '../../errors'
@@ -26,7 +27,9 @@ export function HoursSection() {
   const { data } = useDashboardData()
   const { range, dateRange } = useDashboardRange()
   const filtered = useFilteredEntries(data.workEntries, dateRange)
-  const totals = useDashboardTotals(filtered, data.clients)
+  const { realized, predicted } = useRealizedEntries(filtered)
+  const totals = useDashboardTotals(realized, data.clients)
+  const predictedTotals = useDashboardTotals(predicted, data.clients)
   const target = DEFAULT_TARGET_BY_RANGE[range] ?? 160
   const periodLabel = usePeriodLabel(range)
 
@@ -37,8 +40,16 @@ export function HoursSection() {
         totalDays={totals.totalDays}
         targetHours={target}
         periodLabel={periodShort(periodLabel) || 'period'}
-        entries={filtered}
+        entries={realized}
       />
+      {predictedTotals.totalHours > 0 && (
+        <p className="mt-2 text-sm text-muted-foreground">
+          Przewidywane godziny:{' '}
+          <span className="font-medium text-foreground">
+            {predictedTotals.totalHours.toFixed(1)} h
+          </span>
+        </p>
+      )}
     </ChartErrorBoundary>
   )
 }
