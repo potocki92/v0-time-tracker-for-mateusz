@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useDashboardData } from '../../../hooks'
 import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
+import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
 import { useEarningsTrend } from '../../../hooks/useEarningsTrend'
 import { useEarningsSparkline } from '../../../hooks/useEarningsSparkline'
 import { usePeriodLabel } from '../../../hooks/usePeriodLabel'
@@ -39,8 +40,8 @@ export function EarningsSection() {
 
   const filtered = useFilteredEntries(workEntries, dateRange)
   const prevFiltered = useFilteredEntries(workEntries, prevRange)
-  const realFiltered = filtered.filter((entry) => (entry.entry_kind ?? 'real') === 'real')
-  const realPrevFiltered = prevFiltered.filter((entry) => (entry.entry_kind ?? 'real') === 'real')
+  const { realized: realFiltered, predicted: projectedEntries } = useRealizedEntries(filtered)
+  const { realized: realPrevFiltered } = useRealizedEntries(prevFiltered)
   const totals = useDashboardTotals(realFiltered, clients)
   const trend = useEarningsTrend(realFiltered, realPrevFiltered, clients)
   const sparklineData = useEarningsSparkline(realFiltered, clients)
@@ -56,7 +57,7 @@ export function EarningsSection() {
   const toggleCompare = useDashboardUiStore((s) => s.toggleCompare)
 
   const { exportCSV, exportPDF, isExporting } = useExportData({
-    entries: filtered,
+    entries: realFiltered,
     clients,
     eurRate: eurRateForExport,
     periodLabel,
@@ -65,7 +66,6 @@ export function EarningsSection() {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false)
 
   const totalEUR = eurRate > 0 ? totals.totalEarningsAllPLN / eurRate : 0
-  const projectedEntries = filtered.filter((entry) => (entry.entry_kind ?? 'real') === 'predicted')
   const projectedTotals = useDashboardTotals(projectedEntries, clients)
 
   const handleExportCsv = useCallback(() => {

@@ -1,5 +1,6 @@
 import { Goal } from '@/app/(app)/dashboard/_domain/dashboard.types'
-import { MonthlyTotals } from '@/lib/types'
+import { Client, MonthlyTotals, WorkEntry } from '@/lib/types'
+import { calculateEarnings } from './earnings'
 
 /**
  * Strict, currency-isolated goal progress.
@@ -31,4 +32,38 @@ export function getCurrentEarningsForGoal(
 ): number {
   if (!goal) return 0
   return goal.currency === 'EUR' ? totals.earningsEUR : totals.earningsPLN
+}
+
+/**
+ * Data osiągnięcia celu — pierwszy dzień, w którym skumulowany zarobek
+ * w walucie celu przekroczył próg. Zarobek liczymy przez `calculateEarnings`
+ * (uwzględnia snapshot stawki, akord i walutę), a sumujemy wyłącznie kwoty
+ * w walucie celu — spójnie z `getCurrentEarningsForGoal` (izolacja walut).
+ */
+export function findGoalReachedDate(
+  entries: WorkEntry[],
+  clients: Client[],
+  goal: Goal | null,
+  eurRate: number,
+): string | null {
+  const target = goal?.amount ?? 0
+  if (!goal || target <= 0 || entries.length === 0) return null
+
+  const clientMap = new Map(clients.map((c) => [c.id, c]))
+  const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date))
+  let cumulative = 0
+  for (const entry of sorted) {
+    if (entry.status !== 'worked') continue
+    const client = entry.client_id ? clientMap.get(entry.client_id) : undefined
+    const earned = calculateEarnings(entry, client, eurRate)
+    if (earned.currency !== goal.currency) continue
+    cumulative += earned.amount
+    if (cumulative >= target) {
+      return new Date(entry.date).toLocaleDateString('pl-PL', {
+        day: '2-digit',
+        month: 'short',
+      })
+    }
+  }
+  return null
 }
