@@ -14,6 +14,7 @@ import {
   HowItWorksSection,
   TestimonialSection,
   PricingSection,
+  FaqSection,
   FinalCtaSection,
   FooterSection,
 } from './_landing/components'
@@ -46,6 +47,7 @@ export default async function LandingPage() {
         <HowItWorksSection />
         <TestimonialSection />
         <PricingSection />
+        <FaqSection />
         <FinalCtaSection isAuthenticated={isAuthenticated} />
       </main>
       <FooterSection />

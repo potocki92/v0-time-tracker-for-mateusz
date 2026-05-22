@@ -327,9 +327,9 @@
   border: 1px solid var(--hair);
   border-radius: 18px;
   padding: 20px;
-  transition: border-color .3s ease;
+  transition: border-color .3s ease, transform .3s ease;
 }
-.landing-root .bento:hover { border-color: var(--hair-2); }
+.landing-root .bento:hover { border-color: var(--hair-2); transform: translateY(-2px); }
 
 /* ─── Bar chart ─── */
 .landing-root .bar {
@@ -352,7 +352,9 @@
   background: linear-gradient(180deg, #0E0F11, #0A0B0D);
   border: 1px solid var(--hair);
   border-radius: 18px;
+  transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
 }
+.landing-root .price-card:hover { transform: translateY(-2px); }
 .landing-root .price-card.hot {
   background: linear-gradient(180deg, rgba(34,224,122,.08), rgba(10,11,13,.9));
   border: 1px solid rgba(34,224,122,.30);
@@ -372,6 +374,7 @@
   background: #0D0E10;
   border: 1px solid var(--hair);
   border-radius: 10px;
+  padding: 12px;
 }
 .landing-root .panel-flat {
   background: rgba(255,255,255,0.03);
@@ -505,7 +508,71 @@
   border-color: var(--hair-2);
 }
 
+/* ─── Nav links ─── */
+.landing-root .nav-link {
+  color: var(--ink-2);
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: color .2s ease, background .2s ease;
+}
+.landing-root .nav-link:hover {
+  color: var(--ink-1);
+  background: rgba(255,255,255,.03);
+}
+
+/* ─── FAQ ─── */
+.landing-root .faq-item {
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #0E0F11, #0A0B0D);
+  overflow: hidden;
+  transition: border-color .25s ease;
+}
+.landing-root .faq-item:hover { border-color: var(--hair-2); }
+.landing-root .faq-item[open] { border-color: rgba(34,224,122,.30); }
+.landing-root .faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-1);
+}
+.landing-root .faq-q::-webkit-details-marker { display: none; }
+.landing-root .faq-chevron {
+  color: var(--ink-3);
+  transition: transform .25s ease, color .25s ease;
+}
+.landing-root .faq-item[open] .faq-chevron {
+  transform: rotate(180deg);
+  color: #22E07A;
+}
+.landing-root .faq-a {
+  padding: 0 20px 18px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 680px;
+}
+.landing-root .faq-item[open] .faq-a {
+  animation: faqReveal .25s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-root .faq-item[open] .faq-a { animation: none; }
+}
+
 /* ─── Keyframes ─── */
+@keyframes faqReveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 @keyframes scroll-marq {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }

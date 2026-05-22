@@ -3,7 +3,7 @@ import { Quote } from 'lucide-react'
 export function TestimonialSection() {
   return (
     <section id="customers" className="relative py-24 sm:py-32">
-      <div className="mx-auto max-w-[1080px] px-6 sm:px-8 text-center">
+      <div className="reveal-row mx-auto max-w-[1080px] px-6 sm:px-8 text-center">
         <Quote
           className="mx-auto mb-7 h-7 w-7 opacity-60"
           style={{ color: '#22E07A' }}

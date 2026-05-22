@@ -1,20 +1,27 @@
-import { Accordion } from '@/components/ui/accordion'
-import { SectionIntro } from '@/app/(marketing)/_landing/ui/SectionIntro'
+import { ChevronDown } from 'lucide-react'
 
 import { FAQ_ITEMS } from './data'
-import { FaqItem } from './FaqItem'
 
 export function FaqSection() {
   return (
-    <section id="faq" className="border-b border-border">
-      <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-        <SectionIntro eyebrow="FAQ" title="Najczęściej zadawane pytania" />
+    <section id="faq" className="relative py-24 sm:py-32">
+      <div className="mx-auto max-w-[820px] px-6 sm:px-8">
+        <div className="reveal-row mb-12 text-center">
+          <div className="eyebrow mb-4">FAQ</div>
+          <h2 className="display display-md ink-gradient">Questions, answered.</h2>
+        </div>
 
-        <Accordion type="single" collapsible className="mt-10 w-full">
-          {FAQ_ITEMS.map((item, index) => (
-            <FaqItem key={item.q} index={index} question={item.q} answer={item.a} />
+        <div className="reveal-row flex flex-col gap-3">
+          {FAQ_ITEMS.map((item) => (
+            <details key={item.q} className="faq-item">
+              <summary className="faq-q">
+                <span>{item.q}</span>
+                <ChevronDown className="faq-chevron h-4 w-4 shrink-0" aria-hidden="true" />
+              </summary>
+              <p className="faq-a">{item.a}</p>
+            </details>
           ))}
-        </Accordion>
+        </div>
       </div>
     </section>
   )

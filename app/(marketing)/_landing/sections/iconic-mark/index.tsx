@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 
+import { MARK_STATS } from './data'
+
 export function IconicMarkSection() {
   const tick60Ref = useRef<SVGGElement>(null)
   const tick12Ref = useRef<SVGGElement>(null)
@@ -176,12 +178,7 @@ export function IconicMarkSection() {
         </div>
 
         <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-[920px] mx-auto reveal-row">
-          {[
-            { val: '60', label: 'Minute ticks', green: true },
-            { val: '12', label: 'Hour anchors', green: false },
-            { val: '01', label: 'Source of truth', green: false },
-            { val: '∞', label: 'Hours, kept', green: true },
-          ].map(({ val, label, green }) => (
+          {MARK_STATS.map(({ val, label, green }) => (
             <div key={label} className="text-center">
               <div className={`num text-[22px] font-semibold ${green ? 'em-text' : ''}`}>{val}</div>
               <div
