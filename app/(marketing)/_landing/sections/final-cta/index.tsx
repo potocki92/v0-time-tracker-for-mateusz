@@ -1,7 +1,4 @@
-import { MotionReveal } from '@/app/(marketing)/_landing/ui/MotionReveal'
-import { ParallaxLayer } from '@/app/(marketing)/_landing/ui/ParallaxLayer'
-
-import { FinalCtaActions } from './FinalCtaActions'
+import { ArrowRight } from 'lucide-react'
 
 interface FinalCtaSectionProps {
   isAuthenticated: boolean
@@ -9,43 +6,47 @@ interface FinalCtaSectionProps {
 
 export function FinalCtaSection({ isAuthenticated }: FinalCtaSectionProps) {
   return (
-    <section className="relative overflow-hidden border-b border-border">
-      <ParallaxLayer
-        offset={80}
-        className="pointer-events-none absolute left-1/2 top-12 -z-10 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
-      >
-        <div />
-      </ParallaxLayer>
-
-      <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-        <MotionReveal>
-          <div className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-gradient-to-br from-primary/15 via-card to-card p-10 text-center shadow-2xl shadow-primary/10 sm:p-16">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute -top-20 left-1/2 h-60 w-[120%] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-[linear-gradient(120deg,transparent,theme(colors.primary/8),transparent)]"
-            />
-
-            <div className="relative">
-              <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-                Gotowy na mniej chaosu?
-              </p>
-              <h2 className="mx-auto mt-3 max-w-3xl text-balance text-3xl font-semibold tracking-tight sm:text-5xl">
-                Zacznij mierzyć czas, który faktycznie się opłaca
-              </h2>
-              <p className="mx-auto mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg">
-                Załóż darmowe konto i wystaw pierwszą fakturę jeszcze dzisiaj. Bez zobowiązań,
-                bez karty kredytowej.
-              </p>
-              <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                <FinalCtaActions isAuthenticated={isAuthenticated} />
-              </div>
-            </div>
-          </div>
-        </MotionReveal>
+    <section id="cta" className="relative py-32 sm:py-44 overflow-hidden">
+      <div
+        className="orb"
+        style={{
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%,-50%)',
+          width: 900,
+          height: 900,
+          background: 'radial-gradient(circle, rgba(34,224,122,.20), transparent 65%)',
+        }}
+      />
+      <div className="grid-mesh absolute inset-0" />
+      <div className="relative mx-auto max-w-[1080px] px-6 sm:px-8 text-center">
+        <h2 className="display display-lg reveal-row">
+          <span className="ink-gradient">Start the </span>
+          <span className="em-text">clock.</span>
+        </h2>
+        <p
+          className="mt-7 max-w-[560px] mx-auto text-[16px] sm:text-[18px] leading-[1.55] reveal-row"
+          style={{ color: 'var(--ink-2)' }}
+        >
+          Track your first hour in the next sixty seconds. Send your first invoice this week.
+        </p>
+        <div className="mt-10 flex items-center justify-center gap-3 flex-wrap reveal-row">
+          {isAuthenticated ? (
+            <a href="/dashboard" className="cta-primary !py-3.5 !px-6 !text-[14px]">
+              Open app <ArrowRight className="h-4 w-4" />
+            </a>
+          ) : (
+            <a href="/auth/sign-up" className="cta-primary !py-3.5 !px-6 !text-[14px]">
+              Start tracking — it&apos;s free <ArrowRight className="h-4 w-4" />
+            </a>
+          )}
+          <a href="#pricing" className="cta-ghost !py-3.5 !px-5 !text-[14px]">
+            See pricing
+          </a>
+        </div>
+        <div className="mt-5 text-[11.5px] reveal-row" style={{ color: 'var(--ink-3)' }}>
+          No credit card · 14‑day Pro trial · Cancel anytime
+        </div>
       </div>
     </section>
   )
