@@ -1,25 +1,38 @@
-import { SITE } from '@/lib/seo/site'
-
-export const FOOTER_LINK_GROUPS = [
+export const FOOTER_GROUPS = [
   {
-    title: 'Produkt',
+    title: 'Product',
     links: [
-      { href: '#funkcje', label: 'Funkcje' },
-      { href: '#jak-dziala', label: 'Jak to działa' },
-      { href: '#korzysci', label: 'Korzyści' },
-      { href: '#faq', label: 'FAQ' },
+      { label: 'Tour', href: '#product' },
+      { label: 'Workflow', href: '#flow' },
+      { label: 'Pricing', href: '#pricing' },
+      { label: 'Changelog', href: '/dashboard' },
     ],
   },
   {
-    title: 'Konto',
+    title: 'Company',
     links: [
-      { href: '/auth/sign-up', label: 'Zarejestruj się' },
-      { href: '/auth/login', label: 'Zaloguj się' },
-      { href: '/dashboard', label: 'Panel' },
+      { label: 'About', href: '#' },
+      { label: 'Customers', href: '#customers' },
+      { label: 'Careers', href: '#' },
+      { label: 'Press kit', href: '#' },
     ],
   },
   {
-    title: 'Kontakt',
-    links: [{ href: `mailto:${SITE.contact.email}`, label: SITE.contact.email, external: true }],
+    title: 'Resources',
+    links: [
+      { label: 'Docs', href: '#' },
+      { label: 'API', href: '#' },
+      { label: 'Status', href: '#' },
+      { label: 'Security', href: '#' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Privacy', href: '#' },
+      { label: 'Terms', href: '#' },
+      { label: 'DPA', href: '#' },
+      { label: 'Imprint', href: '#' },
+    ],
   },
 ] as const

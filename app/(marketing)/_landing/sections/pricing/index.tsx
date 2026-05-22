@@ -1,52 +1,6 @@
 import { ArrowRight, Check, Sparkles } from 'lucide-react'
 
-const plans = [
-  {
-    name: 'Solo',
-    badge: { label: 'Free', className: 'chip-mute' },
-    price: '€0',
-    period: '/ month',
-    desc: 'For one independent. Track, invoice, get paid.',
-    cta: { label: 'Start free', href: '#cta', className: 'cta-ghost' },
-    features: ['Unlimited time entries', '3 active projects', '5 invoices / month', 'CSV export'],
-    hot: false,
-  },
-  {
-    name: 'Pro',
-    badge: { label: '14‑day trial', className: 'chip-emerald' },
-    price: '€12',
-    period: '/ month',
-    desc: 'For the working independent. The full clock + invoice machine.',
-    cta: { label: 'Start Pro trial', href: '#cta', className: 'cta-primary', icon: true },
-    features: [
-      'Everything in Solo',
-      'Unlimited projects & invoices',
-      'Stripe + SEPA payments',
-      'Auto‑invoice from timesheet',
-      'Calendar & Slack sync',
-      'Custom invoice templates',
-    ],
-    hot: true,
-    popular: true,
-    nameStyle: { color: '#7BEAA9' },
-  },
-  {
-    name: 'Studio',
-    badge: { label: 'Teams', className: 'chip-mute' },
-    price: '€8',
-    period: '/ seat / month',
-    desc: 'For small teams and agencies. Roles, approvals, consolidated billing.',
-    cta: { label: 'Talk to us', href: '#cta', className: 'cta-ghost', icon: true },
-    features: [
-      'Everything in Pro',
-      'Team timesheets & approvals',
-      'Roles & permissions',
-      'SSO & SCIM',
-      'Priority support',
-    ],
-    hot: false,
-  },
-]
+import { PRICING_PLANS } from './data'
 
 export function PricingSection() {
   return (
@@ -65,10 +19,11 @@ export function PricingSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 max-w-[1100px] mx-auto">
-          {plans.map((plan) => (
+          {PRICING_PLANS.map((plan, i) => (
             <div
               key={plan.name}
               className={`price-card p-7 reveal-row relative ${plan.hot ? 'hot' : ''}`}
+              style={{ transitionDelay: `${i * 90}ms` }}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">

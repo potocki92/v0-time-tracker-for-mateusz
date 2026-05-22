@@ -1,26 +1,26 @@
 export const FAQ_ITEMS = [
   {
-    q: 'Czy WorkFlow Pro jest naprawdę darmowy?',
-    a: 'Tak — plan startowy jest darmowy bez limitu czasowego. Płatne plany odblokowują zaawansowane raporty, eksport do księgowości i integracje.',
+    q: 'Is there really a free plan?',
+    a: 'Yes. Solo is free forever — unlimited time entries, 3 active projects, 5 invoices a month, and CSV export. No credit card required.',
   },
   {
-    q: 'Czy moje dane są bezpieczne?',
-    a: 'Dane przechowujemy w infrastrukturze zgodnej z RODO, w europejskich centrach danych. Stosujemy szyfrowanie w tranzycie (TLS) oraz w spoczynku. Logi dostępu są audytowane.',
+    q: 'How does invoicing work?',
+    a: 'TimeTracker groups your tracked entries by project and rate, then builds a clean invoice you can review and send. Clients pay through Stripe or SEPA in seconds.',
   },
   {
-    q: 'Czy aplikacja działa na telefonie?',
-    a: 'Tak. WorkFlow Pro to progresywna aplikacja webowa (PWA) — uruchomisz ją na iOS, Android i dowolnej przeglądarce. Działa także offline.',
+    q: 'Can I switch projects mid-session?',
+    a: 'Yes. Switch the active project with a single keystroke — the timer keeps running and every second lands on the right project.',
   },
   {
-    q: 'Czy mogę wystawiać faktury VAT?',
-    a: 'Tak — wspieramy faktury VAT, zwolnienia, różne stawki (0%, 5%, 8%, 23%), numerację roczną/miesięczną i eksport do PDF.',
+    q: 'Do you support teams?',
+    a: 'The Studio plan adds team timesheets, approvals, roles & permissions, SSO/SCIM, and consolidated billing at €8 per seat per month.',
   },
   {
-    q: 'Czy mogę zaimportować dane z innego narzędzia?',
-    a: 'Tak, wspieramy import klientów i projektów z CSV. Import wpisów czasu pracy dostępny na życzenie.',
+    q: 'Is my data safe and GDPR compliant?',
+    a: 'Your data is encrypted in transit and at rest, hosted in EU‑West, and fully GDPR compliant. You can export or delete everything at any time.',
   },
   {
-    q: 'Jak wygląda anulowanie subskrypcji?',
-    a: 'W każdej chwili możesz przejść na plan darmowy lub całkowicie usunąć konto — bez ukrytych zobowiązań.',
+    q: 'Can I cancel anytime?',
+    a: 'Always. Plans are month-to-month — cancel whenever you like and keep full access until the end of your billing cycle.',
   },
 ] as const

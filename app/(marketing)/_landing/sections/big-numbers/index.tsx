@@ -1,3 +1,5 @@
+import { CountUp } from './CountUp'
+
 const stats = [
   { val: '€2.4M', label: 'Invoiced', green: true },
   { val: '14,200', label: 'Invoices sent', green: false },
@@ -22,7 +24,7 @@ export function BigNumbersSection() {
       />
       <div className="relative mx-auto max-w-[1280px] px-6 sm:px-8 text-center">
         <div className="eyebrow mb-4 reveal-row">By the numbers</div>
-        <div className="colossal num reveal-row">37,840</div>
+        <CountUp value="37,840" className="colossal num reveal-row block" />
         <div
           className="mt-4 text-[15px] sm:text-[17px] max-w-[640px] mx-auto reveal-row leading-[1.55]"
           style={{ color: 'var(--ink-2)' }}
@@ -33,7 +35,10 @@ export function BigNumbersSection() {
         <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-[920px] mx-auto reveal-row">
           {stats.map(({ val, label, green }) => (
             <div key={label}>
-              <div className={`num text-[28px] font-semibold ${green ? 'em-text' : ''}`}>{val}</div>
+              <CountUp
+                value={val}
+                className={`num block text-[28px] font-semibold ${green ? 'em-text' : ''}`}
+              />
               <div
                 className="text-[11.5px] mt-1 uppercase tracking-[.12em]"
                 style={{ color: 'var(--ink-3)' }}
