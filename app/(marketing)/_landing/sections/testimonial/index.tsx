@@ -1,29 +1,32 @@
 import { Quote } from 'lucide-react'
 
-import { TESTIMONIAL } from './data'
-
 export function TestimonialSection() {
   return (
-    <section className="border-b border-border bg-muted/30">
-      <div className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-        <figure className="relative rounded-2xl border border-border bg-card p-8 sm:p-12">
-          <Quote
-            className="absolute -top-5 left-8 size-10 rounded-full border border-border bg-background p-2 text-primary"
-            aria-hidden="true"
-          />
-          <blockquote className="text-pretty text-lg font-medium leading-relaxed sm:text-xl">
-            {TESTIMONIAL.quote}
-          </blockquote>
-          <figcaption className="mt-6 flex items-center gap-4">
-            <div className="flex size-11 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary">
-              {TESTIMONIAL.initials}
+    <section id="customers" className="relative py-24 sm:py-32">
+      <div className="mx-auto max-w-[1080px] px-6 sm:px-8 text-center">
+        <Quote
+          className="mx-auto mb-7 h-7 w-7 opacity-60"
+          style={{ color: '#22E07A' }}
+          aria-hidden="true"
+        />
+        <p className="display display-sm ink-gradient max-w-[920px] mx-auto !leading-[1.15]">
+          &ldquo;I stopped writing invoices on Sunday nights. The clock writes them for me — and somehow
+          they&apos;re cleaner than mine ever were.&rdquo;
+        </p>
+        <div className="mt-9 flex items-center justify-center gap-3">
+          <div
+            className="flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-semibold hair-strong"
+            style={{ background: 'linear-gradient(135deg,#22E07A33,#0e1a12)', color: '#9CEEBE' }}
+          >
+            RG
+          </div>
+          <div className="text-left">
+            <div className="text-[13px] font-medium">Rafał Gawlik</div>
+            <div className="text-[11.5px]" style={{ color: 'var(--ink-3)' }}>
+              Independent contractor · Düsseldorf
             </div>
-            <div>
-              <p className="font-semibold">{TESTIMONIAL.author}</p>
-              <p className="text-sm text-muted-foreground">{TESTIMONIAL.role}</p>
-            </div>
-          </figcaption>
-        </figure>
+          </div>
+        </div>
       </div>
     </section>
   )

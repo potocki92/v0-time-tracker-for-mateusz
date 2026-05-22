@@ -7,21 +7,22 @@ import {
   LandingNavbarSection,
   HeroSection,
   StatsStripSection,
-  FeaturesSection,
+  IconicMarkSection,
+  BigNumbersSection,
   FeatureShowcaseSection,
+  FeaturesSection,
   HowItWorksSection,
   TestimonialSection,
-  FaqSection,
+  PricingSection,
   FinalCtaSection,
   FooterSection,
 } from './_landing/components'
 
 export const metadata: Metadata = buildMetadata({
   path: '/',
-  title:
-    'WorkFlow Pro — rejestr czasu pracy, faktury i rozliczenia dla freelancerów',
+  title: 'TimeTracker — Time, accounted for.',
   description:
-    'Mierz czas pracy, zarządzaj klientami i wystawiaj faktury w jednym miejscu. Darmowy start, bez karty kredytowej, w pełni zgodne z RODO.',
+    'The clock for independent work. Track every hour, build invoices from the timesheet, and get paid — without the spreadsheet.',
 })
 
 export default async function LandingPage() {
@@ -33,15 +34,18 @@ export default async function LandingPage() {
 
   return (
     <>
+      <div className="mesh" aria-hidden="true" />
       <LandingNavbarSection isAuthenticated={isAuthenticated} />
-      <main id="main-content" tabIndex={-1} className="focus:outline-none">
-        <HeroSection isAuthenticated={isAuthenticated} />
+      <main id="main-content" tabIndex={-1} className="focus:outline-none relative z-10">
+        <HeroSection />
         <StatsStripSection />
-        <FeaturesSection />
+        <IconicMarkSection />
+        <BigNumbersSection />
         <FeatureShowcaseSection />
+        <FeaturesSection />
         <HowItWorksSection />
         <TestimonialSection />
-        <FaqSection />
+        <PricingSection />
         <FinalCtaSection isAuthenticated={isAuthenticated} />
       </main>
       <FooterSection />
