@@ -258,9 +258,9 @@ function ScreenInvoices() {
       </div>
 
       <div className='mt-auto'>
-        <button className='cta-primary w-full text-center text-[12px]'>
+        <a href='/auth/sign-up' className='cta-primary w-full text-center text-[12px]'>
           Send 1 draft →
-        </button>
+        </a>
       </div>
     </div>
   )

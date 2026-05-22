@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight,
   Calendar,
@@ -30,6 +30,12 @@ function formatTime(s: number): string {
 
 export function HeroSection() {
   const [seconds, setSeconds] = useState(START_SECONDS)
+  const shouldReduceMotion = useReducedMotion()
+  const { scrollY } = useScroll()
+  const yOrb1 = useTransform(scrollY, [0, 900], [0, shouldReduceMotion ? 0 : 50])
+  const yOrb2 = useTransform(scrollY, [0, 900], [0, shouldReduceMotion ? 0 : 30])
+  const yOrb3 = useTransform(scrollY, [0, 900], [0, shouldReduceMotion ? 0 : 70])
+  const yDevice = useTransform(scrollY, [0, 900], [0, shouldReduceMotion ? 0 : -25])
 
   useEffect(() => {
     const id = setInterval(() => setSeconds((prev) => prev + 1), 1000)
@@ -37,29 +43,32 @@ export function HeroSection() {
   }, [])
 
   return (
-    <section id='top' className='relative overflow-hidden pb-[100px] pt-[120px]'>
+    <section id='top' className='relative overflow-hidden pb-14 pt-20 sm:pb-[100px] sm:pt-[120px]'>
       {/* Orb 1 */}
-      <div
+      <motion.div
         aria-hidden='true'
         className='pointer-events-none absolute left-[-200px] top-[-100px] h-[600px] w-[600px] rounded-full'
         style={{
           background: 'radial-gradient(circle, rgba(34,224,122,0.12) 0%, transparent 70%)',
+          y: yOrb1,
         }}
       />
       {/* Orb 2 */}
-      <div
+      <motion.div
         aria-hidden='true'
         className='pointer-events-none absolute right-[-150px] top-[200px] h-[500px] w-[500px] rounded-full'
         style={{
           background: 'radial-gradient(circle, rgba(116,169,240,0.08) 0%, transparent 70%)',
+          y: yOrb2,
         }}
       />
       {/* Orb 3 */}
-      <div
+      <motion.div
         aria-hidden='true'
         className='pointer-events-none absolute bottom-[-100px] left-1/2 h-[400px] w-[400px] -translate-x-1/2 rounded-full'
         style={{
           background: 'radial-gradient(circle, rgba(34,224,122,0.06) 0%, transparent 70%)',
+          y: yOrb3,
         }}
       />
 
@@ -135,11 +144,11 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.26 }}
         >
-          <button className='cta-primary'>Start tracking free →</button>
-          <button className='cta-ghost'>
+          <a href='/auth/sign-up' className='cta-primary'>Start tracking free →</a>
+          <a href='#product' className='cta-ghost'>
             <Play size={14} className='mr-1.5 inline-block' />
             Watch demo
-          </button>
+          </a>
         </motion.div>
 
         {/* Trust badges */}
@@ -214,10 +223,11 @@ export function HeroSection() {
 
         {/* Device frame */}
         <motion.div
-          className='device noise mx-auto mt-20 max-w-[1080px]'
+          className='device noise mx-auto mt-10 max-w-[1080px] sm:mt-20'
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.45 }}
+          style={{ y: yDevice }}
         >
           <div className='device-glow' />
           <div className='device-screen'>
