@@ -30,7 +30,7 @@ export function CalendarList({ entries, clients, onSelectEntry }: Props) {
 
   if (sorted.length === 0) {
     return (
-      <Card className="border-border/60 shadow-sm">
+      <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] shadow-none">
         <CardContent className="p-0">
           <EmptyList />
         </CardContent>

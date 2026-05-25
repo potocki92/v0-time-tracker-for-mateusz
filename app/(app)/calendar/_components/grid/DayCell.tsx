@@ -69,15 +69,15 @@ export function DayCell({
         tripMarker ? `, wyjazd${tripMarker.destination ? ` ${tripMarker.destination}` : ''}` : ''
       }`}
       className={cn(
-        'group relative isolate flex h-16 w-full flex-col overflow-hidden border bg-card p-1.5 text-left sm:h-24 sm:p-2',
+        'group relative isolate flex h-16 w-full flex-col overflow-hidden border bg-[#0a0a0a] p-1.5 text-left sm:h-24 sm:p-2',
         tripRounding,
         'transition-all duration-200 motion-reduce:transition-none',
         entry
-          ? `border-l-[3px] ${cfg?.border} border-y border-r border-border/50 ${cfg?.bg}`
-          : 'border-border/50 hover:border-border/80 hover:bg-muted/40',
+          ? `border-l-[3px] ${cfg?.border} border-y border-r border-[#1a1a1a] ${cfg?.bg}`
+          : 'border-[#1a1a1a] hover:border-[#262626] hover:bg-[#0e0e0e]',
         isToday &&
-          'border-primary/60 ring-2 ring-primary/40 ring-offset-1 ring-offset-background shadow-[0_0_0_1px_var(--primary)] before:absolute before:inset-0 before:rounded-[inherit] before:bg-primary/5 before:pointer-events-none',
-        isWeekend && !entry && 'bg-muted/30',
+          'border-emerald-500/60 ring-2 ring-emerald-500/40 ring-offset-1 ring-offset-black shadow-[0_0_0_1px_#22c55e] before:absolute before:inset-0 before:rounded-[inherit] before:bg-emerald-500/5 before:pointer-events-none',
+        isWeekend && !entry && 'bg-[#0e0e0e]',
         'cursor-pointer hover:shadow-sm hover:-translate-y-px active:scale-[0.97]',
         isFuture && 'opacity-70',
       )}
@@ -93,8 +93,8 @@ export function DayCell({
           className={cn(
             'text-[11px] font-semibold leading-none transition-colors sm:text-xs',
             isToday
-              ? 'flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground shadow-sm shadow-primary/40'
-              : 'text-foreground/70 group-hover:text-foreground',
+              ? 'flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-black shadow-sm shadow-emerald-500/40'
+              : 'text-zinc-400 group-hover:text-white',
           )}
         >
           {day}
@@ -107,13 +107,13 @@ export function DayCell({
 
       {entry?.status === 'worked' && (
         <div className="relative mt-auto space-y-0.5">
-          <div className="text-[10px] font-bold leading-none text-foreground sm:text-[11px]">
+          <div className="text-[10px] font-bold leading-none text-white sm:text-[11px]">
             {client?.work_type === 'hourly'
               ? `${entry.hours}h`
               : `${entry.quantity} ${client?.unit ?? ''}`}
           </div>
           {earnings && earnings.amount > 0 && (
-            <div className="truncate text-[9px] font-medium leading-none text-muted-foreground sm:text-[10px]">
+            <div className="truncate text-[9px] font-medium leading-none text-zinc-400 sm:text-[10px]">
               {formatCurrency(earnings.amount, earnings.currency)}
             </div>
           )}

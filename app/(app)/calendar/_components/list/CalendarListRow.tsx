@@ -32,15 +32,15 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
       type="button"
       onClick={() => onClick?.(entry)}
       className={cn(
-        'group flex w-full items-center gap-3 rounded-lg border border-border/50 bg-card p-3 text-left',
-        'transition-all hover:border-border hover:shadow-sm active:scale-[0.99]',
+        'group flex w-full items-center gap-3 rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-3 text-left',
+        'transition-all hover:border-[#262626] hover:shadow-sm active:scale-[0.99]',
       )}
     >
-      <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-muted/50">
-        <span className="text-[9px] font-medium uppercase tracking-widest text-muted-foreground">
+      <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-[#0e0e0e]">
+        <span className="text-[9px] font-medium uppercase tracking-widest text-zinc-500">
           {['', 'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'][Number(m)]}
         </span>
-        <span className="text-sm font-bold leading-none">{Number(d)}</span>
+        <span className="text-sm font-bold leading-none text-white">{Number(d)}</span>
       </div>
 
       <div className="min-w-0 flex-1 space-y-1">
@@ -49,11 +49,11 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
             {cfg?.label}
           </Badge>
           {quantityLabel && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-foreground">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white">
               {client?.work_type === 'hourly' ? (
-                <Clock className="h-3 w-3 text-muted-foreground" />
+                <Clock className="h-3 w-3 text-zinc-500" />
               ) : (
-                <Layers className="h-3 w-3 text-muted-foreground" />
+                <Layers className="h-3 w-3 text-zinc-500" />
               )}
               {quantityLabel}
             </span>
@@ -69,12 +69,12 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
             >
               {client.name.slice(0, 2).toUpperCase()}
             </div>
-            <span className="truncate text-[11px] text-muted-foreground">{client.name}</span>
+            <span className="truncate text-[11px] text-zinc-400">{client.name}</span>
           </div>
         )}
 
         {entry.notes && (
-          <p className="line-clamp-1 text-[11px] text-muted-foreground/80">{entry.notes}</p>
+          <p className="line-clamp-1 text-[11px] text-zinc-400">{entry.notes}</p>
         )}
       </div>
     </button>

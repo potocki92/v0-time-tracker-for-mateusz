@@ -5,8 +5,8 @@ const EVENT_CELLS = new Set([3, 10, 16, 24, 28])
 
 export function CalendarSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex h-12 items-center gap-3 border-b bg-card/50 px-4 sm:h-14">
+    <div className="min-h-screen bg-black">
+      <div className="flex h-12 items-center gap-3 border-b border-[#1a1a1a] bg-black/80 px-4 sm:h-14">
         <Skeleton className="h-7 w-7 rounded-md skeleton" />
         <Skeleton className="h-4 w-32 skeleton" />
       </div>
@@ -15,7 +15,7 @@ export function CalendarSkeleton() {
         {/* 4 KPI bento cards */}
         <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
-            <Card key={i} className="border-border/60 py-0">
+            <Card key={i} className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
               <CardContent className="space-y-3 p-3 sm:p-4">
                 <div className="flex items-start justify-between">
                   <Skeleton className="h-2.5 w-20 skeleton sm:w-24" />
@@ -31,7 +31,7 @@ export function CalendarSkeleton() {
         <Skeleton className="h-8 w-40 rounded-lg skeleton" />
 
         {/* Calendar */}
-        <Card className="border-border/60">
+        <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] shadow-none">
           <CardContent className="space-y-3 p-3 sm:p-4">
             <div className="flex items-center justify-between">
               <Skeleton className="h-8 w-8 rounded-md skeleton" />
@@ -49,7 +49,7 @@ export function CalendarSkeleton() {
               {Array.from({ length: 35 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="h-16 space-y-1.5 rounded-lg border border-border/40 bg-card p-1.5 sm:h-24 sm:p-2"
+                  className="h-16 space-y-1.5 rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-1.5 sm:h-24 sm:p-2"
                 >
                   <Skeleton className="h-3 w-4 skeleton" />
                   {EVENT_CELLS.has(idx) && (
@@ -67,7 +67,7 @@ export function CalendarSkeleton() {
         {/* Insights placeholder */}
         <div className="grid gap-3 lg:grid-cols-2">
           {[0, 1, 2, 3].map((i) => (
-            <Card key={i} className="border-border/60 py-0">
+            <Card key={i} className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
               <CardContent className="space-y-4 p-4 sm:p-5">
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-3 w-28 skeleton" />

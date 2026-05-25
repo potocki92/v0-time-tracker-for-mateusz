@@ -15,23 +15,22 @@ export function HoursCard({ totalHours, baselineHours, progressPercent, isAhead 
     <KPICard
       label="Suma godzin"
       icon={<Clock className="h-4 w-4" />}
-      accent="sky"
       ariaLabel={`Przepracowane godziny: ${totalHours.toFixed(1)} z ${baselineHours} (${Math.round(
         progressPercent,
       )}%)`}
     >
-      <p className="mt-2 text-2xl font-bold tabular-nums tracking-tight sm:text-[26px]">
+      <p className="mt-2 text-2xl font-bold tabular-nums tracking-tight text-white sm:text-[26px]">
         {totalHours.toFixed(1)}
-        <span className="ml-0.5 text-xs font-normal text-muted-foreground sm:text-sm">h</span>
+        <span className="ml-0.5 text-xs font-normal text-zinc-500 sm:text-sm">h</span>
       </p>
 
       <div className="mt-3 space-y-1.5">
         <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
-          <span className="text-muted-foreground">Cel: {baselineHours}h</span>
+          <span className="text-zinc-500">Cel: {baselineHours}h</span>
           <span
             className={cn(
               'font-semibold tabular-nums',
-              isAhead ? 'text-emerald-500' : 'text-muted-foreground',
+              isAhead ? 'text-emerald-400' : 'text-zinc-500',
             )}
           >
             {Math.round(progressPercent)}%
@@ -39,10 +38,7 @@ export function HoursCard({ totalHours, baselineHours, progressPercent, isAhead 
         </div>
         <Progress
           value={progressPercent}
-          className={cn(
-            'h-1.5 bg-muted/60 transition-colors',
-            isAhead ? '[&>div]:bg-emerald-500' : '[&>div]:bg-sky-500',
-          )}
+          className="h-1.5 bg-[#161616] transition-colors [&>div]:bg-emerald-500"
         />
       </div>
     </KPICard>

@@ -26,11 +26,11 @@ export function MonthInsights({ monthName, insights, onViewAllEntries }: Props) 
       <div className="flex items-baseline justify-between gap-2 px-1">
         <h2
           id="month-insights-heading"
-          className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+          className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500"
         >
           Podsumowanie miesiąca
         </h2>
-        <span className="text-[10px] capitalize text-muted-foreground/70">
+        <span className="text-[10px] capitalize text-zinc-600">
           {monthName}
         </span>
       </div>
