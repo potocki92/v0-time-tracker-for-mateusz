@@ -108,6 +108,7 @@ export function InvoiceBuilderFields({
       <FormSection
         title="Metadane faktury"
         description="Numer dokumentu i daty rozliczeniowe — termin płatności jest walidowany względem daty wystawienia."
+        className="border-[#1a1a1a] bg-[#0a0a0a]"
       >
         <FormInput<InvoiceBuilderValues>
           name="invoice_number"
@@ -147,6 +148,7 @@ export function InvoiceBuilderFields({
       <FormSection
         title="Kontrahent (Nabywca)"
         description="Dane do wystawienia dokumentu. Włącz „VAT-EU”, jeśli to transakcja unijna."
+        className="border-[#1a1a1a] bg-[#0a0a0a]"
         action={
           <label
             htmlFor="buyer-vat-eu"
@@ -233,6 +235,7 @@ export function InvoiceBuilderFields({
       <FormSection
         title="Pozycje na fakturze"
         description="Każda pozycja jest przeliczana automatycznie. Możesz zmieniać kolejność (uchwyt z lewej, klawiatura: spacja + strzałki)."
+        className="border-[#1a1a1a] bg-[#0a0a0a]"
         bodyClassName="space-y-3"
       >
         <InvoiceLineItemsField clientId={clientId ?? null} />
@@ -242,6 +245,7 @@ export function InvoiceBuilderFields({
       <FormSection
         title="Podsumowanie"
         description="Rozbicie na poszczególne stawki VAT oraz łączne kwoty netto / brutto."
+        className="border-[#1a1a1a] bg-[#0a0a0a]"
       >
         <InvoiceTotalsSummary />
       </FormSection>
@@ -250,6 +254,7 @@ export function InvoiceBuilderFields({
       <FormSection
         title="Płatność, waluta i uwagi"
         description="Waluta dokumentu, metoda płatności i opcjonalne notatki dla kontrahenta."
+        className="border-[#1a1a1a] bg-[#0a0a0a]"
       >
         <div className="grid gap-4 sm:grid-cols-3">
           <EnumSelectField<InvoiceBuilderValues, InvoiceBuilderCurrency>

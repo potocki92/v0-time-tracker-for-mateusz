@@ -14,6 +14,8 @@ import { SubmitButton, UniversalForm } from '@/components/common/form'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
 import type { Client } from '@/lib/types'
 
+import { DIALOG_DARK_SURFACE } from '../dialog-theme'
+
 import {
   ClientPickerField,
   InvoiceBuilderFields,
@@ -67,6 +69,7 @@ export function InvoiceBuilderDialog({
     <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
       <DialogContent
         className={[
+          DIALOG_DARK_SURFACE,
           // Mobile: full-screen sheet.
           'inset-0 flex h-[100dvh] w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0',
           // Desktop: centred modal — wider than the client form because the

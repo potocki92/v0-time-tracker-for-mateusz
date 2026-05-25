@@ -180,7 +180,7 @@ export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) 
           type="button"
           variant="outline"
           onClick={handleAdd}
-          className="h-12 w-full justify-center gap-2 rounded-xl border-dashed border-border/70 text-sm font-medium text-muted-foreground hover:text-foreground sm:h-11"
+          className="h-12 w-full justify-center gap-2 rounded-xl border-dashed border-[#1f1f1f] text-sm font-medium text-muted-foreground hover:text-foreground sm:h-11"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           Dodaj pozycję

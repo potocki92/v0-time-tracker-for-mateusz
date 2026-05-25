@@ -90,8 +90,8 @@ export const InvoiceLineItemRow = React.memo(function InvoiceLineItemRow({
       style={style}
       data-dragging={isDragging || undefined}
       className={cn(
-        'group relative rounded-2xl border border-border/60 bg-background/70 p-3 sm:p-4 shadow-sm',
-        'transition data-[dragging=true]:shadow-lg data-[dragging=true]:ring-2 data-[dragging=true]:ring-primary/40',
+        'group relative rounded-2xl border border-[#1a1a1a] bg-[#0e0e0e] p-3 sm:p-4 shadow-sm',
+        'transition data-[dragging=true]:shadow-lg data-[dragging=true]:ring-2 data-[dragging=true]:ring-emerald-500/40',
       )}
     >
       <div className="grid grid-cols-12 gap-3">
@@ -199,7 +199,7 @@ export const InvoiceLineItemRow = React.memo(function InvoiceLineItemRow({
             in a traditional invoice grid. */}
         <div className="col-span-12 md:col-start-2 md:col-span-11">
           <div
-            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/40 bg-muted/30 px-3 py-2 text-xs"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 py-2 text-xs"
             aria-live="polite"
           >
             <dl className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
