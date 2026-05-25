@@ -33,19 +33,19 @@ export function DayComposition({ composition }: Props) {
     .join(', ')}`
 
   return (
-    <Card className="border-border/60 py-0 shadow-sm">
+    <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
             Struktura dni
           </h3>
-          <span className="text-[11px] font-medium text-muted-foreground tabular-nums">
+          <span className="text-[11px] font-medium text-zinc-400 tabular-nums">
             {totalDays} dni
           </span>
         </header>
 
         <div
-          className="mt-4 flex h-2.5 w-full overflow-hidden rounded-full bg-muted/60"
+          className="mt-4 flex h-2.5 w-full overflow-hidden rounded-full bg-[#161616]"
           role="img"
           aria-label={summary}
         >
@@ -68,14 +68,14 @@ export function DayComposition({ composition }: Props) {
               key={seg.key}
               className="flex items-center justify-between gap-2 text-[11px]"
             >
-              <span className="flex items-center gap-1.5 text-muted-foreground">
+              <span className="flex items-center gap-1.5 text-zinc-400">
                 <span
                   className={`h-1.5 w-1.5 shrink-0 rounded-full ${seg.ringColor}`}
                   aria-hidden
                 />
                 {seg.label}
               </span>
-              <span className="font-semibold tabular-nums text-foreground">
+              <span className="font-semibold tabular-nums text-white">
                 {seg.value}
               </span>
             </li>

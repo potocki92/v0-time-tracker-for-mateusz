@@ -26,7 +26,7 @@ export function CalendarMonthNav({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 shrink-0 border-border/60"
+          className="h-8 w-8 shrink-0 border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 hover:bg-[#161616] hover:text-white"
           onClick={onPrev}
           aria-label="Poprzedni miesiąc"
         >
@@ -34,22 +34,22 @@ export function CalendarMonthNav({
         </Button>
 
         <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
-          <h2 className="truncate text-sm font-semibold tracking-tight sm:text-base">
+          <h2 className="truncate text-sm font-semibold tracking-tight text-white sm:text-base">
             {MONTH_NAMES[currentMonth]}{' '}
-            <span className="font-normal text-muted-foreground">{currentYear}</span>
+            <span className="font-normal text-zinc-500">{currentYear}</span>
           </h2>
           {!isCurrentMonth && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onToday}
-              className="h-6 px-2 text-[10px] font-semibold uppercase tracking-wide text-primary hover:bg-primary/10"
+              className="h-6 px-2 text-[10px] font-semibold uppercase tracking-wide text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
             >
               Dziś
             </Button>
           )}
           {isCurrentMonth && (
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
               Teraz
             </span>
           )}
@@ -58,7 +58,7 @@ export function CalendarMonthNav({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 shrink-0 border-border/60"
+          className="h-8 w-8 shrink-0 border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 hover:bg-[#161616] hover:text-white"
           onClick={onNext}
           aria-label="Następny miesiąc"
         >
@@ -72,7 +72,7 @@ export function CalendarMonthNav({
             key={day}
             className={cn(
               'py-1 text-center text-[10px] font-medium uppercase tracking-widest sm:text-[11px]',
-              index >= 5 ? 'text-muted-foreground/60' : 'text-muted-foreground',
+              index >= 5 ? 'text-zinc-600' : 'text-zinc-500',
             )}
           >
             {day}

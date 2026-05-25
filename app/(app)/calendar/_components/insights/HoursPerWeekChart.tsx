@@ -40,13 +40,13 @@ export function HoursPerWeekChart({
   const summary = `Łącznie ${totalHours} godzin w ${monthName}, średnio ${avgHours} godzin dziennie.`
 
   return (
-    <Card className="border-border/60 py-0 shadow-sm">
+    <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between gap-2">
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
             Godziny tygodniowo
           </h3>
-          <span className="rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] font-medium capitalize text-muted-foreground">
+          <span className="rounded-full border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[10px] font-medium capitalize text-zinc-400">
             {monthName}
           </span>
         </header>
@@ -66,13 +66,13 @@ export function HoursPerWeekChart({
                 dataKey="label"
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                tick={{ fontSize: 10, fill: '#71717a' }}
                 interval={0}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                tick={{ fontSize: 10, fill: '#71717a' }}
                 width={28}
                 hide
               />
@@ -86,11 +86,7 @@ export function HoursPerWeekChart({
                 {data.map((entry) => (
                   <Cell
                     key={entry.key}
-                    fill={
-                      entry.isCurrent
-                        ? 'var(--primary)'
-                        : 'color-mix(in oklab, var(--primary) 35%, transparent)'
-                    }
+                    fill={entry.isCurrent ? '#22c55e' : 'rgba(34,197,94,0.35)'}
                   />
                 ))}
               </Bar>
@@ -98,7 +94,7 @@ export function HoursPerWeekChart({
           </ResponsiveContainer>
         </div>
 
-        <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/50 pt-3 text-[11px] sm:gap-3">
+        <div className="mt-3 grid grid-cols-3 gap-2 border-t border-[#161616] pt-3 text-[11px] sm:gap-3">
           <Stat label="Łącznie" value={`${totalHours} h`} />
           <Stat label="Śr./tydzień" value={`${avgHours} h`} />
           <Stat label="Szczyt" value={peakLabel} />
@@ -117,11 +113,11 @@ export function HoursPerWeekChart({
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="min-w-0">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-[10px] uppercase tracking-wider text-zinc-500">{label}</div>
       <div
         className={cn(
           'truncate text-xs font-semibold tabular-nums',
-          highlight ? 'text-primary' : 'text-foreground',
+          highlight ? 'text-emerald-400' : 'text-white',
         )}
       >
         {value}
