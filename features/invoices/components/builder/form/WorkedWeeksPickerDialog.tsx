@@ -17,6 +17,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { FormSection } from '@/components/common/form'
 import { cn } from '@/lib/utils'
 import { fetchWorkedWeeksAction } from '@/features/invoices/services/actions/worked-weeks.actions'
 import type { WorkedWeekSummary } from '@/features/invoices/services/server/worked-weeks.service.server'
@@ -110,112 +111,131 @@ export function WorkedWeeksPickerDialog({
           'sm:inset-auto sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[90vh] sm:w-[calc(100%-2rem)] sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:border',
         )}
       >
-        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 py-4 text-left backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6">
-          <DialogTitle>Wczytaj z przepracowanych tygodni</DialogTitle>
-          <DialogDescription>
+        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6">
+          <DialogTitle className="text-lg font-semibold tracking-tight">
+            Wczytaj z przepracowanych tygodni
+          </DialogTitle>
+          <DialogDescription className="sr-only">
             Wybierz tygodnie, które chcesz zafakturować. Każdy zaznaczony tydzień
             doda jedną pozycję na fakturze z sumą godzin i kwotą wyliczoną ze stawki
             klienta.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="grid gap-1.5">
-              <Label htmlFor="weeks-from">Od</Label>
-              <Input
-                id="weeks-from"
-                type="date"
-                value={range.from}
-                max={range.to}
-                onChange={(e) => setRange((prev) => ({ ...prev, from: e.target.value }))}
-              />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="weeks-to">Do</Label>
-              <Input
-                id="weeks-to"
-                type="date"
-                value={range.to}
-                min={range.from}
-                onChange={(e) => setRange((prev) => ({ ...prev, to: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          {error ? (
-            <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-              Nie udało się pobrać tygodni: {error instanceof Error ? error.message : 'błąd serwera'}.{' '}
-              <button type="button" className="underline" onClick={() => void refetch()}>
-                Spróbuj ponownie
-              </button>
-            </div>
-          ) : null}
-
-          <div className="overflow-hidden rounded-md border">
-            {isBusy ? (
-              <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Ładowanie tygodni...
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-5 sm:px-6">
+          <FormSection
+            title="Zakres dat"
+            description="Wczytamy tygodnie z dniami oznaczonymi jako „pracowałem” w tym przedziale."
+            className="border-[#1a1a1a] bg-[#0a0a0a]"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-1.5">
+                <Label htmlFor="weeks-from">Od</Label>
+                <Input
+                  id="weeks-from"
+                  type="date"
+                  value={range.from}
+                  max={range.to}
+                  onChange={(e) => setRange((prev) => ({ ...prev, from: e.target.value }))}
+                />
               </div>
-            ) : weeks.length === 0 ? (
-              <Empty className="py-8">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <CalendarRange className="size-5" />
-                  </EmptyMedia>
-                  <EmptyTitle>Brak przepracowanych tygodni</EmptyTitle>
-                  <EmptyDescription>
-                    Dla wybranego klienta i zakresu nie znaleźliśmy wpisów ze statusem
-                    „pracowałem”. Rozszerz zakres dat lub dodaj wpisy w kalendarzu.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-            ) : (
-              <ul className="divide-y divide-[#1a1a1a]" role="list">
-                {weeks.map((week) => {
-                  const checked = selected.has(week.id)
-                  return (
-                    <li key={week.id}>
-                      <label
-                        className="flex cursor-pointer items-start gap-3 px-4 py-3 transition hover:bg-[#0e0e0e]"
-                        htmlFor={`week-${week.id}`}
-                      >
-                        <Checkbox
-                          id={`week-${week.id}`}
-                          checked={checked}
-                          onCheckedChange={() => toggle(week.id)}
-                          className="mt-1"
-                          aria-label={`Zaznacz tydzień ${week.id}`}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-baseline justify-between gap-3">
-                            <p className="font-medium">{week.id}</p>
-                            <p className="text-sm font-semibold">
-                              {formatAmount(week.amount, week.currency)}
+              <div className="grid gap-1.5">
+                <Label htmlFor="weeks-to">Do</Label>
+                <Input
+                  id="weeks-to"
+                  type="date"
+                  value={range.to}
+                  min={range.from}
+                  onChange={(e) => setRange((prev) => ({ ...prev, to: e.target.value }))}
+                />
+              </div>
+            </div>
+          </FormSection>
+
+          <FormSection
+            title="Przepracowane tygodnie"
+            description="Każdy zaznaczony tydzień doda jedną pozycję z sumą godzin i kwotą ze stawki klienta."
+            className="border-[#1a1a1a] bg-[#0a0a0a]"
+            bodyClassName="space-y-3"
+          >
+            {error ? (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                Nie udało się pobrać tygodni: {error instanceof Error ? error.message : 'błąd serwera'}.{' '}
+                <button type="button" className="underline" onClick={() => void refetch()}>
+                  Spróbuj ponownie
+                </button>
+              </div>
+            ) : null}
+
+            <div className="overflow-hidden rounded-xl border border-[#1a1a1a]">
+              {isBusy ? (
+                <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Ładowanie tygodni...
+                </div>
+              ) : weeks.length === 0 ? (
+                <Empty className="py-8">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <CalendarRange className="size-5" />
+                    </EmptyMedia>
+                    <EmptyTitle>Brak przepracowanych tygodni</EmptyTitle>
+                    <EmptyDescription>
+                      Dla wybranego klienta i zakresu nie znaleźliśmy wpisów ze statusem
+                      „pracowałem”. Rozszerz zakres dat lub dodaj wpisy w kalendarzu.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              ) : (
+                <ul className="divide-y divide-[#1a1a1a]" role="list">
+                  {weeks.map((week) => {
+                    const checked = selected.has(week.id)
+                    return (
+                      <li key={week.id}>
+                        <label
+                          className="flex cursor-pointer items-start gap-3 px-4 py-3 transition hover:bg-[#0e0e0e]"
+                          htmlFor={`week-${week.id}`}
+                        >
+                          <Checkbox
+                            id={`week-${week.id}`}
+                            checked={checked}
+                            onCheckedChange={() => toggle(week.id)}
+                            className="mt-1"
+                            aria-label={`Zaznacz tydzień ${week.id}`}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-baseline justify-between gap-3">
+                              <p className="font-medium">{week.id}</p>
+                              <p className="text-sm font-semibold">
+                                {formatAmount(week.amount, week.currency)}
+                              </p>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {week.start} – {week.end} · {week.workedDays}{' '}
+                              {week.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(week.hours)}
                             </p>
+                            {!week.hasRate ? (
+                              <p className="mt-1 text-xs text-amber-400">
+                                Brak stawki — kwota wyniesie 0. Ustaw stawkę klienta lub wpisz ręcznie.
+                              </p>
+                            ) : null}
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            {week.start} – {week.end} · {week.workedDays}{' '}
-                            {week.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(week.hours)}
-                          </p>
-                          {!week.hasRate ? (
-                            <p className="mt-1 text-xs text-amber-400">
-                              Brak stawki — kwota wyniesie 0. Ustaw stawkę klienta lub wpisz ręcznie.
-                            </p>
-                          ) : null}
-                        </div>
-                      </label>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
+                        </label>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </div>
+          </FormSection>
         </div>
 
         <DialogFooter className="sticky bottom-0 z-10 border-t bg-background/95 px-5 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6 sm:py-4">
           <Button variant="outline" onClick={onClose} className="h-12 sm:h-10">Anuluj</Button>
-          <Button onClick={handleConfirm} disabled={selected.size === 0} className="h-12 sm:h-10 sm:px-6">
+          <Button
+            onClick={handleConfirm}
+            disabled={selected.size === 0}
+            className="h-12 rounded-xl font-semibold shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/30 active:scale-[0.99] sm:h-10 sm:w-auto sm:px-6"
+          >
             Wczytaj {selected.size > 0 ? `${selected.size}` : ''}{' '}
             {selected.size === 1 ? 'tydzień' : 'tygodni'}
           </Button>

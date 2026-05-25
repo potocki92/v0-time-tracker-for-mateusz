@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { FormSection } from '@/components/common/form'
 import { cn } from '@/lib/utils'
 import { fetchWorkedQuartersAction } from '../../services/actions/worked-quarters.actions'
 import type { WorkedQuarterSummary } from '../../services/server/worked-quarters.service.server'
@@ -160,16 +161,22 @@ export function QuickQuarterlyInvoiceDialog({
           'sm:inset-auto sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[90vh] sm:w-[calc(100%-2rem)] sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:border',
         )}
       >
-        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 py-4 text-left backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6">
-          <DialogTitle>Wystaw fakturę za kwartał</DialogTitle>
-          <DialogDescription>
+        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6">
+          <DialogTitle className="text-lg font-semibold tracking-tight">
+            Wystaw fakturę za kwartał
+          </DialogTitle>
+          <DialogDescription className="sr-only">
             Wybierz klienta i kwartał — faktura zostanie wystawiona z agregatem
             wpisów oznaczonych jako „pracowałem” w wybranym okresie.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
-          <div className="grid gap-3">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-5 sm:px-6">
+          <FormSection
+            title="Klient"
+            description="Wybierz klienta, dla którego pobierzemy przepracowane kwartały."
+            className="border-[#1a1a1a] bg-[#0a0a0a]"
+          >
             <div className="grid gap-1.5">
               <Label>Klient</Label>
               {clients.length === 0 ? (
@@ -191,86 +198,93 @@ export function QuickQuarterlyInvoiceDialog({
                 </Select>
               )}
             </div>
-          </div>
+          </FormSection>
 
-          {error ? (
-            <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-              Nie udało się pobrać kwartałów: {error instanceof Error ? error.message : 'błąd serwera'}.{' '}
-              <button type="button" className="underline" onClick={() => void refetch()}>
-                Spróbuj ponownie
-              </button>
-            </div>
-          ) : null}
-
-          <div className="overflow-hidden rounded-md border">
-            {!clientId ? (
-              <p className="px-4 py-10 text-center text-sm text-muted-foreground">
-                Wybierz klienta, aby zobaczyć przepracowane kwartały.
-              </p>
-            ) : isBusy ? (
-              <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Ładowanie kwartałów...
+          <FormSection
+            title="Przepracowane kwartały"
+            description="Wybierz kwartał — faktura powstanie z agregatu wpisów „pracowałem”."
+            className="border-[#1a1a1a] bg-[#0a0a0a]"
+            bodyClassName="space-y-3"
+          >
+            {error ? (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                Nie udało się pobrać kwartałów: {error instanceof Error ? error.message : 'błąd serwera'}.{' '}
+                <button type="button" className="underline" onClick={() => void refetch()}>
+                  Spróbuj ponownie
+                </button>
               </div>
-            ) : quarters.length === 0 ? (
-              <Empty className="py-8">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <CalendarRange className="size-5" />
-                  </EmptyMedia>
-                  <EmptyTitle>Brak danych do wystawienia</EmptyTitle>
-                  <EmptyDescription>
-                    Dodaj wpisy w kalendarzu — kwartały bez pracy nie pojawią się tu.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-            ) : (
-              <ul className="divide-y divide-[#1a1a1a]" role="list">
-                {quarters.map((q) => {
-                  const disabled = q.invoiced || q.amount <= 0
-                  const isSelected = selectedId === q.id
-                  return (
-                    <li key={q.id}>
-                      <button
-                        type="button"
-                        disabled={disabled}
-                        onClick={() => setSelectedId(q.id)}
-                        className={cn(
-                          'flex w-full items-start gap-3 px-4 py-3 text-left transition',
-                          disabled
-                            ? 'cursor-not-allowed opacity-60'
-                            : 'hover:bg-[#0e0e0e]',
-                          isSelected && 'bg-[#161616]',
-                        )}
-                      >
-                        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border">
-                          {isSelected ? <Check className="h-3.5 w-3.5" aria-hidden /> : null}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-baseline justify-between gap-3">
-                            <p className="font-medium">
-                              {q.quarter} {q.year}
-                            </p>
-                            <p className="text-sm font-semibold">
-                              {formatAmount(q.amount, q.currency)}
-                            </p>
+            ) : null}
+
+            <div className="overflow-hidden rounded-xl border border-[#1a1a1a]">
+              {!clientId ? (
+                <p className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  Wybierz klienta, aby zobaczyć przepracowane kwartały.
+                </p>
+              ) : isBusy ? (
+                <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Ładowanie kwartałów...
+                </div>
+              ) : quarters.length === 0 ? (
+                <Empty className="py-8">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <CalendarRange className="size-5" />
+                    </EmptyMedia>
+                    <EmptyTitle>Brak danych do wystawienia</EmptyTitle>
+                    <EmptyDescription>
+                      Dodaj wpisy w kalendarzu — kwartały bez pracy nie pojawią się tu.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              ) : (
+                <ul className="divide-y divide-[#1a1a1a]" role="list">
+                  {quarters.map((q) => {
+                    const disabled = q.invoiced || q.amount <= 0
+                    const isSelected = selectedId === q.id
+                    return (
+                      <li key={q.id}>
+                        <button
+                          type="button"
+                          disabled={disabled}
+                          onClick={() => setSelectedId(q.id)}
+                          className={cn(
+                            'flex w-full items-start gap-3 px-4 py-3 text-left transition',
+                            disabled
+                              ? 'cursor-not-allowed opacity-60'
+                              : 'hover:bg-[#0e0e0e]',
+                            isSelected && 'bg-[#161616]',
+                          )}
+                        >
+                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border">
+                            {isSelected ? <Check className="h-3.5 w-3.5" aria-hidden /> : null}
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            {q.start} – {q.end} · {q.workedDays}{' '}
-                            {q.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(q.hours)}
-                          </p>
-                          {q.invoiced ? (
-                            <p className="mt-0.5 text-xs font-medium text-emerald-400">
-                              Faktura już wystawiona za ten kwartał.
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-baseline justify-between gap-3">
+                              <p className="font-medium">
+                                {q.quarter} {q.year}
+                              </p>
+                              <p className="text-sm font-semibold">
+                                {formatAmount(q.amount, q.currency)}
+                              </p>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {q.start} – {q.end} · {q.workedDays}{' '}
+                              {q.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(q.hours)}
                             </p>
-                          ) : null}
-                        </div>
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
+                            {q.invoiced ? (
+                              <p className="mt-0.5 text-xs font-medium text-emerald-400">
+                                Faktura już wystawiona za ten kwartał.
+                              </p>
+                            ) : null}
+                          </div>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </div>
+          </FormSection>
         </div>
 
         <DialogFooter className="sticky bottom-0 z-10 border-t bg-background/95 px-5 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6 sm:py-4">
@@ -280,7 +294,7 @@ export function QuickQuarterlyInvoiceDialog({
           <Button
             onClick={() => void handleSubmit()}
             disabled={isSaving || !selectedQuarter || !selectedClient}
-            className="h-12 sm:h-10 sm:px-6"
+            className="h-12 rounded-xl font-semibold shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/30 active:scale-[0.99] sm:h-10 sm:w-auto sm:px-6"
           >
             {isSaving ? 'Zapisywanie...' : 'Wystaw fakturę'}
           </Button>

@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { FormSection } from '@/components/common/form'
 import { cn } from '@/lib/utils'
 import { fetchWorkedWeeksAction } from '../../services/actions/worked-weeks.actions'
 import type { WorkedWeekSummary } from '../../services/server/worked-weeks.service.server'
@@ -211,16 +212,22 @@ export function QuickWeeklyInvoiceDialog({
           'sm:inset-auto sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[90vh] sm:w-[calc(100%-2rem)] sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:border',
         )}
       >
-        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 py-4 text-left backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6">
-          <DialogTitle>Wystaw fakturę z przepracowanych tygodni</DialogTitle>
-          <DialogDescription>
+        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6">
+          <DialogTitle className="text-lg font-semibold tracking-tight">
+            Wystaw fakturę z przepracowanych tygodni
+          </DialogTitle>
+          <DialogDescription className="sr-only">
             Wybierz klienta z listy i zaznacz tygodnie do zafakturowania. Faktura
             wypełni się danymi z karty klienta i wpisami z kalendarza.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
-          <div className="grid gap-3">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-5 sm:px-6">
+          <FormSection
+            title="Klient i okres"
+            description="Wybierz klienta oraz zakres dat, z którego wczytamy przepracowane tygodnie."
+            className="border-[#1a1a1a] bg-[#0a0a0a]"
+          >
             <div className="grid gap-1.5">
               <Label>Klient</Label>
               {clients.length === 0 ? (
@@ -243,7 +250,7 @@ export function QuickWeeklyInvoiceDialog({
               )}
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-1.5">
                 <Label htmlFor="quick-from">Od</Label>
                 <Input
@@ -265,92 +272,99 @@ export function QuickWeeklyInvoiceDialog({
                 />
               </div>
             </div>
-          </div>
+          </FormSection>
 
-          {error ? (
-            <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-              Nie udało się pobrać tygodni: {error instanceof Error ? error.message : 'błąd serwera'}.{' '}
-              <button type="button" className="underline" onClick={() => void refetch()}>
-                Spróbuj ponownie
-              </button>
-            </div>
-          ) : null}
-
-          <div className="overflow-hidden rounded-md border">
-            {!clientId ? (
-              <p className="px-4 py-10 text-center text-sm text-muted-foreground">
-                Wybierz klienta, aby zobaczyć przepracowane tygodnie.
-              </p>
-            ) : isBusy ? (
-              <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Ładowanie tygodni...
+          <FormSection
+            title="Przepracowane tygodnie"
+            description="Zaznacz tygodnie, które chcesz zafakturować — każdy doda jedną pozycję na fakturze."
+            className="border-[#1a1a1a] bg-[#0a0a0a]"
+            bodyClassName="space-y-3"
+          >
+            {error ? (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                Nie udało się pobrać tygodni: {error instanceof Error ? error.message : 'błąd serwera'}.{' '}
+                <button type="button" className="underline" onClick={() => void refetch()}>
+                  Spróbuj ponownie
+                </button>
               </div>
-            ) : weeks.length === 0 ? (
-              <Empty className="py-8">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <CalendarRange className="size-5" />
-                  </EmptyMedia>
-                  <EmptyTitle>Brak przepracowanych tygodni</EmptyTitle>
-                  <EmptyDescription>
-                    Rozszerz zakres dat lub dodaj wpisy w kalendarzu — pokażemy tylko
-                    tygodnie z dniami oznaczonymi jako „pracowałem”.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-            ) : (
-              <ul className="divide-y divide-[#1a1a1a]" role="list">
-                {weeks.map((week) => {
-                  const checked = selected.has(week.id)
-                  return (
-                    <li key={week.id}>
-                      <label
-                        className="flex cursor-pointer items-start gap-3 px-4 py-3 transition hover:bg-[#0e0e0e]"
-                        htmlFor={`quick-week-${week.id}`}
-                      >
-                        <Checkbox
-                          id={`quick-week-${week.id}`}
-                          checked={checked}
-                          onCheckedChange={() => toggle(week.id)}
-                          className="mt-1"
-                          aria-label={`Zaznacz tydzień ${week.id}`}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-baseline justify-between gap-3">
-                            <p className="font-medium">{week.id}</p>
-                            <p className="text-sm font-semibold">
-                              {formatAmount(week.amount, week.currency)}
+            ) : null}
+
+            <div className="overflow-hidden rounded-xl border border-[#1a1a1a]">
+              {!clientId ? (
+                <p className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  Wybierz klienta, aby zobaczyć przepracowane tygodnie.
+                </p>
+              ) : isBusy ? (
+                <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Ładowanie tygodni...
+                </div>
+              ) : weeks.length === 0 ? (
+                <Empty className="py-8">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <CalendarRange className="size-5" />
+                    </EmptyMedia>
+                    <EmptyTitle>Brak przepracowanych tygodni</EmptyTitle>
+                    <EmptyDescription>
+                      Rozszerz zakres dat lub dodaj wpisy w kalendarzu — pokażemy tylko
+                      tygodnie z dniami oznaczonymi jako „pracowałem”.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              ) : (
+                <ul className="divide-y divide-[#1a1a1a]" role="list">
+                  {weeks.map((week) => {
+                    const checked = selected.has(week.id)
+                    return (
+                      <li key={week.id}>
+                        <label
+                          className="flex cursor-pointer items-start gap-3 px-4 py-3 transition hover:bg-[#0e0e0e]"
+                          htmlFor={`quick-week-${week.id}`}
+                        >
+                          <Checkbox
+                            id={`quick-week-${week.id}`}
+                            checked={checked}
+                            onCheckedChange={() => toggle(week.id)}
+                            className="mt-1"
+                            aria-label={`Zaznacz tydzień ${week.id}`}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-baseline justify-between gap-3">
+                              <p className="font-medium">{week.id}</p>
+                              <p className="text-sm font-semibold">
+                                {formatAmount(week.amount, week.currency)}
+                              </p>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {week.start} – {week.end} · {week.workedDays}{' '}
+                              {week.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(week.hours)}
                             </p>
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            {week.start} – {week.end} · {week.workedDays}{' '}
-                            {week.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(week.hours)}
-                          </p>
-                        </div>
-                      </label>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
-
-          {weeks.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-              <Button type="button" variant="ghost" size="sm" onClick={handleSelectLastWeek}>
-                Zaznacz ostatni tydzień
-              </Button>
-              {selectedWeeks.length > 0 ? (
-                <p className="text-muted-foreground">
-                  Suma:{' '}
-                  <span className="font-medium text-foreground">
-                    {formatAmount(totalAmount, totalCurrency)}
-                  </span>{' '}
-                  ({selectedWeeks.length} {selectedWeeks.length === 1 ? 'tydzień' : 'tygodni'})
-                </p>
-              ) : null}
+                        </label>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
             </div>
-          ) : null}
+
+            {weeks.length > 0 ? (
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                <Button type="button" variant="ghost" size="sm" onClick={handleSelectLastWeek}>
+                  Zaznacz ostatni tydzień
+                </Button>
+                {selectedWeeks.length > 0 ? (
+                  <p className="text-muted-foreground">
+                    Suma:{' '}
+                    <span className="font-medium text-foreground">
+                      {formatAmount(totalAmount, totalCurrency)}
+                    </span>{' '}
+                    ({selectedWeeks.length} {selectedWeeks.length === 1 ? 'tydzień' : 'tygodni'})
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+          </FormSection>
         </div>
 
         <DialogFooter className="sticky bottom-0 z-10 border-t bg-background/95 px-5 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6 sm:py-4">
@@ -360,7 +374,7 @@ export function QuickWeeklyInvoiceDialog({
           <Button
             onClick={() => void handleSubmit()}
             disabled={isSaving || selectedWeeks.length === 0 || !selectedClient}
-            className="h-12 sm:h-10 sm:px-6"
+            className="h-12 rounded-xl font-semibold shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/30 active:scale-[0.99] sm:h-10 sm:w-auto sm:px-6"
           >
             {isSaving ? 'Zapisywanie...' : 'Wystaw fakturę'}
           </Button>
