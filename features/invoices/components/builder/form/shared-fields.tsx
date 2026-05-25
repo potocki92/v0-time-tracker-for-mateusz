@@ -20,6 +20,8 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
+import { DIALOG_DARK_SURFACE } from '../../dialog-theme'
+
 /**
  * Bridge helpers that follow the same visual language as `<FormInput>` from
  * `components/common/form` but cover two cases that the generic FormInput
@@ -309,7 +311,7 @@ export function EnumSelectField<
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className={DIALOG_DARK_SURFACE}>
           {options.map((opt) => (
             <SelectItem key={opt.value} value={opt.value}>
               {opt.description ? (

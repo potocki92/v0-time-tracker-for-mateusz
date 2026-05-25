@@ -19,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ClientDisplay } from '@/components/common/ClientDisplay'
 import type { Client } from '@/lib/types'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
+import { DIALOG_DARK_SURFACE } from '../../dialog-theme'
 import { resolveBuyerCountryCode } from './invoice-builder.helpers'
 
 interface ClientPickerFieldProps {
@@ -115,7 +116,7 @@ export function ClientPickerField({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[320px] p-0" align="start">
+        <PopoverContent className={cn('w-[320px] p-0', DIALOG_DARK_SURFACE)} align="start">
           <Command>
             <CommandInput
               value={query}

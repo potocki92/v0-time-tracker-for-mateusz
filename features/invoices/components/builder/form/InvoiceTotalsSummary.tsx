@@ -39,9 +39,9 @@ export function InvoiceTotalsSummary() {
   return (
     <div className="space-y-3" aria-live="polite">
       {/* VAT breakdown — one row per (mode, rate) bucket. */}
-      <div className="overflow-hidden rounded-xl border border-border/60">
+      <div className="overflow-hidden rounded-xl border border-[#1a1a1a]">
         <table className="w-full text-sm">
-          <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+          <thead className="bg-[#0e0e0e] text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th scope="col" className="px-3 py-2 text-left font-medium">Stawka</th>
               <th scope="col" className="px-3 py-2 text-right font-medium">Netto</th>
@@ -49,7 +49,7 @@ export function InvoiceTotalsSummary() {
               <th scope="col" className="px-3 py-2 text-right font-medium">Brutto</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border/40">
+          <tbody className="divide-y divide-[#1a1a1a]">
             {totals.vat_breakdown.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-3 py-4 text-center text-xs text-muted-foreground">
@@ -100,7 +100,7 @@ export function InvoiceTotalsSummary() {
             value={formatMoney(totals.gross_in_pln)}
           />
         ) : currency !== 'PLN' ? (
-          <div className="rounded-xl border border-dashed border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+          <div className="rounded-xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-3 py-2 text-xs text-muted-foreground">
             Podaj kurs wymiany, aby zobaczyć równowartość w PLN.
           </div>
         ) : null}
@@ -129,8 +129,8 @@ function TotalsCell({
   return (
     <div
       className={cn(
-        'rounded-xl border border-border/60 bg-background/70 px-3 py-2',
-        emphasis && 'border-primary/40 bg-primary/5',
+        'rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] px-3 py-2',
+        emphasis && 'border-emerald-500/40 bg-emerald-500/10',
       )}
     >
       <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
