@@ -663,3 +663,23 @@
     }
   }
 }
+
+/* Druk: pokazujemy wyłącznie obszar oznaczony [data-print-area]
+   (np. raport tygodniowy dla księgowej), reszta UI jest ukryta. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  [data-print-area],
+  [data-print-area] * {
+    visibility: visible;
+  }
+  [data-print-area] {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 24px;
+    color: #000;
+    background: #fff;
+  }
+}
