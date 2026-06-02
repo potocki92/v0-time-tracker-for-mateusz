@@ -18,6 +18,7 @@ import {
   SectionHeader,
   UpcomingSection,
   WeeklyGlanceSection,
+  WeeklySummarySection,
 } from './sections'
 import {
   ChartSkeleton,
@@ -79,6 +80,10 @@ export function DashboardContent() {
 
           <DashboardSection fallback={<InvoicesSkeleton />}>
             <QuarterlySummarySection />
+          </DashboardSection>
+
+          <DashboardSection fallback={<InvoicesSkeleton />}>
+            <WeeklySummarySection />
           </DashboardSection>
 
           <SectionHeader label="Wkrótce" />
