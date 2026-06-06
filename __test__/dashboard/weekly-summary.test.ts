@@ -160,22 +160,23 @@ describe('buildWeeklySummary', () => {
     expect(toMajor(block.totals.EUR)).toBe(200) // 8h × 25
   })
 
-  it('zbiera adresy projektów (miejsca pracy) bez duplikatów', () => {
+  it('zbiera miejsca pracy (adres, a gdy brak — nazwa projektu) bez duplikatów', () => {
     const c = client({ id: 'c1', name: 'Acme' })
     const p1 = project({ id: 'p1', address: 'ul. Słoneczna 10, Gdańsk' })
     const p2 = project({ id: 'p2', address: 'ul. Morska 5, Gdynia' })
-    const pNoAddr = project({ id: 'p3', address: null })
+    const pNameOnly = project({ id: 'p3', name: 'Kramergasse 4-2, 47179 Duisburg', address: null })
     const entries = [
       entry({ date: '2026-06-01', client_id: 'c1', project_id: 'p1' }),
-      entry({ date: '2026-06-02', client_id: 'c1', project_id: 'p1' }), // duplikat adresu
+      entry({ date: '2026-06-02', client_id: 'c1', project_id: 'p1' }), // duplikat
       entry({ date: '2026-06-03', client_id: 'c1', project_id: 'p2' }),
-      entry({ date: '2026-06-04', client_id: 'c1', project_id: 'p3' }), // projekt bez adresu
+      entry({ date: '2026-06-04', client_id: 'c1', project_id: 'p3' }), // brak adresu → nazwa
       entry({ date: '2026-06-05', client_id: 'c1', project_id: null }), // bez projektu
     ]
-    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY, [p1, p2, pNoAddr])
+    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY, [p1, p2, pNameOnly])
     expect(contractors[0].workLocations).toEqual([
       'ul. Słoneczna 10, Gdańsk',
       'ul. Morska 5, Gdynia',
+      'Kramergasse 4-2, 47179 Duisburg',
     ])
   })
 

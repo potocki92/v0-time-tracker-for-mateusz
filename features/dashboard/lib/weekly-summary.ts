@@ -88,7 +88,10 @@ function dedupeRates(entries: WorkEntry[], fallback: EntryCalculationFallback): 
   return [...seen.values()]
 }
 
-/** Adresy projektów (miejsca pracy) z wpisów, bez duplikatów, w kolejności wystąpienia. */
+/**
+ * Miejsca pracy z przepracowanych wpisów, bez duplikatów, w kolejności wystąpienia.
+ * Bierze adres projektu, a gdy go nie ma — nazwę projektu (często sama jest adresem).
+ */
 function collectWorkLocations(
   entries: WorkEntry[],
   projectById: Map<string, Project>,
@@ -96,8 +99,9 @@ function collectWorkLocations(
   const seen = new Set<string>()
   for (const entry of entries) {
     if (!entry.project_id) continue
-    const address = projectById.get(entry.project_id)?.address?.trim()
-    if (address) seen.add(address)
+    const project = projectById.get(entry.project_id)
+    const location = project?.address?.trim() || project?.name?.trim()
+    if (location) seen.add(location)
   }
   return [...seen]
 }
