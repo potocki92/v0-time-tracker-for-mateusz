@@ -49,6 +49,9 @@ function ContractorCard({ block }: { block: ContractorBlock }) {
       </header>
 
       <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-[13px] sm:grid-cols-2">
+        {block.workLocations.length > 0 && (
+          <Row label="Miejsce pracy">{block.workLocations.join('; ')}</Row>
+        )}
         <Row label="Dni pracy (od – do)">
           {formatDate(block.workedFrom)} – {formatDate(block.workedTo)}
           <span className="text-zinc-500 print:text-gray-500"> ({block.workedDaysCount} dni)</span>
