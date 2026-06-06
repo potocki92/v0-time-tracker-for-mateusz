@@ -9,6 +9,9 @@ function formatBlock(block: ContractorBlock): string {
     .join(', ')
   if (address) lines.push(address)
 
+  if (block.workLocations.length > 0) {
+    lines.push(`Miejsce pracy: ${block.workLocations.join('; ')}`)
+  }
   lines.push(`Dni pracy: ${formatDate(block.workedFrom)} – ${formatDate(block.workedTo)} (${block.workedDaysCount} dni)`)
   lines.push(`Godziny: ${formatHours(block.totalHours)}`)
   lines.push(`Stawka na fakturze: ${block.rates.map(formatRate).join(', ')}`)

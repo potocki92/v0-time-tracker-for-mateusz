@@ -1,4 +1,4 @@
-import type { Client, CURRENCY, WorkEntry } from '@/lib/types'
+import type { Client, CURRENCY, Project, WorkEntry } from '@/lib/types'
 import { getISOWeekNumber, getISOWeekYear, getWeekRange } from '@/lib/date/week'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import { partitionByRealization } from '@/lib/finance/realization'
@@ -44,6 +44,8 @@ export type ContractorBlock = {
   totalHours: number
   /** Wyróżnione stawki do faktury (zwykle jedna). */
   rates: AppliedRate[]
+  /** Adresy projektów (miejsca pracy) z przepracowanych wpisów; bez duplikatów. */
+  workLocations: string[]
   totals: { PLN: Money; EUR: Money }
 }
 
@@ -86,10 +88,25 @@ function dedupeRates(entries: WorkEntry[], fallback: EntryCalculationFallback): 
   return [...seen.values()]
 }
 
+/** Adresy projektów (miejsca pracy) z wpisów, bez duplikatów, w kolejności wystąpienia. */
+function collectWorkLocations(
+  entries: WorkEntry[],
+  projectById: Map<string, Project>,
+): string[] {
+  const seen = new Set<string>()
+  for (const entry of entries) {
+    if (!entry.project_id) continue
+    const address = projectById.get(entry.project_id)?.address?.trim()
+    if (address) seen.add(address)
+  }
+  return [...seen]
+}
+
 function buildBlock(
   clientId: string | null,
   client: Client | null,
   entries: WorkEntry[],
+  projectById: Map<string, Project>,
 ): ContractorBlock {
   const dates = entries.map((e) => e.date).sort()
   const fallback = client ? fallbackFromClient(client) : UNASSIGNED_FALLBACK
@@ -103,6 +120,7 @@ function buildBlock(
     workedDaysCount: new Set(dates).size,
     totalHours: entries.reduce((sum, e) => sum + (e.hours ?? 0), 0),
     rates: dedupeRates(entries, fallback),
+    workLocations: collectWorkLocations(entries, projectById),
     totals: sumEntriesByCurrency(entries, fallback),
   }
 }
@@ -118,6 +136,7 @@ export function buildWeeklySummary(
   clients: Client[],
   weekStart: Date,
   today: string = getTodayLocalDateString(),
+  projects: Project[] = [],
 ): WeeklySummary {
   const { start, end } = getWeekRange(weekStart)
   const from = toDateKey(start)
@@ -129,6 +148,7 @@ export function buildWeeklySummary(
   )
 
   const clientById = new Map(clients.map((c) => [c.id, c]))
+  const projectById = new Map(projects.map((p) => [p.id, p]))
   const grouped = new Map<string, WorkEntry[]>()
   for (const entry of worked) {
     const key = entry.client_id ?? UNASSIGNED_KEY
@@ -141,7 +161,7 @@ export function buildWeeklySummary(
     .map(([key, entries]) => {
       const client = key === UNASSIGNED_KEY ? null : clientById.get(key) ?? null
       const clientId = key === UNASSIGNED_KEY ? null : key
-      return buildBlock(clientId, client, entries)
+      return buildBlock(clientId, client, entries, projectById)
     })
     .sort((a, b) => {
       // „Bez przypisania" zawsze na końcu, reszta alfabetycznie.

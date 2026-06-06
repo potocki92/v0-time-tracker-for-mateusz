@@ -94,6 +94,16 @@ export function ProjectFormDialog({
             />
           </div>
 
+          <div className="grid gap-2">
+            <Label htmlFor="project-address">Adres pracy</Label>
+            <Input
+              id="project-address"
+              value={formData.address || ''}
+              onChange={(event) => onChange({ ...formData, address: event.target.value })}
+              placeholder="np. ul. Słoneczna 10, 80-001 Gdańsk"
+            />
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label>Klient</Label>
