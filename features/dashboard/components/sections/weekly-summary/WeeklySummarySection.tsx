@@ -1,17 +1,18 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { CalendarCheck } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { useDashboardData } from '../../../hooks'
-import { buildWeeklySummary } from '@/features/dashboard/lib/weekly-summary'
+import { buildWeeklySummary, type ContractorBlock } from '@/features/dashboard/lib/weekly-summary'
 import { getWeekStart } from '@/lib/date/week'
 import { WeeklySummaryModal } from './WeeklySummaryModal'
+import { formatDate, formatHours, formatRate, formatTotals } from './presentation'
 
 /**
- * Wejście do skrótu przepracowanego tygodnia (dla księgowej).
- * Przycisk otwiera modal z danymi kontrahentów, zakresem dni, KW i stawką.
- * Nawigacja ◀/▶ pozwala cofnąć się do poprzednich tygodni (np. raport w poniedziałek
- * za miniony tydzień), bez wchodzenia w przyszłość.
+ * Kafel skrótu przepracowanego tygodnia (dla księgowej).
+ * Pokazuje wprost dane bieżącego tygodnia (KW, dni, godziny, stawka, kwota)
+ * per kontrahent. Przycisk „Otwórz" otwiera modal z pełnym raportem
+ * (druk/PDF, kopiowanie, nawigacja ◀/▶ po poprzednich tygodniach).
  */
 export function WeeklySummarySection() {
   const { data } = useDashboardData()
@@ -34,28 +35,41 @@ export function WeeklySummarySection() {
       aria-label="Podsumowanie tygodnia"
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
     >
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-[#101010]"
-      >
-        <span className="flex items-center gap-3">
-          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300">
-            <CalendarCheck className="h-4 w-4" aria-hidden />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-[13px] font-semibold text-white">
+      <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
               Podsumowanie tygodnia
+            </p>
+            <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[11px] text-zinc-300">
+              KW {summary.weekNumber}/{summary.weekYear}
             </span>
-            <span className="block text-[11.5px] text-zinc-500">
-              Skrót dla księgowej — KW, dni, stawka
-            </span>
-          </span>
-        </span>
-        <span className="shrink-0 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] text-zinc-300">
+          </div>
+          <p className="mt-0.5 truncate text-[11.5px] text-zinc-500">
+            dla księgowej · {summary.rangeLabel}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
+        >
           Otwórz
-        </span>
-      </button>
+          <ArrowUpRight className="h-3 w-3" aria-hidden />
+        </button>
+      </header>
+
+      {summary.isEmpty ? (
+        <div className="px-4 py-6 text-center text-sm text-zinc-500">
+          Brak przepracowanych dni w tym tygodniu.
+        </div>
+      ) : (
+        <ul role="list" className="divide-y divide-[#161616]">
+          {summary.contractors.map((block) => (
+            <ContractorRow key={block.clientId ?? '__unassigned__'} block={block} />
+          ))}
+        </ul>
+      )}
 
       <WeeklySummaryModal
         open={open}
@@ -66,5 +80,23 @@ export function WeeklySummarySection() {
         canGoNext={weekOffset < 0}
       />
     </section>
+  )
+}
+
+function ContractorRow({ block }: { block: ContractorBlock }) {
+  return (
+    <li className="px-4 py-3">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="truncate text-[13px] font-semibold text-white">{block.clientName}</p>
+        <p className="shrink-0 text-[12.5px] tabular-nums text-zinc-300">{formatTotals(block)}</p>
+      </div>
+      <p className="mt-0.5 truncate text-[11.5px] text-zinc-500">
+        {formatDate(block.workedFrom)} – {formatDate(block.workedTo)} ({block.workedDaysCount} dni)
+        {' · '}
+        {formatHours(block.totalHours)}
+        {' · '}
+        {block.rates.map(formatRate).join(', ')}
+      </p>
+    </li>
   )
 }

@@ -12,13 +12,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { format as formatMoney, isPositive } from '@/lib/finance/money'
 import type {
-  AppliedRate,
   ContractorBlock,
   WeeklySummary,
 } from '@/features/dashboard/lib/weekly-summary'
 import { formatWeeklySummaryText } from './format'
+import { formatDate, formatHours, formatRate, formatTotals } from './presentation'
 
 type Props = {
   open: boolean
@@ -27,27 +26,6 @@ type Props = {
   onPrevWeek: () => void
   onNextWeek: () => void
   canGoNext: boolean
-}
-
-function formatDate(key: string): string {
-  const [y, m, d] = key.split('-')
-  return `${d}.${m}.${y}`
-}
-
-function formatHours(hours: number): string {
-  return `${hours.toLocaleString('pl-PL', { maximumFractionDigits: 1 })} h`
-}
-
-function formatRate(rate: AppliedRate): string {
-  const per = rate.workType === 'piecework' ? rate.unit ?? 'szt.' : 'h'
-  return `${rate.rate.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} ${rate.currency}/${per}`
-}
-
-function totalsLabel(block: ContractorBlock): string {
-  const parts: string[] = []
-  if (isPositive(block.totals.PLN)) parts.push(formatMoney(block.totals.PLN))
-  if (isPositive(block.totals.EUR)) parts.push(formatMoney(block.totals.EUR))
-  return parts.join(' · ') || formatMoney(block.totals.PLN)
 }
 
 function ContractorCard({ block }: { block: ContractorBlock }) {
@@ -77,7 +55,7 @@ function ContractorCard({ block }: { block: ContractorBlock }) {
         </Row>
         <Row label="Godziny">{formatHours(block.totalHours)}</Row>
         <Row label="Stawka na fakturze">{block.rates.map(formatRate).join(', ')}</Row>
-        <Row label="Do rozliczenia">{totalsLabel(block)}</Row>
+        <Row label="Do rozliczenia">{formatTotals(block)}</Row>
       </dl>
     </section>
   )
