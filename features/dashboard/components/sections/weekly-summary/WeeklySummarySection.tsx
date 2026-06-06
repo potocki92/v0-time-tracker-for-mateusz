@@ -26,8 +26,8 @@ export function WeeklySummarySection() {
   }, [weekOffset])
 
   const summary = useMemo(
-    () => buildWeeklySummary(data.workEntries, data.clients, weekStart),
-    [data.workEntries, data.clients, weekStart],
+    () => buildWeeklySummary(data.workEntries, data.clients, weekStart, undefined, data.projects),
+    [data.workEntries, data.clients, data.projects, weekStart],
   )
 
   return (

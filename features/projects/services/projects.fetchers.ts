@@ -66,6 +66,7 @@ export function toProjectPayload(userId: string, formData: ProjectFormData): Pro
     client_id: formData.client_id || (null as unknown as string),
     name: formData.name.trim(),
     description: formData.description?.trim() || null,
+    address: formData.address?.trim() || null,
     status: formData.status,
     budget_type: formData.budget_type,
     budget_amount:

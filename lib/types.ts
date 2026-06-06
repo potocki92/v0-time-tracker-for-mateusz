@@ -67,6 +67,7 @@ export interface Project {
   client_id: string
   name: string
   description: string | null
+  address: string | null
   status: 'planned' | 'in_progress' | 'completed' | 'on_hold'
   budget_type: 'per_unit' | 'fixed' | 'hourly'
   budget_amount: number | null
@@ -192,6 +193,7 @@ export interface ProjectFormData {
   client_id: string
   name: string
   description?: string
+  address?: string
   status: 'planned' | 'in_progress' | 'completed' | 'on_hold'
   budget_type: 'per_unit' | 'fixed' | 'hourly'
   budget_amount?: number

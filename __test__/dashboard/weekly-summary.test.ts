@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { buildWeeklySummary } from '@/features/dashboard/lib/weekly-summary'
 import { toMajor } from '@/lib/finance/money'
-import type { Client, WorkEntry } from '@/lib/types'
+import type { Client, Project, WorkEntry } from '@/lib/types'
 
 const TODAY = '2026-06-30' // po tygodniu, więc wpisy są „zrealizowane"
 const WEEK = new Date(2026, 5, 3) // środa 03.06.2026 → tydzień 01.06–07.06
@@ -27,6 +27,27 @@ function client(over: Partial<Client> & { id: string; name: string }): Client {
     unit: 'h',
     is_default: false,
     color: '#fff',
+    created_at: TODAY,
+    ...over,
+  }
+}
+
+function project(over: Partial<Project> & { id: string }): Project {
+  return {
+    user_id: 'u1',
+    client_id: 'c1',
+    name: 'Projekt',
+    description: null,
+    address: null,
+    status: 'in_progress',
+    budget_type: 'hourly',
+    budget_amount: null,
+    target_quantity: null,
+    current_quantity: 0,
+    priority: 'medium',
+    color: '#fff',
+    start_date: null,
+    end_date: null,
     created_at: TODAY,
     ...over,
   }
@@ -137,5 +158,31 @@ describe('buildWeeklySummary', () => {
     ])
     expect(toMajor(block.totals.PLN)).toBe(1600) // 16h × 100
     expect(toMajor(block.totals.EUR)).toBe(200) // 8h × 25
+  })
+
+  it('zbiera adresy projektów (miejsca pracy) bez duplikatów', () => {
+    const c = client({ id: 'c1', name: 'Acme' })
+    const p1 = project({ id: 'p1', address: 'ul. Słoneczna 10, Gdańsk' })
+    const p2 = project({ id: 'p2', address: 'ul. Morska 5, Gdynia' })
+    const pNoAddr = project({ id: 'p3', address: null })
+    const entries = [
+      entry({ date: '2026-06-01', client_id: 'c1', project_id: 'p1' }),
+      entry({ date: '2026-06-02', client_id: 'c1', project_id: 'p1' }), // duplikat adresu
+      entry({ date: '2026-06-03', client_id: 'c1', project_id: 'p2' }),
+      entry({ date: '2026-06-04', client_id: 'c1', project_id: 'p3' }), // projekt bez adresu
+      entry({ date: '2026-06-05', client_id: 'c1', project_id: null }), // bez projektu
+    ]
+    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY, [p1, p2, pNoAddr])
+    expect(contractors[0].workLocations).toEqual([
+      'ul. Słoneczna 10, Gdańsk',
+      'ul. Morska 5, Gdynia',
+    ])
+  })
+
+  it('zwraca puste miejsca pracy gdy brak projektów', () => {
+    const c = client({ id: 'c1', name: 'Acme' })
+    const entries = [entry({ date: '2026-06-02', client_id: 'c1' })]
+    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY)
+    expect(contractors[0].workLocations).toEqual([])
   })
 })
