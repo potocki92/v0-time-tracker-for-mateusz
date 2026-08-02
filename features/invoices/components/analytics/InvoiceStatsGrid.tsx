@@ -7,6 +7,8 @@ import { InvoiceStatCard } from './InvoiceStatCard'
 
 interface InvoiceStatsGridProps {
   stats: InvoicesAggregateStats
+  /** Same shape, computed for the other currency (no FX conversion — a plain native sum). */
+  otherCurrencyStats: InvoicesAggregateStats
 }
 
 function formatTrendBadge(percent: number | null): string | undefined {
@@ -51,8 +53,9 @@ function pluralDraft(n: number): string {
   return 'szkiców'
 }
 
-export function InvoiceStatsGrid({ stats }: InvoiceStatsGridProps) {
+export function InvoiceStatsGrid({ stats, otherCurrencyStats }: InvoiceStatsGridProps) {
   const currency = stats.currency as CURRENCY
+  const otherCurrency = otherCurrencyStats.currency as CURRENCY
 
   const billedDescription =
     stats.period.count > 0
@@ -83,6 +86,11 @@ export function InvoiceStatsGrid({ stats }: InvoiceStatsGridProps) {
       <InvoiceStatCard
         label={`WYSTAWIONE · ${stats.monthLabel}`}
         amount={formatCurrency(stats.period.total, currency)}
+        secondaryAmount={
+          otherCurrencyStats.period.count > 0
+            ? formatCurrency(otherCurrencyStats.period.total, otherCurrency)
+            : undefined
+        }
         badge={formatTrendBadge(stats.period.trendPercent)}
         tone="success"
         description={billedDescription}
@@ -90,6 +98,11 @@ export function InvoiceStatsGrid({ stats }: InvoiceStatsGridProps) {
       <InvoiceStatCard
         label="OPŁACONE"
         amount={formatCurrency(stats.paid.total, currency)}
+        secondaryAmount={
+          otherCurrencyStats.paid.paidCount > 0
+            ? formatCurrency(otherCurrencyStats.paid.total, otherCurrency)
+            : undefined
+        }
         badge={paidBadge}
         tone="success"
         description={paidDescription}
@@ -97,6 +110,11 @@ export function InvoiceStatsGrid({ stats }: InvoiceStatsGridProps) {
       <InvoiceStatCard
         label="OCZEKUJĄCE"
         amount={formatCurrency(stats.outstanding.total, currency)}
+        secondaryAmount={
+          otherCurrencyStats.outstanding.openCount + otherCurrencyStats.outstanding.overdueCount > 0
+            ? formatCurrency(otherCurrencyStats.outstanding.total, otherCurrency)
+            : undefined
+        }
         badge={outstandingBadge}
         tone={stats.outstanding.overdueCount > 0 ? 'warning' : 'neutral'}
         description={outstandingDescription}
@@ -104,6 +122,11 @@ export function InvoiceStatsGrid({ stats }: InvoiceStatsGridProps) {
       <InvoiceStatCard
         label="SZKICE"
         amount={formatCurrency(stats.drafts.total, currency)}
+        secondaryAmount={
+          otherCurrencyStats.drafts.count > 0
+            ? formatCurrency(otherCurrencyStats.drafts.total, otherCurrency)
+            : undefined
+        }
         badge={stats.drafts.count > 0 ? 'Akcja' : undefined}
         tone="action"
         description={draftsDescription}
