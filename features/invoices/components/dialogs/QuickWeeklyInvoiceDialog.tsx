@@ -157,7 +157,7 @@ export function QuickWeeklyInvoiceDialog({
         unit:           week.workType === 'piecework' ? 'szt.' : 'h',
         quantity:       Number(quantity.toFixed(3)),
         unit_price_net,
-        vat_rate:       23,
+        vat_rate:       0,
       }
     })
 
