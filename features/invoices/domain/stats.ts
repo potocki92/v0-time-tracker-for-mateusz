@@ -106,23 +106,6 @@ function quarterFromMonth(monthIndex: number): 1 | 2 | 3 | 4 {
   return (Math.floor(monthIndex / 3) + 1) as 1 | 2 | 3 | 4
 }
 
-function pickPrimaryCurrency(invoices: Invoice[]): CURRENCY {
-  const counts = new Map<CURRENCY, number>()
-  for (const inv of invoices) {
-    const cur = (inv.currency ?? 'PLN') as CURRENCY
-    counts.set(cur, (counts.get(cur) ?? 0) + 1)
-  }
-  let best: CURRENCY = 'PLN'
-  let max = -1
-  for (const [cur, c] of counts.entries()) {
-    if (c > max) {
-      best = cur
-      max = c
-    }
-  }
-  return best
-}
-
 function invoiceDate(inv: Invoice): Date | null {
   const raw = inv.invoice_date ?? inv.issue_date ?? inv.created_at ?? null
   if (!raw) return null
@@ -154,9 +137,9 @@ function trendPercent(curr: number, prev: number): number | null {
 
 export function computeInvoicesStats(
   invoices: Invoice[],
+  currency: CURRENCY,
   now: Date = new Date(),
 ): InvoicesAggregateStats {
-  const currency = pickPrimaryCurrency(invoices)
   const monthIndex = now.getMonth()
   const year = now.getFullYear()
   const monthLabel = polishMonthFull(monthIndex).toUpperCase()
