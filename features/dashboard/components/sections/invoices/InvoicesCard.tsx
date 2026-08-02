@@ -74,8 +74,14 @@ function shortDue(due: string | null | undefined): string {
 
 export function InvoicesCard({ invoices, periodShort }: Props) {
   const visible = invoices.slice(0, 5)
-  const totalBilled = invoices.reduce((sum, i) => sum + (i.amount ?? 0), 0)
-  const baseCurrency = visible[0]?.currency ?? 'EUR'
+  const totalsByCurrency = invoices.reduce<Record<string, number>>((totals, i) => {
+    const currency = i.currency ?? 'EUR'
+    totals[currency] = (totals[currency] ?? 0) + (i.amount ?? 0)
+    return totals
+  }, {})
+  const totalBilledLabel = Object.entries(totalsByCurrency)
+    .map(([currency, amount]) => formatCurrency(amount, currency as Invoice['currency']))
+    .join(' · ')
 
   return (
     <section
@@ -153,7 +159,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
         <p className="text-xs text-zinc-500">
           Łącznie wystawione ·{' '}
           <span className="font-semibold text-white">
-            {formatCurrency(totalBilled, baseCurrency)}
+            {totalBilledLabel || formatCurrency(0, 'EUR')}
           </span>
         </p>
         <Link
