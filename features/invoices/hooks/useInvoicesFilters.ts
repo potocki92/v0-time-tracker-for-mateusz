@@ -2,12 +2,14 @@
 
 import { useCallback } from 'react'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
+import type { CURRENCY } from '@/lib/types'
 import type { InvoiceFilterTab } from '../domain/stats'
 
 interface InvoicesFiltersState {
   activeTab: InvoiceFilterTab
   query:     string
   pageSize:  number
+  currency:  CURRENCY
 }
 
 const INVOICES_FILTERS_STORAGE_KEY = 'invoices-filters-v1'
@@ -16,6 +18,7 @@ const DEFAULT_FILTERS: InvoicesFiltersState = {
   activeTab: 'all',
   query:     '',
   pageSize:  10,
+  currency:  'PLN',
 }
 
 const VALID_TABS: ReadonlySet<InvoiceFilterTab> = new Set([
@@ -28,6 +31,8 @@ const VALID_TABS: ReadonlySet<InvoiceFilterTab> = new Set([
 
 const VALID_PAGE_SIZES: ReadonlySet<number> = new Set([10, 25, 50, 100])
 
+const VALID_CURRENCIES: ReadonlySet<CURRENCY> = new Set(['PLN', 'EUR'])
+
 function isValidFilters(value: unknown): value is InvoicesFiltersState {
   if (typeof value !== 'object' || value === null) return false
   const v = value as Record<string, unknown>
@@ -36,7 +41,9 @@ function isValidFilters(value: unknown): value is InvoicesFiltersState {
     VALID_TABS.has(v.activeTab as InvoiceFilterTab) &&
     typeof v.query === 'string' &&
     typeof v.pageSize === 'number' &&
-    VALID_PAGE_SIZES.has(v.pageSize)
+    VALID_PAGE_SIZES.has(v.pageSize) &&
+    typeof v.currency === 'string' &&
+    VALID_CURRENCIES.has(v.currency as CURRENCY)
   )
 }
 
@@ -69,6 +76,11 @@ export function useInvoicesFilters() {
     [setFilters],
   )
 
+  const setCurrency = useCallback(
+    (value: CURRENCY) => setFilters((prev) => ({ ...prev, currency: value })),
+    [setFilters],
+  )
+
   return {
     activeTab: filters.activeTab,
     setActiveTab,
@@ -76,5 +88,7 @@ export function useInvoicesFilters() {
     setQuery,
     pageSize:  filters.pageSize,
     setPageSize,
+    currency:  filters.currency,
+    setCurrency,
   }
 }

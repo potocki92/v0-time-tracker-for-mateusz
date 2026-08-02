@@ -104,8 +104,16 @@ export function InvoicesContent() {
   const [deletingInvoice, setDeletingInvoice] = useState<Invoice | null>(null)
   const [quickWeeksOpen, setQuickWeeksOpen] = useState(false)
   const [quickQuarterOpen, setQuickQuarterOpen] = useState(false)
-  const { activeTab, setActiveTab, query, setQuery, pageSize, setPageSize } =
-    useInvoicesFilters()
+  const {
+    activeTab,
+    setActiveTab,
+    query,
+    setQuery,
+    pageSize,
+    setPageSize,
+    currency,
+    setCurrency,
+  } = useInvoicesFilters()
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
   const [pageIndex, setPageIndex] = useState(0)
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false)
@@ -121,7 +129,10 @@ export function InvoicesContent() {
 
   const isSaving = saveMutation.isPending
 
-  const stats = useMemo(() => computeInvoicesStats(data.invoices), [data.invoices])
+  const stats = useMemo(
+    () => computeInvoicesStats(data.invoices, currency),
+    [data.invoices, currency],
+  )
 
   const clientsById = useMemo(
     () => new Map(data.clients.map((client) => [client.id, client])),
@@ -130,7 +141,7 @@ export function InvoicesContent() {
 
   const filteredInvoices = useMemo(() => {
     const byCurrency = data.invoices.filter(
-      (inv) => (inv.currency ?? 'PLN') === stats.currency,
+      (inv) => (inv.currency ?? 'PLN') === currency,
     )
     const byTab = filterInvoicesByTab(byCurrency, activeTab)
     return searchInvoices(byTab, query).sort((a, b) => {
@@ -138,7 +149,7 @@ export function InvoicesContent() {
       const bd = new Date(b.invoice_date ?? b.issue_date ?? b.created_at).getTime()
       return bd - ad
     })
-  }, [data.invoices, stats.currency, activeTab, query])
+  }, [data.invoices, currency, activeTab, query])
 
   const pageCount = Math.max(1, Math.ceil(filteredInvoices.length / pageSize))
 
@@ -319,6 +330,7 @@ export function InvoicesContent() {
           monthLabel={stats.monthLabel}
           cycleLabel={stats.cycleLabel}
           currency={stats.currency}
+          onCurrencyChange={setCurrency}
           year={new Date().getFullYear()}
         />
         <DropdownMenu>
