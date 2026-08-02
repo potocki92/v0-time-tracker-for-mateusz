@@ -7,6 +7,7 @@ export type StatCardTone = 'neutral' | 'success' | 'warning' | 'action'
 interface InvoiceStatCardProps {
   label: string
   amount: string
+  secondaryAmount?: string
   badge?: string
   tone?: StatCardTone
   description?: string
@@ -22,6 +23,7 @@ const TONE_BADGE: Record<StatCardTone, string> = {
 export function InvoiceStatCard({
   label,
   amount,
+  secondaryAmount,
   badge,
   tone = 'neutral',
   description,
@@ -46,6 +48,11 @@ export function InvoiceStatCard({
       <p className="mt-3 text-[26px] font-semibold tracking-tight tabular-nums text-white sm:text-[28px]">
         {amount}
       </p>
+      {secondaryAmount && (
+        <p className="mt-0.5 text-[13px] font-medium tabular-nums text-zinc-500">
+          {secondaryAmount}
+        </p>
+      )}
       {description && (
         <p className="mt-1 text-[12px] leading-snug text-zinc-500">{description}</p>
       )}

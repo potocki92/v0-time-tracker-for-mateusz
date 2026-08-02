@@ -134,6 +134,11 @@ export function InvoicesContent() {
     [data.invoices, currency],
   )
 
+  const otherCurrencyStats = useMemo(
+    () => computeInvoicesStats(data.invoices, currency === 'EUR' ? 'PLN' : 'EUR'),
+    [data.invoices, currency],
+  )
+
   const clientsById = useMemo(
     () => new Map(data.clients.map((client) => [client.id, client])),
     [data.clients],
@@ -382,7 +387,7 @@ export function InvoicesContent() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <div className="space-y-4 lg:col-span-7">
-          <InvoiceStatsGrid stats={stats} />
+          <InvoiceStatsGrid stats={stats} otherCurrencyStats={otherCurrencyStats} />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <InvoiceARAgingCard aging={stats.aging} currency={stats.currency} />
