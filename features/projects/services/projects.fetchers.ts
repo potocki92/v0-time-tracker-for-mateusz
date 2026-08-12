@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { getWorkEntriesWindowStart } from '@/lib/date/work-entries-window'
 import type { Client, Project, ProjectFormData, WorkEntry } from '@/lib/types'
 
 /**
@@ -40,6 +41,7 @@ export async function fetchProjectsWorkEntries(userId: string): Promise<WorkEntr
     .from('work_entries')
     .select('*')
     .eq('user_id', userId)
+    .gte('date', getWorkEntriesWindowStart())
 
   if (error) throw new Error(`fetchProjectsWorkEntries: ${error.message}`)
   return (data ?? []) as WorkEntry[]

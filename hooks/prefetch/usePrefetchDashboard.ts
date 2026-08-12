@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { getDashboardData } from '@/app/(app)/dashboard/_services/dashboard.service'
+import { getDashboardData } from '@/features/dashboard/services/dashboard.service'
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
 
 // ── Types ─────────────────────────────────────────────────────────────────────

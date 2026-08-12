@@ -1,4 +1,5 @@
 import { createClient as createSupabase } from '@/lib/supabase/client'
+import { getWorkEntriesWindowStart } from '@/lib/date/work-entries-window'
 import type {
   Client,
   ClientFormData,
@@ -33,6 +34,7 @@ export async function fetchWorkEntriesForClients(userId: string): Promise<WorkEn
     .from('work_entries')
     .select('*')
     .eq('user_id', userId)
+    .gte('date', getWorkEntriesWindowStart())
 
   if (error) throw new Error(`fetchWorkEntriesForClients: ${error.message}`)
   return data ?? []

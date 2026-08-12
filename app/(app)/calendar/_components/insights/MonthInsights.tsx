@@ -1,8 +1,15 @@
 'use client'
 
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { CalendarInsights } from '../../_domain/calendar.types'
 import { DayComposition } from './DayComposition'
-import { HoursPerWeekChart } from './HoursPerWeekChart'
+
+// recharts osobnym chunkiem — kalendarz renderuje się bez czekania na wykres.
+const HoursPerWeekChart = dynamic(
+  () => import('./HoursPerWeekChart').then((mod) => mod.HoursPerWeekChart),
+  { ssr: false, loading: () => <Skeleton className="h-[180px] w-full" /> },
+)
 import { RecentEntries } from './RecentEntries'
 import { TimeByProject } from './TimeByProject'
 

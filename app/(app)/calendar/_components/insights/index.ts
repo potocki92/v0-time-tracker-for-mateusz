@@ -1,5 +1,4 @@
 export * from './DayComposition'
-export * from './HoursPerWeekChart'
 export * from './MonthInsights'
 export * from './RecentEntries'
 export * from './TimeByProject'

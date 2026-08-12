@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import { fetchCurrentEurRate } from '@/lib/api/eurRate'
+import { getWorkEntriesWindowStart } from '@/lib/date/work-entries-window'
 import type { Client, Invoice, Project, WorkEntry } from '@/lib/types'
 import type { WorkEntriesFilter } from '@/lib/query/queryKeys'
 
@@ -32,9 +33,10 @@ export async function fetchWorkEntries(userId: string, filter?: WorkEntriesFilte
     .select('*')
     .eq('user_id', userId)
 
-  if (filter?.from) {
-    query = query.gte('date', filter.from)
-  }
+  // Bez jawnego `from` obowiązuje domyślne okno — takie samo jak po stronie
+  // serwera, inaczej refetch po hydracji podmieniłby dane na inny zbiór.
+  query = query.gte('date', filter?.from ?? getWorkEntriesWindowStart())
+
   if (filter?.to) {
     query = query.lte('date', filter.to)
   }

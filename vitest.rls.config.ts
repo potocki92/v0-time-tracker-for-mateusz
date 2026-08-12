@@ -19,7 +19,9 @@ export default defineConfig(({ mode }) => {
       env,
 
       // Testy RLS są osobnym suitem — nie mieszaj z unit testami
-      include: ['**/*.rls.test.ts', '**/rls/**/*.test.ts'],
+      // `__test__/rls.test.ts` nie pasował do `**/*.rls.test.ts` (wzorzec wymaga
+      // członu przed `.rls.`), więc suite RLS nigdy się nie uruchamiał.
+      include: ['**/rls.test.ts', '**/*.rls.test.ts', '**/rls/**/*.test.ts'],
 
       // Sekwencyjnie — unikamy race conditions przy tworzeniu fixtures
       pool:        'forks',
