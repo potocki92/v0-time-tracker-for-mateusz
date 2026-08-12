@@ -1,19 +1,22 @@
 import 'server-only'
+import { requireServerUser } from '@/lib/auth/server-user'
 import {
   fetchClientsServer,
-  fetchCurrentUserIdServer,
   fetchWorkEntriesForClientsServer,
 } from './clients.fetchers.server'
 import type { ClientsData } from '../_domain/clients.types'
 
 /**
  * Serwerowa wersja getClientsData — używana w page.tsx do prefetch przez HydrationBoundary.
+ *
+ * Zapytania nie czekają na `getUser()` (scoping robi RLS) — wszystko jedną falą.
  */
 export async function getClientsDataServer(): Promise<ClientsData> {
-  const userId = await fetchCurrentUserIdServer()
-  const [clients, workEntries] = await Promise.all([
-    fetchClientsServer(userId),
-    fetchWorkEntriesForClientsServer(userId),
+  const [, clients, workEntries] = await Promise.all([
+    requireServerUser(),
+    fetchClientsServer(),
+    fetchWorkEntriesForClientsServer(),
   ])
+
   return { clients, workEntries }
 }

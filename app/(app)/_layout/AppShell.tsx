@@ -1,0 +1,59 @@
+'use client'
+
+import { useCallback } from 'react'
+import dynamic from 'next/dynamic'
+import { useQueryClient } from '@tanstack/react-query'
+import type { User } from '@supabase/supabase-js'
+
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { performLogout } from '@/lib/auth/logout'
+import { AppSidebar } from './components/sidebar/AppSidebar'
+import { MobileHeader } from './components/sidebar/MobileHeader'
+import { BottomNav } from './components/bottom-nav'
+import { AuthWatcher } from './AuthWatcher'
+
+// Panel ustawień otwiera się dopiero z akcji użytkownika (useUiStore), a ciągnie
+// za sobą formularze + upload avatara. Bez dynamic() ładowałby się na każdej
+// stronie panelu.
+const SettingsDrawer = dynamic(
+  () => import('../settings/_components/SettingsDrawer').then((mod) => mod.SettingsDrawer),
+  { ssr: false },
+)
+
+interface AppShellProps {
+  user: User | null
+  badges?: Partial<Record<string, number>>
+  children: React.ReactNode
+}
+
+/**
+ * Interaktywna powłoka panelu. Autoryzację robi serwerowy layout — tutaj
+ * nie ma już żadnej bramki `loading`, więc treść strony trafia do HTML
+ * od razu, bez czekania na hydrację.
+ */
+export function AppShell({ user, badges, children }: AppShellProps) {
+  const queryClient = useQueryClient()
+
+  const logout = useCallback(async () => {
+    await performLogout(queryClient)
+  }, [queryClient])
+
+  return (
+    <SidebarProvider defaultOpen={true}>
+      <a href="#main-content" className="skip-link">
+        Przejdź do treści
+      </a>
+      <AppSidebar user={user} onLogout={logout} badges={badges} />
+      {/* SidebarInset: wypycha content gdy sidebar rozwinięty */}
+      <SidebarInset>
+        <MobileHeader user={user} onLogout={logout} />
+        <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+          {children}
+        </main>
+      </SidebarInset>
+      <SettingsDrawer />
+      <BottomNav />
+      <AuthWatcher />
+    </SidebarProvider>
+  )
+}

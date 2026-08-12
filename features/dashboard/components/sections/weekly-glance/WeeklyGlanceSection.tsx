@@ -2,7 +2,7 @@
 
 import { useDashboardData } from '../../../hooks'
 import { useEffectiveEurRate } from '../../../hooks/usePreferencesStore'
-import { EarningsChart } from '../../chart'
+import { EarningsChart } from '../../chart/EarningsChart'
 
 /**
  * Wykres aktywności (godziny × zarobki) z dwuwymiarową kontrolką

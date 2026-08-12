@@ -1,34 +1,22 @@
-'use client'
+import { redirect } from 'next/navigation'
 
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
-import { useAuth }    from './_layout/hooks/useAuth'
-import { useSidebarBadges } from './_layout/hooks/useSidebarBadges'
-import { AppSidebar } from './_layout/components/sidebar/AppSidebar'
-import { MobileHeader } from './_layout/components/sidebar/MobileHeader'
-import { BottomNav } from './_layout/components/bottom-nav'
-import { SettingsDrawer } from './settings/_components'
+import { getServerUser } from '@/lib/auth/server-user'
+import { AppShell } from './_layout/AppShell'
+import { fetchUnpaidInvoicesCount } from './_layout/services/sidebar-badges.server'
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, logout } = useAuth()
-  const badges = useSidebarBadges()
+// Server Component — shell renderuje się po stronie serwera, więc treść strony
+// trafia do HTML bez czekania na hydrację i na kliencki `auth.getUser()`.
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const [user, unpaidInvoices] = await Promise.all([
+    getServerUser(),
+    fetchUnpaidInvoicesCount(),
+  ])
 
-  if (loading) return null
+  if (!user) redirect('/auth/login')
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <a href="#main-content" className="skip-link">
-        Przejdź do treści
-      </a>
-      <AppSidebar user={user} onLogout={logout} badges={badges} />
-      {/* SidebarInset: wypycha content gdy sidebar rozwinięty */}
-      <SidebarInset>
-        <MobileHeader user={user} onLogout={logout} />
-        <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
-          {children}
-        </main>
-      </SidebarInset>
-      <SettingsDrawer />
-      <BottomNav />
-    </SidebarProvider>
+    <AppShell user={user} badges={{ '/invoices': unpaidInvoices }}>
+      {children}
+    </AppShell>
   )
 }

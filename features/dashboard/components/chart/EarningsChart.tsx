@@ -1,13 +1,22 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Client, WorkEntry } from '@/lib/types'
 import { useChartState } from './hooks/useChartState'
 import { useChartMetrics } from './hooks/useChartMetrics'
 import { ChartHeader } from './ChartHeader'
 import { ChartControls } from './ChartControls'
-import { ChartBars } from './ChartBars'
 import { ChartEmptyState } from './ChartEmptyState'
+
+// recharts to najcięższa zależność dashboardu i nie jest potrzebna do
+// pierwszego renderu — nagłówek i kontrolki wykresu pokazują się od razu,
+// same słupki doładowują się osobnym chunkiem.
+const ChartBars = dynamic(() => import('./ChartBars').then((mod) => mod.ChartBars), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[260px] w-full" />,
+})
 
 type Props = {
   workEntries: WorkEntry[]

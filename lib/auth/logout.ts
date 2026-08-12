@@ -16,7 +16,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import { createClient } from '@/lib/supabase/client'
-import { usePreferencesStore } from '@/app/(app)/dashboard/_hooks/usePreferencesStore'
+import { usePreferencesStore } from '@/features/dashboard/hooks/usePreferencesStore'
 import { useUiStore } from '@/hooks/stores/useUiStore'
 
 export const LOGIN_PATH = '/auth/login'

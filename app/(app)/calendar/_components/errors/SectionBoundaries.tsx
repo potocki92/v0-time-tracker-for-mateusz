@@ -1,6 +1,6 @@
-import { ErrorBoundary } from '@/app/(app)/dashboard/_components/errors/ErrorBoundary'
-import { QueryErrorBoundary } from '@/app/(app)/dashboard/_components/errors/QueryErrorBoundary'
-import type { SectionBoundaryProps } from '@/app/(app)/dashboard/_components/errors/ErrorBoundary.types'
+import { ErrorBoundary } from '@/features/dashboard/components/errors/ErrorBoundary'
+import { QueryErrorBoundary } from '@/features/dashboard/components/errors/QueryErrorBoundary'
+import type { SectionBoundaryProps } from '@/features/dashboard/components/errors/ErrorBoundary.types'
 
 /**
  * Convenience wrappers — gotowe granice dla każdej sekcji kalendarza.

@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutGrid, List } from 'lucide-react'
-import { useEffectiveEurRate } from '@/app/(app)/dashboard/_hooks/usePreferencesStore'
+import { useEffectiveEurRate } from '@/features/dashboard/hooks/usePreferencesStore'
 import { getDateString, isFutureDate } from '@/lib/helpers'
 import {
   useCalendarData,

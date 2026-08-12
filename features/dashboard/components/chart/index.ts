@@ -1,4 +1,3 @@
-export * from "./ChartBars"
 export * from "./ChartControls"
 export * from "./ChartEmptyState"
 export * from "./ChartHeader"

@@ -8,6 +8,7 @@ import {
   uploadInvoicePdfWithMeta,
 } from '@/services/invoices'
 import { createClient } from '@/lib/supabase/server'
+import { getServerUser } from '@/lib/auth/server-user'
 import type { Client, Invoice } from '@/lib/types'
 import { calculateEntryMoney, fallbackFromClient } from '@/lib/finance/entry-calculations'
 import { sum, toDb, zero } from '@/lib/finance/money'
@@ -122,13 +123,9 @@ function resolveMonthlyPeriod(issueDate: Date) {
 }
 
 async function fetchCurrentUserId() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
+  const user = await getServerUser()
 
-  if (error || !user) {
+  if (!user) {
     throw new Error('Brak autoryzacji użytkownika')
   }
 
@@ -255,18 +252,18 @@ const getInvoicesDataServerCached = cache(async (): Promise<InvoicesData> => {
   noStore()
 
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+
+  // Zapytania nie czekają na `getUser()` — scoping robi RLS (`auth.uid() = user_id`).
+  // Użytkownik jest potrzebny tylko po to, by odczytać ustawienia z `user_metadata`.
+  const [user, invoicesRes, clientsRes] = await Promise.all([
+    getServerUser(),
+    supabase.from('invoices').select('*').order('created_at', { ascending: false }),
+    supabase.from('clients').select('*').order('name', { ascending: true }),
+  ])
 
   if (!user) {
     return { invoices: [], clients: [], settings: DEFAULT_INVOICE_SETTINGS }
   }
-
-  const [invoicesRes, clientsRes] = await Promise.all([
-    supabase.from('invoices').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-    supabase.from('clients').select('*').eq('user_id', user.id).order('name', { ascending: true }),
-  ])
 
   if (invoicesRes.error) throw new Error(invoicesRes.error.message)
   if (clientsRes.error) throw new Error(clientsRes.error.message)
