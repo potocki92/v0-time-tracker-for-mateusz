@@ -14,6 +14,7 @@ import {
 import { formatCurrency } from '@/lib/helpers'
 import type { Invoice } from '@/lib/types'
 import { InvoiceStatus, deriveInvoiceStatus } from '@/lib/finance/invoice-status'
+import { sumInvoicesByCurrency } from '@/lib/finance/invoice-currency-totals'
 
 type Props = {
   invoices: Invoice[]
@@ -74,8 +75,7 @@ function shortDue(due: string | null | undefined): string {
 
 export function InvoicesCard({ invoices, periodShort }: Props) {
   const visible = invoices.slice(0, 5)
-  const totalBilled = invoices.reduce((sum, i) => sum + (i.amount ?? 0), 0)
-  const baseCurrency = visible[0]?.currency ?? 'EUR'
+  const totals = sumInvoicesByCurrency(invoices)
 
   return (
     <section
@@ -149,12 +149,23 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
         </ul>
       )}
 
-      <footer className="flex items-center justify-between border-t border-[#161616] px-4 py-3">
+      <footer className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-[#161616] px-4 py-3">
         <p className="text-xs text-zinc-500">
           Łącznie wystawione ·{' '}
-          <span className="font-semibold text-white">
-            {formatCurrency(totalBilled, baseCurrency)}
-          </span>
+          {totals.length === 0 ? (
+            <span className="font-semibold tabular-nums text-white">
+              {formatCurrency(0, 'PLN')}
+            </span>
+          ) : (
+            totals.map((t, index) => (
+              <span key={t.currency}>
+                {index > 0 && ' · '}
+                <span className="font-semibold tabular-nums text-white">
+                  {formatCurrency(t.total, t.currency)}
+                </span>
+              </span>
+            ))
+          )}
         </p>
         <Link
           href="/invoices?action=new"
