@@ -2,9 +2,15 @@ import { useMemo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import type { Invoice } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
+import { sumInvoicesByCurrency, type CurrencyTotal } from '@/lib/finance/invoice-currency-totals'
 
 interface InvoiceStatsProps {
   invoices: Invoice[]
+}
+
+function formatTotals(totals: CurrencyTotal[]): string {
+  if (totals.length === 0) return formatCurrency(0, 'PLN')
+  return totals.map((t) => formatCurrency(t.total, t.currency)).join(' · ')
 }
 
 export function InvoiceStats({ invoices }: InvoiceStatsProps) {
@@ -12,14 +18,11 @@ export function InvoiceStats({ invoices }: InvoiceStatsProps) {
     const unpaid = invoices.filter((invoice) => !invoice.is_paid)
     const paid = invoices.filter((invoice) => invoice.is_paid)
 
-    const unpaidAmount = unpaid.reduce((sum, invoice) => sum + Number(invoice.amount ?? 0), 0)
-    const paidAmount = paid.reduce((sum, invoice) => sum + Number(invoice.amount ?? 0), 0)
-
     return {
       total: invoices.length,
       unpaidCount: unpaid.length,
-      unpaidAmount,
-      paidAmount,
+      unpaidTotals: sumInvoicesByCurrency(unpaid),
+      paidTotals: sumInvoicesByCurrency(paid),
     }
   }, [invoices])
 
@@ -40,13 +43,13 @@ export function InvoiceStats({ invoices }: InvoiceStatsProps) {
       <Card>
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground">Kwota nieopłacona</p>
-          <p className="text-xl font-semibold mt-1">{formatCurrency(stats.unpaidAmount, 'PLN')}</p>
+          <p className="text-xl font-semibold mt-1">{formatTotals(stats.unpaidTotals)}</p>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground">Kwota opłacona</p>
-          <p className="text-xl font-semibold mt-1 text-emerald-600">{formatCurrency(stats.paidAmount, 'PLN')}</p>
+          <p className="text-xl font-semibold mt-1 text-emerald-600">{formatTotals(stats.paidTotals)}</p>
         </CardContent>
       </Card>
     </div>
