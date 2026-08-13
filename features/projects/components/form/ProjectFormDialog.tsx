@@ -115,7 +115,7 @@ export function ProjectFormDialog({
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label>Klient</Label>
               <Select
@@ -160,7 +160,7 @@ export function ProjectFormDialog({
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="grid gap-2">
               <Label>Typ budżetu</Label>
               <Select
@@ -218,7 +218,7 @@ export function ProjectFormDialog({
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="project-target">Docelowa ilość (opcjonalnie)</Label>
               <Input
@@ -254,7 +254,7 @@ export function ProjectFormDialog({
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="project-start">Data startu</Label>
               <Input
@@ -276,7 +276,7 @@ export function ProjectFormDialog({
             </div>
           </div>
 
-          <div className="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <div className="mt-2 flex flex-col-reverse gap-2 md:flex-row md:justify-end">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Anuluj
             </Button>
