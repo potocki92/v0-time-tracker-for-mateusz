@@ -44,7 +44,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${project.color}99, transparent)` }}
+        style={{ background: `linear-gradient(90deg, transparent, ${accent}99, transparent)` }}
       />
 
       <header className={cn('flex items-start justify-between gap-3 border-b px-4 py-3 sm:px-5', LINEAR.borderInset)}>

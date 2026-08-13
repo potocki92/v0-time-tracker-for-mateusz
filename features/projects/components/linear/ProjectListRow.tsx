@@ -1,18 +1,8 @@
 'use client'
 
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { formatCurrency } from '@/lib/helpers'
-import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import {
   PROJECT_PRIORITY_PILL,
@@ -25,8 +15,6 @@ import { LINEAR } from './linear.tokens'
 type ProjectListRowProps = {
   row: ProjectListRowType
   onSelect?: () => void
-  onEdit?: (project: Project) => void
-  onDelete?: (project: Project) => void
 }
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24
@@ -61,7 +49,7 @@ function formatDeadline(
   return { text: formatDate(date), urgent: false }
 }
 
-export function ProjectListRow({ row, onSelect, onEdit, onDelete }: ProjectListRowProps) {
+export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
   const {
     project,
     clientName,
@@ -74,7 +62,6 @@ export function ProjectListRow({ row, onSelect, onEdit, onDelete }: ProjectListR
     isAtRisk,
   } = row
   const statusPill = PROJECT_STATUS_PILL[project.status]
-  const hasActions = Boolean(onEdit || onDelete)
   const isActive = project.status === 'in_progress'
   const isDone = project.status === 'completed'
   const accent = progressAccentOf(project.status, isAtRisk, budgetUtilization)
@@ -107,15 +94,14 @@ export function ProjectListRow({ row, onSelect, onEdit, onDelete }: ProjectListR
         onSelect && 'pointer-events-none',
       )}
     >
-      {/* Szyna tożsamości projektu — jedyne miejsce, gdzie żyje project.color. */}
+      {/* Szyna stanu. Wcześniej brała losowany project.color — osiem różnych
+          barw w kolumnie czytało się jak dekoracja, nie jak informacja. */}
       <span
         aria-hidden
-        className="absolute inset-y-0 left-0 w-1"
-        style={{
-          backgroundColor: project.color,
-          opacity: isDone ? 0.45 : 1,
-          boxShadow: isActive ? `0 0 10px ${project.color}66` : undefined,
-        }}
+        className={cn(
+          'absolute inset-y-0 left-0 w-1',
+          isActive ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.45)]' : LINEAR.rail,
+        )}
       />
 
       {onSelect && (
@@ -160,38 +146,6 @@ export function ProjectListRow({ row, onSelect, onEdit, onDelete }: ProjectListR
             >
               {PROJECT_PRIORITY_PILL.high.label}
             </span>
-          )}
-          {hasActions && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="pointer-events-auto relative z-10 h-8 w-8 text-zinc-400 opacity-70 transition hover:bg-[#212126] hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
-                  aria-label={`Akcje projektu ${project.name}`}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[10rem]">
-                {onEdit && (
-                  <DropdownMenuItem onClick={() => onEdit(project)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edytuj
-                  </DropdownMenuItem>
-                )}
-                {onEdit && onDelete && <DropdownMenuSeparator />}
-                {onDelete && (
-                  <DropdownMenuItem
-                    onClick={() => onDelete(project)}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Usuń
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
           )}
         </div>
       </div>

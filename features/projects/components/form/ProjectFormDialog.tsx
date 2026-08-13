@@ -1,14 +1,21 @@
 'use client'
 
+import { useIsMobile } from '@/hooks/use-mobile'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -45,6 +52,16 @@ type Props = {
   onSubmit: () => void
 }
 
+const TITLE_DESCRIPTION = 'Uzupełnij podstawowe dane, budżet oraz terminy realizacji.'
+
+/**
+ * Formularz otwiera się nad panelem szczegółów projektu (drawer w drawerze),
+ * więc obie warstwy dostają z-index ponad Sheetem (z-50) i własny, wyraźnie
+ * przyciemniony overlay — inaczej druga warstwa zlewałaby się z pierwszą.
+ */
+const STACKED_LAYER = 'z-[60]'
+const STACKED_OVERLAY = 'z-[60] bg-black/60 backdrop-blur-sm'
+
 export function ProjectFormDialog({
   open,
   isSaving,
@@ -55,16 +72,10 @@ export function ProjectFormDialog({
   onChange,
   onSubmit,
 }: Props) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{editing ? 'Edytuj projekt' : 'Nowy projekt'}</DialogTitle>
-          <DialogDescription>
-            Uzupełnij podstawowe dane, budżet oraz terminy realizacji.
-          </DialogDescription>
-        </DialogHeader>
+  const isMobile = useIsMobile()
+  const title = editing ? 'Edytuj projekt' : 'Nowy projekt'
 
+  const form = (
         <form
           className="grid gap-4 py-1"
           onSubmit={(event) => {
@@ -265,15 +276,46 @@ export function ProjectFormDialog({
             </div>
           </div>
 
-          <DialogFooter className="mt-2 gap-2 sm:gap-2">
+          <div className="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Anuluj
             </Button>
             <Button type="submit" disabled={isSaving}>
               {isSaving ? 'Zapisywanie...' : editing ? 'Zapisz zmiany' : 'Dodaj projekt'}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
+  )
+
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent
+          side="bottom"
+          className={`${STACKED_LAYER} max-h-[92dvh] gap-0 overflow-y-auto rounded-t-2xl px-4 pb-[max(env(safe-area-inset-bottom),1rem)] pt-4`}
+          overlayClassName={STACKED_OVERLAY}
+        >
+          <SheetHeader className="p-0 pb-4">
+            <SheetTitle>{title}</SheetTitle>
+            <SheetDescription>{TITLE_DESCRIPTION}</SheetDescription>
+          </SheetHeader>
+          {form}
+        </SheetContent>
+      </Sheet>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className={`${STACKED_LAYER} max-h-[92vh] overflow-y-auto sm:max-w-2xl`}
+        overlayClassName={STACKED_OVERLAY}
+      >
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{TITLE_DESCRIPTION}</DialogDescription>
+        </DialogHeader>
+        {form}
       </DialogContent>
     </Dialog>
   )

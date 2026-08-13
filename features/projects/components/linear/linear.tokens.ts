@@ -12,6 +12,8 @@ export const LINEAR = {
   surfaceHover: 'hover:bg-[#17171a]',
   rowSurface: 'bg-[#151519]',
   track: 'bg-[#26262c]',
+  /** Szyna przy krawędzi karty — neutralna, akcent zarezerwowany dla aktywnych. */
+  rail: 'bg-[#44444f]',
   border: 'border-[#2a2a30]',
   borderInset: 'border-[#212126]',
   divider: 'divide-[#212126]',

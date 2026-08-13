@@ -22,7 +22,12 @@ type Props = {
 export function ProjectDeleteDialog({ project, isDeleting, onCancel, onConfirm }: Props) {
   return (
     <Dialog open={!!project} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="sm:max-w-md">
+      {/* Potwierdzenie wychodzi z panelu szczegółów, więc musi stanąć nad
+          Sheetem (z-50) razem z własnym, przyciemnionym overlayem. */}
+      <DialogContent
+        className="z-[60] sm:max-w-md"
+        overlayClassName="z-[60] bg-black/60 backdrop-blur-sm"
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
