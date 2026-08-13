@@ -540,6 +540,20 @@
     border-radius: var(--radius-sm, 0.25rem);
   }
 
+  /* iOS Safari nadaje input[type="date"] szerokość natywnej kontrolki i ignoruje
+   * width:100%, przez co pole wystaje poza siatkę formularza (i wymusza poziome
+   * przewijanie). appearance:none + max-width trzymają je w komórce. */
+  input[type='date'] {
+    -webkit-appearance: none;
+    appearance: none;
+    max-width: 100%;
+  }
+  input[type='date']::-webkit-date-and-time-value {
+    text-align: start;
+    min-width: 0;
+    margin: 0;
+  }
+
   /* Windows High Contrast Mode — użyj systemowych kolorów zamiast oklch. */
   @media (forced-colors: active) {
     :where(a, button, [role='button'], [role='tab'], [role='menuitem']):focus-visible {
