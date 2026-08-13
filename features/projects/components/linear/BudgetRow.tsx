@@ -3,10 +3,10 @@
 import { formatCurrency } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
 import { BUDGET_OVERSPEND_THRESHOLD, BUDGET_WARNING_THRESHOLD } from '../../types/projects.constants'
+import { LINEAR } from './linear.tokens'
 
 type BudgetRowProps = {
   projectName: string
-  projectColor: string
   budget: number
   spent: number
   utilization: number
@@ -15,7 +15,6 @@ type BudgetRowProps = {
 
 export function BudgetRow({
   projectName,
-  projectColor,
   budget,
   spent,
   utilization,
@@ -30,11 +29,7 @@ export function BudgetRow({
 
   return (
     <li className="flex items-center gap-3 px-4 py-3 sm:px-5">
-      <span
-        aria-hidden
-        className="h-8 w-1 shrink-0 rounded-full"
-        style={{ backgroundColor: projectColor, boxShadow: `0 0 8px ${projectColor}55` }}
-      />
+      <span aria-hidden className={cn('h-8 w-1 shrink-0 rounded-full', LINEAR.rail)} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[13px] font-medium text-white">{projectName}</p>
         <p className="mt-0.5 text-[11.5px] text-zinc-400">

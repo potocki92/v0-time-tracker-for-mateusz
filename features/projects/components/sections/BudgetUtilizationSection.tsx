@@ -72,7 +72,6 @@ export function BudgetUtilizationSection() {
           <BudgetRow
             key={row.projectId}
             projectName={row.projectName}
-            projectColor={row.projectColor}
             budget={row.budget}
             spent={row.spent}
             utilization={row.utilization}

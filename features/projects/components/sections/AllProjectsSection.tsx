@@ -143,8 +143,6 @@ export function AllProjectsSection({
                 <ProjectListRow
                   row={row}
                   onSelect={() => setSelectedProjectId(row.project.id)}
-                  onEdit={onEditProject}
-                  onDelete={onDeleteProject}
                 />
               </Fragment>
             )
@@ -172,16 +170,13 @@ export function AllProjectsSection({
           </SheetHeader>
           {selectedRow && (
             <div className="px-2 pb-[max(env(safe-area-inset-bottom),1rem)] pt-2">
+              {/* Panel zostaje otwarty pod spodem — formularz i potwierdzenie
+                  usunięcia wychodzą jako druga warstwa nad nim. Po usunięciu
+                  projekt wypada z `rows`, więc panel zamyka się sam. */}
               <ProjectDetailsPanel
                 row={selectedRow}
-                onEdit={() => {
-                  setSelectedProjectId(null)
-                  onEditProject?.(selectedRow.project)
-                }}
-                onDelete={() => {
-                  setSelectedProjectId(null)
-                  onDeleteProject?.(selectedRow.project)
-                }}
+                onEdit={() => onEditProject?.(selectedRow.project)}
+                onDelete={() => onDeleteProject?.(selectedRow.project)}
               />
             </div>
           )}
