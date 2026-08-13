@@ -18,6 +18,7 @@ import type { ProjectListRow as ProjectListRowType } from '../../types/projects.
 
 type ProjectListRowProps = {
   row: ProjectListRowType
+  onSelect?: () => void
   onEdit?: (project: Project) => void
   onDelete?: (project: Project) => void
 }
@@ -36,7 +37,7 @@ function clientInitials(name: string): string {
   return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
 }
 
-export function ProjectListRow({ row, onEdit, onDelete }: ProjectListRowProps) {
+export function ProjectListRow({ row, onSelect, onEdit, onDelete }: ProjectListRowProps) {
   const {
     project,
     clientName,
@@ -55,10 +56,22 @@ export function ProjectListRow({ row, onEdit, onDelete }: ProjectListRowProps) {
   return (
     <li
       className={cn(
-        'group rounded-xl border bg-[#0c0c0c] p-3.5 transition hover:border-zinc-700/60',
+        'group relative rounded-xl border bg-[#0c0c0c] p-3.5 transition hover:border-zinc-700/60',
         'border-[#161616]',
+        // Kliknięcie w kartę obsługuje nakładka poniżej — treść musi być
+        // przezroczysta dla kursora, żeby nie przechwytywała kliknięć.
+        onSelect && 'pointer-events-none',
       )}
     >
+      {onSelect && (
+        <button
+          type="button"
+          onClick={onSelect}
+          aria-label={`Szczegóły projektu ${project.name}`}
+          className="pointer-events-auto absolute inset-0 rounded-xl focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-600"
+        />
+      )}
+
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13.5px] font-semibold text-white">{project.name}</p>
@@ -89,7 +102,7 @@ export function ProjectListRow({ row, onEdit, onDelete }: ProjectListRowProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 text-zinc-400 opacity-60 transition hover:bg-[#161616] hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
+                  className="pointer-events-auto relative z-10 h-7 w-7 text-zinc-400 opacity-60 transition hover:bg-[#161616] hover:text-white group-hover:opacity-100 focus-visible:opacity-100"
                   aria-label={`Akcje projektu ${project.name}`}
                 >
                   <MoreHorizontal className="h-4 w-4" />
