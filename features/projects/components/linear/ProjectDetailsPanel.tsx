@@ -1,6 +1,7 @@
 'use client'
 
 import { Pencil, Trash2 } from 'lucide-react'
+import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatCurrency } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
@@ -8,6 +9,7 @@ import {
   PROJECT_BUDGET_LABELS,
   PROJECT_PRIORITY_PILL,
   PROJECT_STATUS_PILL,
+  progressAccentOf,
 } from '../../types/projects.constants'
 import type { ProjectListRow as ProjectListRowType } from '../../types/projects.types'
 import { LINEAR } from './linear.tokens'
@@ -25,13 +27,6 @@ function formatDate(date: string | null): string {
   return d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
-function clientInitials(name: string): string {
-  const parts = name.split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return '?'
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
-}
-
 export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPanelProps) {
   const {
     project,
@@ -46,6 +41,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
   } = row
   const statusPill = PROJECT_STATUS_PILL[project.status]
   const priorityPill = PROJECT_PRIORITY_PILL[project.priority]
+  const accent = progressAccentOf(project.status, isAtRisk, budgetUtilization)
 
   return (
     <section className={cn('rounded-2xl border p-4 sm:p-5', LINEAR.border, LINEAR.surface)}>
@@ -74,29 +70,29 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       <div className="mt-2">
         <h3 className="text-[20px] font-semibold text-white">{project.name}</h3>
         {project.description && (
-          <p className="mt-0.5 text-[11.5px] text-zinc-500">{project.description}</p>
+          <p className="mt-0.5 text-[12px] text-zinc-400">{project.description}</p>
         )}
       </div>
 
       <div className="mt-4 space-y-1.5">
-        <div className="flex items-center justify-between text-[11px] text-zinc-500">
+        <div className="flex items-center justify-between text-[11px] text-zinc-400">
           <span>Postęp</span>
-          <span className="tabular-nums text-zinc-300">{Math.round(progressPct)}%</span>
+          <span className="tabular-nums text-zinc-200">{Math.round(progressPct)}%</span>
         </div>
-        <div className="h-1 w-full overflow-hidden rounded-full bg-[#161616]">
+        <div className={cn('h-1.5 w-full overflow-hidden rounded-full', LINEAR.track)}>
           <div
             className="h-full rounded-full"
             style={{
               width: `${Math.max(0, Math.min(100, progressPct))}%`,
-              backgroundColor: project.color,
+              backgroundColor: accent,
             }}
             aria-hidden
           />
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
-        <Avatar className="h-7 w-7 border border-[#1a1a1a]">
+      <div className={cn('mt-4 flex items-center gap-2 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
+        <Avatar className={cn('h-7 w-7 border', LINEAR.border)}>
           <AvatarFallback
             className="text-[11px] font-semibold text-white"
             style={{ backgroundColor: clientColor }}
@@ -105,7 +101,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
             KLIENT
           </p>
           <p className="truncate text-[13px] font-medium text-zinc-100">{clientName}</p>
@@ -119,8 +115,8 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
         <DetailField label="GODZINY" value={`${Math.round(hoursLogged)}h`} />
       </dl>
 
-      <div className="mt-4 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
-        <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+      <div className={cn('mt-4 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
+        <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
           BUDŻET
         </p>
         <div className="mt-2 space-y-1.5 text-[12.5px]">
@@ -139,8 +135,8 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       </div>
 
       {project.address && (
-        <div className="mt-3 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
-          <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <div className={cn('mt-3 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
             ADRES
           </p>
           <p className="mt-1.5 text-[13px] font-medium text-zinc-100">{project.address}</p>
@@ -164,7 +160,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       <button
         type="button"
         onClick={onDelete}
-        className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-transparent text-[12px] font-medium text-zinc-500 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+        className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-transparent text-[12px] font-medium text-zinc-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden />
         Usuń projekt
@@ -183,8 +179,8 @@ function DetailField({
   danger?: boolean
 }) {
   return (
-    <div className="rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+    <div className={cn('rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
         {label}
       </p>
       <p
@@ -212,7 +208,7 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-zinc-500">{label}</span>
+      <span className="text-zinc-400">{label}</span>
       <span
         className={cn(
           'tabular-nums text-zinc-200',

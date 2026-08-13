@@ -2,11 +2,16 @@
 
 import type { ReactNode } from 'react'
 import { Pencil, Pin } from 'lucide-react'
+import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatCurrency } from '@/lib/helpers'
 import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { PROJECT_PRIORITY_PILL, PROJECT_STATUS_PILL } from '../../types/projects.constants'
+import {
+  PROJECT_PRIORITY_PILL,
+  PROJECT_STATUS_PILL,
+  progressAccentOf,
+} from '../../types/projects.constants'
 import type { FeaturedProject } from '../../types/projects.types'
 import { LINEAR } from './linear.tokens'
 
@@ -19,20 +24,14 @@ function formatStartedAt(date: string | null): string {
   if (!date) return ''
   const d = new Date(date)
   if (Number.isNaN(d.getTime())) return ''
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
-function clientInitials(name: string): string {
-  const parts = name.split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return '?'
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+  return d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardProps) {
-  const { project, clientName, progressPct, hoursLogged, hoursTarget, budget, budgetSpent, tasksDone, tasksTotal, isAtRisk } = featured
+  const { project, clientName, progressPct, hoursLogged, hoursTarget, budget, budgetSpent, budgetUtilization, tasksDone, tasksTotal, isAtRisk } = featured
   const statusPill = PROJECT_STATUS_PILL[project.status]
-  const priorityPill = PROJECT_PRIORITY_PILL[project.priority]
+  const accent = progressAccentOf(project.status, isAtRisk, budgetUtilization)
+  const isOverHours = hoursTarget !== null && hoursLogged > hoursTarget
 
   return (
     <section
@@ -48,16 +47,16 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
         style={{ background: `linear-gradient(90deg, transparent, ${project.color}99, transparent)` }}
       />
 
-      <header className="flex items-start justify-between gap-3 border-b border-[#161616] px-4 py-3 sm:px-5">
-        <div className="flex items-center gap-2">
+      <header className={cn('flex items-start justify-between gap-3 border-b px-4 py-3 sm:px-5', LINEAR.borderInset)}>
+        <div className="flex flex-wrap items-center gap-2">
           <span
             className={cn(
               'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
-              'bg-[#101010] text-zinc-200 ring-1 ring-[#1a1a1a]',
+              'bg-[#17171a] text-zinc-200 ring-1 ring-[#2a2a30]',
             )}
           >
             <Pin className="h-3 w-3" aria-hidden />
-            Featured
+            Wyróżniony
           </span>
           <span
             className={cn(
@@ -67,14 +66,16 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
           >
             {statusPill.label}
           </span>
-          <span
-            className={cn(
-              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
-              priorityPill.className,
-            )}
-          >
-            {priorityPill.label}
-          </span>
+          {project.priority === 'high' && (
+            <span
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                PROJECT_PRIORITY_PILL.high.className,
+              )}
+            >
+              {PROJECT_PRIORITY_PILL.high.label}
+            </span>
+          )}
         </div>
 
         {onEdit && (
@@ -99,20 +100,20 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
           <h2 className="text-lg font-semibold tracking-tight text-white sm:text-xl">
             {project.name}
           </h2>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-zinc-400">
             {clientName}
-            {project.start_date && ` · Started ${formatStartedAt(project.start_date)}`}
+            {project.start_date && ` · Start ${formatStartedAt(project.start_date)}`}
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Metric label="Progress" value={`${Math.round(progressPct)}%`}>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#161616]">
+          <Metric label="Postęp" value={`${Math.round(progressPct)}%`}>
+            <div className={cn('mt-2 h-1.5 w-full overflow-hidden rounded-full', LINEAR.track)}>
               <div
                 className="h-full rounded-full"
                 style={{
                   width: `${Math.max(0, Math.min(100, progressPct))}%`,
-                  backgroundColor: project.color,
+                  backgroundColor: accent,
                 }}
                 aria-hidden
               />
@@ -120,25 +121,30 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
           </Metric>
 
           <Metric
-            label="Hours"
+            label="Godziny"
             value={hoursTarget ? `${Math.round(hoursLogged)} / ${hoursTarget}` : `${Math.round(hoursLogged)}`}
+            meta={isOverHours ? 'Ponad plan' : undefined}
+            warning={isOverHours}
           />
 
           <Metric
-            label="Budget used"
+            label="Wykorzystany budżet"
             value={budget > 0 ? formatCurrency(budgetSpent, 'PLN') : '—'}
-            meta={budget > 0 ? `of ${formatCurrency(budget, 'PLN')}` : undefined}
-            danger={isAtRisk}
+            meta={budget > 0 ? `z ${formatCurrency(budget, 'PLN')}` : 'Brak budżetu'}
+            danger={budget > 0 && isAtRisk}
+            empty={budget <= 0}
           />
 
           <Metric
-            label="Tasks"
+            label="Zadania"
             value={tasksTotal > 0 ? `${tasksDone} / ${tasksTotal}` : '—'}
+            meta={tasksTotal > 0 ? undefined : 'Brak zadań'}
+            empty={tasksTotal <= 0}
           />
         </div>
 
-        <div className="flex items-center gap-2 border-t border-[#161616] pt-3">
-          <Avatar className="h-7 w-7 border border-[#1a1a1a]">
+        <div className={cn('flex items-center gap-2 border-t pt-3', LINEAR.borderInset)}>
+          <Avatar className={cn('h-7 w-7 border', LINEAR.border)}>
             <AvatarFallback
               className="text-[11px] font-semibold text-white"
               style={{ backgroundColor: project.color }}
@@ -149,7 +155,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
           <div className="min-w-0 flex-1">
             <p className="truncate text-[12.5px] font-medium text-white">{clientName}</p>
             {project.description && (
-              <p className="truncate text-[11px] text-zinc-500">{project.description}</p>
+              <p className="truncate text-[11.5px] text-zinc-400">{project.description}</p>
             )}
           </div>
         </div>
@@ -163,28 +169,40 @@ function Metric({
   value,
   meta,
   danger,
+  warning,
+  empty,
   children,
 }: {
   label: string
   value: string
   meta?: string
   danger?: boolean
+  /** Przekroczony cel — informacja, nie błąd. */
+  warning?: boolean
+  /** Brak danych: wygaszamy wartość, żeby „—” czytało się jako pusty stan, a nie awaria. */
+  empty?: boolean
   children?: ReactNode
 }) {
   return (
-    <div className="rounded-lg border border-[#161616] bg-[#0c0c0c] px-3 py-2.5">
+    <div className={cn('rounded-lg border px-3 py-2.5', LINEAR.borderInset, LINEAR.rowSurface)}>
       <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
         {label}
       </p>
       <p
         className={cn(
           'mt-0.5 text-base font-semibold tabular-nums tracking-tight text-white sm:text-lg',
+          empty && 'text-zinc-600',
+          warning && 'text-amber-300',
           danger && 'text-rose-300',
         )}
       >
         {value}
       </p>
-      {meta && <p className="mt-0.5 text-[11px] text-zinc-500">{meta}</p>}
+      {meta && (
+        <p className={cn('mt-0.5 text-[11px] text-zinc-400', warning && 'text-amber-300/80')}>
+          {meta}
+        </p>
+      )}
       {children}
     </div>
   )
