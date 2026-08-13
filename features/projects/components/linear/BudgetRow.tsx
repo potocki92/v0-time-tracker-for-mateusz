@@ -37,8 +37,8 @@ export function BudgetRow({
       />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[13px] font-medium text-white">{projectName}</p>
-        <p className="mt-0.5 text-[11px] text-zinc-500">
-          {Math.round(hours)}h logged · {formatCurrency(spent, 'PLN')} spent
+        <p className="mt-0.5 text-[11.5px] text-zinc-400">
+          {Math.round(hours)} h · {formatCurrency(spent, 'PLN')} wydane
         </p>
       </div>
       <div className="shrink-0 text-right">

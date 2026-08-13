@@ -10,6 +10,7 @@ import { useBudgetUtilization } from '../../hooks/useBudgetUtilization'
 import { useProjectsData } from '../../hooks/useProjectsData'
 import { BudgetRow } from '../linear/BudgetRow'
 import { LinearCard } from '../linear/LinearCard'
+import { LINEAR } from '../linear/linear.tokens'
 
 export function BudgetUtilizationSection() {
   const { data } = useProjectsData()
@@ -27,27 +28,30 @@ export function BudgetUtilizationSection() {
 
   return (
     <LinearCard
-      eyebrow="Total budget"
+      eyebrow="Budżet portfela"
       badge={
         <span
           className={cn(
-            'rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[11px] font-medium tabular-nums',
+            'rounded-md border px-2 py-0.5 text-[11px] font-medium tabular-nums',
+            LINEAR.border,
+            LINEAR.surfaceElevated,
             tone,
           )}
         >
-          {utilizationPct}% used
+          {utilizationPct}% wykorzystania
         </span>
       }
     >
-      <div className="border-b border-[#161616] px-4 py-4 sm:px-5">
+      <div className={cn('border-b px-4 py-4 sm:px-5', LINEAR.borderInset)}>
         <p className="text-2xl font-semibold tabular-nums tracking-tight text-white sm:text-3xl">
           {formatCurrency(utilisation.totalSpent, 'PLN')}
         </p>
-        <p className="mt-1 text-xs text-zinc-500">
-          of {formatCurrency(utilisation.totalBudget, 'PLN')} contracted ·{' '}
-          {utilisation.contractedCount} project{utilisation.contractedCount === 1 ? '' : 's'}
+        <p className="mt-1 text-xs text-zinc-400">
+          z {formatCurrency(utilisation.totalBudget, 'PLN')} w umowach ·{' '}
+          {utilisation.contractedCount}{' '}
+          {utilisation.contractedCount === 1 ? 'projekt' : 'projektów'}
         </p>
-        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#161616]">
+        <div className={cn('mt-3 h-1.5 w-full overflow-hidden rounded-full', LINEAR.track)}>
           <div
             className={cn(
               'h-full rounded-full',
@@ -63,7 +67,7 @@ export function BudgetUtilizationSection() {
         </div>
       </div>
 
-      <ul role="list" className="divide-y divide-[#161616]">
+      <ul role="list" className={cn('divide-y', LINEAR.divider)}>
         {utilisation.rows.slice(0, 5).map((row) => (
           <BudgetRow
             key={row.projectId}

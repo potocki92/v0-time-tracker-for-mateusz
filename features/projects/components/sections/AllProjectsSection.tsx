@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Search, X } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import { PROJECT_STATUS_FILTER_OPTIONS } from '../../types/projects.constants'
+import {
+  PROJECT_STATUS_FILTER_OPTIONS,
+  PROJECT_STATUS_GROUP_LABELS,
+} from '../../types/projects.constants'
 import { useProjectsData } from '../../hooks/useProjectsData'
 import { useProjectsFilters } from '../../hooks/useProjectsFilters'
 import { LinearCard } from '../linear/LinearCard'
@@ -31,11 +34,25 @@ export function AllProjectsSection({
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const selectedRow = rows.find((row) => row.project.id === selectedProjectId) ?? null
 
+  // Wiersze przychodzą już posortowane statusami (STATUS_ORDER w selektorze),
+  // więc grupy wykrywamy zwykłą zmianą statusu względem poprzedniego wiersza.
+  const countsByStatus = rows.reduce<Record<string, number>>((acc, row) => {
+    acc[row.project.status] = (acc[row.project.status] ?? 0) + 1
+    return acc
+  }, {})
+  const showGroups = Object.keys(countsByStatus).length > 1
+
   return (
     <LinearCard
       eyebrow="Wszystkie projekty"
       badge={
-        <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[11px] text-zinc-300">
+        <span
+          className={cn(
+            'rounded-md border px-2 py-0.5 text-[11px] text-zinc-300',
+            LINEAR.border,
+            LINEAR.surfaceElevated,
+          )}
+        >
           {rows.length} z {totalRows}
         </span>
       }
@@ -44,7 +61,7 @@ export function AllProjectsSection({
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-400 transition hover:bg-[#141414] hover:text-white"
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:bg-[#212126] hover:text-white"
           >
             <X className="h-3 w-3" aria-hidden />
             Reset
@@ -62,10 +79,14 @@ export function AllProjectsSection({
                 type="button"
                 onClick={() => setStatus(option.value)}
                 className={cn(
-                  'rounded-full px-3 py-1 text-[11px] font-medium transition',
+                  'inline-flex min-h-9 items-center rounded-full px-3.5 text-[12px] font-medium transition',
                   isActive
                     ? 'bg-white text-black'
-                    : 'border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 hover:border-zinc-700 hover:text-white',
+                    : cn(
+                        'border text-zinc-300 hover:border-zinc-600 hover:text-white',
+                        LINEAR.border,
+                        LINEAR.surfaceElevated,
+                      ),
                 )}
                 aria-pressed={isActive}
               >
@@ -77,7 +98,7 @@ export function AllProjectsSection({
 
         <div className="relative">
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
             aria-hidden
           />
           <input
@@ -86,19 +107,20 @@ export function AllProjectsSection({
             placeholder="Szukaj projektu, klienta, opisu..."
             aria-label="Szukaj projektów"
             className={cn(
-              'h-9 w-full rounded-lg border bg-[#0c0c0c] px-9 text-[13px] text-white placeholder:text-zinc-600',
+              'h-11 w-full rounded-lg border px-10 text-sm text-white placeholder:text-zinc-500',
               LINEAR.border,
-              'focus:border-zinc-600 focus:outline-none',
+              LINEAR.surfaceElevated,
+              'focus:border-zinc-500 focus:outline-none',
             )}
           />
           {search && (
             <button
               type="button"
               onClick={() => setSearch('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-500 transition hover:bg-[#141414] hover:text-white"
+              className="absolute right-1.5 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-zinc-400 transition hover:bg-[#212126] hover:text-white"
               aria-label="Wyczyść wyszukiwanie"
             >
-              <X className="h-3 w-3" aria-hidden />
+              <X className="h-4 w-4" aria-hidden />
             </button>
           )}
         </div>
@@ -110,15 +132,23 @@ export function AllProjectsSection({
         </div>
       ) : (
         <ul role="list" className="space-y-2 px-4 pb-4 sm:px-5">
-          {rows.map((row) => (
-            <ProjectListRow
-              key={row.project.id}
-              row={row}
-              onSelect={() => setSelectedProjectId(row.project.id)}
-              onEdit={onEditProject}
-              onDelete={onDeleteProject}
-            />
-          ))}
+          {rows.map((row, index) => {
+            const status = row.project.status
+            const startsGroup = showGroups && rows[index - 1]?.project.status !== status
+            return (
+              <Fragment key={row.project.id}>
+                {startsGroup && (
+                  <GroupHeading label={PROJECT_STATUS_GROUP_LABELS[status]} count={countsByStatus[status]} />
+                )}
+                <ProjectListRow
+                  row={row}
+                  onSelect={() => setSelectedProjectId(row.project.id)}
+                  onEdit={onEditProject}
+                  onDelete={onDeleteProject}
+                />
+              </Fragment>
+            )
+          })}
         </ul>
       )}
 
@@ -131,7 +161,11 @@ export function AllProjectsSection({
       >
         <SheetContent
           side="bottom"
-          className="max-h-[90dvh] overflow-y-auto rounded-t-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-0"
+          className={cn(
+            'max-h-[90dvh] overflow-y-auto rounded-t-2xl border p-0',
+            LINEAR.border,
+            LINEAR.surface,
+          )}
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Szczegóły projektu</SheetTitle>
@@ -154,5 +188,19 @@ export function AllProjectsSection({
         </SheetContent>
       </Sheet>
     </LinearCard>
+  )
+}
+
+/**
+ * Separator grupy statusów wewnątrz listy. Bez niego 1 aktywny projekt ginie
+ * w stosie 6 zakończonych, bo wszystkie wiersze wyglądają tak samo.
+ */
+function GroupHeading({ label, count }: { label: string; count: number }) {
+  return (
+    <li className="flex items-center gap-2 pb-0.5 pt-3 first:pt-0">
+      <p className={LINEAR.eyebrow}>{label}</p>
+      <span className="text-[10px] font-semibold tabular-nums text-zinc-500">{count}</span>
+      <span aria-hidden className={cn('h-px flex-1 border-t', LINEAR.borderInset)} />
+    </li>
   )
 }

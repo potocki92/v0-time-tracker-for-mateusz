@@ -13,33 +13,33 @@ export function KpiSection() {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <KpiTile
-        label="All projects"
+        label="Wszystkie"
         value={String(kpis.total)}
         icon={FolderKanban}
-        meta={`${kpis.planned} planned`}
+        meta={`${kpis.planned} zaplanowanych`}
         accent="blue"
       />
       <KpiTile
-        label="In progress"
+        label="W trakcie"
         value={String(kpis.active)}
         icon={ListChecks}
-        meta={`${kpis.activeShare}% of all · ${kpis.onHold} on hold`}
+        meta={`${kpis.activeShare}% całości · ${kpis.onHold} wstrzymanych`}
         progress={kpis.activeShare}
         accent="emerald"
       />
       <KpiTile
-        label="Completed"
+        label="Zakończone"
         value={String(kpis.completed)}
         icon={CheckCircle2}
-        meta={`${kpis.completedShare}% of all`}
+        meta={`${kpis.completedShare}% całości`}
         progress={kpis.completedShare}
         accent="violet"
       />
       <KpiTile
-        label="Total budget"
+        label="Budżet"
         value={formatCurrency(kpis.totalBudget, kpis.totalBudgetCurrency)}
         icon={Wallet}
-        meta={kpis.total > 0 ? `${kpis.total} contracts` : 'No contracts yet'}
+        meta={kpis.total > 0 ? `${kpis.total} umów` : 'Brak umów'}
         accent="amber"
       />
     </div>

@@ -1,8 +1,8 @@
-import type { Client, Project, WorkEntry } from '@/lib/types'
+import { clientNameToColor } from '@/components/common/ClientDisplay'
+import { PROJECT_STATUS_LABELS, type Client, type Project, type WorkEntry } from '@/lib/types'
 import {
   FEATURED_DEFAULT_TARGET_HOURS,
   PROJECT_STATUS_ACCENT,
-  PROJECT_STATUS_LABELS,
 } from './projects.constants'
 import type {
   ClientProjectAggregate,
@@ -17,8 +17,8 @@ import type {
   ProjectsFiltersState,
 } from './projects.types'
 
-const NO_CLIENT_LABEL = 'No client'
-const UNKNOWN_CLIENT_LABEL = 'Unknown client'
+const NO_CLIENT_LABEL = 'Bez klienta'
+const UNKNOWN_CLIENT_LABEL = 'Nieznany klient'
 
 const STATUS_ORDER: Record<ProjectStatus, number> = {
   in_progress: 0,
@@ -277,10 +277,13 @@ export function selectProjectListRows(data: ProjectsData): ProjectListRow[] {
       const budget = safeNumber(project.budget_amount)
       const spent = projectSpent(project, data.workEntries, client)
       const utilization = budget > 0 ? spent / budget : 0
+      const clientName = clientNameOf(project.client_id, byId)
       return {
         project,
-        clientName: clientNameOf(project.client_id, byId),
-        clientColor: client?.color ?? '#3b82f6',
+        clientName,
+        // Deterministyczny kolor z nazwy zamiast jednego niebieskiego dla
+        // wszystkich klientów bez ustawionego `color`.
+        clientColor: client?.color ?? clientNameToColor(clientName),
         progressPct: progressPercent(project, data.workEntries) || Math.round(utilization * 100),
         hoursLogged: projectHours(project.id, data.workEntries),
         budget,
