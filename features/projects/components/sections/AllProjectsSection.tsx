@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { Search, X } from 'lucide-react'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { PROJECT_STATUS_FILTER_OPTIONS } from '../../types/projects.constants'
@@ -8,6 +10,7 @@ import { useProjectsData } from '../../hooks/useProjectsData'
 import { useProjectsFilters } from '../../hooks/useProjectsFilters'
 import { LinearCard } from '../linear/LinearCard'
 import { LINEAR } from '../linear/linear.tokens'
+import { ProjectDetailsPanel } from '../linear/ProjectDetailsPanel'
 import { ProjectListRow } from '../linear/ProjectListRow'
 
 type AllProjectsSectionProps = {
@@ -22,6 +25,11 @@ export function AllProjectsSection({
   const { data } = useProjectsData()
   const { search, status, setSearch, setStatus, reset, isFiltering, rows, totalRows } =
     useProjectsFilters(data)
+
+  // Zaznaczenie trzymamy po id, nie jako obiekt — dzięki temu drawer pokazuje
+  // świeże dane po edycji projektu i sam się zamyka, gdy projekt wypadnie z filtrów.
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
+  const selectedRow = rows.find((row) => row.project.id === selectedProjectId) ?? null
 
   return (
     <LinearCard
@@ -106,12 +114,45 @@ export function AllProjectsSection({
             <ProjectListRow
               key={row.project.id}
               row={row}
+              onSelect={() => setSelectedProjectId(row.project.id)}
               onEdit={onEditProject}
               onDelete={onDeleteProject}
             />
           ))}
         </ul>
       )}
+
+      {/* Renderuje się przez portal, więc miejsce w drzewie nie ma znaczenia. */}
+      <Sheet
+        open={Boolean(selectedRow)}
+        onOpenChange={(open) => {
+          if (!open) setSelectedProjectId(null)
+        }}
+      >
+        <SheetContent
+          side="bottom"
+          className="max-h-[90dvh] overflow-y-auto rounded-t-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-0"
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Szczegóły projektu</SheetTitle>
+          </SheetHeader>
+          {selectedRow && (
+            <div className="px-2 pb-[max(env(safe-area-inset-bottom),1rem)] pt-2">
+              <ProjectDetailsPanel
+                row={selectedRow}
+                onEdit={() => {
+                  setSelectedProjectId(null)
+                  onEditProject?.(selectedRow.project)
+                }}
+                onDelete={() => {
+                  setSelectedProjectId(null)
+                  onDeleteProject?.(selectedRow.project)
+                }}
+              />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </LinearCard>
   )
 }
