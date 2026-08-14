@@ -61,6 +61,9 @@ const TITLE_DESCRIPTION = 'Uzupełnij podstawowe dane, budżet oraz terminy real
  */
 const STACKED_LAYER = 'z-[60]'
 const STACKED_OVERLAY = 'z-[60] bg-black/60 backdrop-blur-sm'
+/** Listy selectów portalują się do body z bazowym z-50, więc bez podbicia
+ *  chowają się pod overlayem formularza — kliknięcie trafiało w overlay. */
+const STACKED_POPOVER = 'z-[70]'
 
 export function ProjectFormDialog({
   open,
@@ -127,7 +130,7 @@ export function ProjectFormDialog({
                 <SelectTrigger>
                   <SelectValue placeholder="Wybierz klienta" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className={STACKED_POPOVER}>
                   <SelectItem value="none">Bez klienta</SelectItem>
                   {clients.map((client) => (
                     <SelectItem key={client.id} value={client.id}>
@@ -149,7 +152,7 @@ export function ProjectFormDialog({
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className={STACKED_POPOVER}>
                   {PROJECT_STATUS_OPTIONS.map((status) => (
                     <SelectItem key={status} value={status}>
                       {PROJECT_STATUS_LABELS[status]}
@@ -172,7 +175,7 @@ export function ProjectFormDialog({
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className={STACKED_POPOVER}>
                   {PROJECT_BUDGET_OPTIONS.map((budgetType) => (
                     <SelectItem key={budgetType} value={budgetType}>
                       {PROJECT_BUDGET_LABELS[budgetType]}
@@ -207,7 +210,7 @@ export function ProjectFormDialog({
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className={STACKED_POPOVER}>
                   {PROJECT_PRIORITY_OPTIONS.map((priority) => (
                     <SelectItem key={priority} value={priority}>
                       {PRIORITY_LABELS[priority]}
