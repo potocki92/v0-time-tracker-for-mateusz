@@ -15,6 +15,11 @@ import { useCurrentUser } from '@/hooks/auth/useCurrentUser'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { ClientsHeader } from './ClientsHeader'
 import { ClientsStats } from './ClientsStats'
+import { CurrentClientCard } from './CurrentClientCard'
+import {
+  selectClientMonthStats,
+  selectCurrentClient,
+} from '../_domain/clients.selectors'
 import { ClientsTable } from './ClientsTable'
 import { ClientsMobileList } from './ClientsMobileList'
 import { ClientsEmpty } from './ClientsEmpty'
@@ -40,6 +45,11 @@ export function ClientsContent() {
     setWorkTypeFilter,
     currencyFilter,
     setCurrencyFilter,
+    activityFilter,
+    setActivityFilter,
+    sortKey,
+    setSort,
+    activeFilterCount,
     allWithStats,
     visible,
   } = useClientsFilters(data.clients, data.workEntries, rateHistoryMap)
@@ -89,9 +99,31 @@ export function ClientsContent() {
     setSearch('')
     setWorkTypeFilter('all')
     setCurrencyFilter('all')
-  }, [setSearch, setWorkTypeFilter, setCurrencyFilter])
+    setActivityFilter('all')
+  }, [setSearch, setWorkTypeFilter, setCurrencyFilter, setActivityFilter])
 
   const allClients = useMemo(() => data.clients, [data.clients])
+
+  // Karta hero ma sens tylko przy pełnej liście — przy zawężonym widoku
+  // „aktualny zleceniodawca" mógłby nie mieć nic wspólnego z tym, co widać niżej.
+  const isBrowsingAll = search.trim() === '' && activeFilterCount === 0
+  const currentClient = useMemo(
+    () => (isBrowsingAll ? selectCurrentClient(allWithStats) : null),
+    [isBrowsingAll, allWithStats],
+  )
+  const currentClientMonth = useMemo(
+    () => (currentClient ? selectClientMonthStats(currentClient, data.workEntries) : null),
+    [currentClient, data.workEntries],
+  )
+
+  // Na telefonie karta hero to pełnoekranowa wersja tego samego kafelka —
+  // zostawienie go też na liście kosztowało cały ekran przewijania.
+  // Tabela na desktopie zostaje kompletna: brakujący wiersz w siatce danych
+  // (z własnym sortowaniem i licznikiem) myliłby bardziej, niż pomagał.
+  const listClients = useMemo(
+    () => (currentClient ? visible.filter((c) => c.id !== currentClient.id) : visible),
+    [visible, currentClient],
+  )
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -120,12 +152,24 @@ export function ClientsContent() {
         onWorkTypeFilterChange={setWorkTypeFilter}
         currencyFilter={currencyFilter}
         onCurrencyFilterChange={setCurrencyFilter}
+        activityFilter={activityFilter}
+        onActivityFilterChange={setActivityFilter}
         onAddClient={openCreate}
       />
 
+      {currentClient && currentClientMonth && (
+        <ClientsStatsBoundary>
+          <CurrentClientCard
+            client={currentClient}
+            monthStats={currentClientMonth}
+            onOpen={openEdit}
+          />
+        </ClientsStatsBoundary>
+      )}
+
       {allClients.length > 0 && (
         <ClientsStatsBoundary>
-          <ClientsStats clients={allWithStats} />
+          <ClientsStats clients={allWithStats} workEntries={data.workEntries} />
         </ClientsStatsBoundary>
       )}
 
@@ -138,11 +182,16 @@ export function ClientsContent() {
       ) : isMobile ? (
         <ClientsTableBoundary>
           <ClientsMobileList
-            clients={visible}
+            clients={listClients}
             workTypeFilter={workTypeFilter}
             onWorkTypeFilterChange={setWorkTypeFilter}
             currencyFilter={currencyFilter}
             onCurrencyFilterChange={setCurrencyFilter}
+            activityFilter={activityFilter}
+            onActivityFilterChange={setActivityFilter}
+            sortKey={sortKey}
+            onSortChange={setSort}
+            activeFilterCount={activeFilterCount}
             onClearFilters={clearFilters}
             onEdit={openEdit}
             onDelete={(c) => setDeleteCandidate(toClient(c))}

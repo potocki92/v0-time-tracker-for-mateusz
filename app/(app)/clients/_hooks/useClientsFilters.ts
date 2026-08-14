@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo } from 'react'
 import {
+  filterClientsByActivity,
   filterClientsByCurrency,
   filterClientsBySearch,
   filterClientsByWorkType,
@@ -9,6 +10,7 @@ import {
   sortClients,
 } from '../_domain/clients.selectors'
 import type {
+  ClientsActivityFilter,
   ClientsCurrencyFilter,
   ClientsSortDirection,
   ClientsSortKey,
@@ -22,23 +24,29 @@ interface ClientsFiltersState {
   search:         string
   workTypeFilter: ClientsWorkTypeFilter
   currencyFilter: ClientsCurrencyFilter
+  activityFilter: ClientsActivityFilter
   sortKey:        ClientsSortKey
   sortDirection:  ClientsSortDirection
 }
 
-const CLIENTS_FILTERS_STORAGE_KEY = 'clients-filters-v1'
+// v2: doszedł `activityFilter`, a domyślny sort zmienił się z name/asc na
+// recent/desc. Bez podbicia klucza zapisany v1 nadpisałby nowy domyślny.
+const CLIENTS_FILTERS_STORAGE_KEY = 'clients-filters-v2'
 
 const DEFAULT_FILTERS: ClientsFiltersState = {
   search:         '',
   workTypeFilter: 'all',
   currencyFilter: 'all',
-  sortKey:        'name',
-  sortDirection:  'asc',
+  activityFilter: 'all',
+  sortKey:        'recent',
+  sortDirection:  'desc',
 }
 
 const VALID_WORK_TYPE: ReadonlySet<ClientsWorkTypeFilter> = new Set(['all', 'hourly', 'piecework'])
 const VALID_CURRENCY:  ReadonlySet<ClientsCurrencyFilter> = new Set(['all', 'PLN', 'EUR'])
+const VALID_ACTIVITY:  ReadonlySet<ClientsActivityFilter> = new Set(['all', 'active', 'dormant', 'new'])
 const VALID_SORT_KEY:  ReadonlySet<ClientsSortKey> = new Set([
+  'recent',
   'name',
   'rate',
   'created_at',
@@ -56,6 +64,8 @@ function isValidFilters(value: unknown): value is ClientsFiltersState {
     VALID_WORK_TYPE.has(v.workTypeFilter as ClientsWorkTypeFilter) &&
     typeof v.currencyFilter === 'string' &&
     VALID_CURRENCY.has(v.currencyFilter as ClientsCurrencyFilter) &&
+    typeof v.activityFilter === 'string' &&
+    VALID_ACTIVITY.has(v.activityFilter as ClientsActivityFilter) &&
     typeof v.sortKey === 'string' &&
     VALID_SORT_KEY.has(v.sortKey as ClientsSortKey) &&
     typeof v.sortDirection === 'string' &&
@@ -90,13 +100,28 @@ export function useClientsFilters(
     (value: ClientsCurrencyFilter) => setFilters((prev) => ({ ...prev, currencyFilter: value })),
     [setFilters],
   )
+  const setActivityFilter = useCallback(
+    (value: ClientsActivityFilter) => setFilters((prev) => ({ ...prev, activityFilter: value })),
+    [setFilters],
+  )
+  const setSort = useCallback(
+    (key: ClientsSortKey) =>
+      setFilters((prev) => ({
+        ...prev,
+        sortKey: key,
+        // Dla dat i kwot „najpierw największe" jest tym, czego się oczekuje;
+        // dla nazwy — A-Z.
+        sortDirection: key === 'name' ? 'asc' : 'desc',
+      })),
+    [setFilters],
+  )
 
   const toggleSort = useCallback(
     (key: ClientsSortKey) => {
       setFilters((prev) =>
         prev.sortKey === key
           ? { ...prev, sortDirection: prev.sortDirection === 'asc' ? 'desc' : 'asc' }
-          : { ...prev, sortKey: key, sortDirection: 'asc' },
+          : { ...prev, sortKey: key, sortDirection: key === 'name' ? 'asc' : 'desc' },
       )
     },
     [setFilters],
@@ -111,15 +136,23 @@ export function useClientsFilters(
     const bySearch   = filterClientsBySearch(withStats, filters.search)
     const byWorkType = filterClientsByWorkType(bySearch, filters.workTypeFilter)
     const byCurrency = filterClientsByCurrency(byWorkType, filters.currencyFilter)
-    return sortClients(byCurrency, filters.sortKey, filters.sortDirection)
+    const byActivity = filterClientsByActivity(byCurrency, filters.activityFilter)
+    return sortClients(byActivity, filters.sortKey, filters.sortDirection)
   }, [
     withStats,
     filters.search,
     filters.workTypeFilter,
     filters.currencyFilter,
+    filters.activityFilter,
     filters.sortKey,
     filters.sortDirection,
   ])
+
+  /** Ile wymiarów zawęża listę — do licznika na przycisku „Filtruj". */
+  const activeFilterCount =
+    (filters.workTypeFilter !== 'all' ? 1 : 0) +
+    (filters.currencyFilter !== 'all' ? 1 : 0) +
+    (filters.activityFilter !== 'all' ? 1 : 0)
 
   return {
     search:         filters.search,
@@ -128,9 +161,13 @@ export function useClientsFilters(
     setWorkTypeFilter,
     currencyFilter: filters.currencyFilter,
     setCurrencyFilter,
+    activityFilter: filters.activityFilter,
+    setActivityFilter,
     sortKey:        filters.sortKey,
     sortDirection:  filters.sortDirection,
+    setSort,
     toggleSort,
+    activeFilterCount,
     allWithStats:   withStats,
     visible,
   }

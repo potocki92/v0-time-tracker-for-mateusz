@@ -12,9 +12,11 @@ import {
 } from '@/components/ui/select'
 import {
   CURRENCY_FILTER_OPTIONS,
+  STATUS_FILTER_OPTIONS,
   WORK_TYPE_FILTER_OPTIONS,
 } from '../_domain/clients.constants'
 import type {
+  ClientsActivityFilter,
   ClientsCurrencyFilter,
   ClientsWorkTypeFilter,
 } from '../_domain/clients.types'
@@ -28,6 +30,8 @@ type Props = {
   onWorkTypeFilterChange: (value: ClientsWorkTypeFilter) => void
   currencyFilter: ClientsCurrencyFilter
   onCurrencyFilterChange: (value: ClientsCurrencyFilter) => void
+  activityFilter: ClientsActivityFilter
+  onActivityFilterChange: (value: ClientsActivityFilter) => void
   onAddClient: () => void
 }
 
@@ -40,6 +44,8 @@ export function ClientsHeader({
   onWorkTypeFilterChange,
   currencyFilter,
   onCurrencyFilterChange,
+  activityFilter,
+  onActivityFilterChange,
   onAddClient,
 }: Props) {
   const countLabel =
@@ -73,6 +79,22 @@ export function ClientsHeader({
         </div>
 
         <div className="hidden items-center gap-2 sm:flex">
+          <Select
+            value={activityFilter}
+            onValueChange={(v) => onActivityFilterChange(v as ClientsActivityFilter)}
+          >
+            <SelectTrigger className="w-32" aria-label="Filtruj po statusie">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_FILTER_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Select
             value={workTypeFilter}
             onValueChange={(v) => onWorkTypeFilterChange(v as ClientsWorkTypeFilter)}
