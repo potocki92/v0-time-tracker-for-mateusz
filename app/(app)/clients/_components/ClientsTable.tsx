@@ -12,6 +12,13 @@ type Props = {
   onShowHistory: (client: ClientWithStats) => void
 }
 
+/**
+ * `hours` było domyślnie ukryte — na desktopie godziny i zarobki, czyli jedyne
+ * liczby mówiące cokolwiek o biznesie, w ogóle nie trafiały na ekran.
+ * `currency` zostaje ukryte: waluta jest już widoczna przy stawce i zarobkach.
+ */
+const INITIAL_VISIBILITY = { currency: false }
+
 export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props) {
   const tableMeta = useMemo<ClientsTableMeta>(
     () => ({ onEdit, onDelete, onShowHistory }),
@@ -49,7 +56,7 @@ export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props
       storageKey={{ filters: 'clients-table-filters-v1', layout: 'clients-table-layout-v1' }}
       searchPlaceholder="Szukaj klientów po nazwie, mieście, e-mailu..."
       emptyLabel="Brak klientów spełniających kryteria."
-      initialVisibility={{ hours: false, currency: false }}
+      initialVisibility={INITIAL_VISIBILITY}
       enableColumnDnd
     />
   )

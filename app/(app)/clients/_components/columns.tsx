@@ -12,13 +12,24 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ClientDisplay } from '@/components/common/ClientDisplay'
 import { formatCurrency } from '@/lib/helpers'
+import { cn } from '@/lib/utils'
 import type { ClientWithStats } from '../_domain/clients.types'
-import { WORK_TYPE_LABELS } from '../_domain/clients.constants'
+import {
+  ACTIVITY_DOT,
+  ACTIVITY_LABELS,
+  WORK_TYPE_LABELS,
+} from '../_domain/clients.constants'
+import { deriveActivity, formatRelativeDate } from '../_domain/clients.selectors'
 
 export type ClientsTableMeta = {
   onEdit: (client: ClientWithStats) => void
   onDelete: (client: ClientWithStats) => void
   onShowHistory: (client: ClientWithStats) => void
+}
+
+/** 7.5 → „7,5", 816 → „816" — bez zbędnego „,00" przy pełnych godzinach. */
+function formatHours(hours: number): string {
+  return Number.isInteger(hours) ? String(hours) : hours.toFixed(1).replace('.', ',')
 }
 
 export const columns: ColumnDef<ClientWithStats>[] = [
@@ -85,11 +96,36 @@ export const columns: ColumnDef<ClientWithStats>[] = [
     accessorFn: (row) => row.totalHours,
     header: 'Godziny / Dni',
     meta: { label: 'Godziny / Dni' },
-    size: 130,
+    size: 150,
+    // `816.0h` — końcówka `.0` przy pełnych godzinach rozpychała kolumnę
+    // na tyle, że treść wchodziła w sąsiednią.
     cell: ({ row }) =>
       row.original.totalHours > 0
-        ? `${row.original.totalHours.toFixed(1)}h · ${row.original.totalDays} dni`
+        ? `${formatHours(row.original.totalHours)} h · ${row.original.totalDays} dni`
         : '—',
+  },
+  {
+    id: 'lastEntry',
+    // Sortujemy po surowej dacie, a nie po „5 mies. temu" — tekst układałby się
+    // alfabetycznie. Klienci bez wpisów lądują na końcu.
+    accessorFn: (row) => row.lastEntryDate ?? '',
+    header: 'Ostatni wpis',
+    meta: { label: 'Ostatni wpis' },
+    size: 150,
+    cell: ({ row }) => {
+      const activity = deriveActivity(row.original)
+      const relative = formatRelativeDate(row.original.lastEntryDate)
+      return (
+        <div className="flex items-center gap-2">
+          <span
+            aria-hidden
+            className={cn('size-1.5 shrink-0 rounded-full', ACTIVITY_DOT[activity])}
+          />
+          <span className="truncate tabular-nums">{relative ?? '—'}</span>
+          <span className="sr-only">{ACTIVITY_LABELS[activity]}</span>
+        </div>
+      )
+    },
   },
   {
     id: 'actions',

@@ -14,7 +14,6 @@ import {
   Trash2,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
@@ -27,57 +26,25 @@ import {
 import { clientInitials, clientNameToColor } from '@/components/common/ClientDisplay'
 import { formatCurrency } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
-import { WORK_TYPE_LABELS } from '../_domain/clients.constants'
+import {
+  ACTIVITY_DOT,
+  ACTIVITY_LABELS,
+  WORK_TYPE_LABELS,
+} from '../_domain/clients.constants'
+import {
+  buildContactLinks,
+  deriveActivity,
+  formatRelativeDate,
+  toExternalUrl,
+} from '../_domain/clients.selectors'
 import type { ClientWithStats } from '../_domain/clients.types'
-
-type ClientActivity = 'active' | 'dormant' | 'new'
+import { LINEAR } from './clients.tokens'
 
 interface ClientCardProps {
   client: ClientWithStats
   onEdit: (client: ClientWithStats) => void
   onDelete: (client: ClientWithStats) => void
   onShowHistory: (client: ClientWithStats) => void
-}
-
-const ACTIVITY_LABELS: Record<ClientActivity, string> = {
-  active: 'Aktywny',
-  dormant: 'Uśpiony',
-  new: 'Nowy',
-}
-
-const ACTIVITY_DOT: Record<ClientActivity, string> = {
-  active: 'bg-emerald-500',
-  dormant: 'bg-amber-500',
-  new: 'bg-sky-500',
-}
-
-const DAY_MS = 24 * 60 * 60 * 1000
-
-function deriveActivity(client: ClientWithStats): ClientActivity {
-  if (!client.lastEntryDate || client.workEntriesCount === 0) return 'new'
-  const days = Math.floor((Date.now() - new Date(client.lastEntryDate).getTime()) / DAY_MS)
-  if (days <= 30) return 'active'
-  return 'dormant'
-}
-
-function formatRelativeDate(iso: string | null): string | null {
-  if (!iso) return null
-  const days = Math.floor((Date.now() - new Date(iso).getTime()) / DAY_MS)
-  if (days <= 0) return 'dziś'
-  if (days === 1) return 'wczoraj'
-  if (days < 30) return `${days} dni temu`
-  if (days < 365) return `${Math.floor(days / 30)} mies. temu`
-  return `${Math.floor(days / 365)} lat temu`
-}
-
-function formatAddress(c: ClientWithStats): string | null {
-  const line2 = [c.postal_code, c.city].filter(Boolean).join(' ').trim()
-  const full = [c.address?.trim(), line2].filter(Boolean).join(', ')
-  return full.length > 0 ? full : null
-}
-
-function toExternalUrl(url: string): string {
-  return /^https?:\/\//i.test(url) ? url : `https://${url}`
 }
 
 function pluralizeEntries(count: number): string {
@@ -93,15 +60,12 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
   const [detailsOpen, setDetailsOpen] = useState(false)
 
   const activity = deriveActivity(client)
+  const isActive = activity === 'active'
   const initials = clientInitials(client.name)
   const color = client.color?.trim() ? client.color : clientNameToColor(client.name)
   const unit = client.work_type === 'hourly' ? 'h' : (client.unit ?? 'szt')
   const lastEntry = formatRelativeDate(client.lastEntryDate)
-  const address = formatAddress(client)
-  const phoneHref = client.phone ? `tel:${client.phone.replace(/\s+/g, '')}` : null
-  const mapsHref = address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
-    : null
+  const { phoneHref, mailHref, mapsHref, address } = buildContactLinks(client)
   const hasDetails = Boolean(client.nip || client.regon || address || client.website)
 
   function withClose(action: () => void) {
@@ -112,7 +76,25 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
   }
 
   return (
-    <article className="group rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-colors hover:border-border">
+    <article
+      className={cn(
+        'group relative overflow-hidden rounded-2xl border py-4 pl-5 pr-4 transition-colors',
+        LINEAR.rowSurface,
+        isActive
+          ? 'border-emerald-500/25 ring-1 ring-emerald-500/15'
+          : cn(LINEAR.borderInset, 'hover:border-zinc-700/60'),
+      )}
+    >
+      {/* Szyna stanu — jedyne miejsce, gdzie kolor niesie informację.
+          Kolor klienta zostaje na awatarze jako jego tożsamość. */}
+      <span
+        aria-hidden
+        className={cn(
+          'absolute inset-y-0 left-0 w-1',
+          isActive ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.45)]' : LINEAR.rail,
+        )}
+      />
+
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <div className="relative shrink-0">
@@ -128,7 +110,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
               aria-hidden
               title={ACTIVITY_LABELS[activity]}
               className={cn(
-                'absolute -bottom-0.5 -right-0.5 size-3 rounded-full ring-2 ring-card',
+                'absolute -bottom-0.5 -right-0.5 size-3 rounded-full ring-2 ring-[#151519]',
                 ACTIVITY_DOT[activity],
               )}
             />
@@ -136,7 +118,11 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
-              <h3 className="truncate text-sm font-semibold text-foreground">{client.name}</h3>
+              {/* 15 px + line-clamp-2: nazwy firm ucięte do jednej linii
+                  („ELITT HOME SPÓŁKA Z OGR…") były nie do rozróżnienia. */}
+              <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-white">
+                {client.name}
+              </h3>
               {client.is_default && (
                 <Star
                   className="size-3.5 shrink-0 fill-amber-500 text-amber-500"
@@ -144,7 +130,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
                 />
               )}
             </div>
-            <p className="truncate text-xs text-muted-foreground">
+            <p className="truncate text-xs text-zinc-400">
               {client.email || client.city || client.phone || ACTIVITY_LABELS[activity]}
             </p>
           </div>
@@ -155,7 +141,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
             <Button
               variant="ghost"
               size="icon"
-              className="-mr-2 h-9 w-9 shrink-0 text-muted-foreground"
+              className="-mr-2 h-9 w-9 shrink-0 text-zinc-400"
               aria-label={`Więcej akcji dla ${client.name}`}
             >
               <MoreHorizontal className="size-5" />
@@ -198,53 +184,65 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
         </Sheet>
       </header>
 
-      <div className="mt-3 flex flex-wrap items-center gap-1.5">
-        <Badge variant="secondary" className="text-[11px]">
-          {WORK_TYPE_LABELS[client.work_type]}
-        </Badge>
-        <Badge variant="outline" className="text-[11px]">
-          {client.currency}
-        </Badge>
+      {/* Typ / waluta / liczba wpisów to metadane, nie nagłówek — jedna linia
+          drobnym drukiem zamiast trzech pigułek konkurujących z nazwą. */}
+      <p className="mt-2.5 flex items-center gap-1.5 text-[11px] text-zinc-500">
+        <span>{WORK_TYPE_LABELS[client.work_type]}</span>
+        <span aria-hidden>·</span>
+        <span>{client.currency}</span>
         {client.workEntriesCount > 0 && (
-          <Badge variant="outline" className="text-[11px] text-muted-foreground">
-            {client.workEntriesCount} {pluralizeEntries(client.workEntriesCount)}
-          </Badge>
+          <>
+            <span aria-hidden>·</span>
+            <span>
+              {client.workEntriesCount} {pluralizeEntries(client.workEntriesCount)}
+            </span>
+          </>
         )}
-        <span className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground">
+        <span className="ml-auto flex items-center gap-1 text-zinc-400">
           <span className={cn('size-1.5 rounded-full', ACTIVITY_DOT[activity])} aria-hidden />
           {ACTIVITY_LABELS[activity]}
         </span>
-      </div>
+      </p>
 
-      <dl className="mt-3 grid grid-cols-2 gap-3 border-t border-border/60 pt-3 text-xs">
-        <div className="min-w-0">
-          <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">Stawka</dt>
-          <dd className="mt-0.5 truncate text-sm font-semibold tabular-nums text-foreground">
-            {formatCurrency(client.rate, client.currency)}
-            <span className="text-[11px] font-normal text-muted-foreground">/{unit}</span>
-          </dd>
-        </div>
-        <div className="min-w-0 text-right">
-          <dt className="text-[10px] uppercase tracking-wide text-muted-foreground">
-            Ostatni wpis
-          </dt>
-          <dd className="mt-0.5 truncate text-sm font-medium tabular-nums text-foreground">
-            {lastEntry ?? '—'}
-          </dd>
-        </div>
+      <dl
+        className={cn(
+          'mt-3 grid grid-cols-2 gap-x-3 gap-y-3 border-t pt-3 text-xs',
+          LINEAR.borderInset,
+        )}
+      >
+        <Metric
+          label="Stawka"
+          value={
+            <>
+              {formatCurrency(client.rate, client.currency)}
+              <span className="text-[11px] font-normal text-zinc-500">/{unit}</span>
+            </>
+          }
+        />
+        <Metric label="Ostatni wpis" value={lastEntry ?? '—'} empty={!lastEntry} />
+        <Metric
+          label="Godziny"
+          value={client.totalHours > 0 ? `${formatHours(client.totalHours)} h` : '—'}
+          empty={client.totalHours <= 0}
+        />
+        <Metric
+          label="Zarobek"
+          value={
+            client.totalEarningsInClientCurrency > 0
+              ? formatCurrency(client.totalEarningsInClientCurrency, client.currency)
+              : '—'
+          }
+          empty={client.totalEarningsInClientCurrency <= 0}
+        />
       </dl>
 
-      {(phoneHref || client.email || mapsHref) && (
+      {(phoneHref || mailHref || mapsHref) && (
         <div className="mt-3 flex items-stretch gap-1.5">
           {phoneHref && (
             <QuickAction icon={<Phone className="size-4" />} label="Zadzwoń" href={phoneHref} />
           )}
-          {client.email && (
-            <QuickAction
-              icon={<Mail className="size-4" />}
-              label="E-mail"
-              href={`mailto:${client.email}`}
-            />
+          {mailHref && (
+            <QuickAction icon={<Mail className="size-4" />} label="E-mail" href={mailHref} />
           )}
           {mapsHref && (
             <QuickAction icon={<MapPin className="size-4" />} label="Mapy" href={mapsHref} external />
@@ -257,7 +255,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
           <CollapsibleTrigger asChild>
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-2 rounded-md px-1 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="flex min-h-9 w-full items-center justify-between gap-2 rounded-md px-1 py-1 text-[11px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
               <span>{detailsOpen ? 'Ukryj szczegóły' : 'Pokaż szczegóły'}</span>
               <ChevronDown
@@ -266,7 +264,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
             </button>
           </CollapsibleTrigger>
           <CollapsibleContent className="data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
-            <dl className="mt-2 space-y-1.5 rounded-lg bg-muted/40 p-3 text-xs">
+            <dl className={cn('mt-2 space-y-1.5 rounded-lg border p-3 text-xs', LINEAR.borderInset, LINEAR.surface)}>
               {client.nip && <DetailRow label="NIP" value={client.nip} />}
               {client.regon && <DetailRow label="REGON" value={client.regon} />}
               {address && <DetailRow label="Adres" value={address} />}
@@ -279,11 +277,43 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
   )
 }
 
+function Metric({
+  label,
+  value,
+  empty,
+}: {
+  label: string
+  value: React.ReactNode
+  /** Brak danych: „—" ma czytać się jako pusty stan, nie jako awaria. */
+  empty?: boolean
+}) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+        {label}
+      </dt>
+      <dd
+        className={cn(
+          'mt-0.5 truncate text-[13.5px] font-semibold tabular-nums text-white',
+          empty && 'text-zinc-600',
+        )}
+      >
+        {value}
+      </dd>
+    </div>
+  )
+}
+
+/** 7.5 → „7,5", 8 → „8" — bez zbędnego „,00" przy pełnych godzinach. */
+function formatHours(hours: number): string {
+  return Number.isInteger(hours) ? String(hours) : hours.toFixed(1).replace('.', ',')
+}
+
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <dt className="shrink-0 text-muted-foreground">{label}</dt>
-      <dd className="min-w-0 truncate text-right font-medium text-foreground">{value}</dd>
+      <dt className="shrink-0 text-zinc-500">{label}</dt>
+      <dd className="min-w-0 truncate text-right font-medium text-zinc-200">{value}</dd>
     </div>
   )
 }
@@ -301,9 +331,14 @@ function QuickAction({ icon, label, href, external }: QuickActionProps) {
       href={href}
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener noreferrer' : undefined}
-      className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-border/60 bg-background text-xs font-medium text-foreground transition-colors hover:bg-muted active:bg-muted/80"
+      className={cn(
+        'flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border text-xs font-medium text-white transition-colors',
+        LINEAR.border,
+        LINEAR.surface,
+        'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300',
+      )}
     >
-      <span className="text-muted-foreground">{icon}</span>
+      <span className="text-zinc-400">{icon}</span>
       {label}
     </a>
   )
