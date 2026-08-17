@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Nowy push do tej samej galezi anuluje poprzedni bieg.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Typecheck / Test / Lint / Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Kolejnosc od najszybszego: typecheck ~30s, test ~6s, lint ~30s, build ~90s.
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Restore Next build cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+      - name: Build
+        run: npm run build
+
+      # `shell: bash` jest tu obowiazkowe: daje `-o pipefail`, bez ktorego kodem
+      # wyjscia byl by kod `tee` (zawsze 0) i przekroczony budzet nie zatrzymalby CI.
+      - name: Bundle budgets
+        shell: bash
+        run: |
+          {
+            echo '## Bundle budgets'
+            echo '```'
+            npm run perf:budget --silent
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
