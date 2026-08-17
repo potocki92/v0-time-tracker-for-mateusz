@@ -43,6 +43,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Dead code
+        run: npm run deadcode
+
       - name: Restore Next build cache
         uses: actions/cache@v4
         with:
