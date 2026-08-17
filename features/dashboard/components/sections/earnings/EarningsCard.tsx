@@ -18,7 +18,7 @@ import { maskValue } from '../../../hooks/useDashboardUiStore'
 import type { EarningsTrendData } from '../../../hooks/useEarningsTrend'
 import type { SparklinePoint } from '../../../hooks/useEarningsSparkline'
 import { EarningsMenu } from './EarningsMenu'
-import { buildSeries, type SeriesPoint } from './series'
+import { buildSeries } from './series'
 
 // recharts osobnym chunkiem — kwota i KPI nie czekają na wykres.
 const EarningsSparkChart = dynamic(

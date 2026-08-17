@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { Goal } from '../types/dashboard.types'
 import { MonthlyTotals } from '@/lib/types'
 import { calculateGoalProgress } from '@/lib/finance/goal'
 import { selectGoal, usePreferencesStore } from './usePreferencesStore'

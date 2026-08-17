@@ -133,11 +133,11 @@ function faktura(entry: JpkFaInvoice): { xml: string; net: number; vat: number }
 }
 
 function wierszeFaktur(entries: JpkFaInvoice[]): string {
-  let total = 0
+  let _total = 0
   const lines: string[] = []
   entries.forEach((entry, invoiceIndex) => {
     entry.lineItems.forEach((item, lineIndex) => {
-      total += 1
+      _total += 1
       lines.push(
         openTag('FakturaWiersz', { typ: 'G' }),
         tag('P_2B', entry.invoice.invoice_number ?? entry.invoice.id),

@@ -4,7 +4,7 @@
 
 import { defineConfig } from 'vitest/config'
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode: _mode }) => {
   const env = Object.fromEntries(
     Object.entries(process.env).filter(([key]) => key.startsWith('TEST_')),
   )

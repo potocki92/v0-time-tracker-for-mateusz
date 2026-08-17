@@ -26,7 +26,7 @@ import { z } from 'zod'
 const urlSchema = z.string().url()
 
 /** Przetwarza string na liczbę z walidacją zakresu */
-const portSchema = z
+const _portSchema = z
   .string()
   .transform(Number)
   .pipe(z.number().int().min(1).max(65535))

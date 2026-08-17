@@ -46,7 +46,7 @@ interface FetchInput {
   count?: number
 }
 
-function pad(n: number) {
+function _pad(n: number) {
   return String(n).padStart(2, '0')
 }
 

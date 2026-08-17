@@ -258,7 +258,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             {isEditMode ? (
               <p className="text-xs text-muted-foreground">
                 Edycja nadpisuje aktualną stawkę. Aby dodać nową stawkę obowiązującą
-                od daty (bez utraty historii) — użyj przycisku „Historia stawek".
+                od daty (bez utraty historii) — użyj przycisku „Historia stawek&quot;.
               </p>
             ) : null}
           </div>

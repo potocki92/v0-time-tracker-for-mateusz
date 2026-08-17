@@ -15,7 +15,7 @@
  * i jednym wspólnym animation-iteration-count.
  */
 
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties } from 'react'
 
 // ── Bazowy element skeleton ───────────────────────────────────────────────────
 

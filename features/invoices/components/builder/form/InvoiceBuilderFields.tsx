@@ -6,13 +6,10 @@ import { useQuery } from '@tanstack/react-query'
 
 import { FormInput, FormSection } from '@/components/common/form'
 import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
 import { fetchCurrentEurRate } from '@/lib/api/eurRate'
 import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
 import {
   INVOICE_BUILDER_CURRENCIES,
-  INVOICE_LANGUAGES,
-  PAYMENT_METHODS,
   type InvoiceBuilderCurrency,
   type InvoiceBuilderValues,
   type InvoiceLanguage,

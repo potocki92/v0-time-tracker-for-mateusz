@@ -1,21 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  typescript: {},
   images: {
-    remotePatterns: [{
-      protocol: 'https', hostname: '*.<supabase.co>'
-    }]
+    remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }],
   },
   eslint: {
-    dirs: ['app','components','lib','hooks','services']
+    // Lint to osobny krok (npm run lint / CI). Build go nie powtarza.
+    ignoreDuringBuilds: true,
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'date-fns', 'recharts'],
-  },
-  webpack: (config, { dev }) => {
-    if (dev) config.cache = { type: 'memory' }
-    return config
   },
 }
 

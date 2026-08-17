@@ -26,7 +26,6 @@ import {
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { cn } from '@/lib/utils'
 import { fetchWorkedWeeksAction } from '../../services/actions/worked-weeks.actions'
-import type { WorkedWeekSummary } from '../../services/server/worked-weeks.service.server'
 import type { Client } from '@/lib/types'
 import type { InvoiceFormValues, InvoiceSettings } from '../../domain'
 import { DIALOG_DARK_SURFACE } from '../dialog-theme'

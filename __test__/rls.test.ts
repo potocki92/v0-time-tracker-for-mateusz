@@ -104,7 +104,7 @@ describe('RLS: work_entries', () => {
   })
 
   it('user B NIE może UPDATE wpisu usera A', async () => {
-    const { error, count } = await clientB
+    const { count } = await clientB
       .from('work_entries')
       .update({ hours: 99 })
       .eq('id', entryAId)
