@@ -78,7 +78,7 @@ export function EffectiveRateSection() {
       })
       .sort((a, b) => b.earnings - a.earnings)
       .slice(0, 4)
-      .map(({ earnings, ...rest }) => rest)
+      .map(({ earnings: _earnings, ...rest }) => rest)
 
     const blended = eurHours > 0 ? eurEarnings / eurHours : 0
     return { rates: list, blendedRate: blended }

@@ -10,7 +10,7 @@
  * TanStack Query automatycznie refetchuje po powrocie (networkMode: 'online').
  */
 
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 
 // ── useOnlineStatus ───────────────────────────────────────────────────────────
 

@@ -1,9 +1,8 @@
 'use client'
 
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { fetchWorkEntries } from '../services/dashboard.fetchers'
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
-import type { WorkEntry } from '@/lib/types'
 import { WorkEntriesFilter } from '@/lib/query/queryKeys'
 
 /**

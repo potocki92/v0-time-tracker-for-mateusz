@@ -33,7 +33,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void {
+  override componentDidCatch(error: Error, info: ErrorInfo): void {
     const { onError, sectionName } = this.props
 
     this.setState({ componentStack: info.componentStack ?? null })
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.setState({ hasError: false, error: null, componentStack: null })
   }
 
-  render(): ReactNode {
+  override render(): ReactNode {
     const { hasError, error, componentStack } = this.state
     const { children, fallback }              = this.props
 

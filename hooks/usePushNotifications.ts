@@ -19,7 +19,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { clientEnv } from '@/lib/env'
 
 // ── Typy ──────────────────────────────────────────────────────────────────────
 

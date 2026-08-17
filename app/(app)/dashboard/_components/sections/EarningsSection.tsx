@@ -89,7 +89,7 @@ export function EarningsSection() {
     try {
       exportCSV()
       toast.success('Eksport CSV wygenerowany')
-    } catch (e) {
+    } catch {
       toast.error('Nie udało się wygenerować CSV')
     }
   }, [exportCSV])
