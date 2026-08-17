@@ -12,8 +12,9 @@
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "test:rls": "vitest run --config vitest.rls.config.ts",
-    "verify": "npm run typecheck && npm run lint && npm run test && npm run build",
-    "perf:budget": "node scripts/check-performance-budgets.mjs"
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run build && npm run perf:budget",
+    "perf:budget": "node scripts/check-performance-budgets.mjs",
+    "perf:budget:init": "node scripts/check-performance-budgets.mjs --init"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -96,6 +97,7 @@
     "tw-animate-css": "1.3.3",
     "typescript": "^5",
     "typescript-eslint": "^8.67.0",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.4",
+    "yaml": "^2.9.0"
   }
 }

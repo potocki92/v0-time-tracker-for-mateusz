@@ -1,0 +1,15 @@
+{
+  "/_not-found/page": 145,
+  "/(app)/calendar/page": 340,
+  "/(app)/clients/page": 455,
+  "/(app)/dashboard/page": 355,
+  "/(app)/invoices/analytics/page": 400,
+  "/(app)/invoices/page": 445,
+  "/(app)/projects/page": 325,
+  "/(app)/reports/page": 310,
+  "/(marketing)/page": 210,
+  "/auth/error/page": 210,
+  "/auth/login/page": 310,
+  "/auth/sign-up-success/page": 210,
+  "/auth/sign-up/page": 310
+}
