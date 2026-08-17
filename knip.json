@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["public/sw.js"],
+  "next": {
+    "entry": [
+      "middleware.ts",
+      "instrumentation.ts",
+      "app/**/{page,layout,loading,error,not-found,template,default,route,global-error}.{ts,tsx}",
+      "app/{manifest,robots,sitemap,icon,apple-icon,opengraph-image}.{ts,tsx}"
+    ]
+  },
+  "vitest": { "config": ["vitest.config.ts", "vitest.rls.config.ts"] },
+  "ignore": ["mobile/**", "docs/**"],
+  "ignoreDependencies": ["autoprefixer", "eslint-config-next"]
+}
