@@ -4,13 +4,16 @@ Poniżej jest minimalny zestaw rzeczy, które muszą istnieć w Supabase, żeby 
 
 ## 1) Tabele i kolumny
 
-Uruchom migracje z katalogu `scripts/` w tej kolejności:
+Migracje żyją w `supabase/migrations/` i są aplikowane przez Supabase CLI
+(`npx supabase db reset` lokalnie, `npx supabase db push` na zdalną bazę) —
+kolejność wynika ze znaczników czasu w nazwach plików. Za auto‑fakturowanie
+odpowiadają:
 
-1. `scripts/001_create_tables.sql`
-2. `scripts/004_invoices_upgrade.sql`
-3. `scripts/008_invoice_automation_and_templates.sql`
-4. `scripts/009_invoice_sequence_reservation.sql`
-5. `scripts/010_client_auto_invoicing.sql`
+1. `*_create_tables.sql`
+2. `*_invoices_upgrade.sql`
+3. `*_invoice_automation_and_templates.sql`
+4. `*_invoice_sequence_reservation.sql`
+5. `*_client_auto_invoicing.sql`
 
 Najważniejsze obiekty po migracji:
 

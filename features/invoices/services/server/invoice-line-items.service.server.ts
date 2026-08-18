@@ -7,6 +7,7 @@ import {
   invoiceLineItemsSchema,
   type InvoiceLineItemInputSchema,
 } from '@/lib/schemas/invoice-line-item.schema'
+import { INVOICE_LINE_ITEM_COLUMNS, INVOICES_MAX_LINE_ITEMS } from '../invoices.columns'
 
 async function assertOwnership(invoiceId: string, userId: string) {
   const supabase = await createClient()
@@ -70,7 +71,7 @@ export async function replaceInvoiceLineItemsAction(
   const { data, error } = await supabase
     .from('invoice_line_items')
     .insert(rows)
-    .select('*')
+    .select(INVOICE_LINE_ITEM_COLUMNS)
     .order('position', { ascending: true })
 
   if (error) throw new Error(error.message)
@@ -85,9 +86,10 @@ export async function listInvoiceLineItems(invoiceId: string): Promise<InvoiceLi
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('invoice_line_items')
-    .select('*')
+    .select(INVOICE_LINE_ITEM_COLUMNS)
     .eq('invoice_id', invoiceId)
     .order('position', { ascending: true })
+    .limit(INVOICES_MAX_LINE_ITEMS)
   if (error) throw new Error(error.message)
   return (data ?? []) as InvoiceLineItem[]
 }

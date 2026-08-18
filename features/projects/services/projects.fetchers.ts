@@ -1,6 +1,14 @@
 import { createClient } from '@/lib/supabase/client'
 import { getWorkEntriesWindowStart } from '@/lib/date/work-entries-window'
 import type { Client, Project, ProjectFormData, WorkEntry } from '@/lib/types'
+import {
+  PROJECTS_CLIENT_COLUMNS,
+  PROJECTS_MAX_CLIENTS,
+  PROJECTS_MAX_PROJECTS,
+  PROJECTS_MAX_WORK_ENTRIES,
+  PROJECTS_PROJECT_COLUMNS,
+  PROJECTS_WORK_ENTRY_COLUMNS,
+} from './projects.columns'
 
 /**
  * Surowe funkcje fetch dla modułu Projects — tylko transport, bez logiki
@@ -17,9 +25,11 @@ function getSupabase() {
 export async function fetchProjects(userId: string): Promise<Project[]> {
   const { data, error } = await getSupabase()
     .from('projects')
-    .select('*')
+    .select(PROJECTS_PROJECT_COLUMNS)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(PROJECTS_MAX_PROJECTS)
 
   if (error) throw new Error(`fetchProjects: ${error.message}`)
   return (data ?? []) as Project[]
@@ -28,9 +38,10 @@ export async function fetchProjects(userId: string): Promise<Project[]> {
 export async function fetchProjectsClients(userId: string): Promise<Client[]> {
   const { data, error } = await getSupabase()
     .from('clients')
-    .select('*')
+    .select(PROJECTS_CLIENT_COLUMNS)
     .eq('user_id', userId)
     .order('name')
+    .limit(PROJECTS_MAX_CLIENTS)
 
   if (error) throw new Error(`fetchProjectsClients: ${error.message}`)
   return (data ?? []) as Client[]
@@ -39,9 +50,10 @@ export async function fetchProjectsClients(userId: string): Promise<Client[]> {
 export async function fetchProjectsWorkEntries(userId: string): Promise<WorkEntry[]> {
   const { data, error } = await getSupabase()
     .from('work_entries')
-    .select('*')
+    .select(PROJECTS_WORK_ENTRY_COLUMNS)
     .eq('user_id', userId)
     .gte('date', getWorkEntriesWindowStart())
+    .limit(PROJECTS_MAX_WORK_ENTRIES)
 
   if (error) throw new Error(`fetchProjectsWorkEntries: ${error.message}`)
   return (data ?? []) as WorkEntry[]

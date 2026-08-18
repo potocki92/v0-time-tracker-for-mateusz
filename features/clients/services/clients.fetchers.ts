@@ -7,6 +7,14 @@ import type {
   ClientRateFormData,
   WorkEntry,
 } from '@/lib/types'
+import {
+  CLIENTS_CLIENT_COLUMNS,
+  CLIENTS_CLIENT_RATE_COLUMNS,
+  CLIENTS_MAX_CLIENT_RATES,
+  CLIENTS_MAX_CLIENTS,
+  CLIENTS_MAX_WORK_ENTRIES,
+  CLIENTS_WORK_ENTRY_COLUMNS,
+} from './clients.columns'
 
 /**
  * Surowe funkcje fetch/mutacji dla modułu Clients — tylko transport, bez logiki biznesowej.
@@ -21,23 +29,27 @@ function getSupabase() {
 export async function fetchClients(userId: string): Promise<Client[]> {
   const { data, error } = await getSupabase()
     .from('clients')
-    .select('*')
+    .select(CLIENTS_CLIENT_COLUMNS)
     .eq('user_id', userId)
+    // `(user_id, created_at desc, id desc)` — dokładnie idx_clients_user_created.
     .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(CLIENTS_MAX_CLIENTS)
 
   if (error) throw new Error(`fetchClients: ${error.message}`)
-  return data ?? []
+  return (data ?? []) as unknown as Client[]
 }
 
 export async function fetchWorkEntriesForClients(userId: string): Promise<WorkEntry[]> {
   const { data, error } = await getSupabase()
     .from('work_entries')
-    .select('*')
+    .select(CLIENTS_WORK_ENTRY_COLUMNS)
     .eq('user_id', userId)
     .gte('date', getWorkEntriesWindowStart())
+    .limit(CLIENTS_MAX_WORK_ENTRIES)
 
   if (error) throw new Error(`fetchWorkEntriesForClients: ${error.message}`)
-  return data ?? []
+  return (data ?? []) as unknown as WorkEntry[]
 }
 
 /**
@@ -50,9 +62,10 @@ export async function fetchClientRates(
 ): Promise<ClientRate[]> {
   let query = getSupabase()
     .from('client_rates')
-    .select('*')
+    .select(CLIENTS_CLIENT_RATE_COLUMNS)
     .eq('user_id', userId)
     .order('effective_from', { ascending: false })
+    .limit(CLIENTS_MAX_CLIENT_RATES)
 
   if (clientId) query = query.eq('client_id', clientId)
 
@@ -62,7 +75,7 @@ export async function fetchClientRates(
     if ((error as { code?: string }).code === '42P01') return []
     throw new Error(`fetchClientRates: ${error.message}`)
   }
-  return data ?? []
+  return (data ?? []) as unknown as ClientRate[]
 }
 
 // ── Mutacje ───────────────────────────────────────────────────────────────────
@@ -115,7 +128,7 @@ export async function createClient(input: ClientMutationInput): Promise<Client> 
   const { data, error } = await getSupabase()
     .from('clients')
     .insert(toClientRow(input))
-    .select('*')
+    .select(CLIENTS_CLIENT_COLUMNS)
     .single()
 
   if (error) throw new Error(`createClient: ${error.message}`)
@@ -132,7 +145,7 @@ export async function updateClient(
     .from('clients')
     .update(toClientRow(input))
     .eq('id', id)
-    .select('*')
+    .select(CLIENTS_CLIENT_COLUMNS)
     .single()
 
   if (error) throw new Error(`updateClient: ${error.message}`)
@@ -172,7 +185,7 @@ export async function addClientRate(
       effective_from: input.effective_from,
       note:           input.note ?? null,
     })
-    .select('*')
+    .select(CLIENTS_CLIENT_RATE_COLUMNS)
     .single()
 
   if (error) throw new Error(`addClientRate: ${error.message}`)
