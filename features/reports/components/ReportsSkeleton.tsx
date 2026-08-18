@@ -1,4 +1,4 @@
-import { SkeletonBlock } from '@/features/dashboard/components/skeletons'
+import { SkeletonBlock } from '@/components/common/SkeletonBlock'
 
 export function ReportsSkeleton() {
   return (

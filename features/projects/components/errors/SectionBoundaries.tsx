@@ -1,6 +1,5 @@
-import { ErrorBoundary } from './ErrorBoundary'
-import { QueryErrorBoundary } from './QueryErrorBoundary'
-import type { SectionBoundaryProps } from './ErrorBoundary.types'
+import { ErrorBoundary, QueryErrorBoundary } from '@/components/common/errors'
+import type { SectionBoundaryProps } from '@/components/common/errors'
 
 /**
  * Convenience wrappers — gotowe granice dla każdej sekcji modułu projektów.

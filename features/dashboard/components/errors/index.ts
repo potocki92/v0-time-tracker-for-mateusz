@@ -1,7 +1,6 @@
-// app/(app)/dashboard/_components/errors/index.ts
-export { ErrorBoundary } from './ErrorBoundary'
-export { QueryErrorBoundary } from './QueryErrorBoundary'   // ⬅ NOWE
-export { DefaultFallback } from './ErrorBoundary.fallback'
+export { ErrorBoundary } from '@/components/common/errors'
+export { QueryErrorBoundary } from '@/components/common/errors'
+export { DefaultFallback } from '@/components/common/errors'
 export {
   DashboardContentBoundary,                                  // ⬅ NOWE
   ChartErrorBoundary,
@@ -10,4 +9,4 @@ export {
   EarningsCardBoundary,
   GoalCardBoundary,
 } from './SectionBoundaries'
-export type * from './ErrorBoundary.types'
+export type * from '@/components/common/errors'

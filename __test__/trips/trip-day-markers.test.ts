@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { selectTripDayMarkers } from '@/app/(app)/calendar/_domain/calendar.selectors'
+import { selectTripDayMarkers } from '@/features/calendar/domain/calendar.selectors'
 import type { Trip } from '@/features/trips/domain'
 
 const trip = (start: string, end: string, id = `${start}-${end}`): Trip => ({

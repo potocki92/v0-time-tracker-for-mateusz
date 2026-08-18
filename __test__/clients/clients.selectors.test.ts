@@ -4,8 +4,8 @@ import {
   selectClientMonthStats,
   selectCurrentClient,
   sortClients,
-} from '@/app/(app)/clients/_domain/clients.selectors'
-import type { ClientWithStats } from '@/app/(app)/clients/_domain/clients.types'
+} from '@/features/clients/domain/clients.selectors'
+import type { ClientWithStats } from '@/features/clients/domain/clients.types'
 import type { Client, WorkEntry } from '@/lib/types'
 
 const NOW = new Date('2026-08-14T12:00:00Z').getTime()

@@ -8,6 +8,7 @@ const pkg = JSON.parse(read('package.json')) as {
   scripts: Record<string, string>
   dependencies: Record<string, string>
   devDependencies: Record<string, string>
+  sideEffects: string[]
 }
 
 const major = (v: string) => v.replace(/[^0-9.]/g, '').split('.')[0]
@@ -25,6 +26,10 @@ describe('quality gates — package.json', () => {
     for (const dep of ['vitest', 'autoprefixer', 'eslint', 'typescript']) {
       expect(pkg.dependencies[dep], `${dep} nie moze byc runtime dependency`).toBeUndefined()
     }
+  })
+
+  it('declares sideEffects so barrel files stay tree-shakeable', () => {
+    expect(pkg.sideEffects).toEqual(['*.css'])
   })
 
   it('pins React type packages to the React major version', () => {

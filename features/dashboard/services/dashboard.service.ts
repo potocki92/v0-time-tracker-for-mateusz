@@ -5,7 +5,7 @@ import {
   fetchInvoices,
   fetchProjects,
 } from './dashboard.fetchers'
-import type { DashboardData } from '@/features/dashboard/types/dashboard.types'
+import type { DashboardData } from '../types/dashboard.types'
 
 function resolveUserName(metadata: Record<string, unknown>, email?: string): string {
   return (

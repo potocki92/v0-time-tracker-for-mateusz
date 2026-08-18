@@ -16,7 +16,7 @@ import { AuthWatcher } from './AuthWatcher'
 // za sobą formularze + upload avatara. Bez dynamic() ładowałby się na każdej
 // stronie panelu.
 const SettingsDrawer = dynamic(
-  () => import('../settings/_components/SettingsDrawer').then((mod) => mod.SettingsDrawer),
+  () => import('@/features/settings').then((mod) => mod.SettingsDrawer),
   { ssr: false },
 )
 

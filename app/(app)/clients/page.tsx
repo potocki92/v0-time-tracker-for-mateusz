@@ -5,10 +5,8 @@ import {
   dehydrate,
 } from '@tanstack/react-query'
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
-import { ClientsContent } from './_components/ClientsContent'
-import { ClientsSkeleton } from './_components/ClientsSkeleton'
-import { ClientsContentBoundary } from './_components/errors'
-import { getClientsDataServer } from './_services/clients.service.server'
+import { ClientsContent, ClientsContentBoundary, ClientsSkeleton } from '@/features/clients'
+import { getClientsDataServer } from '@/features/clients/server'
 
 // Server Component — prefetch na serwerze, user dostaje dane od razu po hydracji.
 export default async function ClientsPage() {

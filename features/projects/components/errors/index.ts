@@ -1,9 +1,9 @@
-export { ErrorBoundary } from './ErrorBoundary'
-export { QueryErrorBoundary } from './QueryErrorBoundary'
-export { DefaultFallback } from './ErrorBoundary.fallback'
+export { ErrorBoundary } from '@/components/common/errors'
+export { QueryErrorBoundary } from '@/components/common/errors'
+export { DefaultFallback } from '@/components/common/errors'
 export {
   ProjectsContentBoundary,
   ProjectsStatsBoundary,
   ProjectsListBoundary,
 } from './SectionBoundaries'
-export type * from './ErrorBoundary.types'
+export type * from '@/components/common/errors'

@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import type { TimeRange } from '@/app/(app)/dashboard/_domain/dashboard.types'
+import type { TimeRange } from '@/features/dashboard/domain'
 
 type ModalId =
   | 'invoice-create'
