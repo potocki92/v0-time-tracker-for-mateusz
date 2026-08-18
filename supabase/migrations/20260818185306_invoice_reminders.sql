@@ -15,8 +15,13 @@ CREATE TABLE IF NOT EXISTS public.invoice_reminders_sent (
 CREATE INDEX IF NOT EXISTS idx_invoice_reminders_invoice
   ON public.invoice_reminders_sent (invoice_id);
 
+-- `sent_at::date` zalezy od ustawienia TimeZone sesji, wiec jest STABLE, nie
+-- IMMUTABLE — Postgres odrzuca taki wyraz w indeksie ("functions in index
+-- expression must be marked IMMUTABLE"). Przypiecie strefy do UTC czyni wyraz
+-- immutable i daje stabilna, niezalezna od sesji granice doby dla idempotencji
+-- dziennego crona.
 CREATE UNIQUE INDEX IF NOT EXISTS idx_invoice_reminders_idempotency
-  ON public.invoice_reminders_sent (invoice_id, reminder_kind, (sent_at::date))
+  ON public.invoice_reminders_sent (invoice_id, reminder_kind, ((sent_at AT TIME ZONE 'UTC')::date))
   WHERE error_message IS NULL;
 
 ALTER TABLE public.invoice_reminders_sent ENABLE ROW LEVEL SECURITY;

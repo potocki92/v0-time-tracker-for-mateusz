@@ -95,7 +95,7 @@ export function RateHistoryDialog({ userId, client, open, onClose }: Props) {
               <p className="rounded-md border border-dashed border-amber-300 bg-amber-50 p-3 text-xs text-amber-800 dark:bg-amber-950/30">
                 Historia niedostępna. Uruchom migrację
                 <code className="mx-1 rounded bg-amber-100 px-1 dark:bg-amber-900">
-                  scripts/005_client_rates.sql
+                  supabase/migrations (client_rates)
                 </code>
                 żeby włączyć śledzenie zmian stawek.
               </p>

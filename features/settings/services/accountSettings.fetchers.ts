@@ -10,6 +10,9 @@ type UserMetadata = {
   invoice_settings?: Partial<InvoiceSettings>
 }
 
+/** Sufit listy klientow w selectcie auto-fakturowania. */
+const MAX_AUTO_INVOICE_CLIENTS = 500
+
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   userPrefix: 'FV',
   numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
@@ -54,6 +57,9 @@ export async function fetchAccountProfile(): Promise<AccountProfile> {
     .select('id, name')
     .eq('user_id', user.id)
     .order('name', { ascending: true })
+    // Select do auto-fakturowania — jawny sufit zamiast odczytu rosnacego
+    // liniowo z liczba klientow.
+    .limit(MAX_AUTO_INVOICE_CLIENTS)
 
   if (clientsError) {
     throw new Error(`Nie udało się pobrać klientów dla auto-fakturowania: ${clientsError.message}`)

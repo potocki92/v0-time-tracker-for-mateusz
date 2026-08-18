@@ -1,6 +1,6 @@
 /**
  * Invoice lifecycle status. Mirrors the `invoice_status` enum in PostgreSQL
- * (see scripts/011_invoice_status_enum.sql).
+ * (see migracja invoice_status_enum w supabase/migrations).
  */
 export const InvoiceStatus = {
   DRAFT: 'DRAFT',

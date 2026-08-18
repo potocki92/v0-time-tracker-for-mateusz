@@ -6,6 +6,18 @@ import { RevenueChart } from './_components/RevenueChart'
 import { StatusDistribution } from './_components/StatusDistribution'
 import { TopClientsTable } from './_components/TopClientsTable'
 
+/**
+ * Analityka czyta tylko to, czego uzywa `calculateInvoiceAnalytics`
+ * (kwoty, waluta, daty) i `deriveInvoiceStatus` (status, due_date,
+ * is_paid, invoice_number). Reszta wiersza — blok szablonu PDF, notatki,
+ * file_url — nie jest tu potrzebna.
+ */
+const INVOICES_ANALYTICS_COLUMNS =
+  'id, client_id, invoice_number, issue_date, invoice_date, due_date, paid_date, amount, gross_amount, currency, is_paid, status, created_at'
+
+/** Jawny sufit zamiast odczytu rosnacego liniowo z historia. */
+const INVOICES_ANALYTICS_MAX = 2_000
+
 export const dynamic = 'force-dynamic'
 
 export default async function InvoicesAnalyticsPage() {
@@ -19,7 +31,13 @@ export default async function InvoicesAnalyticsPage() {
   }
 
   const [{ data: invoices }, { data: clients }, { data: profile }] = await Promise.all([
-    supabase.from('invoices').select('*').eq('user_id', user.id),
+    supabase
+      .from('invoices')
+      .select(INVOICES_ANALYTICS_COLUMNS)
+      .eq('user_id', user.id)
+      .order('issue_date', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(INVOICES_ANALYTICS_MAX),
     supabase.from('clients').select('id, name').eq('user_id', user.id),
     supabase.from('profiles').select('eur_to_pln').eq('id', user.id).maybeSingle(),
   ])

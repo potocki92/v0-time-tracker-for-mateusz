@@ -2,6 +2,12 @@ import { createClient } from '@/lib/supabase/client'
 import { uploadInvoicePdf } from '@/services/invoices'
 import type { Client, Invoice } from '@/lib/types'
 import type { ImportInvoiceCsvRow, InvoiceFormValues, InvoiceSettings } from '../../domain'
+import {
+  INVOICES_CLIENT_COLUMNS,
+  INVOICES_INVOICE_COLUMNS,
+  INVOICES_MAX_CLIENTS,
+  INVOICES_MAX_INVOICES,
+} from '../invoices.columns'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
   userPrefix: 'FV',
@@ -39,8 +45,18 @@ export async function fetchInvoicesAndClients(): Promise<{ invoices: Invoice[]; 
   const userId = user.id
 
   const [invoicesRes, clientsRes] = await Promise.all([
-    supabase.from('invoices').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
-    supabase.from('clients').select('*').eq('user_id', userId).order('name', { ascending: true }),
+    supabase
+      .from('invoices')
+      .select(INVOICES_INVOICE_COLUMNS)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(INVOICES_MAX_INVOICES),
+    supabase
+      .from('clients')
+      .select(INVOICES_CLIENT_COLUMNS)
+      .eq('user_id', userId)
+      .order('name', { ascending: true })
+      .limit(INVOICES_MAX_CLIENTS),
   ])
 
   if (invoicesRes.error) throw new Error(invoicesRes.error.message)

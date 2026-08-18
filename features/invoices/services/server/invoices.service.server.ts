@@ -20,6 +20,12 @@ import { formatInvoiceNumber, sanitizeInvoicePrefix } from '@/lib/finance/invoic
 import { INVOICE_STATUS_VALUES, InvoiceStatus } from '@/lib/finance/invoice-status'
 import type { InvoiceLifecycleStatus } from '@/lib/types'
 import type { AutoIssueResult, InvoiceSettings, InvoicesData, SaveInvoiceInput } from '../../domain'
+import {
+  INVOICES_CLIENT_COLUMNS,
+  INVOICES_INVOICE_COLUMNS,
+  INVOICES_MAX_CLIENTS,
+  INVOICES_MAX_INVOICES,
+} from '../invoices.columns'
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
 
@@ -257,8 +263,16 @@ const getInvoicesDataServerCached = cache(async (): Promise<InvoicesData> => {
   // Użytkownik jest potrzebny tylko po to, by odczytać ustawienia z `user_metadata`.
   const [user, invoicesRes, clientsRes] = await Promise.all([
     getServerUser(),
-    supabase.from('invoices').select('*').order('created_at', { ascending: false }),
-    supabase.from('clients').select('*').order('name', { ascending: true }),
+    supabase
+      .from('invoices')
+      .select(INVOICES_INVOICE_COLUMNS)
+      .order('created_at', { ascending: false })
+      .limit(INVOICES_MAX_INVOICES),
+    supabase
+      .from('clients')
+      .select(INVOICES_CLIENT_COLUMNS)
+      .order('name', { ascending: true })
+      .limit(INVOICES_MAX_CLIENTS),
   ])
 
   if (!user) {
