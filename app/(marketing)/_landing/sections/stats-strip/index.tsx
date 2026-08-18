@@ -23,9 +23,9 @@ const logos = [
   )},
   { key: 'auto', height: 30, children: (
     <svg viewBox="0 0 150 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <text x="0" y="22" fontFamily="JetBrains Mono,monospace" fontSize="18" fontWeight="400" fill="currentColor">auto</text>
+      <text x="0" y="22" fontFamily="Geist Mono,monospace" fontSize="18" fontWeight="400" fill="currentColor">auto</text>
       <circle cx="56" cy="15" r="2.5" fill="currentColor" />
-      <text x="62" y="22" fontFamily="JetBrains Mono,monospace" fontSize="18" fontWeight="500" fill="currentColor">werk</text>
+      <text x="62" y="22" fontFamily="Geist Mono,monospace" fontSize="18" fontWeight="500" fill="currentColor">werk</text>
     </svg>
   )},
   { key: 'nordlicht', height: 34, children: (
@@ -44,7 +44,7 @@ const logos = [
   { key: 'atelier', height: 34, children: (
     <svg viewBox="0 0 160 34" fill="none" xmlns="http://www.w3.org/2000/svg">
       <text x="0" y="24" fontFamily="Inter,sans-serif" fontSize="22" fontWeight="700" fill="currentColor" letterSpacing="-0.8">Atelier</text>
-      <text x="82" y="24" fontFamily="JetBrains Mono,monospace" fontSize="20" fontWeight="500" fill="currentColor">44</text>
+      <text x="82" y="24" fontFamily="Geist Mono,monospace" fontSize="20" fontWeight="500" fill="currentColor">44</text>
       <circle cx="120" cy="10" r="3" stroke="currentColor" strokeWidth="1.2" fill="none" />
     </svg>
   )},

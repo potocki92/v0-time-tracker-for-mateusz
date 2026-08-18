@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CalendarRange, Plus } from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -145,7 +145,7 @@ export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) 
           <ul className="space-y-3" role="list" aria-label="Pozycje na fakturze">
             <AnimatePresence initial={false}>
               {fields.map((field, index) => (
-                <motion.div
+                <m.div
                   key={(field as unknown as { id: string }).id}
                   layout="position"
                   initial={{ opacity: 0, y: -4 }}
@@ -159,7 +159,7 @@ export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) 
                     itemCount={fields.length}
                     onRemove={handleRemove}
                   />
-                </motion.div>
+                </m.div>
               ))}
             </AnimatePresence>
           </ul>

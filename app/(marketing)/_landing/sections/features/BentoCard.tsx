@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 
 interface BentoCardProps {
   className?: string
@@ -13,7 +13,7 @@ interface BentoCardProps {
 export function BentoCard({ className = '', delay = 0, children }: BentoCardProps) {
   const shouldReduceMotion = useReducedMotion()
   return (
-    <motion.div
+    <m.div
       className={`bento ${className}`}
       initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -21,6 +21,6 @@ export function BentoCard({ className = '', delay = 0, children }: BentoCardProp
       transition={{ duration: 0.5, delay: shouldReduceMotion ? 0 : delay }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }

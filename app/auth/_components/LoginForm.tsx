@@ -1,48 +1,23 @@
 'use client'
 
+import { useActionState } from 'react'
 import Link from 'next/link'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight, KeyRound, Mail } from 'lucide-react'
 
-import {
-  SubmitButton,
-  UniversalForm,
-  type UniversalFieldConfig,
-} from '@/components/common/form'
 import { FormWrapper } from '@/components/common/form/FormWrapper'
-import { loginSchema, type LoginInput } from '@/lib/schemas/auth.schema'
-import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
 
-const DEFAULT_VALUES: LoginInput = {
-  email:    '',
-  password: '',
-}
+import { loginAction, type LoginState } from '../_actions/login.action'
+import { AuthField, AuthSubmitButton } from './AuthField'
 
-const LOGIN_FIELDS: ReadonlyArray<UniversalFieldConfig<LoginInput>> = [
-  {
-    name:         'email',
-    type:         'email',
-    label:        'Email',
-    placeholder:  'jan@przyklad.pl',
-    autoComplete: 'email',
-    icon:         <Mail className="h-4 w-4" />,
-  },
-  {
-    name:         'password',
-    type:         'password',
-    label:        'Hasło',
-    placeholder:  '••••••••',
-    autoComplete: 'current-password',
-    icon:         <KeyRound className="h-4 w-4" />,
-  },
-]
+const INITIAL_STATE: LoginState = {}
 
 /**
- * Presentation layer — wires schema, fields, and mutation together.
- * Business logic (Supabase, routing, toasts) lives in `useLoginMutation`.
+ * Warstwa prezentacji — walidacja i wywolanie Supabase zyja w
+ * `loginAction`, wiec ten formularz nie wciaga do przegladarki ani
+ * `@supabase/supabase-js`, ani `zod`, ani react-hook-form.
  */
 export function LoginForm() {
-  const loginMutation = useLoginMutation()
+  const [state, formAction, pending] = useActionState(loginAction, INITIAL_STATE)
 
   return (
     <FormWrapper
@@ -60,18 +35,42 @@ export function LoginForm() {
         </p>
       }
     >
-      <UniversalForm<LoginInput>
-        resolver={zodResolver(loginSchema)}
-        defaultValues={DEFAULT_VALUES}
-        fields={LOGIN_FIELDS}
-        ariaLabel="Formularz logowania"
-        onSubmit={(values) => loginMutation.mutateAsync(values)}
-      >
-        <SubmitButton pendingLabel="Logowanie...">
+      <form action={formAction} aria-label="Formularz logowania" noValidate className="space-y-6">
+        <AuthField
+          name="email"
+          type="email"
+          label="Email"
+          placeholder="jan@przyklad.pl"
+          autoComplete="email"
+          icon={<Mail className="h-4 w-4" />}
+          error={state.fieldErrors?.email}
+          disabled={pending}
+        />
+        <AuthField
+          name="password"
+          type="password"
+          label="Hasło"
+          placeholder="••••••••"
+          autoComplete="current-password"
+          icon={<KeyRound className="h-4 w-4" />}
+          error={state.fieldErrors?.password}
+          disabled={pending}
+        />
+
+        {state.error ? (
+          <p
+            role="alert"
+            className="rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-[13px] text-destructive/85"
+          >
+            {state.error}
+          </p>
+        ) : null}
+
+        <AuthSubmitButton pending={pending} pendingLabel="Logowanie...">
           Zaloguj się
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </SubmitButton>
-      </UniversalForm>
+        </AuthSubmitButton>
+      </form>
     </FormWrapper>
   )
 }

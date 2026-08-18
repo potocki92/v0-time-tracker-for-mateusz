@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-/** Minimum password length used for both login and signup. */
-export const PASSWORD_MIN = 8
+import { PASSWORD_MIN } from './auth.constants'
 
 const emailField = z
   .string({ required_error: 'Email jest wymagany' })

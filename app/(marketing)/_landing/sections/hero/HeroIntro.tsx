@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { ArrowRight, Check, Play } from 'lucide-react'
 
 import { TRUST_BADGES } from './data'
@@ -10,7 +10,7 @@ export function HeroIntro() {
     <>
       {/* Live chip */}
       <div className="flex justify-center">
-        <motion.span
+        <m.span
           className="live-chip group"
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -19,11 +19,11 @@ export function HeroIntro() {
           <span className="dot" />
           v3.2 · Live tracking now in EU‑West
           <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
-        </motion.span>
+        </m.span>
       </div>
 
       {/* Headline */}
-      <motion.h1
+      <m.h1
         className="display display-lg mt-6 text-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -32,10 +32,10 @@ export function HeroIntro() {
         <span className="ink-gradient">Time, </span>
         <span className="em-text">accounted</span>
         <span className="ink-gradient"> for.</span>
-      </motion.h1>
+      </m.h1>
 
       {/* Subheadline */}
-      <motion.p
+      <m.p
         className="mx-auto mt-6 max-w-[640px] text-center text-[18px] leading-relaxed"
         style={{ color: 'var(--ink-2)' }}
         initial={{ opacity: 0, y: 16 }}
@@ -44,10 +44,10 @@ export function HeroIntro() {
       >
         Track every hour, invoice every euro. TimeTracker turns raw time into revenue — with a live
         timer, calendar, and one-click invoicing built for freelancers who mean business.
-      </motion.p>
+      </m.p>
 
       {/* CTAs */}
-      <motion.div
+      <m.div
         className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -60,10 +60,10 @@ export function HeroIntro() {
           <Play size={14} className="mr-1.5 inline-block" />
           Watch demo
         </a>
-      </motion.div>
+      </m.div>
 
       {/* Trust badges */}
-      <motion.div
+      <m.div
         className="mt-5 flex flex-wrap items-center justify-center gap-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -79,7 +79,7 @@ export function HeroIntro() {
             {label}
           </span>
         ))}
-      </motion.div>
+      </m.div>
     </>
   )
 }

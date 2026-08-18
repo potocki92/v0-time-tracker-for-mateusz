@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 
 import { STEPS } from './data'
 import { ScreenCalendar } from './screens/ScreenCalendar'
@@ -98,7 +98,7 @@ export function FeatureShowcaseSection() {
                 <div className="device-glow" />
                 <div className="device-screen" style={{ minHeight: '400px' }}>
                   <AnimatePresence mode="wait">
-                    <motion.div
+                    <m.div
                       key={activeScreen}
                       className="h-full"
                       initial={{ opacity: 0, y: 12 }}
@@ -107,7 +107,7 @@ export function FeatureShowcaseSection() {
                       transition={{ duration: 0.3 }}
                     >
                       <ActiveScreen />
-                    </motion.div>
+                    </m.div>
                   </AnimatePresence>
                 </div>
               </div>

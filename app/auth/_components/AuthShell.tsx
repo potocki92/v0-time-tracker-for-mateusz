@@ -1,10 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 import { cn } from '@/lib/utils'
 import { BRAND, Logo } from '@/components/brand/logo'
+import { MotionProvider } from '@/components/common/motion-provider'
 
 import { AuthBackground } from './AuthBackground'
 import { AuthShowcase } from './AuthShowcase'
@@ -30,10 +31,10 @@ interface AuthShellProps {
  */
 export function AuthShell({ children, className }: AuthShellProps) {
   return (
-    <>
+    <MotionProvider>
       <AuthBackground />
       <div className="flex min-h-screen items-center justify-center px-4 py-8 sm:py-12">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20, scale: 0.98 }}
           animate={{ opacity: 1, y: 0,  scale: 1 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -62,8 +63,8 @@ export function AuthShell({ children, className }: AuthShellProps) {
 
             <AuthShowcase />
           </div>
-        </motion.div>
+        </m.div>
       </div>
-    </>
+    </MotionProvider>
   )
 }

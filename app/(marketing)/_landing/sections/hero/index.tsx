@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
+import { m, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 
 import { DashboardMockup } from './DashboardMockup'
 import { HeroFloatingCards } from './HeroFloatingCards'
@@ -17,7 +17,7 @@ export function HeroSection() {
   return (
     <section id="top" className="relative overflow-hidden pb-14 pt-20 sm:pb-[100px] sm:pt-[120px]">
       {/* Orbs */}
-      <motion.div
+      <m.div
         aria-hidden="true"
         className="pointer-events-none absolute left-[-200px] top-[-100px] h-[600px] w-[600px] rounded-full"
         style={{
@@ -25,7 +25,7 @@ export function HeroSection() {
           y: yOrb1,
         }}
       />
-      <motion.div
+      <m.div
         aria-hidden="true"
         className="pointer-events-none absolute right-[-150px] top-[200px] h-[500px] w-[500px] rounded-full"
         style={{
@@ -33,7 +33,7 @@ export function HeroSection() {
           y: yOrb2,
         }}
       />
-      <motion.div
+      <m.div
         aria-hidden="true"
         className="pointer-events-none absolute bottom-[-100px] left-1/2 h-[400px] w-[400px] -translate-x-1/2 rounded-full"
         style={{
@@ -51,7 +51,7 @@ export function HeroSection() {
         <HeroFloatingCards />
 
         {/* Device frame */}
-        <motion.div
+        <m.div
           className="device noise mx-auto mt-10 max-w-[1080px] sm:mt-20"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -60,7 +60,7 @@ export function HeroSection() {
         >
           <div className="device-glow" />
           <DashboardMockup />
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

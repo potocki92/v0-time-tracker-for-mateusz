@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useFormContext, useFormState, type FieldValues } from 'react-hook-form'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Eye, EyeOff } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
@@ -156,7 +156,7 @@ export function FormInput<TValues extends FieldValues>({
 
       <AnimatePresence initial={false}>
         {error?.message ? (
-          <motion.p
+          <m.p
             key="error"
             id={errorId}
             role="alert"
@@ -167,7 +167,7 @@ export function FormInput<TValues extends FieldValues>({
             className="pt-0.5 text-[13px] text-destructive/75 dark:text-destructive/80"
           >
             {error.message}
-          </motion.p>
+          </m.p>
         ) : null}
       </AnimatePresence>
     </div>

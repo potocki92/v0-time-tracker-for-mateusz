@@ -52,10 +52,10 @@
 
 /* ─── Numeric / mono ─── */
 .landing-root .num {
-  font-family: var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+  font-family: var(--font-geist-mono, 'Geist Mono', monospace);
 }
 .landing-root .mono {
-  font-family: var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+  font-family: var(--font-geist-mono, 'Geist Mono', monospace);
 }
 
 /* ─── Mesh / grid overlay ─── */
@@ -246,7 +246,7 @@
   justify-content: center;
 }
 .landing-root .step-num {
-  font-family: var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+  font-family: var(--font-geist-mono, 'Geist Mono', monospace);
   font-size: 11px;
   letter-spacing: .18em;
   color: var(--ink-3);
@@ -262,7 +262,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-family: var(--font-jetbrains-mono, 'JetBrains Mono', monospace);
+  font-family: var(--font-geist-mono, 'Geist Mono', monospace);
 }
 
 /* ─── Aurora ─── */
