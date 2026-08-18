@@ -1,4 +1,3 @@
-export { SkeletonBlock } from './SkeletonBlock'
 export {
   HeaderSkeleton,
   KpiSkeleton,

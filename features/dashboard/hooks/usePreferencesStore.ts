@@ -15,8 +15,8 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { DEFAULT_EUR_TO_PLN } from '@/features/dashboard/types/dashboard.constants'
-import type { Currency, Goal } from '@/features/dashboard/types/dashboard.types'
+import { DEFAULT_EUR_TO_PLN } from '../types/dashboard.constants'
+import type { Currency, Goal } from '../types/dashboard.types'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

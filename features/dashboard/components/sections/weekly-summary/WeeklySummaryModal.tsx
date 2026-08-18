@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button'
 import type {
   ContractorBlock,
   WeeklySummary,
-} from '@/features/dashboard/lib/weekly-summary'
+} from '../../../lib/weekly-summary'
 import { formatWeeklySummaryText } from './format'
 import { formatDate, formatHours, formatRate, formatTotals } from './presentation'
 

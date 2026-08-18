@@ -15,7 +15,7 @@ import {
   type InvoiceLanguage,
   type PaymentMethod,
 } from '@/lib/schemas/invoice-builder.schema'
-import { useEffectiveEurRate } from '@/features/dashboard/hooks/usePreferencesStore'
+import { useEffectiveEurRate } from '@/features/dashboard'
 
 import { InvoiceLineItemsField } from './InvoiceLineItemsField'
 import { InvoiceTotalsSummary } from './InvoiceTotalsSummary'

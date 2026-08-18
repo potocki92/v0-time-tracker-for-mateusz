@@ -123,7 +123,10 @@ export function useExportData({
     try {
       // Dynamic import — @react-pdf/renderer jest duży, ładuj tylko gdy potrzeba
       const { pdf }           = await import('@react-pdf/renderer')
-      const { EarningsReport } = await import('../app/(app)/dashboard/_components/export/EarningsReport')
+      // Import gleboki celowo: przez barrel '@/features/dashboard' ten lazy chunk
+      // wciagnalby caly modul dashboardu. Wyjatek udokumentowany w
+      // __test__/config/module-boundaries.test.ts (CODE_SPLIT_EXCEPTIONS).
+      const { EarningsReport } = await import('@/features/dashboard/components/export/EarningsReport')
 
       const rows     = buildRows(entries, clients, eurRate)
       const totals   = {

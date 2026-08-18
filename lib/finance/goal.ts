@@ -1,4 +1,4 @@
-import { Goal } from '@/app/(app)/dashboard/_domain/dashboard.types'
+import type { Goal } from '@/features/dashboard/domain'
 import { Client, MonthlyTotals, WorkEntry } from '@/lib/types'
 import { calculateEarnings } from './earnings'
 

@@ -4,10 +4,11 @@
  * Micro-SaaS boundary: only the symbols below may be imported by the
  * rest of the app. Internal modules (selectors, fetchers, linear cards)
  * stay private to keep the contract stable.
+ *
+ * Server-only entry point lives in '@/features/projects/server'.
  */
 export { ProjectsContent } from './components/ProjectsContent'
 export { ProjectsSkeleton } from './components/ProjectsSkeleton'
-export { getProjectsDataServer } from './services/projects.service.server'
 export {
   ProjectsContentBoundary,
   ProjectsListBoundary,

@@ -1,5 +1,5 @@
 import { format as formatMoney, isPositive } from '@/lib/finance/money'
-import type { AppliedRate, ContractorBlock } from '@/features/dashboard/lib/weekly-summary'
+import type { AppliedRate, ContractorBlock } from '../../../lib/weekly-summary'
 
 /** Klucz `YYYY-MM-DD` → `DD.MM.YYYY`. */
 export function formatDate(key: string): string {

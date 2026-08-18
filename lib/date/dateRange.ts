@@ -1,5 +1,5 @@
 import { getWeekStart } from './week'
-import type { TimeRange } from '@/app/(app)/dashboard/_domain/dashboard.types'
+import type { TimeRange } from '@/features/dashboard/domain'
 
 export type DateRange = { from: Date | null; to: Date | null }
 

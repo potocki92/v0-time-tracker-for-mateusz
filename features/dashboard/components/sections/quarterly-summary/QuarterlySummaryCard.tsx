@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowUpRight, CheckCircle2, Clock, FileWarning, Loader2 } from 'lucide-react'
-import { fetchOverallQuartersAction } from '@/features/invoices/services/actions/worked-quarters.actions'
-import type { OverallQuarterSummary } from '@/features/invoices/services/server/worked-quarters.service.server'
+import { fetchOverallQuartersAction } from '@/features/invoices'
+import type { OverallQuarterSummary } from '@/features/invoices/domain'
 import { formatCurrency } from '@/lib/helpers'
 
 const QUERY_KEY = ['dashboard-module', 'data', 'quarterly-summary'] as const

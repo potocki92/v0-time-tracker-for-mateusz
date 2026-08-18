@@ -1,4 +1,4 @@
-import { SkeletonBlock } from './SkeletonBlock'
+import { SkeletonBlock } from '@/components/common/SkeletonBlock'
 
 /**
  * Linear-style dark skeletons.

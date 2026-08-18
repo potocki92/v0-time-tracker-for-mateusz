@@ -2,7 +2,7 @@
 
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { useMemo } from 'react'
-import { useProfile } from '@/app/(app)/settings/_hooks'
+import { useProfile } from '@/features/settings'
 import { toPublicAvatarUrl } from '@/lib/supabase/avatars'
 
 function getInitials(name?: string, email?: string): string {

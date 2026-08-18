@@ -1,4 +1,4 @@
-import type { ContractorBlock, WeeklySummary } from '@/features/dashboard/lib/weekly-summary'
+import type { ContractorBlock, WeeklySummary } from '../../../lib/weekly-summary'
 import { formatDate, formatHours, formatRate, formatTotals } from './presentation'
 
 function formatBlock(block: ContractorBlock): string {

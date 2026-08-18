@@ -18,8 +18,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { cn } from '@/lib/utils'
-import { fetchWorkedWeeksAction } from '@/features/invoices/services/actions/worked-weeks.actions'
-import type { WorkedWeekSummary } from '@/features/invoices/services/server/worked-weeks.service.server'
+import { fetchWorkedWeeksAction } from '../../../services/actions/worked-weeks.actions'
+import type { WorkedWeekSummary } from '../../../services/server/worked-weeks.service.server'
 
 import { DIALOG_DARK_SURFACE } from '../../dialog-theme'
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { selectCalendarStats } from '@/app/(app)/calendar/_domain/calendar.selectors'
+import { selectCalendarStats } from '@/features/calendar/domain/calendar.selectors'
 import type { Client, WorkEntry } from '@/lib/types'
 
 const TODAY = '2026-05-15'

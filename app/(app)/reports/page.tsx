@@ -2,10 +2,9 @@ import { Suspense } from 'react'
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
 import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
 import { ReportsContent, ReportsSkeleton } from '@/features/reports'
-// Import prosto z serwisu, nie przez barrel `@/features/dashboard` — barrel
-// re-eksportuje `DashboardContent`, przez co cały kliencki dashboard wpadłby
-// do bundle'a raportów.
-import { getDashboardDataServer } from '@/features/dashboard/services/dashboard.service.server'
+// Wejscie serwerowe, nie kliencki barrel `@/features/dashboard` — dzieki temu
+// `DashboardContent` i reszta klienckiego dashboardu nie wpada do bundle'a raportow.
+import { getDashboardDataServer } from '@/features/dashboard/server'
 
 // Server Component — raporty czytają ten sam zbiór co dashboard
 // (`useDashboardData`), więc prefetchujemy go na serwerze zamiast czekać

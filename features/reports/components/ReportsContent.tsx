@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useDashboardData } from '@/features/dashboard/hooks/useDashboardData'
+import { useDashboardData } from '@/features/dashboard'
 import {
   uniqueTags,
   useReportsAnalytics,

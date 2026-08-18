@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import { useDashboardData } from '../../../hooks'
-import { buildWeeklySummary, type ContractorBlock } from '@/features/dashboard/lib/weekly-summary'
+import { buildWeeklySummary, type ContractorBlock } from '../../../lib/weekly-summary'
 import { getWeekStart } from '@/lib/date/week'
 import { WeeklySummaryModal } from './WeeklySummaryModal'
 import { formatDate, formatHours, formatRate, formatTotals } from './presentation'

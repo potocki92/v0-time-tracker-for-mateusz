@@ -6,10 +6,8 @@ import {
 } from '@tanstack/react-query'
 import { QUERY_KEYS } from '@/lib/query/queryKeys'
 import { QUERY_CONFIG } from '@/lib/query/queryConfig'
-import { getCalendarDataServer } from './_services/calendar.service.server'
-import { CalendarContent } from './_components/CalendarContent'
-import { CalendarSkeleton } from './_components/CalendarSkeleton'
-import { CalendarContentBoundary } from './_components/errors'
+import { CalendarContent, CalendarContentBoundary, CalendarSkeleton } from '@/features/calendar'
+import { getCalendarDataServer } from '@/features/calendar/server'
 
 // Server Component — prefetch w HydrationBoundary, analogicznie do dashboardu
 export default async function CalendarPage() {

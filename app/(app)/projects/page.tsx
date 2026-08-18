@@ -1,12 +1,8 @@
 import { Suspense } from 'react'
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
 import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
-import {
-  ProjectsContent,
-  ProjectsContentBoundary,
-  ProjectsSkeleton,
-  getProjectsDataServer,
-} from '@/features/projects'
+import { ProjectsContent, ProjectsContentBoundary, ProjectsSkeleton } from '@/features/projects'
+import { getProjectsDataServer } from '@/features/projects/server'
 
 // Server Component — bez 'use client'.
 // Prefetch po stronie serwera + hydracja React Query → user dostaje

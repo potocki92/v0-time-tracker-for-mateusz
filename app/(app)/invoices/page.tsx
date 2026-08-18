@@ -1,9 +1,9 @@
 import { Suspense } from 'react'
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query'
 import { QUERY_CONFIG } from '@/lib/query'
-import { InvoicesContent } from '@/features/invoices/components'
+import { InvoicesContent } from '@/features/invoices'
 import { INVOICES_MANAGER_QUERY_KEY } from '@/features/invoices/domain'
-import { getInvoicesDataServer } from '@/features/invoices/services/server/invoices.service.server'
+import { getInvoicesDataServer } from '@/features/invoices/server'
 import InvoicesSkeleton from './loading'
 
 export default async function InvoicesPage() {

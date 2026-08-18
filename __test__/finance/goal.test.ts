@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { findGoalReachedDate } from '@/lib/finance/goal'
-import type { Goal } from '@/app/(app)/dashboard/_domain/dashboard.types'
+import type { Goal } from '@/features/dashboard/domain'
 import type { WorkEntry } from '@/lib/types'
 
 const plDate = (iso: string) =>

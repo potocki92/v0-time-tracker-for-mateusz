@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button'
 import {
   type InvoiceBuilderValues,
 } from '@/lib/schemas/invoice-builder.schema'
-import type { WorkedWeekSummary } from '@/features/invoices/services/server/worked-weeks.service.server'
+import type { WorkedWeekSummary } from '../../../services/server/worked-weeks.service.server'
 
 import { emptyLineItem, makeLineItemId } from './invoice-builder.helpers'
 import { InvoiceLineItemRow } from './InvoiceLineItemRow'
