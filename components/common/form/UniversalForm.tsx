@@ -14,6 +14,7 @@ import {
 } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
+import { MotionProvider } from '@/components/common/motion-provider'
 
 import { FormInput } from './FormInput'
 import type { UniversalFieldConfig } from './types'
@@ -86,22 +87,24 @@ export function UniversalForm<TValues extends FieldValues>({
   }, [defaultValues, methods, resetOnDefaultValuesChange])
 
   return (
-    <FormProvider {...methods}>
-      <form
-        id={id}
-        aria-label={ariaLabel}
-        noValidate
-        onSubmit={methods.handleSubmit(onSubmit)}
-        className={cn('space-y-6', className)}
-      >
-        <FormSubmittingFieldset enabled={disableOnSubmit}>
-          {fields?.map((field) => (
-            <FormInput<TValues> key={String(field.name)} {...field} />
-          ))}
-          {typeof children === 'function' ? children(methods) : children}
-        </FormSubmittingFieldset>
-      </form>
-    </FormProvider>
+    <MotionProvider>
+      <FormProvider {...methods}>
+        <form
+          id={id}
+          aria-label={ariaLabel}
+          noValidate
+          onSubmit={methods.handleSubmit(onSubmit)}
+          className={cn('space-y-6', className)}
+        >
+          <FormSubmittingFieldset enabled={disableOnSubmit}>
+            {fields?.map((field) => (
+              <FormInput<TValues> key={String(field.name)} {...field} />
+            ))}
+            {typeof children === 'function' ? children(methods) : children}
+          </FormSubmittingFieldset>
+        </form>
+      </FormProvider>
+    </MotionProvider>
   )
 }
 

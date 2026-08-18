@@ -7,7 +7,7 @@ import {
   type FieldPath,
   type FieldValues,
 } from 'react-hook-form'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -110,7 +110,7 @@ function FieldShell({
 
       <AnimatePresence initial={false}>
         {error ? (
-          <motion.p
+          <m.p
             key="error"
             id={errorId}
             role="alert"
@@ -121,7 +121,7 @@ function FieldShell({
             className="pt-0.5 text-[13px] text-destructive/75 dark:text-destructive/80"
           >
             {error}
-          </motion.p>
+          </m.p>
         ) : null}
       </AnimatePresence>
     </div>

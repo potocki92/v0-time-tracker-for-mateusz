@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { Timer } from 'lucide-react'
 
 import { useTickingClock } from '../../hooks/useTickingClock'
@@ -156,7 +156,7 @@ export function DashboardMockup() {
             </div>
             <div className="grid h-[72px] grid-cols-12 items-end gap-1.5">
               {bars.map((h, i) => (
-                <motion.div
+                <m.div
                   key={i}
                   className={i === bars.length - 1 ? 'bar now' : 'bar'}
                   initial={shouldReduceMotion ? false : { height: 0 }}

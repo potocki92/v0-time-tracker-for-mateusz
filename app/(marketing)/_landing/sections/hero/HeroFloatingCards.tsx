@@ -1,13 +1,13 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { Zap } from 'lucide-react'
 
 export function HeroFloatingCards() {
   return (
     <>
       {/* Floating chip LEFT */}
-      <motion.div
+      <m.div
         className="panel absolute -left-2 top-[120px] hidden w-[220px] xl:left-6 xl:block"
         initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
@@ -25,10 +25,10 @@ export function HeroFloatingCards() {
         <div className="mt-1 text-[11px]" style={{ color: 'var(--ink-3)' }}>
           Tomasz Ignor · 72h × €18
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Floating chip RIGHT */}
-      <motion.div
+      <m.div
         className="panel absolute -right-2 top-[260px] hidden w-[240px] xl:block"
         initial={{ opacity: 0, x: 24 }}
         animate={{ opacity: 1, x: 0 }}
@@ -50,7 +50,7 @@ export function HeroFloatingCards() {
         >
           Review draft →
         </a>
-      </motion.div>
+      </m.div>
     </>
   )
 }

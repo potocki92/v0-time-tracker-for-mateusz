@@ -1,72 +1,23 @@
 'use client'
 
+import { useActionState } from 'react'
 import Link from 'next/link'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight, KeyRound, Mail, User } from 'lucide-react'
 
-import {
-  SubmitButton,
-  UniversalForm,
-  type UniversalFieldConfig,
-} from '@/components/common/form'
 import { FormWrapper } from '@/components/common/form/FormWrapper'
-import {
-  signUpSchema,
-  PASSWORD_MIN,
-  type SignUpInput,
-} from '@/lib/schemas/auth.schema'
-import { useSignUpMutation } from '@/hooks/auth/useSignUpMutation'
+import { PASSWORD_MIN } from '@/lib/schemas/auth.constants'
 
-const DEFAULT_VALUES: SignUpInput = {
-  fullName:        '',
-  email:           '',
-  password:        '',
-  confirmPassword: '',
-}
+import { signUpAction, type SignUpState } from '../_actions/sign-up.action'
+import { AuthField, AuthSubmitButton } from './AuthField'
 
-const SIGNUP_FIELDS: ReadonlyArray<UniversalFieldConfig<SignUpInput>> = [
-  {
-    name:         'fullName',
-    type:         'text',
-    label:        'Imię i nazwisko',
-    placeholder:  'Jan Kowalski',
-    autoComplete: 'name',
-    icon:         <User className="h-4 w-4" />,
-  },
-  {
-    name:         'email',
-    type:         'email',
-    label:        'Email',
-    placeholder:  'jan@przyklad.pl',
-    autoComplete: 'email',
-    icon:         <Mail className="h-4 w-4" />,
-  },
-  {
-    name:         'password',
-    type:         'password',
-    label:        'Hasło',
-    placeholder:  `Minimum ${PASSWORD_MIN} znaków`,
-    autoComplete: 'new-password',
-    icon:         <KeyRound className="h-4 w-4" />,
-    description:  'Użyj unikalnego hasła, którego nie wykorzystujesz gdzie indziej.',
-  },
-  {
-    name:         'confirmPassword',
-    type:         'password',
-    label:        'Potwierdź hasło',
-    placeholder:  'Powtórz hasło',
-    autoComplete: 'new-password',
-    icon:         <KeyRound className="h-4 w-4" />,
-  },
-]
+const INITIAL_STATE: SignUpState = {}
 
 /**
- * Presentation layer for signup. All network/business logic lives in
- * `useSignUpMutation`, the Zod schema is the single source of truth for
- * validation, and `UniversalForm` orchestrates RHF.
+ * Warstwa prezentacji rejestracji. Schemat Zod pozostaje jedynym zrodlem
+ * prawdy dla walidacji, ale wykonuje sie w `signUpAction` na serwerze.
  */
 export function SignUpForm() {
-  const signUpMutation = useSignUpMutation()
+  const [state, formAction, pending] = useActionState(signUpAction, INITIAL_STATE)
 
   return (
     <FormWrapper
@@ -84,18 +35,63 @@ export function SignUpForm() {
         </p>
       }
     >
-      <UniversalForm<SignUpInput>
-        resolver={zodResolver(signUpSchema)}
-        defaultValues={DEFAULT_VALUES}
-        fields={SIGNUP_FIELDS}
-        ariaLabel="Formularz rejestracji"
-        onSubmit={(values) => signUpMutation.mutateAsync(values)}
-      >
-        <SubmitButton pendingLabel="Tworzenie konta...">
+      <form action={formAction} aria-label="Formularz rejestracji" noValidate className="space-y-6">
+        <AuthField
+          name="fullName"
+          type="text"
+          label="Imię i nazwisko"
+          placeholder="Jan Kowalski"
+          autoComplete="name"
+          icon={<User className="h-4 w-4" />}
+          error={state.fieldErrors?.fullName}
+          disabled={pending}
+        />
+        <AuthField
+          name="email"
+          type="email"
+          label="Email"
+          placeholder="jan@przyklad.pl"
+          autoComplete="email"
+          icon={<Mail className="h-4 w-4" />}
+          error={state.fieldErrors?.email}
+          disabled={pending}
+        />
+        <AuthField
+          name="password"
+          type="password"
+          label="Hasło"
+          placeholder={`Minimum ${PASSWORD_MIN} znaków`}
+          autoComplete="new-password"
+          icon={<KeyRound className="h-4 w-4" />}
+          description="Użyj unikalnego hasła, którego nie wykorzystujesz gdzie indziej."
+          error={state.fieldErrors?.password}
+          disabled={pending}
+        />
+        <AuthField
+          name="confirmPassword"
+          type="password"
+          label="Potwierdź hasło"
+          placeholder="Powtórz hasło"
+          autoComplete="new-password"
+          icon={<KeyRound className="h-4 w-4" />}
+          error={state.fieldErrors?.confirmPassword}
+          disabled={pending}
+        />
+
+        {state.error ? (
+          <p
+            role="alert"
+            className="rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-[13px] text-destructive/85"
+          >
+            {state.error}
+          </p>
+        ) : null}
+
+        <AuthSubmitButton pending={pending} pendingLabel="Tworzenie konta...">
           Zarejestruj się
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </SubmitButton>
-      </UniversalForm>
+        </AuthSubmitButton>
+      </form>
     </FormWrapper>
   )
 }

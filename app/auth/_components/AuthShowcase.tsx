@@ -1,7 +1,7 @@
 'use client'
 
 import { Clock3, Receipt, ShieldCheck, Users } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 import { BRAND, Logo } from '@/components/brand/logo'
 
@@ -21,7 +21,7 @@ const FEATURES = [
  */
 export function AuthShowcase() {
   return (
-    <motion.aside
+    <m.aside
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -33,13 +33,13 @@ export function AuthShowcase() {
         className="absolute inset-0 bg-[linear-gradient(135deg,var(--primary)_0%,color-mix(in_oklab,var(--primary)_75%,black)_100%)]"
       />
 
-      <motion.div
+      <m.div
         aria-hidden="true"
         animate={{ scale: [1, 1.15, 1], x: [0, 24, 0], y: [0, -18, 0] }}
         transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-white/25 blur-3xl motion-reduce:animate-none"
       />
-      <motion.div
+      <m.div
         aria-hidden="true"
         animate={{ scale: [1, 1.12, 1], x: [0, -20, 0], y: [0, 24, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
@@ -68,7 +68,7 @@ export function AuthShowcase() {
         </div>
 
         <div className="space-y-8">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -82,11 +82,11 @@ export function AuthShowcase() {
               <br />
               <span className="text-white/80">Resztą zajmiemy się my.</span>
             </h2>
-          </motion.div>
+          </m.div>
 
           <ul className="space-y-3.5">
             {FEATURES.map(({ icon: Icon, label }, i) => (
-              <motion.li
+              <m.li
                 key={label}
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -97,7 +97,7 @@ export function AuthShowcase() {
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <span>{label}</span>
-              </motion.li>
+              </m.li>
             ))}
           </ul>
         </div>
@@ -106,6 +106,6 @@ export function AuthShowcase() {
           © {new Date().getFullYear()} {BRAND.name}. Wszystkie prawa zastrzeżone.
         </p>
       </div>
-    </motion.aside>
+    </m.aside>
   )
 }

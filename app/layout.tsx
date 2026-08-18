@@ -9,7 +9,6 @@ import { GlobalJsonLd } from '@/components/seo/json-ld'
 import { buildMetadata } from '@/lib/seo/metadata'
 import { SITE } from '@/lib/seo/site'
 import './globals.css'
-import { Providers } from './providers'
 
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
@@ -54,8 +53,6 @@ export default function RootLayout({
     <html lang="pl" suppressHydrationWarning>
       <head>
         <ColorThemeInitScript />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <GlobalJsonLd />
       </head>
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`}>
@@ -72,7 +69,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ColorThemeProvider>
-            <Providers>{children}</Providers>
+            {children}
             <Toaster richColors position="top-center" />
           </ColorThemeProvider>
         </ThemeProvider>

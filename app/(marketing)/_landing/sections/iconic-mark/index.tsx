@@ -165,7 +165,7 @@ export function IconicMarkSection() {
             <line x1="400" y1="400" x2="400" y2="220" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" opacity=".9" />
             <line x1="400" y1="400" x2="560" y2="320" stroke="#22E07A" strokeWidth="2.5" strokeLinecap="round" filter="url(#softGlow)" />
             <text
-              fontFamily="JetBrains Mono, monospace"
+              fontFamily="Geist Mono, monospace"
               fontSize="11"
               fill="rgba(255,255,255,.4)"
               letterSpacing="3"

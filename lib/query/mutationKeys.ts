@@ -33,10 +33,6 @@ export const MUTATION_KEYS = {
     uploadAvatar:  ['account', 'upload-avatar']  as const,
     updateInvoiceSettings: ['account', 'update-invoice-settings'] as const,
   },
-  auth: {
-    login:  ['auth', 'login']   as const,
-    signUp: ['auth', 'sign-up'] as const,
-  },
   trip: {
     create: ['trip', 'create'] as const,
     update: ['trip', 'update'] as const,

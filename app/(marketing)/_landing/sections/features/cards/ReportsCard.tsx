@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { LineChart } from 'lucide-react'
 
 import { BentoCard } from '../BentoCard'
@@ -24,7 +24,7 @@ export function ReportsCard() {
 
       <div className="flex h-[56px] items-end gap-1.5">
         {REPORT_BARS.map((h, i) => (
-          <motion.div
+          <m.div
             key={i}
             className={`flex-1 rounded-sm ${i === REPORT_BARS.length - 1 ? 'bar now' : 'bar'}`}
             initial={shouldReduceMotion ? false : { height: 0 }}

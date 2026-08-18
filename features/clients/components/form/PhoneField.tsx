@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useFormContext, useFormState } from 'react-hook-form'
 
 import { Input } from '@/components/ui/input'
@@ -118,7 +118,7 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
 
       <AnimatePresence initial={false}>
         {error ? (
-          <motion.p
+          <m.p
             key="phone-error"
             id={errorId}
             role="alert"
@@ -129,7 +129,7 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
             className="pt-0.5 text-[13px] text-destructive/75 dark:text-destructive/80"
           >
             {error}
-          </motion.p>
+          </m.p>
         ) : null}
       </AnimatePresence>
     </div>
