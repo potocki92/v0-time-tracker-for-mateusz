@@ -82,7 +82,7 @@ export function AuthField({
             [descId, error ? errorId : undefined].filter(Boolean).join(' ') || undefined
           }
           className={cn(
-            'h-12 rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm transition',
+            'h-12 rounded-xl border-input-border bg-background px-4 text-sm shadow-sm transition',
             'focus-visible:border-primary/70 focus-visible:ring-primary/25',
             'aria-invalid:border-destructive/55 aria-invalid:ring-destructive/10 dark:aria-invalid:ring-destructive/20',
             icon && 'pl-11',

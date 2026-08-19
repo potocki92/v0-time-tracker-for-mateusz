@@ -207,7 +207,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             >
               <SelectTrigger
                 id="client-work-type"
-                className="h-12 w-full rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm"
+                className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -231,7 +231,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             >
               <SelectTrigger
                 id="client-currency"
-                className="h-12 w-full rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm"
+                className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -290,7 +290,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             >
               <SelectTrigger
                 id="client-locale"
-                className="h-12 w-full rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm"
+                className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm"
               >
                 <SelectValue placeholder="Wybierz język" />
               </SelectTrigger>
@@ -314,7 +314,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             >
               <SelectTrigger
                 id="client-timezone"
-                className="h-12 w-full rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm"
+                className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm"
               >
                 <SelectValue placeholder="Wybierz strefę" />
               </SelectTrigger>
@@ -416,7 +416,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
           >
             <SelectTrigger
               id="client-auto-invoice-freq"
-              className="h-12 w-full rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm disabled:opacity-60"
+              className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm disabled:opacity-60"
             >
               <SelectValue />
             </SelectTrigger>

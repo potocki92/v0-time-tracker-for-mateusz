@@ -46,10 +46,10 @@ const SOFT_INVALID_CLASS =
   'aria-invalid:border-destructive/55 aria-invalid:ring-destructive/10 dark:aria-invalid:ring-destructive/20'
 
 const INPUT_BASE_CLASS =
-  'h-12 rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm transition focus-visible:border-primary/70 focus-visible:ring-primary/25'
+  'h-12 rounded-xl border-input-border bg-background px-4 text-sm shadow-sm transition focus-visible:border-primary/70 focus-visible:ring-primary/25'
 
 const TRIGGER_BASE_CLASS =
-  'h-12 w-full rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/25'
+  'h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/25'
 
 // ---------------------------------------------------------------------------
 // FieldShell — reused chrome (label, description, animated error message)

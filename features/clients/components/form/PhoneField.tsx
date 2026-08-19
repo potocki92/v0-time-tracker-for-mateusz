@@ -63,7 +63,7 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
 
       <div
         className={cn(
-          'flex items-stretch gap-0 rounded-xl border border-border/70 bg-background shadow-sm transition',
+          'flex items-stretch gap-0 rounded-xl border border-input-border bg-background shadow-sm transition',
           'focus-within:border-primary/70 focus-within:ring-2 focus-within:ring-primary/25',
           error && 'border-destructive/55 ring-destructive/10',
         )}
