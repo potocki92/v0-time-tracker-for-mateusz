@@ -65,6 +65,10 @@ export function DayCell({
   const cellButton = (
     <button
       onClick={() => onClick(day)}
+      // Stabilny uchwyt dla E2E: aria-label komorki zmienia sie razem ze
+      // statusem wpisu i markerem wyjazdu, wiec "komorka dnia X" nie ma
+      // niezmiennej nazwy dostepnosciowej, po ktorej dalo by sie ja wskazac.
+      data-testid={`day-cell-${dateStr}`}
       aria-label={`Dzień ${day}${entry ? `, ${cfg?.label}` : ''}${
         tripMarker ? `, wyjazd${tripMarker.destination ? ` ${tripMarker.destination}` : ''}` : ''
       }`}

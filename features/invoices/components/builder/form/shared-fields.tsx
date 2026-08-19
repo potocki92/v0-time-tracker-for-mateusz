@@ -62,6 +62,8 @@ interface FieldShellProps {
   description?: React.ReactNode
   error?:       string
   className?:   string
+  /** Visual hint rendered inside the control (e.g. currency code). */
+  suffix?:      React.ReactNode
   children:     React.ReactNode
 }
 
@@ -72,10 +74,13 @@ function FieldShell({
   description,
   error,
   className,
+  suffix,
   children,
 }: FieldShellProps) {
   const errorId = `${fieldId}-error`
   const descId = description ? `${fieldId}-desc` : undefined
+  const describedBy =
+    [descId, error ? errorId : undefined].filter(Boolean).join(' ') || undefined
 
   return (
     <div className={cn('space-y-2', className)} data-slot="form-field">
@@ -94,13 +99,24 @@ function FieldShell({
         </Label>
       ) : null}
 
-      {/* Render children with the wiring needed for a11y. */}
-      {React.cloneElement(children as React.ReactElement<{ id?: string; 'aria-describedby'?: string }>, {
-        id: fieldId,
-        'aria-describedby':
-          [descId, error ? errorId : undefined].filter(Boolean).join(' ') ||
-          undefined,
-      })}
+      {/* Render children with the wiring needed for a11y. The clone target
+          MUST be the control itself: when a caller passed a wrapper, `id`
+          landed on the <div>, the label pointed at a non-labelable element
+          and the field ended up with no accessible name at all. That is why
+          the suffix is rendered here rather than by the caller. */}
+      {suffix ? (
+        <div className="relative">
+          {wireControl(children, fieldId, describedBy)}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-medium text-muted-foreground"
+          >
+            {suffix}
+          </span>
+        </div>
+      ) : (
+        wireControl(children, fieldId, describedBy)
+      )}
 
       {description ? (
         <p id={descId} className="text-xs text-muted-foreground">
@@ -125,6 +141,17 @@ function FieldShell({
         ) : null}
       </AnimatePresence>
     </div>
+  )
+}
+
+function wireControl(
+  control: React.ReactNode,
+  id: string,
+  describedBy: string | undefined,
+): React.ReactNode {
+  return React.cloneElement(
+    control as React.ReactElement<{ id?: string; 'aria-describedby'?: string }>,
+    { id, 'aria-describedby': describedBy },
   )
 }
 
@@ -186,46 +213,37 @@ export function NumericFormInput<TValues extends FieldValues>({
       description={description}
       error={fieldError}
       className={className}
+      suffix={suffix}
     >
-      <div className="relative">
-        <Input
-          {...register(name)}
-          type="number"
-          inputMode="decimal"
-          step={step}
-          min={min}
-          max={max}
-          placeholder={placeholder}
-          aria-invalid={Boolean(fieldError)}
-          aria-required={required}
-          aria-label={ariaLabel}
-          disabled={disabled || isSubmitting}
-          onWheel={(event) => {
-            // Block wheel events from mutating focused number inputs —
-            // a long-standing Chrome footgun for currency fields.
-            if (document.activeElement === event.currentTarget) {
-              event.currentTarget.blur()
-            }
-          }}
-          className={cn(
-            INPUT_BASE_CLASS,
-            'font-mono tabular-nums',
-            // Hide the spin buttons; users have step controls or just type.
-            '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-            SOFT_INVALID_CLASS,
-            suffix && 'pr-14',
-            inputClassName,
-          )}
-        />
-        {suffix ? (
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-medium text-muted-foreground"
-          >
-            {suffix}
-          </span>
-        ) : null}
-      </div>
+      <Input
+        {...register(name)}
+        type="number"
+        inputMode="decimal"
+        step={step}
+        min={min}
+        max={max}
+        placeholder={placeholder}
+        aria-invalid={Boolean(fieldError)}
+        aria-required={required}
+        aria-label={ariaLabel}
+        disabled={disabled || isSubmitting}
+        onWheel={(event) => {
+          // Block wheel events from mutating focused number inputs —
+          // a long-standing Chrome footgun for currency fields.
+          if (document.activeElement === event.currentTarget) {
+            event.currentTarget.blur()
+          }
+        }}
+        className={cn(
+          INPUT_BASE_CLASS,
+          'font-mono tabular-nums',
+          // Hide the spin buttons; users have step controls or just type.
+          '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+          SOFT_INVALID_CLASS,
+          suffix && 'pr-14',
+          inputClassName,
+        )}
+      />
     </FieldShell>
   )
 }
