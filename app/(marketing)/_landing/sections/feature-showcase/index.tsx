@@ -48,7 +48,7 @@ export function FeatureShowcaseSection() {
       <div className="mx-auto max-w-[760px] px-4 pb-16 pt-24 sm:px-6 lg:px-8">
         <div className="eyebrow mb-3">The product</div>
         <h2 className="display display-md ink-gradient">A surface for every hour you work.</h2>
-        <p className="mt-4 text-[17px] leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+        <p className="mt-4 text-lg leading-relaxed" style={{ color: 'var(--ink-2)' }}>
           Three views. One source of truth. Dashboard for the big picture, Calendar for the
           day-to-day, Invoices to get paid — all connected, all live.
         </p>
@@ -74,7 +74,7 @@ export function FeatureShowcaseSection() {
                 <h3 className="display display-sm mb-3" style={{ color: 'var(--ink-1)' }}>
                   {step.heading}
                 </h3>
-                <p className="text-[15px] leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-2)' }}>
                   {step.body}
                 </p>
               </div>

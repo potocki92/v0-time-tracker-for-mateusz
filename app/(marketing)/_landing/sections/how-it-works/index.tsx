@@ -42,7 +42,7 @@ export function HowItWorksSection() {
             <div key={num} className="reveal-row">
               <div className="step-num mb-4">{num}</div>
               <div className="display display-sm em-text mb-4">{word}</div>
-              <p className="text-[15px] leading-[1.6]" style={{ color: 'var(--ink-2)' }}>{desc}</p>
+              <p className="text-sm leading-[1.6]" style={{ color: 'var(--ink-2)' }}>{desc}</p>
             </div>
           ))}
         </div>

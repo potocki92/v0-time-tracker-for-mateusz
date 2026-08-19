@@ -83,12 +83,12 @@ export function ActivityCard({
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
     >
       <header className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Aktywność
         </p>
         <Link
           href="/calendar"
-          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
         >
           Zobacz wszystkie
         </Link>
@@ -111,12 +111,12 @@ export function ActivityCard({
               >
                 <Icon className="h-3.5 w-3.5" aria-hidden />
               </span>
-              <span className="text-[10px] font-medium text-zinc-500">{hint}</span>
+              <span className="text-2xs font-medium text-zinc-500">{hint}</span>
             </div>
-            <p className="mt-2 text-[20px] font-semibold tabular-nums leading-[1.15] text-white sm:text-[22px] sm:font-bold">
+            <p className="mt-2 text-xl font-semibold tabular-nums leading-[1.15] text-white sm:text-2xl sm:font-bold">
               {value}
             </p>
-            <p className="text-[10.5px] text-zinc-500 sm:text-[11px]">{label}</p>
+            <p className="text-2xs text-zinc-500">{label}</p>
           </div>
         ))}
       </div>
@@ -135,10 +135,10 @@ export function ActivityCard({
                   TONE[item.tone],
                 )}
               />
-              <p className="min-w-0 flex-1 text-[12.5px] leading-[1.45] text-white sm:text-sm">
+              <p className="min-w-0 flex-1 text-xs leading-[1.45] text-white sm:text-sm">
                 {item.text}
               </p>
-              <span className="shrink-0 text-[10.5px] text-zinc-500 sm:text-[11px]">
+              <span className="shrink-0 text-2xs text-zinc-500">
                 {item.ago}
               </span>
             </li>

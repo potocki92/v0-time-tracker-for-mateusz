@@ -30,13 +30,13 @@ function dayStyle(dataIndex: number): CSSProperties {
 export function ScreenCalendar() {
   return (
     <div className="flex h-full flex-col gap-3 p-4">
-      <div className="text-[13px] font-semibold" style={{ color: 'var(--ink-1)' }}>
+      <div className="text-xs font-semibold" style={{ color: 'var(--ink-1)' }}>
         Calendar · April 2026
       </div>
 
       <div className="grid grid-cols-7 gap-1">
         {DAY_HEADERS.map((d, i) => (
-          <div key={i} className="text-center text-[10px]" style={{ color: 'var(--ink-3)' }}>
+          <div key={i} className="text-center text-2xs" style={{ color: 'var(--ink-3)' }}>
             {d}
           </div>
         ))}
@@ -50,13 +50,13 @@ export function ScreenCalendar() {
           const isToday = dataIndex === TODAY_INDEX
 
           if (isEmpty) {
-            return <div key={cellIndex} className="day-empty aspect-square rounded-md text-[10px]" />
+            return <div key={cellIndex} className="day-empty aspect-square rounded-md text-2xs" />
           }
 
           return (
             <div
               key={cellIndex}
-              className={`flex aspect-square items-center justify-center rounded-md text-[10px] ${isToday ? 'day-today' : dayClass(dataIndex)}`}
+              className={`flex aspect-square items-center justify-center rounded-md text-2xs ${isToday ? 'day-today' : dayClass(dataIndex)}`}
               style={isToday ? {} : dayStyle(dataIndex)}
             >
               <span style={{ color: isToday ? '#22E07A' : 'var(--ink-3)' }}>{dayNum}</span>
@@ -67,19 +67,19 @@ export function ScreenCalendar() {
 
       <div className="panel mt-auto">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-[11px] font-medium" style={{ color: 'var(--ink-1)' }}>
+          <span className="text-2xs font-medium" style={{ color: 'var(--ink-1)' }}>
             Apr 22 · Wed
           </span>
-          <span className="num text-[13px]">8.5h</span>
+          <span className="num text-xs">8.5h</span>
         </div>
         <div className="flex flex-col gap-1.5">
           {DETAIL_ENTRIES.map((entry) => (
             <div key={entry.label} className="flex items-center gap-2">
               <div className="h-3 w-1 shrink-0 rounded-full" style={{ background: entry.color }} />
-              <span className="flex-1 text-[11px]" style={{ color: 'var(--ink-2)' }}>
+              <span className="flex-1 text-2xs" style={{ color: 'var(--ink-2)' }}>
                 {entry.label}
               </span>
-              <span className="mono text-[10px]" style={{ color: 'var(--ink-3)' }}>
+              <span className="mono text-2xs" style={{ color: 'var(--ink-3)' }}>
                 {entry.time}
               </span>
             </div>

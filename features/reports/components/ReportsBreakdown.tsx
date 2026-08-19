@@ -16,11 +16,11 @@ export function ReportsBreakdown({ items }: Props) {
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
     >
       <header className="flex items-center justify-between gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Projekty
         </p>
         {items.length > 0 && (
-          <span className="text-[11px] text-zinc-500">
+          <span className="text-2xs text-zinc-500">
             {items.length === 1 ? '1 projekt' : `${items.length} projektów`}
           </span>
         )}

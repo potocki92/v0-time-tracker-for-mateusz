@@ -32,7 +32,7 @@ export function BudgetUtilizationSection() {
       badge={
         <span
           className={cn(
-            'rounded-md border px-2 py-0.5 text-[11px] font-medium tabular-nums',
+            'rounded-md border px-2 py-0.5 text-2xs font-medium tabular-nums',
             LINEAR.border,
             LINEAR.surfaceElevated,
             tone,

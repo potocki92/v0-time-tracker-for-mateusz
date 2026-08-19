@@ -81,7 +81,7 @@ export function SignUpForm() {
         {state.error ? (
           <p
             role="alert"
-            className="rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-[13px] text-destructive/85"
+            className="rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-xs text-destructive/85"
           >
             {state.error}
           </p>

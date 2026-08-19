@@ -57,7 +57,7 @@ export function CountrySelect({
           aria-required={required}
           aria-describedby={[descId, error ? errorId : undefined].filter(Boolean).join(' ') || undefined}
           className={cn(
-            'h-12 w-full rounded-xl border-border/70 bg-background px-4 text-[0.95rem] shadow-sm',
+            'h-12 w-full rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm',
             'focus-visible:border-primary/70 focus-visible:ring-primary/25',
             error && 'border-destructive/55 ring-destructive/10',
           )}
@@ -84,7 +84,7 @@ export function CountrySelect({
       ) : null}
 
       {error ? (
-        <p id={errorId} role="alert" className="pt-0.5 text-[13px] text-destructive/75">
+        <p id={errorId} role="alert" className="pt-0.5 text-xs text-destructive/75">
           {error}
         </p>
       ) : null}

@@ -75,7 +75,7 @@ export function MonthlyGoalCard({
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
     >
       <header className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Cel miesięczny
         </p>
         <button
@@ -91,30 +91,30 @@ export function MonthlyGoalCard({
       <div className="mt-3.5 flex items-center gap-4">
         <CircularProgress value={progress} />
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-medium leading-[1.3] text-white sm:text-sm">{headline}</p>
-          <p className="mt-1 text-[20px] font-semibold tabular-nums leading-[1.2] text-white sm:text-[22px] sm:font-bold">
+          <p className="text-xs font-medium leading-[1.3] text-white sm:text-sm">{headline}</p>
+          <p className="mt-1 text-xl font-semibold tabular-nums leading-[1.2] text-white sm:text-2xl sm:font-bold">
             {formatCurrency(target, currency)}
           </p>
           {reachedDate && reached ? (
-            <p className="text-[11.5px] leading-[1.35] text-zinc-500 sm:text-xs">Osiągnięty {reachedDate}</p>
+            <p className="text-2xs leading-[1.35] text-zinc-500 sm:text-xs">Osiągnięty {reachedDate}</p>
           ) : (
-            <p className="text-[11.5px] leading-[1.35] text-zinc-500 sm:text-xs">
+            <p className="text-2xs leading-[1.35] text-zinc-500 sm:text-xs">
               Aktualnie {formatCurrency(current, currency)}
             </p>
           )}
-          <p className="mt-1 text-[10.5px] leading-[1.35] text-zinc-600 sm:text-[11px]">z {formatCurrency(target, currency)}</p>
+          <p className="mt-1 text-2xs leading-[1.35] text-zinc-600">z {formatCurrency(target, currency)}</p>
         </div>
       </div>
 
       <div className="mt-3.5 grid grid-cols-2 gap-2">
         <div className="rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] px-3 py-2.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Nadwyżka</p>
+          <p className="text-2xs font-semibold uppercase tracking-wider text-zinc-500">Nadwyżka</p>
           <p className="mt-1 text-base font-semibold tabular-nums text-emerald-400">
             +{formatCurrency(surplus, currency)}
           </p>
         </div>
         <div className="rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] px-3 py-2.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Seria</p>
+          <p className="text-2xs font-semibold uppercase tracking-wider text-zinc-500">Seria</p>
           <p className="mt-1 text-base font-semibold tabular-nums text-white">
             {streakDays} dni
           </p>

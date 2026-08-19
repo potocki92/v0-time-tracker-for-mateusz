@@ -72,8 +72,8 @@ const AVATAR_SIZE: Record<ClientDisplaySize, string> = {
 }
 
 const INITIALS_TEXT: Record<ClientDisplaySize, string> = {
-  sm: 'text-[9px]',
-  md: 'text-[10px]',
+  sm: 'text-2xs',
+  md: 'text-2xs',
   lg: 'text-xs',
 }
 

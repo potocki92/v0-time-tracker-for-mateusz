@@ -116,7 +116,7 @@ export function RateHistoryDialog({ userId, client, open, onClose }: Props) {
                             </span>
                           </span>
                           {isCurrent && (
-                            <Badge variant="secondary" className="text-[10px]">Aktualna</Badge>
+                            <Badge variant="secondary" className="text-2xs">Aktualna</Badge>
                           )}
                         </div>
                         <p className="mt-0.5 text-xs text-muted-foreground">
@@ -259,7 +259,7 @@ function CurrentOnly({ client }: { client: Client }) {
           {formatCurrency(client.rate, client.currency)}
           <span className="text-xs font-normal text-muted-foreground">/{unit}</span>
         </span>
-        <Badge variant="secondary" className="text-[10px]">Aktualna</Badge>
+        <Badge variant="secondary" className="text-2xs">Aktualna</Badge>
       </div>
       <p className="mt-0.5 text-xs text-muted-foreground">
         Brak wcześniejszej historii. Dodaj nową stawkę poniżej, żeby rozpocząć śledzenie zmian.

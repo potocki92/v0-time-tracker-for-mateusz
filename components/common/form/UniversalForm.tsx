@@ -173,7 +173,7 @@ export const SubmitButton = React.forwardRef<
       disabled={isDisabled}
       className={cn(
         'relative mt-2 inline-flex h-12 w-full items-center justify-center gap-2 overflow-hidden',
-        'rounded-xl bg-primary px-5 text-[0.95rem] font-semibold text-primary-foreground tracking-tight',
+        'rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground tracking-tight',
         'shadow-md shadow-primary/20 transition-all duration-200',
         'hover:shadow-lg hover:shadow-primary/30 hover:brightness-[1.04] active:scale-[0.99]',
         'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',

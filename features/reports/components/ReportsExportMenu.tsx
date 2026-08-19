@@ -34,7 +34,7 @@ export function ReportsExportMenu({ onExportCsv, onExportJson }: Props) {
         sideOffset={8}
         className="w-44 rounded-xl border-[#1a1a1a] bg-[#0a0a0a] text-zinc-200"
       >
-        <DropdownMenuLabel className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <DropdownMenuLabel className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Pobierz dane
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-[#1a1a1a]" />

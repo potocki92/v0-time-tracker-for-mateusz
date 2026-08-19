@@ -145,13 +145,13 @@ function KpiTile({
         className={cn(
           'mt-2 truncate font-semibold leading-none tracking-tight text-white',
           compact
-            ? 'text-[15px] leading-snug sm:text-base'
-            : 'text-[22px] tabular-nums sm:text-[26px]',
+            ? 'text-sm leading-snug sm:text-base'
+            : 'text-2xl tabular-nums sm:text-3xl',
         )}
       >
         {value}
       </p>
-      {meta && <p className="mt-2 truncate text-[11.5px] text-zinc-400 sm:text-xs">{meta}</p>}
+      {meta && <p className="mt-2 truncate text-2xs text-zinc-400 sm:text-xs">{meta}</p>}
     </div>
   )
 }

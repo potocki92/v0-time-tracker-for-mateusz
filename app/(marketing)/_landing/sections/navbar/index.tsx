@@ -54,11 +54,11 @@ export function LandingNavbarSection({ isAuthenticated }: LandingNavbarSectionPr
         <div className="flex items-center gap-2">
           <a
             href="/dashboard"
-            className="em-hover hidden items-center gap-1.5 text-[13px] sm:inline-flex"
+            className="em-hover hidden items-center gap-1.5 text-xs sm:inline-flex"
           >
             Sign in <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
-          <a href="#cta" className="cta-primary !px-3.5 !py-2 !text-[12.5px]">
+          <a href="#cta" className="cta-primary !px-3.5 !py-2 !text-xs">
             Start free <ArrowRight className="h-3.5 w-3.5" />
           </a>
           <button

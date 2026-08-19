@@ -51,7 +51,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
         <div className="flex flex-wrap items-center gap-2">
           <span
             className={cn(
-              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold',
               'bg-[#17171a] text-zinc-200 ring-1 ring-[#2a2a30]',
             )}
           >
@@ -60,7 +60,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
           </span>
           <span
             className={cn(
-              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold',
               statusPill.className,
             )}
           >
@@ -69,7 +69,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
           {project.priority === 'high' && (
             <span
               className={cn(
-                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold',
                 PROJECT_PRIORITY_PILL.high.className,
               )}
             >
@@ -146,16 +146,16 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
         <div className={cn('flex items-center gap-2 border-t pt-3', LINEAR.borderInset)}>
           <Avatar className={cn('h-7 w-7 border', LINEAR.border)}>
             <AvatarFallback
-              className="text-[11px] font-semibold text-white"
+              className="text-2xs font-semibold text-white"
               style={{ backgroundColor: project.color }}
             >
               {clientInitials(clientName)}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[12.5px] font-medium text-white">{clientName}</p>
+            <p className="truncate text-xs font-medium text-white">{clientName}</p>
             {project.description && (
-              <p className="truncate text-[11.5px] text-zinc-400">{project.description}</p>
+              <p className="truncate text-2xs text-zinc-400">{project.description}</p>
             )}
           </div>
         </div>
@@ -185,7 +185,7 @@ function Metric({
 }) {
   return (
     <div className={cn('rounded-lg border px-3 py-2.5', LINEAR.borderInset, LINEAR.rowSurface)}>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+      <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
         {label}
       </p>
       <p
@@ -199,7 +199,7 @@ function Metric({
         {value}
       </p>
       {meta && (
-        <p className={cn('mt-0.5 text-[11px] text-zinc-400', warning && 'text-amber-300/80')}>
+        <p className={cn('mt-0.5 text-2xs text-zinc-400', warning && 'text-amber-300/80')}>
           {meta}
         </p>
       )}

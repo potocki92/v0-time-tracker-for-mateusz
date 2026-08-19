@@ -32,21 +32,21 @@ export function EffectiveRateCard({
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
     >
       <header className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Stawka efektywna
         </p>
-        <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[11px] text-zinc-400">
+        <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-400">
           {periodShort}
         </span>
       </header>
 
       <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-[26px] font-semibold tabular-nums leading-[1.15] text-white sm:text-[28px] sm:font-bold">
+        <span className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
           {formatCurrency(blendedRate, currency)}
         </span>
-        <span className="text-[12.5px] text-zinc-500 sm:text-sm">/ h</span>
+        <span className="text-xs text-zinc-500 sm:text-sm">/ h</span>
       </div>
-      <p className="mt-1 text-[11.5px] leading-[1.4] text-zinc-500 sm:text-xs">
+      <p className="mt-1 text-2xs leading-[1.4] text-zinc-500 sm:text-xs">
         Średnia ważona ·{' '}
         {clientsCount === 1 ? '1 klient' : `${clientsCount} klientów`}
       </p>

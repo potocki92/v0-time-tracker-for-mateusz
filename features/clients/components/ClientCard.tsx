@@ -91,7 +91,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
         aria-hidden
         className={cn(
           'absolute inset-y-0 left-0 w-1',
-          isActive ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.45)]' : LINEAR.rail,
+          isActive ? 'bg-emerald-500 shadow-[0_0_10px_color-mix(in_oklab,var(--primary)_45%,transparent)]' : LINEAR.rail,
         )}
       />
 
@@ -120,7 +120,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
             <div className="flex items-center gap-1.5">
               {/* 15 px + line-clamp-2: nazwy firm ucięte do jednej linii
                   („ELITT HOME SPÓŁKA Z OGR…") były nie do rozróżnienia. */}
-              <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-white">
+              <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-white">
                 {client.name}
               </h3>
               {client.is_default && (
@@ -186,7 +186,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
 
       {/* Typ / waluta / liczba wpisów to metadane, nie nagłówek — jedna linia
           drobnym drukiem zamiast trzech pigułek konkurujących z nazwą. */}
-      <p className="mt-2.5 flex items-center gap-1.5 text-[11px] text-zinc-500">
+      <p className="mt-2.5 flex items-center gap-1.5 text-2xs text-zinc-500">
         <span>{WORK_TYPE_LABELS[client.work_type]}</span>
         <span aria-hidden>·</span>
         <span>{client.currency}</span>
@@ -215,7 +215,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
           value={
             <>
               {formatCurrency(client.rate, client.currency)}
-              <span className="text-[11px] font-normal text-zinc-500">/{unit}</span>
+              <span className="text-2xs font-normal text-zinc-500">/{unit}</span>
             </>
           }
         />
@@ -255,7 +255,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
           <CollapsibleTrigger asChild>
             <button
               type="button"
-              className="flex min-h-9 w-full items-center justify-between gap-2 rounded-md px-1 py-1 text-[11px] font-medium text-zinc-400 transition-colors hover:text-white"
+              className="flex min-h-9 w-full items-center justify-between gap-2 rounded-md px-1 py-1 text-2xs font-medium text-zinc-400 transition-colors hover:text-white"
             >
               <span>{detailsOpen ? 'Ukryj szczegóły' : 'Pokaż szczegóły'}</span>
               <ChevronDown
@@ -289,12 +289,12 @@ function Metric({
 }) {
   return (
     <div className="min-w-0">
-      <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+      <dt className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
         {label}
       </dt>
       <dd
         className={cn(
-          'mt-0.5 truncate text-[13.5px] font-semibold tabular-nums text-white',
+          'mt-0.5 truncate text-xs font-semibold tabular-nums text-white',
           empty && 'text-zinc-600',
         )}
       >

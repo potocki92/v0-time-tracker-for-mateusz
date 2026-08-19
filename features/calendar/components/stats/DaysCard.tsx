@@ -14,11 +14,11 @@ export function DaysCard({ workDays, freeDays }: Props) {
       ariaLabel={`${workDays} dni pracy, ${freeDays} dni wolnych`}
     >
       <div className="mt-2 flex items-baseline gap-2">
-        <p className="text-2xl font-bold tabular-nums tracking-tight text-white sm:text-[26px]">{workDays}</p>
+        <p className="text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">{workDays}</p>
         <span className="text-xs text-zinc-500 sm:text-sm">/ {freeDays}</span>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] sm:text-[11px]">
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-2xs">
         <span className="flex items-center gap-1 text-zinc-500">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           {workDays} pracy

@@ -40,7 +40,7 @@ export function AuthShell({ children, className }: AuthShellProps) {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className={cn(
             'relative w-full max-w-6xl overflow-hidden rounded-[28px] border border-border/60',
-            'bg-card shadow-[0_24px_60px_-20px_rgba(0,0,0,0.25)] dark:shadow-[0_24px_60px_-20px_rgba(0,0,0,0.6)]',
+            'bg-card shadow-xl',
             className,
           )}
         >

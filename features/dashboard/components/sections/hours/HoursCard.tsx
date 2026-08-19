@@ -22,8 +22,8 @@ const LEVEL_CLASSES: Record<Cell['level'], string> = {
   0: 'bg-[#101410] border border-[#1a1a1a]',
   1: 'bg-emerald-900/70 border border-emerald-900/30',
   2: 'bg-emerald-700 border border-emerald-700/40',
-  3: 'bg-emerald-500 border border-emerald-500/40 shadow-[0_0_8px_-2px_rgba(34,197,94,0.5)]',
-  4: 'bg-emerald-400 border border-emerald-400/40 shadow-[0_0_12px_-2px_rgba(34,197,94,0.7)]',
+  3: 'bg-emerald-500 border border-emerald-500/40 shadow-[0_0_8px_-2px_color-mix(in_oklab,var(--primary)_50%,transparent)]',
+  4: 'bg-emerald-400 border border-emerald-400/40 shadow-[0_0_12px_-2px_color-mix(in_oklab,var(--primary)_70%,transparent)]',
 }
 
 function levelFromHours(h: number): Cell['level'] {
@@ -99,22 +99,22 @@ export function HoursCard({
     >
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Godziny · {periodLabel}
           </p>
-          <p className="mt-2 text-[26px] font-semibold tabular-nums leading-[1.15] text-white sm:text-[28px] sm:font-bold">
+          <p className="mt-2 text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
             {totalHours.toFixed(1)}{' '}
-            <span className="text-[12.5px] font-medium text-zinc-500 sm:text-sm">
+            <span className="text-xs font-medium text-zinc-500 sm:text-sm">
               / {targetHours} h
             </span>
           </p>
-          <p className="mt-1 text-[11.5px] leading-[1.4] text-zinc-500 sm:text-xs">
+          <p className="mt-1 text-2xs leading-[1.4] text-zinc-500 sm:text-xs">
             Średnio {avgPerDay.toFixed(1)} h/dzień
             {overtime > 0 && <> · {overtime.toFixed(0)} h nadgodzin</>}
           </p>
         </div>
         {reached && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400 ring-1 ring-emerald-500/30">
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-semibold text-emerald-400 ring-1 ring-emerald-500/30">
             <Check className="h-3 w-3" aria-hidden />
             Cel osiągnięty
           </span>
@@ -131,7 +131,7 @@ export function HoursCard({
             }}
           />
         </div>
-        <div className="mt-1.5 flex justify-between text-[10px] text-zinc-500">
+        <div className="mt-1.5 flex justify-between text-2xs text-zinc-500">
           <span>0</span>
           <span>Cel {targetHours}</span>
           <span className={reached ? 'font-semibold text-emerald-400' : ''}>

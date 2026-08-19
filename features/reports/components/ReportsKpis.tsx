@@ -33,7 +33,7 @@ function TrendBadge({ trend }: { trend: Trend }) {
     : 'text-zinc-500'
 
   return (
-    <span className={`inline-flex items-center gap-1 text-[11px] font-medium ${tone}`}>
+    <span className={`inline-flex items-center gap-1 text-2xs font-medium ${tone}`}>
       <Icon aria-hidden className="size-3" />
       {trend.direction === 'flat' ? 'bez zmian' : `${trend.value.toFixed(1)}%`}
     </span>
@@ -52,15 +52,15 @@ function KpiCard({ label, value, hint, trend, icon: Icon }: CardProps) {
   return (
     <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           {label}
         </p>
         <Icon aria-hidden className="size-4 text-zinc-600" />
       </div>
-      <p className="mt-3 text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[28px]">
+      <p className="mt-3 text-3xl font-semibold leading-none tabular-nums text-white sm:text-4xl">
         {value}
       </p>
-      <div className="mt-2 flex items-center justify-between gap-2 text-[11.5px] text-zinc-500">
+      <div className="mt-2 flex items-center justify-between gap-2 text-2xs text-zinc-500">
         <span className="truncate">{hint ?? ' '}</span>
         {trend ? <TrendBadge trend={trend} /> : null}
       </div>

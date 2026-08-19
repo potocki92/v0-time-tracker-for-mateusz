@@ -47,7 +47,7 @@ export const FormWrapper = React.forwardRef<HTMLDivElement, FormWrapperProps>(
           {title || description ? (
             <header className="mb-8 space-y-2">
               {title ? (
-                <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-[2rem]">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-h1">
                   {title}
                 </h1>
               ) : null}

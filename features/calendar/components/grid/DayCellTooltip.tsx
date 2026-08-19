@@ -27,7 +27,7 @@ export function DayCellTooltip({ entry, client, earnings, day, month, year }: Pr
         <span className="font-medium text-foreground">
           {day} {MONTH_ABBR[month]} {year}
         </span>
-        <span className={cn('ml-auto rounded px-1.5 py-0.5 text-[10px] font-semibold', cfg?.pill)}>
+        <span className={cn('ml-auto rounded px-1.5 py-0.5 text-2xs font-semibold', cfg?.pill)}>
           {cfg?.label}
         </span>
       </div>
@@ -36,14 +36,14 @@ export function DayCellTooltip({ entry, client, earnings, day, month, year }: Pr
         {client && (
           <div className="flex items-center gap-2">
             <div
-              className="h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-background"
+              className="h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-2xs font-bold text-white ring-2 ring-background"
               style={{ background: stringToColor(client.name) }}
             >
               {client.name.slice(0, 2).toUpperCase()}
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-foreground truncate">{client.name}</p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-2xs text-muted-foreground">
                 {client.rate} {client.currency}/{client.work_type === 'hourly' ? 'h' : client.unit}
               </p>
             </div>
@@ -67,7 +67,7 @@ export function DayCellTooltip({ entry, client, earnings, day, month, year }: Pr
                 {entry.quantity} {client.unit}
               </span>
               {entry.quantity_from != null && entry.quantity_to != null && (
-                <span className="text-[10px]">
+                <span className="text-2xs">
                   {' '}
                   ({entry.quantity_from} → {entry.quantity_to})
                 </span>
@@ -84,7 +84,7 @@ export function DayCellTooltip({ entry, client, earnings, day, month, year }: Pr
                 {formatCurrency(earnings.amount, earnings.currency as CURRENCY)}
               </span>
               {earnings.currency !== 'PLN' && (
-                <span className="text-[10px] text-muted-foreground ml-1">
+                <span className="text-2xs text-muted-foreground ml-1">
                   ≈ {formatCurrency(earnings.amountInPLN, 'PLN')}
                 </span>
               )}

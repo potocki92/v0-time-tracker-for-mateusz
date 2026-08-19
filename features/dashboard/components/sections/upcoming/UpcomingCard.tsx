@@ -47,13 +47,13 @@ export function UpcomingCard({ items, onAdd }: Props) {
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Nadchodzące
         </p>
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
         >
           <Plus className="h-3 w-3" aria-hidden />
           Dodaj
@@ -71,15 +71,15 @@ export function UpcomingCard({ items, onAdd }: Props) {
             return (
               <li key={it.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex w-10 flex-col items-center text-center">
-                  <span className="text-[15px] font-semibold tabular-nums leading-[1.15] text-white sm:text-base sm:font-bold">{day}</span>
-                  <span className="text-[10px] font-semibold tracking-wider text-zinc-500">
+                  <span className="text-sm font-semibold tabular-nums leading-[1.15] text-white sm:text-base sm:font-bold">{day}</span>
+                  <span className="text-2xs font-semibold tracking-wider text-zinc-500">
                     {month}
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-medium leading-[1.35] text-white sm:text-sm">{it.title}</p>
+                  <p className="truncate text-xs font-medium leading-[1.35] text-white sm:text-sm">{it.title}</p>
                   <span
-                    className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${CATEGORY_PILL[it.category]}`}
+                    className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-2xs font-semibold ${CATEGORY_PILL[it.category]}`}
                   >
                     {CATEGORY_LABEL[it.category]}
                   </span>

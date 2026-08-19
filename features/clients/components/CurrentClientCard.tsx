@@ -60,13 +60,13 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
           LINEAR.borderInset,
         )}
       >
-        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 ring-1 ring-emerald-500/30">
+        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-2xs font-semibold text-emerald-300 ring-1 ring-emerald-500/30">
           <Zap className="h-3 w-3" aria-hidden />
           Aktualny zleceniodawca
         </span>
         <span
           className={cn(
-            'inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold',
+            'inline-flex items-center rounded-full px-2 py-0.5 text-2xs font-semibold',
             ACTIVITY_PILL[activity],
           )}
         >
@@ -74,7 +74,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
         </span>
         {client.is_default && (
           <span
-            className="inline-flex items-center gap-1 rounded-full bg-[#17171a] px-2 py-0.5 text-[10px] font-semibold text-zinc-300 ring-1 ring-[#2a2a30]"
+            className="inline-flex items-center gap-1 rounded-full bg-[#17171a] px-2 py-0.5 text-2xs font-semibold text-zinc-300 ring-1 ring-[#2a2a30]"
             title="Klient domyślny dla nowych wpisów"
           >
             <Star className="h-3 w-3 fill-amber-500 text-amber-500" aria-hidden />
@@ -106,7 +106,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
             <div className="min-w-0 flex-1">
               <h2
                 id="current-client-name"
-                className="line-clamp-2 text-[17px] font-semibold leading-snug tracking-tight text-white sm:text-xl"
+                className="line-clamp-2 text-lg font-semibold leading-snug tracking-tight text-white sm:text-xl"
               >
                 {client.name}
               </h2>
@@ -177,7 +177,7 @@ function Metric({
     <div className={cn('rounded-lg border px-3 py-2.5', LINEAR.borderInset, LINEAR.rowSurface)}>
       {/* min-h na dwie linie: gdy jedna etykieta się zawinie, a inne nie,
           wartości w siatce przestają stać w jednej linii. */}
-      <p className="min-h-[2.4em] text-[10px] font-semibold uppercase leading-[1.2] tracking-[0.16em] text-zinc-500">
+      <p className="min-h-[2.4em] text-2xs font-semibold uppercase leading-[1.2] tracking-[0.16em] text-zinc-500">
         {label}
       </p>
       <p
@@ -188,7 +188,7 @@ function Metric({
       >
         {value}
       </p>
-      {meta && <p className="mt-0.5 truncate text-[11px] text-zinc-400">{meta}</p>}
+      {meta && <p className="mt-0.5 truncate text-2xs text-zinc-400">{meta}</p>}
     </div>
   )
 }

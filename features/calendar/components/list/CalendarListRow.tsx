@@ -37,7 +37,7 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
       )}
     >
       <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-[#0e0e0e]">
-        <span className="text-[9px] font-medium uppercase tracking-widest text-zinc-500">
+        <span className="text-2xs font-medium uppercase tracking-widest text-zinc-500">
           {['', 'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'][Number(m)]}
         </span>
         <span className="text-sm font-bold leading-none text-white">{Number(d)}</span>
@@ -45,11 +45,11 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
 
       <div className="min-w-0 flex-1 space-y-1">
         <div className="flex flex-wrap items-center gap-1.5">
-          <Badge variant="outline" className={cn('text-[10px] font-medium px-1.5 py-0 border', cfg?.badge)}>
+          <Badge variant="outline" className={cn('text-2xs font-medium px-1.5 py-0 border', cfg?.badge)}>
             {cfg?.label}
           </Badge>
           {quantityLabel && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white">
+            <span className="inline-flex items-center gap-1 text-2xs font-semibold text-white">
               {client?.work_type === 'hourly' ? (
                 <Clock className="h-3 w-3 text-zinc-500" />
               ) : (
@@ -63,18 +63,18 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
         {client && (
           <div className="flex items-center gap-1.5">
             <div
-              className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white"
+              className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-2xs font-bold text-white"
               style={{ background: stringToColor(client.name) }}
               aria-hidden
             >
               {client.name.slice(0, 2).toUpperCase()}
             </div>
-            <span className="truncate text-[11px] text-zinc-400">{client.name}</span>
+            <span className="truncate text-2xs text-zinc-400">{client.name}</span>
           </div>
         )}
 
         {entry.notes && (
-          <p className="line-clamp-1 text-[11px] text-zinc-400">{entry.notes}</p>
+          <p className="line-clamp-1 text-2xs text-zinc-400">{entry.notes}</p>
         )}
       </div>
     </button>

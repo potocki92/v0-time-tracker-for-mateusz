@@ -30,7 +30,7 @@ export function ClientSelect({ clients, value, onChange }: Props) {
             <SelectItem key={client.id} value={client.id}>
               <span className="flex items-center gap-2">
                 <span
-                  className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold text-white"
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full text-2xs font-bold text-white"
                   style={{ background: stringToColor(client.name) }}
                 >
                   {client.name.slice(0, 2).toUpperCase()}

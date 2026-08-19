@@ -38,7 +38,7 @@ export function BottomNav() {
                 onMouseEnter={prefetch ? prefetchOnHover : undefined}
                 onFocus={prefetch ? prefetchOnHover : undefined}
                 className={cn(
-                  'flex h-full flex-col items-center justify-center gap-1 px-1 text-[10.5px] font-medium leading-[1.1] transition-colors',
+                  'flex h-full flex-col items-center justify-center gap-1 px-1 text-2xs font-medium leading-[1.1] transition-colors',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40',
                   isActive
                     ? 'text-emerald-400'

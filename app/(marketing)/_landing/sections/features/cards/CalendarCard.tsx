@@ -11,10 +11,10 @@ export function CalendarCard() {
         <Calendar size={14} style={{ color: '#22E07A' }} />
         <span className="stat-label">Calendar</span>
       </div>
-      <h3 className="mb-2 text-[18px] font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>
+      <h3 className="mb-2 text-lg font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>
         A month painted in hours.
       </h3>
-      <p className="mb-4 text-[14px] leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+      <p className="mb-4 text-sm leading-relaxed" style={{ color: 'var(--ink-2)' }}>
         Colour intensity shows effort at a glance. Drill into any day in one tap.
       </p>
 

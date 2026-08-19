@@ -42,7 +42,7 @@ interface EarningsMenuProps {
 }
 
 const ITEM_BASE =
-  'cursor-pointer gap-2.5 rounded-md px-2 py-2 text-[13px] text-zinc-200 focus:bg-[#161616] focus:text-white data-[state=checked]:text-white'
+  'cursor-pointer gap-2.5 rounded-md px-2 py-2 text-xs text-zinc-200 focus:bg-[#161616] focus:text-white data-[state=checked]:text-white'
 
 export const EarningsMenu = memo(function EarningsMenu({
   privacyMode,
@@ -73,7 +73,7 @@ export const EarningsMenu = memo(function EarningsMenu({
         sideOffset={6}
         className="min-w-[260px] rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-1.5 text-zinc-200 shadow-2xl"
       >
-        <DropdownMenuLabel className="px-2 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <DropdownMenuLabel className="px-2 pb-1 pt-1.5 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Karta Zarobki
         </DropdownMenuLabel>
 
@@ -81,7 +81,7 @@ export const EarningsMenu = memo(function EarningsMenu({
           <DropdownMenuSub>
             <DropdownMenuSubTrigger
               disabled={isExporting}
-              className="cursor-pointer gap-2.5 rounded-md px-2 py-2 text-[13px] text-zinc-200 focus:bg-[#161616] focus:text-white data-[state=open]:bg-[#161616] data-[state=open]:text-white"
+              className="cursor-pointer gap-2.5 rounded-md px-2 py-2 text-xs text-zinc-200 focus:bg-[#161616] focus:text-white data-[state=open]:bg-[#161616] data-[state=open]:text-white"
             >
               <Download className="size-4 text-emerald-400" aria-hidden />
               <span className="flex-1">
@@ -119,14 +119,14 @@ export const EarningsMenu = memo(function EarningsMenu({
 
         <DropdownMenuSeparator className="my-1 bg-[#1a1a1a]" />
 
-        <DropdownMenuLabel className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <DropdownMenuLabel className="px-2 pb-1 pt-1 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Analiza
         </DropdownMenuLabel>
 
         <DropdownMenuCheckboxItem
           checked={compareMode}
           onCheckedChange={onToggleCompare}
-          className="cursor-pointer gap-2.5 rounded-md py-2 text-[13px] text-zinc-200 focus:bg-[#161616] focus:text-white"
+          className="cursor-pointer gap-2.5 rounded-md py-2 text-xs text-zinc-200 focus:bg-[#161616] focus:text-white"
         >
           <span className="flex flex-1 items-center gap-2.5 pl-1">
             <GitCompareArrows className="size-4 text-emerald-400" aria-hidden />
@@ -144,7 +144,7 @@ export const EarningsMenu = memo(function EarningsMenu({
         <DropdownMenuCheckboxItem
           checked={privacyMode}
           onCheckedChange={onTogglePrivacy}
-          className="cursor-pointer gap-2.5 rounded-md py-2 text-[13px] text-zinc-200 focus:bg-[#161616] focus:text-white"
+          className="cursor-pointer gap-2.5 rounded-md py-2 text-xs text-zinc-200 focus:bg-[#161616] focus:text-white"
         >
           <span className="flex flex-1 items-center gap-2.5 pl-1">
             {privacyMode ? (

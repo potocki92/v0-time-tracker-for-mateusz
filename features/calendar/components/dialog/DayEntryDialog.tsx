@@ -115,10 +115,10 @@ export function DayEntryDialog({
             {selectedDay && `${selectedDay} ${MONTH_NAMES[currentMonth]} ${currentYear}`}
           </DialogTitle>
           {existingEntry && (
-            <p className="mt-0.5 text-[11px] text-muted-foreground">Edycja istniejącego wpisu</p>
+            <p className="mt-0.5 text-2xs text-muted-foreground">Edycja istniejącego wpisu</p>
           )}
           {entryKind === 'predicted' && (
-            <Badge variant="secondary" className="mt-2 w-fit text-[11px]">
+            <Badge variant="secondary" className="mt-2 w-fit text-2xs">
               Planujesz przewidywane godziny dla tej daty
             </Badge>
           )}
@@ -130,7 +130,7 @@ export function DayEntryDialog({
               Tryb wpisu
             </Label>
             {isFutureDate ? (
-              <Badge variant="secondary" className="w-fit text-[11px]">
+              <Badge variant="secondary" className="w-fit text-2xs">
                 Przewidywane (dla przyszłych dat)
               </Badge>
             ) : (

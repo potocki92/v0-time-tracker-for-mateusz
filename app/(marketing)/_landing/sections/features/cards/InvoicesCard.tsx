@@ -11,7 +11,7 @@ export function InvoicesCard() {
         <FileText size={14} style={{ color: '#22E07A' }} />
         <span className="stat-label">Invoices</span>
       </div>
-      <h3 className="mb-3 text-[18px] font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>
+      <h3 className="mb-3 text-lg font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>
         From timesheet to paid.
       </h3>
       <div className="flex flex-col gap-0">
@@ -24,7 +24,7 @@ export function InvoicesCard() {
             <div className="flex items-center gap-2">
               <FileEdit size={12} style={{ color: 'var(--ink-3)' }} />
               <div>
-                <div className="mono text-[11px]" style={{ color: 'var(--ink-1)' }}>
+                <div className="mono text-2xs" style={{ color: 'var(--ink-1)' }}>
                   {inv.id}
                 </div>
                 <div className="mt-0.5">
@@ -32,7 +32,7 @@ export function InvoicesCard() {
                 </div>
               </div>
             </div>
-            <span className="num text-[13px]">{inv.amount}</span>
+            <span className="num text-xs">{inv.amount}</span>
           </div>
         ))}
       </div>

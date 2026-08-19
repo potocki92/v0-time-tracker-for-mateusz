@@ -48,7 +48,7 @@ export function AllProjectsSection({
       badge={
         <span
           className={cn(
-            'rounded-md border px-2 py-0.5 text-[11px] text-zinc-300',
+            'rounded-md border px-2 py-0.5 text-2xs text-zinc-300',
             LINEAR.border,
             LINEAR.surfaceElevated,
           )}
@@ -61,7 +61,7 @@ export function AllProjectsSection({
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:bg-[#212126] hover:text-white"
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-[#212126] hover:text-white"
           >
             <X className="h-3 w-3" aria-hidden />
             Reset
@@ -79,7 +79,7 @@ export function AllProjectsSection({
                 type="button"
                 onClick={() => setStatus(option.value)}
                 className={cn(
-                  'inline-flex min-h-9 items-center rounded-full px-3.5 text-[12px] font-medium transition',
+                  'inline-flex min-h-9 items-center rounded-full px-3.5 text-xs font-medium transition',
                   isActive
                     ? 'bg-white text-black'
                     : cn(
@@ -194,7 +194,7 @@ function GroupHeading({ label, count }: { label: string; count: number }) {
   return (
     <li className="flex items-center gap-2 pb-0.5 pt-3 first:pt-0">
       <p className={LINEAR.eyebrow}>{label}</p>
-      <span className="text-[10px] font-semibold tabular-nums text-zinc-500">{count}</span>
+      <span className="text-2xs font-semibold tabular-nums text-zinc-500">{count}</span>
       <span aria-hidden className={cn('h-px flex-1 border-t', LINEAR.borderInset)} />
     </li>
   )

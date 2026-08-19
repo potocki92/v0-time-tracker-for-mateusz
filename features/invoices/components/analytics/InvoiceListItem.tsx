@@ -72,18 +72,18 @@ export function InvoiceListItem({
               <FileText className="h-4 w-4" />
             </span>
             <div className="min-w-0 space-y-0.5">
-              <p className="truncate text-[13px] font-semibold tabular-nums text-white">
+              <p className="truncate text-xs font-semibold tabular-nums text-white">
                 {numberLabel}
               </p>
               {period && (
-                <p className="truncate text-[11.5px] text-zinc-500">{period}</p>
+                <p className="truncate text-2xs text-zinc-500">{period}</p>
               )}
             </div>
           </div>
 
           <span
             className={cn(
-              'inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold',
+              'inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-2xs font-semibold',
               STATUS_PILL[status],
             )}
           >
@@ -92,15 +92,15 @@ export function InvoiceListItem({
         </header>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#161616] pt-3">
-          <p className="truncate text-[13px] font-medium text-zinc-200">{clientName}</p>
+          <p className="truncate text-xs font-medium text-zinc-200">{clientName}</p>
         </div>
 
         <footer className="flex items-end justify-between gap-3 tabular-nums">
-          <div className="flex items-center gap-3 text-[12px] text-zinc-500">
+          <div className="flex items-center gap-3 text-xs text-zinc-500">
             {typeof hours === 'number' && hours > 0 && <span>{Math.round(hours)} h</span>}
             {dateLabel && <span>{dateLabel}</span>}
           </div>
-          <span className="text-[15px] font-semibold text-white">
+          <span className="text-sm font-semibold text-white">
             {formatCurrency(invoice.amount, invoice.currency)}
           </span>
         </footer>

@@ -1,6 +1,6 @@
 'use client'
 
-import { LazyMotion } from 'framer-motion'
+import { LazyMotion, MotionConfig } from 'framer-motion'
 import type { ReactNode } from 'react'
 
 /**
@@ -15,7 +15,9 @@ const loadDomAnimation = () => import('framer-motion').then((mod) => mod.domAnim
 export function MotionProvider({ children }: { children: ReactNode }) {
   return (
     <LazyMotion features={loadDomAnimation} strict>
-      {children}
+      {/* reducedMotion="user" respektuje ustawienie systemowe dla calego poddrzewa,
+        * wiec pojedyncze komponenty nie musza o tym pamietac. */}
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </LazyMotion>
   )
 }

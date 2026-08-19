@@ -32,7 +32,7 @@ function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.Re
   return (
     <label
       htmlFor={htmlFor}
-      className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500"
+      className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500"
     >
       {children}
     </label>
@@ -71,7 +71,7 @@ export function ReportsFilterForm({
                 aria-selected={active}
                 onClick={() => onPresetChange(p.value)}
                 className={
-                  'h-9 rounded-lg text-[12.5px] font-medium transition-colors ' +
+                  'h-9 rounded-lg text-xs font-medium transition-colors ' +
                   (active
                     ? 'bg-white text-black'
                     : 'text-zinc-400 hover:bg-[#141414] hover:text-zinc-200')

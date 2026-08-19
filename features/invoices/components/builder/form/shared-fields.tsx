@@ -46,10 +46,10 @@ const SOFT_INVALID_CLASS =
   'aria-invalid:border-destructive/55 aria-invalid:ring-destructive/10 dark:aria-invalid:ring-destructive/20'
 
 const INPUT_BASE_CLASS =
-  'h-12 rounded-xl border-border/70 bg-background px-4 text-[0.95rem] shadow-sm transition focus-visible:border-primary/70 focus-visible:ring-primary/25'
+  'h-12 rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm transition focus-visible:border-primary/70 focus-visible:ring-primary/25'
 
 const TRIGGER_BASE_CLASS =
-  'h-12 w-full rounded-xl border-border/70 bg-background px-4 text-[0.95rem] shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/25'
+  'h-12 w-full rounded-xl border-border/70 bg-background px-4 text-sm shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/25'
 
 // ---------------------------------------------------------------------------
 // FieldShell — reused chrome (label, description, animated error message)
@@ -118,7 +118,7 @@ function FieldShell({
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -4, height: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="pt-0.5 text-[13px] text-destructive/75 dark:text-destructive/80"
+            className="pt-0.5 text-xs text-destructive/75 dark:text-destructive/80"
           >
             {error}
           </m.p>

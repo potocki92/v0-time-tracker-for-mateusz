@@ -53,18 +53,18 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
 
   return (
     <section className="space-y-2.5">
-      <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-zinc-500">
+      <p className="text-2xs font-medium uppercase tracking-[0.18em] text-zinc-500">
         {dateline}
       </p>
       <div>
         {/* Mobile: stacked.  Desktop (sm+): inline „— here's how April is shaping up." */}
-        <h1 className="text-[22px] font-semibold leading-[1.25] text-white sm:text-[26px]">
+        <h1 className="text-2xl font-semibold leading-[1.25] text-white sm:text-3xl">
           {greetingByHour()}{name ? `, ${name}` : ''}
           <span className="ml-2 hidden font-normal text-zinc-500 sm:inline">
             — {shapingCopy(now)}
           </span>
         </h1>
-        <p className="mt-1 text-[12.5px] leading-[1.4] text-zinc-500 sm:hidden">
+        <p className="mt-1 text-xs leading-[1.4] text-zinc-500 sm:hidden">
           {shapingCopy(now)}
         </p>
       </div>
@@ -85,8 +85,8 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
               onClick={() => onChangeRange(t.value)}
               className={
                 active
-                  ? 'rounded-md bg-[#161616] px-3 py-1.5 text-[11.5px] font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)] sm:px-3.5 sm:text-xs'
-                  : 'rounded-md px-3 py-1.5 text-[11.5px] font-medium text-zinc-500 transition hover:text-zinc-200 sm:px-3.5 sm:text-xs'
+                  ? 'rounded-md bg-[#161616] px-3 py-1.5 text-2xs font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)] sm:px-3.5 sm:text-xs'
+                  : 'rounded-md px-3 py-1.5 text-2xs font-medium text-zinc-500 transition hover:text-zinc-200 sm:px-3.5 sm:text-xs'
               }
             >
               {t.label}

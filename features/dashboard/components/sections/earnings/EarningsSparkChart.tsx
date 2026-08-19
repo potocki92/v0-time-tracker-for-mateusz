@@ -40,7 +40,7 @@ function makeChartTooltip(privacyMode: boolean, compareMode: boolean) {
           </p>
         )}
         {isForecast && (
-          <p className="text-[10px] uppercase tracking-wide text-zinc-500">prognoza</p>
+          <p className="text-2xs uppercase tracking-wide text-zinc-500">prognoza</p>
         )}
       </div>
     )

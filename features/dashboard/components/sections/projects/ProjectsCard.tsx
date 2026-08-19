@@ -47,16 +47,16 @@ export function ProjectsCard({ projects, totalActive }: Props) {
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
         <div className="flex items-center gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Projekty
           </p>
-          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[11px] text-zinc-300">
+          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
             {totalActive} aktywne
           </span>
         </div>
         <Link
           href="/projects"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
         >
           Zobacz wszystkie
           <ArrowUpRight className="h-3 w-3" aria-hidden />
@@ -86,15 +86,15 @@ export function ProjectsCard({ projects, totalActive }: Props) {
                     }}
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-medium leading-[1.35] text-white sm:text-sm">{p.name}</p>
+                    <p className="truncate text-xs font-medium leading-[1.35] text-white sm:text-sm">{p.name}</p>
                     <div className="mt-1 flex items-center gap-2">
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${pill.className}`}
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold ${pill.className}`}
                       >
                         <pill.icon className="h-3 w-3" aria-hidden />
                         {pill.label}
                       </span>
-                      <span className="text-[11.5px] tabular-nums text-zinc-400 sm:text-xs">
+                      <span className="text-2xs tabular-nums text-zinc-400 sm:text-xs">
                         {p.progress}%
                       </span>
                     </div>

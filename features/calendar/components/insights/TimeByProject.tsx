@@ -18,10 +18,10 @@ export function TimeByProject({ projects }: Props) {
     <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
             Czas wg projektu
           </h3>
-          <span className="text-[11px] font-semibold tabular-nums text-zinc-300">
+          <span className="text-2xs font-semibold tabular-nums text-zinc-300">
             {formatCurrency(total, 'PLN')}
           </span>
         </header>
@@ -60,7 +60,7 @@ function ProjectRow({ project }: { project: ProjectAggregate }) {
             {project.clientName}
           </span>
         </div>
-        <div className="flex shrink-0 items-baseline gap-2 text-[11px] tabular-nums">
+        <div className="flex shrink-0 items-baseline gap-2 text-2xs tabular-nums">
           <span className="font-semibold text-white">{project.hours.toFixed(1)}h</span>
           <span className="text-zinc-400">
             {formatCurrency(project.amountPLN, 'PLN')}
@@ -85,7 +85,7 @@ function ProjectRow({ project }: { project: ProjectAggregate }) {
         />
       </div>
 
-      <p className="mt-1 text-[10px] text-zinc-500">
+      <p className="mt-1 text-2xs text-zinc-500">
         {percent}% miesiąca
       </p>
     </li>

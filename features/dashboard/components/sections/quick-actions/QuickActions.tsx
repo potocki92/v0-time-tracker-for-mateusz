@@ -36,7 +36,7 @@ export function QuickActions() {
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
     >
       <header className="flex items-center justify-between">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Szybkie akcje
         </p>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-500">
@@ -58,7 +58,7 @@ export function QuickActions() {
             {highlight && (
               <span
                 aria-hidden
-                className="pointer-events-none absolute left-0 top-0 h-full w-[2px] bg-emerald-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]"
+                className="pointer-events-none absolute left-0 top-0 h-full w-[2px] bg-emerald-500 shadow-[0_0_10px_color-mix(in_oklab,var(--primary)_60%,transparent)]"
               />
             )}
             <span
@@ -71,9 +71,9 @@ export function QuickActions() {
               <Icon className="h-4 w-4" aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-[13px] font-semibold leading-[1.3] text-white sm:text-sm">{label}</p>
+              <p className="text-xs font-semibold leading-[1.3] text-white sm:text-sm">{label}</p>
               {shortcut && (
-                <kbd className="mt-1 inline-block font-mono text-[10px] tracking-wider text-zinc-500">
+                <kbd className="mt-1 inline-block font-mono text-2xs tracking-wider text-zinc-500">
                   {shortcut}
                 </kbd>
               )}

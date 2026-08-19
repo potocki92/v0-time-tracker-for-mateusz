@@ -36,7 +36,7 @@ export function HeroIntro() {
 
       {/* Subheadline */}
       <m.p
-        className="mx-auto mt-6 max-w-[640px] text-center text-[18px] leading-relaxed"
+        className="mx-auto mt-6 max-w-[640px] text-center text-lg leading-relaxed"
         style={{ color: 'var(--ink-2)' }}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ export function HeroIntro() {
         {TRUST_BADGES.map((label) => (
           <span
             key={label}
-            className="flex items-center gap-1.5 text-[13px]"
+            className="flex items-center gap-1.5 text-xs"
             style={{ color: 'var(--ink-3)' }}
           >
             <Check size={13} style={{ color: '#22E07A' }} />

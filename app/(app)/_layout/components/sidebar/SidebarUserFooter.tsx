@@ -49,14 +49,14 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
                 displayName={displayName}
                 initials={initials}
                 className="size-7 shadow-none"
-                fallbackClassName="text-[10.5px] font-semibold"
+                fallbackClassName="text-2xs font-semibold"
               />
 
               <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate text-[12.5px] font-medium text-sidebar-foreground">
+                <span className="truncate text-xs font-medium text-sidebar-foreground">
                   {displayName}
                 </span>
-                <span className="truncate text-[10.5px] text-sidebar-foreground/55">
+                <span className="truncate text-2xs text-sidebar-foreground/55">
                   {email}
                 </span>
               </div>

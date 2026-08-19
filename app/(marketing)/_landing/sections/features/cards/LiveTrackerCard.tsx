@@ -23,10 +23,10 @@ export function LiveTrackerCard() {
         <Timer size={14} style={{ color: '#22E07A' }} />
         <span className="stat-label">Live tracker</span>
       </div>
-      <h3 className="mb-2 text-[18px] font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>
+      <h3 className="mb-2 text-lg font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>
         One key. Start, switch, stop.
       </h3>
-      <p className="mb-5 max-w-[400px] text-[14px] leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+      <p className="mb-5 max-w-[400px] text-sm leading-relaxed" style={{ color: 'var(--ink-2)' }}>
         Tap once to start. Every second counts — no friction, no form. Switch projects mid-session
         without losing a minute.
       </p>
@@ -38,7 +38,7 @@ export function LiveTrackerCard() {
       >
         <div className="flex items-center gap-2">
           <span className="live-dot" style={paused ? { animation: 'none', opacity: 0.4 } : undefined} />
-          <span className="text-[12px]" style={{ color: 'var(--ink-2)' }}>
+          <span className="text-xs" style={{ color: 'var(--ink-2)' }}>
             {paused ? 'Paused' : 'Tracking'} · Im Winkel 51
           </span>
         </div>
@@ -53,7 +53,7 @@ export function LiveTrackerCard() {
             type="button"
             onClick={toggle}
             aria-pressed={paused}
-            className="btn-ghost flex items-center gap-1.5 text-[12px]"
+            className="btn-ghost flex items-center gap-1.5 text-xs"
             style={{ padding: '5px 12px' }}
           >
             {paused ? <Play size={12} /> : <Pause size={12} />}
@@ -62,7 +62,7 @@ export function LiveTrackerCard() {
           <button
             type="button"
             onClick={reset}
-            className="btn-ghost flex items-center gap-1.5 text-[12px]"
+            className="btn-ghost flex items-center gap-1.5 text-xs"
             style={{ padding: '5px 12px' }}
           >
             <Square size={12} />

@@ -34,16 +34,16 @@ export function QuarterlySummaryCard() {
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
         <div className="flex items-center gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Kwartały
           </p>
-          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[11px] text-zinc-300">
+          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
             ostatnie 4
           </span>
         </div>
         <Link
           href="/invoices"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
         >
           Wystaw fakturę
           <ArrowUpRight className="h-3 w-3" aria-hidden />
@@ -105,29 +105,29 @@ function QuarterRow({ quarter: q }: { quarter: OverallQuarterSummary }) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="truncate text-[13px] font-semibold text-white">
+          <p className="truncate text-xs font-semibold text-white">
             {q.quarter} {q.year}
           </p>
-          <p className="shrink-0 text-[12.5px] tabular-nums text-zinc-300">
+          <p className="shrink-0 text-xs tabular-nums text-zinc-300">
             {earningsLabel}
           </p>
         </div>
-        <p className="mt-0.5 truncate text-[11.5px] text-zinc-500">
+        <p className="mt-0.5 truncate text-2xs text-zinc-500">
           {q.workedDays} {q.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(q.hours)}
           {q.invoiceCount > 0
             ? ` · ${q.invoiceCount} ${q.invoiceCount === 1 ? 'faktura' : 'faktur'}`
             : ''}
         </p>
         {q.invoiced ? (
-          <p className="mt-1 inline-flex items-center gap-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-emerald-400">
+          <p className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold uppercase tracking-[0.14em] text-emerald-400">
             Wystawiona
           </p>
         ) : q.workedDays > 0 ? (
-          <p className="mt-1 inline-flex items-center gap-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-amber-300">
+          <p className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold uppercase tracking-[0.14em] text-amber-300">
             Do wystawienia
           </p>
         ) : (
-          <p className="mt-1 inline-flex items-center gap-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <p className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
             Brak pracy
           </p>
         )}

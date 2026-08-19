@@ -38,7 +38,7 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
   return (
     <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
       <header className="flex items-center justify-between gap-3">
-        <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           NALEŻNOŚCI · WIEKOWANIE
         </p>
         <button
@@ -51,10 +51,10 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
       </header>
 
       <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-[26px] font-semibold tracking-tight tabular-nums text-white sm:text-[28px]">
+        <span className="text-3xl font-semibold tracking-tight tabular-nums text-white sm:text-4xl">
           {formatCurrency(total, currency)}
         </span>
-        <span className="text-[12px] text-zinc-500">
+        <span className="text-xs text-zinc-500">
           do odzyskania · {aging.invoiceCount} {pluralFaktur(aging.invoiceCount)}
         </span>
       </div>
@@ -82,11 +82,11 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
       <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
         {SEGMENTS.map((seg) => (
           <div key={seg.key} className="space-y-1">
-            <dt className="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+            <dt className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
               <span className={`h-2 w-2 rounded-full ${seg.dot}`} aria-hidden />
               {seg.label}
             </dt>
-            <dd className="text-[14px] font-semibold tabular-nums text-white">
+            <dd className="text-sm font-semibold tabular-nums text-white">
               {formatCurrency(segmentValues[seg.key], currency)}
             </dd>
           </div>

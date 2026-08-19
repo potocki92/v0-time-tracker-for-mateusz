@@ -11,7 +11,7 @@ export default function SignUpSuccessPage() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-[2rem]">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-h1">
           Sprawdź swoją skrzynkę
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">

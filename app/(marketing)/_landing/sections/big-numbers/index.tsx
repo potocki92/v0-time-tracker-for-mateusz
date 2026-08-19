@@ -26,7 +26,7 @@ export function BigNumbersSection() {
         <div className="eyebrow mb-4 reveal-row">By the numbers</div>
         <CountUp value="37,840" className="colossal num reveal-row block" />
         <div
-          className="mt-4 text-[15px] sm:text-[17px] max-w-[640px] mx-auto reveal-row leading-[1.55]"
+          className="mt-4 text-sm sm:text-lg max-w-[640px] mx-auto reveal-row leading-[1.55]"
           style={{ color: 'var(--ink-2)' }}
         >
           Hours tracked across freelancers, agencies, and tradespeople in Q1. Every minute
@@ -37,10 +37,10 @@ export function BigNumbersSection() {
             <div key={label}>
               <CountUp
                 value={val}
-                className={`num block text-[28px] font-semibold ${green ? 'em-text' : ''}`}
+                className={`num block text-4xl font-semibold ${green ? 'em-text' : ''}`}
               />
               <div
-                className="text-[11.5px] mt-1 uppercase tracking-[.12em]"
+                className="text-2xs mt-1 uppercase tracking-[.12em]"
                 style={{ color: 'var(--ink-3)' }}
               >
                 {label}

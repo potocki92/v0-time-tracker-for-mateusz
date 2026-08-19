@@ -167,7 +167,7 @@ export function TripManagerDialog({
                             <p className="truncate text-sm font-medium">
                               {trip.destination?.trim() || 'Wyjazd'}
                             </p>
-                            <p className="truncate text-[11px] text-muted-foreground">
+                            <p className="truncate text-2xs text-muted-foreground">
                               {formatPlLongDate(trip.startDate)} → {formatPlLongDate(trip.endDate)}
                             </p>
                           </div>
@@ -200,7 +200,7 @@ export function TripManagerDialog({
                           className="grid gap-2 border-t border-border/50 bg-muted/20 px-3 py-3 sm:grid-cols-2"
                         >
                           <div className="grid gap-1">
-                            <Label htmlFor={`start-${trip.id}`} className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                            <Label htmlFor={`start-${trip.id}`} className="text-2xs uppercase tracking-wide text-muted-foreground">
                               Wyjazd
                             </Label>
                             <Input
@@ -213,7 +213,7 @@ export function TripManagerDialog({
                             />
                           </div>
                           <div className="grid gap-1">
-                            <Label htmlFor={`end-${trip.id}`} className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                            <Label htmlFor={`end-${trip.id}`} className="text-2xs uppercase tracking-wide text-muted-foreground">
                               Powrót
                             </Label>
                             <Input
@@ -226,7 +226,7 @@ export function TripManagerDialog({
                             />
                           </div>
                           <div className="grid gap-1 sm:col-span-2">
-                            <Label htmlFor={`destination-${trip.id}`} className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                            <Label htmlFor={`destination-${trip.id}`} className="text-2xs uppercase tracking-wide text-muted-foreground">
                               Miejsce
                             </Label>
                             <Input

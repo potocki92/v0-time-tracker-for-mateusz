@@ -11,7 +11,7 @@ export function BrandMark({ label = true }: { label?: boolean }) {
           <span className="h-[14px] w-[3px] rounded-[1.5px] bg-[#22E07A]" />
         </span>
       </span>
-      {label && <span className="text-[14px] font-semibold tracking-tight">TimeTracker</span>}
+      {label && <span className="text-sm font-semibold tracking-tight">TimeTracker</span>}
     </span>
   )
 }
