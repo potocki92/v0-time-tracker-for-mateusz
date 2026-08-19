@@ -43,7 +43,7 @@ export function HoursPerWeekChart({
     <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between gap-2">
-          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
             Godziny tygodniowo
           </h3>
           <span className="rounded-full border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs font-medium capitalize text-zinc-400">
@@ -113,7 +113,7 @@ export function HoursPerWeekChart({
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="min-w-0">
-      <div className="text-2xs uppercase tracking-wider text-zinc-500">{label}</div>
+      <div className="text-2xs uppercase tracking-wider text-zinc-400">{label}</div>
       <div
         className={cn(
           'truncate text-xs font-semibold tabular-nums',

@@ -99,16 +99,16 @@ export function HoursCard({
     >
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Godziny · {periodLabel}
           </p>
           <p className="mt-2 text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
             {totalHours.toFixed(1)}{' '}
-            <span className="text-xs font-medium text-zinc-500 sm:text-sm">
+            <span className="text-xs font-medium text-zinc-400 sm:text-sm">
               / {targetHours} h
             </span>
           </p>
-          <p className="mt-1 text-2xs leading-[1.4] text-zinc-500 sm:text-xs">
+          <p className="mt-1 text-2xs leading-[1.4] text-zinc-400 sm:text-xs">
             Średnio {avgPerDay.toFixed(1)} h/dzień
             {overtime > 0 && <> · {overtime.toFixed(0)} h nadgodzin</>}
           </p>
@@ -131,7 +131,7 @@ export function HoursCard({
             }}
           />
         </div>
-        <div className="mt-1.5 flex justify-between text-2xs text-zinc-500">
+        <div className="mt-1.5 flex justify-between text-2xs text-zinc-400">
           <span>0</span>
           <span>Cel {targetHours}</span>
           <span className={reached ? 'font-semibold text-emerald-400' : ''}>
@@ -146,6 +146,7 @@ export function HoursCard({
             {row.map((cell) => (
               <div
                 key={cell.date}
+                role="img"
                 title={`${cell.date} · ${cell.hours.toFixed(1)} h`}
                 aria-label={`${cell.date}: ${cell.hours.toFixed(1)} godzin`}
                 className={`aspect-square rounded-md ${LEVEL_CLASSES[cell.level]}`}

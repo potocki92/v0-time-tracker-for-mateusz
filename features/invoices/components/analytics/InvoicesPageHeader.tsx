@@ -23,7 +23,7 @@ export function InvoicesPageHeader({
   return (
     <header className="space-y-2">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <p className="text-2xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           {monthLabel} {year} · CYKL {cycleLabel}
         </p>
         <div
@@ -44,7 +44,7 @@ export function InvoicesPageHeader({
                   'rounded-full px-2 py-0.5 text-2xs font-semibold uppercase tracking-[0.1em] transition',
                   active
                     ? 'bg-emerald-500/10 text-emerald-200'
-                    : 'text-zinc-500 hover:text-white',
+                    : 'text-zinc-400 hover:text-white',
                 )}
               >
                 {value}
@@ -53,10 +53,10 @@ export function InvoicesPageHeader({
           })}
         </div>
       </div>
-      <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+      <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
         Faktury
       </h1>
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-muted-foreground">
         Wystawione, wysłane, w księgach.
       </p>
     </header>

@@ -212,7 +212,7 @@ function Row({
       <span
         className={cn(
           'tabular-nums text-zinc-200',
-          mute && 'text-zinc-500',
+          mute && 'text-zinc-400',
           danger && !mute && 'text-rose-300',
         )}
       >

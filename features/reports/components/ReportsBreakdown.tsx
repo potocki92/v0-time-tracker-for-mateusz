@@ -16,11 +16,11 @@ export function ReportsBreakdown({ items }: Props) {
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
     >
       <header className="flex items-center justify-between gap-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Projekty
         </p>
         {items.length > 0 && (
-          <span className="text-2xs text-zinc-500">
+          <span className="text-2xs text-zinc-400">
             {items.length === 1 ? '1 projekt' : `${items.length} projektów`}
           </span>
         )}
@@ -48,8 +48,8 @@ function BreakdownRow({ item }: { item: ProjectUsage }) {
         <span className="min-w-0 truncate text-sm text-zinc-200">{item.label}</span>
         <span className="shrink-0 tabular-nums text-sm text-zinc-300">
           {item.hours.toFixed(1)}
-          <span className="text-xs text-zinc-500">h</span>
-          <span className="ml-2 text-xs text-zinc-500">{Math.round(item.share)}%</span>
+          <span className="text-xs text-zinc-400">h</span>
+          <span className="ml-2 text-xs text-zinc-400">{Math.round(item.share)}%</span>
         </span>
       </div>
       <div
@@ -72,9 +72,9 @@ function BreakdownRow({ item }: { item: ProjectUsage }) {
 function EmptyState() {
   return (
     <div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#1a1a1a] bg-[#0e0e0e] px-4 py-10 text-center">
-      <FolderOpen aria-hidden className="size-6 text-zinc-600" />
+      <FolderOpen aria-hidden className="size-6 text-zinc-400" />
       <p className="text-sm text-zinc-400">Brak danych w wybranym zakresie</p>
-      <p className="text-xs text-zinc-600">Zmień filtry, aby zobaczyć podział pracy</p>
+      <p className="text-xs text-zinc-400">Zmień filtry, aby zobaczyć podział pracy</p>
     </div>
   )
 }

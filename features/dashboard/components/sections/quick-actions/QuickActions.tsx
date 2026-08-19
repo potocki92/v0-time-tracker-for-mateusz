@@ -36,10 +36,10 @@ export function QuickActions() {
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
     >
       <header className="flex items-center justify-between">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Szybkie akcje
         </p>
-        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-500">
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400">
           <Command className="h-3.5 w-3.5" aria-hidden />
         </span>
       </header>
@@ -73,7 +73,7 @@ export function QuickActions() {
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold leading-[1.3] text-white sm:text-sm">{label}</p>
               {shortcut && (
-                <kbd className="mt-1 inline-block font-mono text-2xs tracking-wider text-zinc-500">
+                <kbd className="mt-1 inline-block font-mono text-2xs tracking-wider text-zinc-400">
                   {shortcut}
                 </kbd>
               )}

@@ -98,7 +98,7 @@ export function AllProjectsSection({
 
         <div className="relative">
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
             aria-hidden
           />
           <input
@@ -107,7 +107,7 @@ export function AllProjectsSection({
             placeholder="Szukaj projektu, klienta, opisu..."
             aria-label="Szukaj projektów"
             className={cn(
-              'h-11 w-full rounded-lg border px-10 text-sm text-white placeholder:text-zinc-500',
+              'h-11 w-full rounded-lg border px-10 text-sm text-white placeholder:text-zinc-400',
               LINEAR.border,
               LINEAR.surfaceElevated,
               'focus:border-zinc-500 focus:outline-none',
@@ -127,7 +127,7 @@ export function AllProjectsSection({
       </div>
 
       {rows.length === 0 ? (
-        <div className="px-4 pb-5 pt-2 text-center text-sm text-zinc-500 sm:px-5">
+        <div className="px-4 pb-5 pt-2 text-center text-sm text-zinc-400 sm:px-5">
           Żaden projekt nie pasuje do bieżących filtrów.
         </div>
       ) : (
@@ -194,7 +194,7 @@ function GroupHeading({ label, count }: { label: string; count: number }) {
   return (
     <li className="flex items-center gap-2 pb-0.5 pt-3 first:pt-0">
       <p className={LINEAR.eyebrow}>{label}</p>
-      <span className="text-2xs font-semibold tabular-nums text-zinc-500">{count}</span>
+      <span className="text-2xs font-semibold tabular-nums text-zinc-400">{count}</span>
       <span aria-hidden className={cn('h-px flex-1 border-t', LINEAR.borderInset)} />
     </li>
   )

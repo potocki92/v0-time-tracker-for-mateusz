@@ -29,7 +29,7 @@ export function InvoiceCashflowCard({
   return (
     <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
       <header className="flex items-center justify-between gap-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           PRZEPŁYW · 6 MIESIĘCY
         </p>
         {trendBadge && (
@@ -44,12 +44,12 @@ export function InvoiceCashflowCard({
         <span className="text-3xl font-semibold tracking-tight tabular-nums text-white sm:text-4xl">
           {formatCurrency(total, currency)}
         </span>
-        <span className="text-xs text-zinc-500">łącznie wystawione</span>
+        <span className="text-xs text-zinc-400">łącznie wystawione</span>
       </div>
 
       <div
         className="mt-5 grid h-32 grid-cols-6 items-end gap-2 sm:gap-3"
-        role="img"
+        role="group"
         aria-label="Wartość wystawionych faktur w ostatnich 6 miesiącach"
       >
         {cashflow.map((m, idx) => {
@@ -64,6 +64,7 @@ export function InvoiceCashflowCard({
                     : 'block rounded-md bg-emerald-500/30'
                 }
                 style={{ height: `${Math.round(ratio * 100)}%` }}
+                role="img"
                 aria-label={`${m.label}: ${formatCurrency(m.total, currency)}`}
               />
             </div>
@@ -71,7 +72,7 @@ export function InvoiceCashflowCard({
         })}
       </div>
 
-      <ul className="mt-2 grid grid-cols-6 gap-2 text-center text-2xs uppercase tracking-wide text-zinc-500 sm:gap-3">
+      <ul className="mt-2 grid grid-cols-6 gap-2 text-center text-2xs uppercase tracking-wide text-zinc-400 sm:gap-3">
         {cashflow.map((m) => (
           <li key={`${m.year}-${m.monthIndex}-label`}>{m.label}</li>
         ))}

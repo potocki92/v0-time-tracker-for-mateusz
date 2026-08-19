@@ -35,12 +35,12 @@ function makeChartTooltip(privacyMode: boolean, compareMode: boolean) {
           {maskValue(formatCurrency(value, 'PLN'), privacyMode)}
         </p>
         {compareMode && row.prevCumulative !== null && (
-          <p className="tabular-nums text-zinc-500">
+          <p className="tabular-nums text-zinc-400">
             Poprz.: {maskValue(formatCurrency(row.prevCumulative, 'PLN'), privacyMode)}
           </p>
         )}
         {isForecast && (
-          <p className="text-2xs uppercase tracking-wide text-zinc-500">prognoza</p>
+          <p className="text-2xs uppercase tracking-wide text-zinc-400">prognoza</p>
         )}
       </div>
     )

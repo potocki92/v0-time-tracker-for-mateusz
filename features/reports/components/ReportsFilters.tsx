@@ -81,7 +81,7 @@ export function ReportsFilters(props: Props) {
           >
             <SheetHeader className="border-b border-[#1a1a1a] px-4 py-3">
               <SheetTitle className="text-base text-white">Filtry raportu</SheetTitle>
-              <SheetDescription className="text-xs text-zinc-500">
+              <SheetDescription className="text-xs text-zinc-400">
                 Dopasuj zakres i przekroje danych
               </SheetDescription>
             </SheetHeader>
@@ -158,7 +158,7 @@ export function ReportsFilters(props: Props) {
             type="button"
             onClick={props.onReset}
             disabled={props.activeCount === 0}
-            className="text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-300 disabled:opacity-40"
+            className="text-xs font-medium text-zinc-400 transition-colors hover:text-zinc-300 disabled:opacity-40"
           >
             Resetuj filtry
           </button>

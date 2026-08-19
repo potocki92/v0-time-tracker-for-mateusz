@@ -18,7 +18,7 @@ export function TimeByProject({ projects }: Props) {
     <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
-          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
             Czas wg projektu
           </h3>
           <span className="text-2xs font-semibold tabular-nums text-zinc-300">
@@ -29,7 +29,7 @@ export function TimeByProject({ projects }: Props) {
         {projects.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-1 py-8 text-center">
             <Briefcase className="h-6 w-6 text-zinc-700" />
-            <p className="text-xs text-zinc-500">Brak przepracowanych godzin</p>
+            <p className="text-xs text-zinc-400">Brak przepracowanych godzin</p>
           </div>
         ) : (
           <ul className="mt-4 space-y-3">
@@ -85,7 +85,7 @@ function ProjectRow({ project }: { project: ProjectAggregate }) {
         />
       </div>
 
-      <p className="mt-1 text-2xs text-zinc-500">
+      <p className="mt-1 text-2xs text-zinc-400">
         {percent}% miesiąca
       </p>
     </li>

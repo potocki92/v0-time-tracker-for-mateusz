@@ -36,7 +36,7 @@ export function AppSidebarHeader() {
               <span className="truncate text-xs font-semibold tracking-tight">
                 TimeTracker
               </span>
-              <span className="truncate text-2xs font-normal text-sidebar-foreground/55">
+              <span className="truncate text-2xs font-normal text-sidebar-foreground/80">
                 Workspace · Developer
               </span>
             </div>

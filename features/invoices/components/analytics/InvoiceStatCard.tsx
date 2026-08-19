@@ -31,7 +31,7 @@ export function InvoiceStatCard({
   return (
     <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
       <header className="flex items-center justify-between gap-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           {label}
         </p>
         {badge && (
@@ -49,12 +49,12 @@ export function InvoiceStatCard({
         {amount}
       </p>
       {secondaryAmount && (
-        <p className="mt-0.5 text-xs font-medium tabular-nums text-zinc-500">
+        <p className="mt-0.5 text-xs font-medium tabular-nums text-zinc-400">
           {secondaryAmount}
         </p>
       )}
       {description && (
-        <p className="mt-1 text-xs leading-snug text-zinc-500">{description}</p>
+        <p className="mt-1 text-xs leading-snug text-zinc-400">{description}</p>
       )}
     </section>
   )

@@ -106,7 +106,10 @@ describe('RLS: work_entries', () => {
   it('user B NIE może UPDATE wpisu usera A', async () => {
     const { count } = await clientB
       .from('work_entries')
-      .update({ hours: 99 })
+      // `count: 'exact'` jest obowiazkowe — bez niego PostgREST nie odsyla
+      // Content-Range i `count` przychodzi jako null, wiec asercja nie
+      // sprawdzalaby niczego.
+      .update({ hours: 99 }, { count: 'exact' })
       .eq('id', entryAId)
 
     // Supabase RLS: brak błędu (polityka filtruje), ale 0 wierszy zmienionych
@@ -124,7 +127,7 @@ describe('RLS: work_entries', () => {
   it('user B NIE może DELETE wpisu usera A', async () => {
     const { count } = await clientB
       .from('work_entries')
-      .delete()
+      .delete({ count: 'exact' })
       .eq('id', entryAId)
 
     expect(count).toBe(0)
@@ -158,11 +161,12 @@ describe('RLS: invoices', () => {
     const { data, error } = await clientA
       .from('invoices')
       .insert({
-        user_id:  userAId,
-        name:     'Test Invoice',
-        amount:   1000,
-        currency: 'PLN',
-        is_paid:  false,
+        user_id:      userAId,
+        name:         'Test Invoice',
+        invoice_date: '2024-01-15',
+        amount:       1000,
+        currency:     'PLN',
+        is_paid:      false,
       })
       .select('id')
       .single()
@@ -184,7 +188,7 @@ describe('RLS: invoices', () => {
   it('user B NIE może oznaczyć faktury A jako zapłaconej', async () => {
     const { count } = await clientB
       .from('invoices')
-      .update({ is_paid: true })
+      .update({ is_paid: true }, { count: 'exact' })
       .eq('id', invoiceAId)
 
     expect(count).toBe(0)

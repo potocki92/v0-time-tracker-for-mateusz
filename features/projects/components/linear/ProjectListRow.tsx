@@ -206,7 +206,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
 function Stat({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
   return (
     <div>
-      <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+      <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
         {label}
       </p>
       <p

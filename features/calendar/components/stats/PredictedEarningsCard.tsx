@@ -35,7 +35,7 @@ export function PredictedEarningsCard({
 
       <div className="mt-3 space-y-1.5">
         <div className="flex items-center justify-between text-2xs">
-          <span className="text-zinc-500">
+          <span className="text-zinc-400">
             Realnie {formatCurrency(realizedEarningsPLN, 'PLN')}
           </span>
           <span className="font-semibold tabular-nums text-emerald-400">
@@ -43,10 +43,11 @@ export function PredictedEarningsCard({
           </span>
         </div>
         <Progress
+          aria-label="Udział zrealizowanych zarobków w prognozie"
           value={realizedSharePercent}
           className="h-1.5 bg-[#161616] [&>div]:bg-emerald-500"
         />
-        <p className="text-2xs text-zinc-500">
+        <p className="text-2xs text-zinc-400">
           {hasPlan
             ? `Plan: ${formatCurrency(predictedEarningsPLN, 'PLN')} • ${predictedDays} ${pluralizeDays(
                 predictedDays,

@@ -20,8 +20,12 @@ jobs:
     timeout-minutes: 15
 
     env:
-      E2E_USER_EMAIL: e2e@example.test
-      E2E_USER_PASSWORD: e2e-local-password-1234
+      # Jeden zestaw zmiennych dla seeda, E2E i suite'u RLS — `vitest.rls.config.ts`
+      # przepuszcza do testow wylacznie `process.env` z prefiksem `TEST_`.
+      TEST_USER_A_EMAIL: a@example.test
+      TEST_USER_A_PASSWORD: e2e-local-a-1234
+      TEST_USER_B_EMAIL: b@example.test
+      TEST_USER_B_PASSWORD: e2e-local-b-1234
       E2E_PORT: 3100
 
     steps:
@@ -64,8 +68,20 @@ jobs:
             echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
           } >> "$GITHUB_ENV"
 
-      - name: Seed test user
+      - name: Seed test users
         run: npm run e2e:seed
+
+      # Przed buildem celowo: RLS nie potrzebuje zbudowanej aplikacji, a trwa
+      # sekundy — dziurawa polityka wywala job zanim zacznie sie trzyminutowy build.
+      - name: RLS policies
+        env:
+          TEST_SUPABASE_URL: ${{ env.NEXT_PUBLIC_SUPABASE_URL }}
+          TEST_SUPABASE_ANON_KEY: ${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          TEST_USER_A_EMAIL: ${{ env.TEST_USER_A_EMAIL }}
+          TEST_USER_A_PASSWORD: ${{ env.TEST_USER_A_PASSWORD }}
+          TEST_USER_B_EMAIL: ${{ env.TEST_USER_B_EMAIL }}
+          TEST_USER_B_PASSWORD: ${{ env.TEST_USER_B_PASSWORD }}
+        run: npm run test:rls
 
       - name: Build
         run: npm run build

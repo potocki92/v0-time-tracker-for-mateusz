@@ -26,7 +26,7 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
         className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
       >
         <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Wyjazdy
           </p>
           <button
@@ -38,7 +38,7 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
             Dodaj
           </button>
         </header>
-        <div className="px-4 py-6 text-center text-sm text-zinc-500 sm:px-5">
+        <div className="px-4 py-6 text-center text-sm text-zinc-400 sm:px-5">
           Brak zaplanowanych wyjazdów. Dodaj pierwszy, aby zacząć liczyć dni do
           powrotu.
         </div>
@@ -71,7 +71,7 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Wyjazdy
         </p>
         <button
@@ -93,7 +93,7 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
             <Icon className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+            <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
               {heading}
             </p>
             {isToday ? (
@@ -110,7 +110,7 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
             )}
             <p className="mt-1 truncate text-xs text-zinc-400">{subline}</p>
             {targetLabel ? (
-              <p className="mt-0.5 text-xs text-zinc-500">
+              <p className="mt-0.5 text-xs text-zinc-400">
                 {isAway ? 'Powrót: ' : 'Wyjazd: '}
                 <span className="text-zinc-300">{targetLabel}</span>
               </p>

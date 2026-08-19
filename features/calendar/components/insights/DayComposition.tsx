@@ -36,7 +36,7 @@ export function DayComposition({ composition }: Props) {
     <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
-          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
             Struktura dni
           </h3>
           <span className="text-2xs font-medium text-zinc-400 tabular-nums">

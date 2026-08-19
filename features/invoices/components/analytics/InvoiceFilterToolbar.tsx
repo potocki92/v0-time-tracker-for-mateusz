@@ -38,7 +38,7 @@ export function InvoiceFilterToolbar({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <h2 className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Wszystkie faktury
         </h2>
       </div>
@@ -61,7 +61,7 @@ export function InvoiceFilterToolbar({
               className={cn(
                 'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition',
                 active
-                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
+                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200'
                   : 'border-[#1a1a1a] bg-[#0a0a0a] text-zinc-300 hover:border-[#262626] hover:text-white',
               )}
             >
@@ -84,7 +84,7 @@ export function InvoiceFilterToolbar({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
             aria-hidden
           />
           <input
@@ -93,7 +93,7 @@ export function InvoiceFilterToolbar({
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Szukaj faktury, klienta, projektu..."
             aria-label="Szukaj faktury"
-            className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-400 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
         <button

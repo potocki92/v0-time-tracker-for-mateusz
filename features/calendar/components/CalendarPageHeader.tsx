@@ -34,11 +34,11 @@ export function CalendarPageHeader({
 
         <Separator orientation="vertical" className="h-5 bg-[#1a1a1a]" />
 
-        <span className="truncate text-xs text-zinc-500">
+        <span className="truncate text-xs text-zinc-400">
           {MONTH_NAMES[currentMonth]} {currentYear}
         </span>
 
-        <div className="ml-auto flex items-center gap-2 text-2xs text-zinc-500">
+        <div className="ml-auto flex items-center gap-2 text-2xs text-zinc-400">
           <span className="hidden sm:inline">
             {workDays} dni pracy • {totalEntries} wpisów
           </span>

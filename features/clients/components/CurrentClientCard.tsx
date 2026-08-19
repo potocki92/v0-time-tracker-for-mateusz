@@ -2,7 +2,11 @@
 
 import { Mail, MapPin, Phone, Star, Zap } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { clientInitials, clientNameToColor } from '@/components/common/ClientDisplay'
+import {
+  clientInitials,
+  clientNameToColor,
+  readableTextColor,
+} from '@/components/common/ClientDisplay'
 import { formatCurrency } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
 import {
@@ -97,8 +101,8 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
           <div className="flex items-start gap-3">
             <Avatar className={cn('size-11 shrink-0 border', LINEAR.border)}>
               <AvatarFallback
-                className="text-sm font-bold text-white"
-                style={{ background: color }}
+                className="text-sm font-bold"
+                style={{ background: color, color: readableTextColor(color) }}
               >
                 {initials}
               </AvatarFallback>
@@ -112,7 +116,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
               </h2>
               <p className="mt-1 text-xs text-zinc-400">
                 {formatCurrency(client.rate, client.currency)}
-                <span className="text-zinc-500">/{unit}</span>
+                <span className="text-zinc-400">/{unit}</span>
                 {' · '}
                 {WORK_TYPE_LABELS[client.work_type]}
               </p>
@@ -177,13 +181,13 @@ function Metric({
     <div className={cn('rounded-lg border px-3 py-2.5', LINEAR.borderInset, LINEAR.rowSurface)}>
       {/* min-h na dwie linie: gdy jedna etykieta się zawinie, a inne nie,
           wartości w siatce przestają stać w jednej linii. */}
-      <p className="min-h-[2.4em] text-2xs font-semibold uppercase leading-[1.2] tracking-[0.16em] text-zinc-500">
+      <p className="min-h-[2.4em] text-2xs font-semibold uppercase leading-[1.2] tracking-[0.16em] text-zinc-400">
         {label}
       </p>
       <p
         className={cn(
           'mt-0.5 truncate text-base font-semibold tabular-nums tracking-tight text-white sm:text-lg',
-          empty && 'text-zinc-600',
+          empty && 'text-zinc-400',
         )}
       >
         {value}

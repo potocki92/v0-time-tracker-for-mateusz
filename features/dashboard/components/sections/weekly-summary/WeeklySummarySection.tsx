@@ -38,14 +38,14 @@ export function WeeklySummarySection() {
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+            <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
               Podsumowanie tygodnia
             </p>
             <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
               KW {summary.weekNumber}/{summary.weekYear}
             </span>
           </div>
-          <p className="mt-0.5 truncate text-2xs text-zinc-500">
+          <p className="mt-0.5 truncate text-2xs text-zinc-400">
             dla księgowej · {summary.rangeLabel}
           </p>
         </div>
@@ -60,7 +60,7 @@ export function WeeklySummarySection() {
       </header>
 
       {summary.isEmpty ? (
-        <div className="px-4 py-6 text-center text-sm text-zinc-500">
+        <div className="px-4 py-6 text-center text-sm text-zinc-400">
           Brak przepracowanych dni w tym tygodniu.
         </div>
       ) : (
@@ -90,7 +90,7 @@ function ContractorRow({ block }: { block: ContractorBlock }) {
         <p className="truncate text-xs font-semibold text-white">{block.clientName}</p>
         <p className="shrink-0 text-xs tabular-nums text-zinc-300">{formatTotals(block)}</p>
       </div>
-      <p className="mt-0.5 truncate text-2xs text-zinc-500">
+      <p className="mt-0.5 truncate text-2xs text-zinc-400">
         {formatDate(block.workedFrom)} – {formatDate(block.workedTo)} ({block.workedDaysCount} dni)
         {' · '}
         {formatHours(block.totalHours)}

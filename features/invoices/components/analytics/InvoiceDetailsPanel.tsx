@@ -82,7 +82,7 @@ export function InvoiceDetailsPanel({
   return (
     <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
       <header className="flex items-center justify-between gap-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           FAKTURA
         </p>
         {onChangeStatus ? (
@@ -142,7 +142,7 @@ export function InvoiceDetailsPanel({
             {numberLabel}
           </h3>
           {invoice.invoice_number && (
-            <p className="truncate text-2xs text-zinc-500">{invoice.name || projectName}</p>
+            <p className="truncate text-2xs text-zinc-400">{invoice.name || projectName}</p>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-1">
@@ -184,7 +184,7 @@ export function InvoiceDetailsPanel({
       </dl>
 
       <div className="mt-4 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           POZYCJE
         </p>
         <ul className="mt-2 space-y-2 text-xs">
@@ -211,7 +211,7 @@ export function InvoiceDetailsPanel({
       </div>
 
       <div className="mt-4 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           AKTYWNOŚĆ
         </p>
         <ul className="mt-2 space-y-1.5 text-xs text-zinc-400">
@@ -219,7 +219,7 @@ export function InvoiceDetailsPanel({
           {sentLabel && <ActivityRow dot="bg-emerald-400" text={sentLabel} />}
           {draftedLabel && <ActivityRow dot="bg-zinc-500" text={draftedLabel} />}
           {!paidLabel && !sentLabel && !draftedLabel && (
-            <li className="text-zinc-500">Brak zarejestrowanych zdarzeń.</li>
+            <li className="text-zinc-400">Brak zarejestrowanych zdarzeń.</li>
           )}
         </ul>
       </div>
@@ -270,7 +270,7 @@ export function InvoiceDetailsPanel({
       <button
         type="button"
         onClick={onDelete}
-        className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-transparent text-xs font-medium text-zinc-500 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+        className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-transparent text-xs font-medium text-zinc-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden />
         Usuń fakturę
@@ -282,7 +282,7 @@ export function InvoiceDetailsPanel({
 function DetailField({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
-      <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+      <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
         {label}
       </p>
       <p className="mt-1.5 truncate text-xs font-medium text-zinc-100">{value}</p>
@@ -303,11 +303,11 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-zinc-500">{label}</span>
+      <span className="text-zinc-400">{label}</span>
       <span
         className={cn(
           'tabular-nums',
-          mute && 'text-zinc-500',
+          mute && 'text-zinc-400',
           strong ? 'text-sm font-semibold text-white' : 'text-zinc-200',
         )}
       >

@@ -90,7 +90,7 @@ function NavSectionGroup({
 
   return (
     <SidebarGroup className="py-1">
-      <SidebarGroupLabel className="px-3 text-2xs font-medium uppercase tracking-[0.08em] text-sidebar-foreground/45">
+      <SidebarGroupLabel className="px-3 text-2xs font-medium uppercase tracking-[0.08em] text-sidebar-foreground/75">
         {section.label}
       </SidebarGroupLabel>
 
@@ -233,7 +233,7 @@ function PinnedGroup() {
 
   return (
     <SidebarGroup className="py-1">
-      <SidebarGroupLabel className="px-3 text-2xs font-medium uppercase tracking-[0.08em] text-sidebar-foreground/45">
+      <SidebarGroupLabel className="px-3 text-2xs font-medium uppercase tracking-[0.08em] text-sidebar-foreground/75">
         Przypięte
       </SidebarGroupLabel>
 

@@ -185,13 +185,13 @@ function Metric({
 }) {
   return (
     <div className={cn('rounded-lg border px-3 py-2.5', LINEAR.borderInset, LINEAR.rowSurface)}>
-      <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+      <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
         {label}
       </p>
       <p
         className={cn(
           'mt-0.5 text-base font-semibold tabular-nums tracking-tight text-white sm:text-lg',
-          empty && 'text-zinc-600',
+          empty && 'text-zinc-400',
           warning && 'text-amber-300',
           danger && 'text-rose-300',
         )}

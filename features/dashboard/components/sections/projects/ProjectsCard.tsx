@@ -47,7 +47,7 @@ export function ProjectsCard({ projects, totalActive }: Props) {
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
         <div className="flex items-center gap-2">
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Projekty
           </p>
           <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
@@ -64,7 +64,7 @@ export function ProjectsCard({ projects, totalActive }: Props) {
       </header>
 
       {projects.length === 0 ? (
-        <div className="px-4 py-6 text-center text-sm text-zinc-500">
+        <div className="px-4 py-6 text-center text-sm text-zinc-400">
           Brak projektów.
         </div>
       ) : (
@@ -99,7 +99,7 @@ export function ProjectsCard({ projects, totalActive }: Props) {
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600" aria-hidden />
+                  <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
                 </Link>
               </li>
             )

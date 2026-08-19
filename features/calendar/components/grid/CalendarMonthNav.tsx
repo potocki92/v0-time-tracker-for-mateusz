@@ -36,7 +36,7 @@ export function CalendarMonthNav({
         <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
           <h2 className="truncate text-sm font-semibold tracking-tight text-white sm:text-base">
             {MONTH_NAMES[currentMonth]}{' '}
-            <span className="font-normal text-zinc-500">{currentYear}</span>
+            <span className="font-normal text-zinc-400">{currentYear}</span>
           </h2>
           {!isCurrentMonth && (
             <Button
@@ -72,7 +72,7 @@ export function CalendarMonthNav({
             key={day}
             className={cn(
               'py-1 text-center text-2xs font-medium uppercase tracking-widest',
-              index >= 5 ? 'text-zinc-600' : 'text-zinc-500',
+              index >= 5 ? 'text-zinc-400' : 'text-zinc-400',
             )}
           >
             {day}

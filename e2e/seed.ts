@@ -1,16 +1,25 @@
 import { createClient } from '@supabase/supabase-js'
 
 /**
- * Zaklada uzytkownika testowego i czysci jego dane.
+ * Zaklada uzytkownikow testowych i czysci ich dane.
  * Uzywa klucza service-role, wiec dziala TYLKO lokalnie / w CI na bazie testowej.
+ *
+ * Dwoch uzytkownikow, bo testy RLS (`__test__/rls.test.ts`) sprawdzaja, ze user A
+ * nie widzi danych usera B — user B musi wiec miec wlasnego klienta i projekt,
+ * inaczej "A nie widzi cudzych rekordow" przechodziloby na pustym zbiorze.
+ * E2E loguje sie wylacznie jako user A.
  */
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-const email = process.env.E2E_USER_EMAIL
-const password = process.env.E2E_USER_PASSWORD
 
-if (!url || !serviceKey || !email || !password) {
-  throw new Error('Brak NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / E2E_USER_*')
+function required(name: string): string {
+  const value = process.env[name]
+  if (!value) throw new Error(`Brak zmiennej ${name} — patrz e2e/README.md`)
+  return value
+}
+
+if (!url || !serviceKey) {
+  throw new Error('Brak NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY')
 }
 if (!/localhost|127\.0\.0\.1|\.local/.test(url)) {
   throw new Error(`Odmowa seedowania na ${url} — seed dziala tylko na bazie lokalnej`)
@@ -18,21 +27,33 @@ if (!/localhost|127\.0\.0\.1|\.local/.test(url)) {
 
 const admin = createClient(url, serviceKey, { auth: { persistSession: false } })
 
-async function findUser(): Promise<string | null> {
-  const { data, error } = await admin.auth.admin.listUsers({ perPage: 200 })
-  if (error) throw error
-  return data.users.find((u) => u.email === email)?.id ?? null
+interface SeedUser {
+  email: string
+  password: string
+  fullName: string
+  /** Kolumny klienta zakladanego dla tego uzytkownika. */
+  client: Record<string, unknown>
+  projectName: string
 }
 
-async function main() {
-  let userId = await findUser()
+async function ensureUser({
+  email,
+  password,
+  fullName,
+  client,
+  projectName,
+}: SeedUser): Promise<string> {
+  const { data: list, error: listError } = await admin.auth.admin.listUsers({ perPage: 200 })
+  if (listError) throw listError
+
+  let userId = list.users.find((u) => u.email === email)?.id
 
   if (!userId) {
     const { data, error } = await admin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
-      user_metadata: { full_name: 'E2E Tester' },
+      user_metadata: { full_name: fullName },
     })
     if (error) throw error
     userId = data.user.id
@@ -51,13 +72,30 @@ async function main() {
     'clients',
   ]) {
     const { error } = await admin.from(table).delete().eq('user_id', userId)
-    if (error) throw new Error(`czyszczenie ${table}: ${error.message}`)
+    if (error) throw new Error(`czyszczenie ${table} dla ${email}: ${error.message}`)
   }
 
-  const { data: client, error: clientError } = await admin
+  const { data: createdClient, error: clientError } = await admin
     .from('clients')
-    .insert({
-      user_id: userId,
+    .insert({ user_id: userId, ...client })
+    .select('id')
+    .single()
+  if (clientError) throw clientError
+
+  const { error: projectError } = await admin
+    .from('projects')
+    .insert({ user_id: userId, client_id: createdClient.id, name: projectName, status: 'active' })
+  if (projectError) throw projectError
+
+  return userId
+}
+
+async function main() {
+  const a = await ensureUser({
+    email: required('TEST_USER_A_EMAIL'),
+    password: required('TEST_USER_A_PASSWORD'),
+    fullName: 'E2E Tester',
+    client: {
       name: 'E2E Klient Testowy',
       // Stawka godzinowa jest tu istotna: `DayEntryDialog` pokazuje pole
       // "Godziny" tylko dla work_type === 'hourly'.
@@ -65,17 +103,19 @@ async function main() {
       rate: 100,
       currency: 'PLN',
       unit: 'h',
-    })
-    .select('id')
-    .single()
-  if (clientError) throw clientError
+    },
+    projectName: 'E2E Projekt',
+  })
 
-  const { error: projectError } = await admin
-    .from('projects')
-    .insert({ user_id: userId, client_id: client.id, name: 'E2E Projekt', status: 'active' })
-  if (projectError) throw projectError
+  const b = await ensureUser({
+    email: required('TEST_USER_B_EMAIL'),
+    password: required('TEST_USER_B_PASSWORD'),
+    fullName: 'RLS Tester B',
+    client: { name: 'Klient Uzytkownika B' },
+    projectName: 'Projekt Uzytkownika B',
+  })
 
-  console.log(`[e2e:seed] gotowe — user ${userId}, klient ${client.id}`)
+  console.log(`[e2e:seed] gotowe — A ${a}, B ${b}`)
 }
 
 main().catch((error) => {

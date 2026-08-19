@@ -21,22 +21,23 @@ export function HoursCard({ totalHours, baselineHours, progressPercent, isAhead 
     >
       <p className="mt-2 text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
         {totalHours.toFixed(1)}
-        <span className="ml-0.5 text-xs font-normal text-zinc-500 sm:text-sm">h</span>
+        <span className="ml-0.5 text-xs font-normal text-zinc-400 sm:text-sm">h</span>
       </p>
 
       <div className="mt-3 space-y-1.5">
         <div className="flex items-center justify-between text-2xs">
-          <span className="text-zinc-500">Cel: {baselineHours}h</span>
+          <span className="text-zinc-400">Cel: {baselineHours}h</span>
           <span
             className={cn(
               'font-semibold tabular-nums',
-              isAhead ? 'text-emerald-400' : 'text-zinc-500',
+              isAhead ? 'text-emerald-400' : 'text-zinc-400',
             )}
           >
             {Math.round(progressPercent)}%
           </span>
         </div>
         <Progress
+          aria-label="Realizacja celu godzinowego"
           value={progressPercent}
           className="h-1.5 bg-[#161616] transition-colors [&>div]:bg-emerald-500"
         />
