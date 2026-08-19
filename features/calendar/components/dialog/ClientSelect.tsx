@@ -22,7 +22,10 @@ export function ClientSelect({ clients, value, onChange }: Props) {
         Klient
       </Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="h-10 sm:h-9">
+        {/* Etykieta "Klient" nie jest zwiazana z triggerem (Radix Select nie
+            przyjmuje htmlFor), wiec w dialogu sasiaduja dwa comboboxy bez
+            nazwy dostepnosciowej. data-testid rozroznia je dla E2E. */}
+        <SelectTrigger data-testid="entry-client-select" className="h-10 sm:h-9">
           <SelectValue placeholder="Wybierz klienta…" />
         </SelectTrigger>
         <SelectContent>

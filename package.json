@@ -2,7 +2,9 @@
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -13,6 +15,9 @@
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
     "test:rls": "vitest run --config vitest.rls.config.ts",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:seed": "tsx e2e/seed.ts",
     "verify": "npm run typecheck && npm run lint && npm run deadcode && npm run test && npm run build && npm run perf:budget",
     "deadcode": "knip --include files,dependencies",
     "deadcode:all": "knip",
@@ -68,6 +73,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/culori": "^4.0.1",
     "@types/node": "^22",
@@ -80,6 +86,7 @@
     "knip": "^5.88.1",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
+    "tsx": "^4.23.12",
     "tw-animate-css": "1.3.3",
     "typescript": "^5",
     "typescript-eslint": "^8.67.0",
