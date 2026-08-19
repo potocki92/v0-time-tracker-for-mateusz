@@ -31,13 +31,13 @@ export function InvoiceStatCard({
   return (
     <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
       <header className="flex items-center justify-between gap-3">
-        <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           {label}
         </p>
         {badge && (
           <span
             className={cn(
-              'inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold tabular-nums',
+              'inline-flex items-center rounded-full px-2 py-0.5 text-2xs font-semibold tabular-nums',
               TONE_BADGE[tone],
             )}
           >
@@ -45,16 +45,16 @@ export function InvoiceStatCard({
           </span>
         )}
       </header>
-      <p className="mt-3 text-[26px] font-semibold tracking-tight tabular-nums text-white sm:text-[28px]">
+      <p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums text-white sm:text-4xl">
         {amount}
       </p>
       {secondaryAmount && (
-        <p className="mt-0.5 text-[13px] font-medium tabular-nums text-zinc-500">
+        <p className="mt-0.5 text-xs font-medium tabular-nums text-zinc-500">
           {secondaryAmount}
         </p>
       )}
       {description && (
-        <p className="mt-1 text-[12px] leading-snug text-zinc-500">{description}</p>
+        <p className="mt-1 text-xs leading-snug text-zinc-500">{description}</p>
       )}
     </section>
   )

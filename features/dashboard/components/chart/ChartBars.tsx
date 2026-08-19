@@ -49,7 +49,7 @@ export function ChartBars({ data, avgHours, isYearDaily }: Props) {
   const showBrush = data.length > 14
 
   return (
-    <div className="rounded-lg border border-white/10 bg-linear-to-b from-white/10 via-white/[0.03] to-transparent p-2 shadow-[0_10px_30px_-16px_rgba(80,130,255,0.35)] backdrop-blur-sm">
+    <div className="rounded-lg border border-white/10 bg-linear-to-b from-white/10 via-white/[0.03] to-transparent p-2 shadow-lg backdrop-blur-sm">
       <ChartContainer config={chartConfig} className="h-[220px] w-full">
         <ComposedChart data={enriched} margin={{ top: 14, right: 8, left: -2, bottom: 0 }} barCategoryGap={isYearDaily ? '15%' : '30%'}>
           <defs>
@@ -77,7 +77,7 @@ export function ChartBars({ data, avgHours, isYearDaily }: Props) {
             ))}
           </Bar>
           {showRolling && <Line type="monotone" dataKey="rolling" stroke="oklch(0.78 0.14 159)" strokeWidth={2} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} isAnimationActive={false} />}
-          {showBrush && <Brush dataKey="label" height={20} travellerWidth={8} stroke="rgba(255,255,255,0.2)" fill="rgba(255,255,255,0.06)" className="text-[10px]" />}
+          {showBrush && <Brush dataKey="label" height={20} travellerWidth={8} stroke="rgba(255,255,255,0.2)" fill="rgba(255,255,255,0.06)" className="text-2xs" />}
         </ComposedChart>
       </ChartContainer>
     </div>

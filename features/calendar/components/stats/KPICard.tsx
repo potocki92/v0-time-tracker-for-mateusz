@@ -26,7 +26,7 @@ export function KPICard({ label, icon, className, children, ariaLabel }: Props) 
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-500 sm:text-[11px]">
+        <p className="text-2xs font-medium uppercase tracking-[0.14em] text-zinc-500">
           {label}
         </p>
         <div

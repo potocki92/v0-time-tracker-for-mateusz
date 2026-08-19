@@ -13,7 +13,7 @@ export function ReportsHeader({ rangeLabel, onExportCsv, onExportJson }: Props) 
   return (
     <header className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.22em] text-zinc-500">
           Insights
         </p>
         <h1 className="mt-1 flex items-center gap-2 text-xl font-semibold text-white sm:text-2xl">

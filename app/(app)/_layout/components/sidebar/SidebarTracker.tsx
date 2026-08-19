@@ -90,13 +90,13 @@ export function SidebarTracker({
             running ? 'animate-[claudePulse_2.4s_ease-in-out_infinite] bg-sidebar-primary' : 'bg-sidebar-foreground/35',
           )}
         />
-        <span className="truncate text-[11px] text-sidebar-foreground/70">{label}</span>
+        <span className="truncate text-2xs text-sidebar-foreground/70">{label}</span>
       </div>
 
       <div className="flex items-center justify-between gap-2">
         <span
           className={cn(
-            'font-mono text-[15px] font-medium tabular-nums tracking-tight',
+            'font-mono text-sm font-medium tabular-nums tracking-tight',
             running ? 'text-sidebar-foreground' : 'text-sidebar-foreground/60',
           )}
         >
@@ -109,7 +109,7 @@ export function SidebarTracker({
           aria-label={running ? 'Zatrzymaj śledzenie' : 'Uruchom śledzenie'}
           className={cn(
             'inline-flex h-6 items-center gap-1 rounded border border-sidebar-border/80 bg-transparent px-2',
-            'text-[11px] text-sidebar-foreground/70',
+            'text-2xs text-sidebar-foreground/70',
             'transition-colors hover:bg-sidebar-accent/70 hover:text-sidebar-foreground',
           )}
         >

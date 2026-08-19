@@ -13,7 +13,7 @@ export function StatusLegend() {
         return (
           <div
             key={status}
-            className="flex shrink-0 items-center gap-1.5 text-[10px] text-zinc-500"
+            className="flex shrink-0 items-center gap-1.5 text-2xs text-zinc-500"
           >
             <span className={cn('h-2 w-2 rounded-full', cfg.dot)} />
             <span>{cfg.label}</span>

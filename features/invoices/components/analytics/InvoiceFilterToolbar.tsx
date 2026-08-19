@@ -38,7 +38,7 @@ export function InvoiceFilterToolbar({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <h2 className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Wszystkie faktury
         </h2>
       </div>
@@ -59,7 +59,7 @@ export function InvoiceFilterToolbar({
               aria-selected={active}
               onClick={() => onTabChange(tab.value)}
               className={cn(
-                'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition',
+                'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition',
                 active
                   ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200'
                   : 'border-[#1a1a1a] bg-[#0a0a0a] text-zinc-300 hover:border-[#262626] hover:text-white',
@@ -68,7 +68,7 @@ export function InvoiceFilterToolbar({
               <span>{tab.label}</span>
               <span
                 className={cn(
-                  'inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[10.5px] font-semibold tabular-nums',
+                  'inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-2xs font-semibold tabular-nums',
                   active
                     ? 'bg-emerald-400/20 text-emerald-100'
                     : 'bg-[#141414] text-zinc-400',
@@ -93,13 +93,13 @@ export function InvoiceFilterToolbar({
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Szukaj faktury, klienta, projektu..."
             aria-label="Szukaj faktury"
-            className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] pl-9 pr-3 text-[13px] text-zinc-200 placeholder:text-zinc-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
         <button
           type="button"
           onClick={onCreate}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-[13px] font-semibold text-black shadow-[0_0_22px_-6px_rgba(34,197,94,0.65)] transition hover:bg-emerald-400 active:scale-[0.99]"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-xs font-semibold text-black shadow-[0_0_22px_-6px_color-mix(in_oklab,var(--primary)_65%,transparent)] transition hover:bg-emerald-400 active:scale-[0.99]"
         >
           <Plus className="h-4 w-4" aria-hidden />
           Nowa faktura

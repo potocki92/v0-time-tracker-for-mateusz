@@ -25,26 +25,26 @@ export function FinalCtaSection({ isAuthenticated }: FinalCtaSectionProps) {
           <span className="em-text">clock.</span>
         </h2>
         <p
-          className="mt-7 max-w-[560px] mx-auto text-[16px] sm:text-[18px] leading-[1.55] reveal-row"
+          className="mt-7 max-w-[560px] mx-auto text-base sm:text-lg leading-[1.55] reveal-row"
           style={{ color: 'var(--ink-2)' }}
         >
           Track your first hour in the next sixty seconds. Send your first invoice this week.
         </p>
         <div className="mt-10 flex items-center justify-center gap-3 flex-wrap reveal-row">
           {isAuthenticated ? (
-            <a href="/dashboard" className="cta-primary !py-3.5 !px-6 !text-[14px]">
+            <a href="/dashboard" className="cta-primary !py-3.5 !px-6 !text-sm">
               Open app <ArrowRight className="h-4 w-4" />
             </a>
           ) : (
-            <a href="/auth/sign-up" className="cta-primary !py-3.5 !px-6 !text-[14px]">
+            <a href="/auth/sign-up" className="cta-primary !py-3.5 !px-6 !text-sm">
               Start tracking — it&apos;s free <ArrowRight className="h-4 w-4" />
             </a>
           )}
-          <a href="#pricing" className="cta-ghost !py-3.5 !px-5 !text-[14px]">
+          <a href="#pricing" className="cta-ghost !py-3.5 !px-5 !text-sm">
             See pricing
           </a>
         </div>
-        <div className="mt-5 text-[11.5px] reveal-row" style={{ color: 'var(--ink-3)' }}>
+        <div className="mt-5 text-2xs reveal-row" style={{ color: 'var(--ink-3)' }}>
           No credit card · 14‑day Pro trial · Cancel anytime
         </div>
       </div>

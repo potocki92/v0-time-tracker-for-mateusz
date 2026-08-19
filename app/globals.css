@@ -27,7 +27,7 @@
   --card-foreground: oklch(0.14 0.005 240);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.14 0.005 240);
-  --primary: oklch(0.55 0.18 160);
+  --primary: oklch(0.52 0.18 160);
   --primary-foreground: oklch(1 0 0);
   --primary-accessible: oklch(0.42 0.15 160);
   --success: oklch(0.55 0.15 150);
@@ -44,7 +44,9 @@
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.91 0.005 240);
   --input: oklch(0.91 0.005 240);
-  --ring: oklch(0.55 0.18 160);
+  --input-border: oklch(0.60 0.008 240);
+  --shadow-color: oklch(0.14 0.005 240 / 0.12);
+  --ring: oklch(0.52 0.18 160);
   --chart-1: oklch(0.55 0.18 160);
   --chart-2: oklch(0.60 0.12 250);
   --chart-3: oklch(0.65 0.15 40);
@@ -53,12 +55,12 @@
   --radius: 0.75rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.55 0.18 160);
+  --sidebar-primary: oklch(0.52 0.18 160);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.94 0.01 160);
   --sidebar-accent-foreground: oklch(0.30 0.08 160);
   --sidebar-border: oklch(0.91 0.005 240);
-  --sidebar-ring: oklch(0.55 0.18 160);
+  --sidebar-ring: oklch(0.52 0.18 160);
 }
 
 /* ═══ Ocean — głęboki azur, świetnie działa w trybie dark ════════════════ */
@@ -69,7 +71,7 @@
   --card-foreground: oklch(0.16 0.04 250);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.16 0.04 250);
-  --primary: oklch(0.55 0.18 230);
+  --primary: oklch(0.52 0.18 230);
   --primary-foreground: oklch(1 0 0);
   --primary-accessible: oklch(0.42 0.17 230);
   --success: oklch(0.60 0.14 190);
@@ -86,7 +88,9 @@
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.90 0.02 230);
   --input: oklch(0.90 0.02 230);
-  --ring: oklch(0.55 0.18 230);
+  --input-border: oklch(0.60 0.008 240);
+  --shadow-color: oklch(0.14 0.005 240 / 0.12);
+  --ring: oklch(0.52 0.18 230);
   --chart-1: oklch(0.55 0.18 230);
   --chart-2: oklch(0.65 0.14 190);
   --chart-3: oklch(0.70 0.13 260);
@@ -95,12 +99,12 @@
   --radius: 0.875rem;
   --sidebar: oklch(0.97 0.015 230);
   --sidebar-foreground: oklch(0.18 0.04 250);
-  --sidebar-primary: oklch(0.55 0.18 230);
+  --sidebar-primary: oklch(0.52 0.18 230);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.93 0.035 220);
   --sidebar-accent-foreground: oklch(0.30 0.10 230);
   --sidebar-border: oklch(0.89 0.02 230);
-  --sidebar-ring: oklch(0.55 0.18 230);
+  --sidebar-ring: oklch(0.52 0.18 230);
 }
 
 /* ═══ Sunset — ciepła koralowo-pomarańczowa paleta ═══════════════════════ */
@@ -111,7 +115,7 @@
   --card-foreground: oklch(0.18 0.03 30);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.03 30);
-  --primary: oklch(0.64 0.20 35);
+  --primary: oklch(0.52 0.20 35);
   --primary-foreground: oklch(1 0 0);
   --primary-accessible: oklch(0.48 0.18 35);
   --success: oklch(0.62 0.14 150);
@@ -128,7 +132,9 @@
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.91 0.02 50);
   --input: oklch(0.91 0.02 50);
-  --ring: oklch(0.64 0.20 35);
+  --input-border: oklch(0.60 0.008 240);
+  --shadow-color: oklch(0.14 0.005 240 / 0.12);
+  --ring: oklch(0.52 0.20 35);
   --chart-1: oklch(0.64 0.20 35);
   --chart-2: oklch(0.70 0.17 60);
   --chart-3: oklch(0.60 0.22 10);
@@ -137,12 +143,12 @@
   --radius: 1rem;
   --sidebar: oklch(0.97 0.02 60);
   --sidebar-foreground: oklch(0.20 0.03 30);
-  --sidebar-primary: oklch(0.64 0.20 35);
+  --sidebar-primary: oklch(0.52 0.20 35);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.93 0.045 50);
   --sidebar-accent-foreground: oklch(0.32 0.11 30);
   --sidebar-border: oklch(0.90 0.02 50);
-  --sidebar-ring: oklch(0.64 0.20 35);
+  --sidebar-ring: oklch(0.52 0.20 35);
 }
 
 /* ═══ Violet — elegancki fiolet, luksusowy look ═══════════════════════════ */
@@ -170,6 +176,8 @@
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.90 0.02 300);
   --input: oklch(0.90 0.02 300);
+  --input-border: oklch(0.60 0.008 240);
+  --shadow-color: oklch(0.14 0.005 240 / 0.12);
   --ring: oklch(0.55 0.22 295);
   --chart-1: oklch(0.55 0.22 295);
   --chart-2: oklch(0.65 0.18 320);
@@ -212,6 +220,8 @@
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.90 0 0);
   --input: oklch(0.90 0 0);
+  --input-border: oklch(0.60 0.008 240);
+  --shadow-color: oklch(0.14 0.005 240 / 0.12);
   --ring: oklch(0.40 0 0);
   --chart-1: oklch(0.30 0 0);
   --chart-2: oklch(0.48 0 0);
@@ -268,6 +278,8 @@
   --destructive-foreground: oklch(0.98 0.005 27);
   --border: oklch(0.24 0.01 250);
   --input: oklch(0.24 0.01 250);
+  --input-border: oklch(0.50 0.008 240);
+  --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.78 0.18 160);
   --chart-1: oklch(0.65 0.20 160);
   --chart-2: oklch(0.55 0.15 250);
@@ -305,10 +317,12 @@
   --muted-foreground: oklch(0.72 0.02 230);
   --accent: oklch(0.28 0.07 230);
   --accent-foreground: oklch(0.82 0.13 230);
-  --destructive: oklch(0.60 0.22 27);
+  --destructive: oklch(0.55 0.22 27);
   --destructive-foreground: oklch(0.98 0.005 27);
   --border: oklch(0.25 0.03 250);
   --input: oklch(0.25 0.03 250);
+  --input-border: oklch(0.50 0.008 240);
+  --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.80 0.15 230);
   --chart-1: oklch(0.70 0.17 230);
   --chart-2: oklch(0.72 0.14 190);
@@ -346,10 +360,12 @@
   --muted-foreground: oklch(0.72 0.02 40);
   --accent: oklch(0.30 0.08 30);
   --accent-foreground: oklch(0.85 0.13 40);
-  --destructive: oklch(0.60 0.22 15);
+  --destructive: oklch(0.55 0.22 15);
   --destructive-foreground: oklch(0.98 0.005 27);
   --border: oklch(0.26 0.025 25);
   --input: oklch(0.26 0.025 25);
+  --input-border: oklch(0.50 0.008 240);
+  --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.72 0.18 35);
   --chart-1: oklch(0.72 0.18 35);
   --chart-2: oklch(0.76 0.15 60);
@@ -387,10 +403,12 @@
   --muted-foreground: oklch(0.72 0.02 295);
   --accent: oklch(0.28 0.07 295);
   --accent-foreground: oklch(0.84 0.15 295);
-  --destructive: oklch(0.60 0.22 15);
+  --destructive: oklch(0.55 0.22 15);
   --destructive-foreground: oklch(0.98 0.005 27);
   --border: oklch(0.25 0.025 300);
   --input: oklch(0.25 0.025 300);
+  --input-border: oklch(0.50 0.008 240);
+  --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.80 0.17 295);
   --chart-1: oklch(0.68 0.22 295);
   --chart-2: oklch(0.72 0.18 320);
@@ -428,10 +446,12 @@
   --muted-foreground: oklch(0.72 0 0);
   --accent: oklch(0.26 0 0);
   --accent-foreground: oklch(0.92 0 0);
-  --destructive: oklch(0.60 0.22 27);
+  --destructive: oklch(0.55 0.22 27);
   --destructive-foreground: oklch(0.98 0.005 27);
   --border: oklch(0.24 0 0);
   --input: oklch(0.24 0 0);
+  --input-border: oklch(0.50 0.008 240);
+  --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.72 0 0);
   --chart-1: oklch(0.88 0 0);
   --chart-2: oklch(0.66 0 0);
@@ -452,25 +472,28 @@
   --font-sans: 'Inter', 'Inter Fallback';
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
 
-  /* Fluid typography: 16px → 20px base between 320px and 1920px */
-  --text-xxs: clamp(0.833rem, 0.813rem + 0.104vw, 0.938rem);
-  --text-xs: clamp(0.913rem, 0.879rem + 0.170vw, 1.083rem);
-  --text-sm: clamp(1rem, 0.95rem + 0.25vw, 1.25rem);
-  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.25rem);
-  --text-lg: clamp(1.2rem, 1.107rem + 0.467vw, 1.667rem);
-  --text-xl: clamp(1.44rem, 1.282rem + 0.791vw, 2.231rem);
-  --text-2xl: clamp(1.728rem, 1.47rem + 1.289vw, 3.017rem);
-  --text-3xl: clamp(1.893rem, 1.587rem + 1.527vw, 3.42rem);
-  --text-4xl: clamp(2.074rem, 1.698rem + 1.879vw, 3.953rem);
-  --text-h1: clamp(2.488rem, 1.955rem + 2.665vw, 5.153rem);
+  /* Fluid typography: 16px → 18px base miedzy 320px a 1920px.
+   * Gorna granica obnizona z 20px — przy 20px krok --text-xxs wypadal
+   * na 15px i drobny tekst nie mial czym byc opisany, stad 471 wystapien
+   * text-[10px] / text-[11px] w kodzie. */
+  --text-2xs: clamp(0.625rem, 0.610rem + 0.078vw, 0.703rem); /* 10 → 11.25px */
+  --text-xs: clamp(0.750rem, 0.731rem + 0.094vw, 0.844rem); /* 12 → 13.5px  */
+  --text-sm: clamp(0.875rem, 0.853rem + 0.109vw, 0.984rem); /* 14 → 15.75px */
+  --text-base: clamp(1rem, 0.975rem + 0.125vw, 1.125rem); /* 16 → 18px    */
+  --text-lg: clamp(1.125rem, 1.097rem + 0.141vw, 1.266rem);
+  --text-xl: clamp(1.266rem, 1.234rem + 0.158vw, 1.424rem);
+  --text-2xl: clamp(1.424rem, 1.389rem + 0.178vw, 1.602rem);
+  --text-3xl: clamp(1.602rem, 1.562rem + 0.200vw, 1.802rem);
+  --text-4xl: clamp(1.802rem, 1.757rem + 0.225vw, 2.027rem);
+  --text-h1: clamp(2.027rem, 1.977rem + 0.253vw, 2.281rem);
 
-  --text-xxs--line-height: 1.25rem;
-  --text-xs--line-height: 1.35rem;
-  --text-sm--line-height: 1.5rem;
-  --text-base--line-height: 1.6rem;
-  --text-lg--line-height: 1.65;
-  --text-xl--line-height: 1.5;
-  --text-2xl--line-height: 1.35;
+  --text-2xs--line-height: 1.4;
+  --text-xs--line-height: 1.45;
+  --text-sm--line-height: 1.5;
+  --text-base--line-height: 1.6;
+  --text-lg--line-height: 1.55;
+  --text-xl--line-height: 1.4;
+  --text-2xl--line-height: 1.3;
   --text-3xl--line-height: 1.2;
   --text-4xl--line-height: 1.15;
   --text-h1--line-height: 1.05;
@@ -481,6 +504,14 @@
    * Zapewnia 1:1 parytet wizualny między obiema krawędziami aplikacji. */
   --app-bar-height: 3.5rem;
   --shadow-avatar-ring: 0 0 0 1px rgba(47, 47, 50, 0.2);
+
+  /* Cien w kolorze tla motywu, nie czarny — inaczej w dark mode znika,
+   * a w light robi szara mgle zamiast glebi. */
+  --shadow-xs: 0 1px 2px -1px var(--shadow-color);
+  --shadow-sm: 0 2px 4px -2px var(--shadow-color), 0 1px 2px -1px var(--shadow-color);
+  --shadow-md: 0 6px 12px -4px var(--shadow-color), 0 2px 4px -2px var(--shadow-color);
+  --shadow-lg: 0 16px 32px -12px var(--shadow-color), 0 4px 8px -4px var(--shadow-color);
+  --shadow-xl: 0 28px 56px -20px var(--shadow-color);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -504,6 +535,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-border: var(--input-border);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -552,6 +584,21 @@
     text-align: start;
     min-width: 0;
     margin: 0;
+  }
+
+  /* Globalny bezpiecznik dla `prefers-reduced-motion` — obejmuje kazda animacje
+   * i tranzycje CSS, takze te z bibliotek. Framer-motion animuje w JS i tego nie
+   * widzi; jego odpowiednikiem jest MotionConfig reducedMotion="user"
+   * w components/common/motion-provider.tsx. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   /* Windows High Contrast Mode — użyj systemowych kolorów zamiast oklch. */

@@ -63,9 +63,9 @@ function SearchGroup({ onSearchClick }: { onSearchClick?: () => void }) {
               )}
             >
               <Search />
-              <span className="flex-1 truncate text-left text-[12.5px]">Szukaj…</span>
+              <span className="flex-1 truncate text-left text-xs">Szukaj…</span>
               <KbdGroup className="ml-auto group-data-[collapsible=icon]:hidden">
-                <Kbd className="h-4 min-w-[18px] rounded border border-sidebar-border/80 bg-transparent px-1 text-[10.5px]">
+                <Kbd className="h-4 min-w-[18px] rounded border border-sidebar-border/80 bg-transparent px-1 text-2xs">
                   ⌘K
                 </Kbd>
               </KbdGroup>
@@ -90,7 +90,7 @@ function NavSectionGroup({
 
   return (
     <SidebarGroup className="py-1">
-      <SidebarGroupLabel className="px-3 text-[10.5px] font-medium uppercase tracking-[0.08em] text-sidebar-foreground/45">
+      <SidebarGroupLabel className="px-3 text-2xs font-medium uppercase tracking-[0.08em] text-sidebar-foreground/45">
         {section.label}
       </SidebarGroupLabel>
 
@@ -135,7 +135,7 @@ function NavRow({
         isActive={active}
         tooltip={item.label}
         className={cn(
-          'h-8 gap-2.5 rounded-md text-[13px] font-normal',
+          'h-8 gap-2.5 rounded-md text-xs font-normal',
           'text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
           'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-foreground data-[active=true]:font-medium',
           '[&>svg]:size-[15px] [&>svg]:text-sidebar-foreground/55',
@@ -157,7 +157,7 @@ function NavRow({
             {showCount && <CountBadge count={count!} />}
 
             {item.shortcut && !hasQuickAction && (
-              <Kbd className="h-4 min-w-[18px] rounded border border-sidebar-border/80 bg-transparent px-1 text-[10.5px] font-medium text-sidebar-foreground/55">
+              <Kbd className="h-4 min-w-[18px] rounded border border-sidebar-border/80 bg-transparent px-1 text-2xs font-medium text-sidebar-foreground/55">
                 {item.shortcut}
               </Kbd>
             )}
@@ -181,7 +181,7 @@ function NavRow({
  * usunięty — sidebar nie powinien krzyczeć neonem o liczbach.
  */
 const BADGE_BASE =
-  'inline-flex h-[18px] items-center justify-center rounded-md bg-sidebar-accent/60 px-1.5 text-[10px] font-semibold tabular-nums tracking-wide text-sidebar-foreground/65 ring-1 ring-sidebar-border/70'
+  'inline-flex h-[18px] items-center justify-center rounded-md bg-sidebar-accent/60 px-1.5 text-2xs font-semibold tabular-nums tracking-wide text-sidebar-foreground/65 ring-1 ring-sidebar-border/70'
 
 function CountBadge({ count }: { count: number }) {
   const display = count > 99 ? '99+' : String(count)
@@ -233,7 +233,7 @@ function PinnedGroup() {
 
   return (
     <SidebarGroup className="py-1">
-      <SidebarGroupLabel className="px-3 text-[10.5px] font-medium uppercase tracking-[0.08em] text-sidebar-foreground/45">
+      <SidebarGroupLabel className="px-3 text-2xs font-medium uppercase tracking-[0.08em] text-sidebar-foreground/45">
         Przypięte
       </SidebarGroupLabel>
 
@@ -255,7 +255,7 @@ function PinnedRow({ item }: { item: PinnedItem }) {
         asChild
         tooltip={item.label}
         className={cn(
-          'h-8 gap-2.5 rounded-md text-[13px] font-normal transition-colors',
+          'h-8 gap-2.5 rounded-md text-xs font-normal transition-colors',
           'text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
         )}
       >

@@ -36,17 +36,17 @@ export function InvoicesPagination({
 
   return (
     <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-3 sm:flex-row">
-      <div className="flex items-center gap-3 text-[12px] text-zinc-400">
+      <div className="flex items-center gap-3 text-xs text-zinc-400">
         <span className="tabular-nums">
           {fromIndex + 1}–{toIndex} z {totalCount}
         </span>
 
-        <label className="flex items-center gap-2 text-[11.5px] text-zinc-500">
+        <label className="flex items-center gap-2 text-2xs text-zinc-500">
           <span>Na stronę</span>
           <select
             value={pageSize}
             onChange={(event) => onPageSizeChange(Number(event.target.value))}
-            className="h-8 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 text-[12px] text-zinc-200 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-8 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 text-xs text-zinc-200 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           >
             {PAGE_SIZE_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -72,7 +72,7 @@ export function InvoicesPagination({
           <ChevronLeft className="h-4 w-4" aria-hidden />
         </button>
 
-        <span className="px-2 text-[12px] tabular-nums text-zinc-400">
+        <span className="px-2 text-xs tabular-nums text-zinc-400">
           {pageIndex + 1} / {pageCount}
         </span>
 

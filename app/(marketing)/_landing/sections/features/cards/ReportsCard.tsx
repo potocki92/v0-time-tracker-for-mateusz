@@ -15,10 +15,10 @@ export function ReportsCard() {
         <LineChart size={14} style={{ color: '#22E07A' }} />
         <span className="stat-label">Reports</span>
       </div>
-      <h3 className="mb-2 text-[18px] font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>
+      <h3 className="mb-2 text-lg font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>
         The story your hours tell.
       </h3>
-      <p className="mb-4 text-[14px] leading-relaxed" style={{ color: 'var(--ink-2)' }}>
+      <p className="mb-4 text-sm leading-relaxed" style={{ color: 'var(--ink-2)' }}>
         Weekly and monthly breakdowns by client, project, and rate. Export to CSV in one click.
       </p>
 

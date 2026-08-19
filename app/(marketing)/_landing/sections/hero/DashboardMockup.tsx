@@ -42,7 +42,7 @@ export function DashboardMockup() {
             >
               <Timer size={14} style={{ color: '#22E07A' }} />
             </div>
-            <span className="text-[13px] font-semibold" style={{ color: 'var(--ink-1)' }}>
+            <span className="text-xs font-semibold" style={{ color: 'var(--ink-1)' }}>
               TimeTracker
             </span>
           </div>
@@ -55,7 +55,7 @@ export function DashboardMockup() {
             {NAV_ITEMS.map(({ label, icon: Icon, active, badge }) => (
               <div
                 key={label}
-                className={`nav-item flex items-center gap-2.5 text-[12px] ${active ? 'active' : ''} ${badge ? 'justify-between' : ''}`}
+                className={`nav-item flex items-center gap-2.5 text-xs ${active ? 'active' : ''} ${badge ? 'justify-between' : ''}`}
               >
                 {badge ? (
                   <>
@@ -64,7 +64,7 @@ export function DashboardMockup() {
                       {label}
                     </span>
                     <span
-                      className="rounded px-1.5 py-0.5 text-[10px]"
+                      className="rounded px-1.5 py-0.5 text-2xs"
                       style={{ background: 'rgba(34,224,122,0.12)', color: '#22E07A' }}
                     >
                       {badge}
@@ -91,15 +91,15 @@ export function DashboardMockup() {
             >
               <div className="mb-1 flex items-center gap-1.5">
                 <span className="live-dot" />
-                <span className="text-[10px]" style={{ color: 'var(--ink-3)' }}>
+                <span className="text-2xs" style={{ color: 'var(--ink-3)' }}>
                   Tracking
                 </span>
               </div>
-              <div className="text-[10px]" style={{ color: 'var(--ink-2)' }}>
+              <div className="text-2xs" style={{ color: 'var(--ink-2)' }}>
                 Im Winkel 51
               </div>
               <div
-                className="mono mt-1.5 text-[18px] font-bold tabular-nums"
+                className="mono mt-1.5 text-lg font-bold tabular-nums"
                 style={{ color: '#22E07A', letterSpacing: '0.02em' }}
               >
                 {liveTime}
@@ -113,10 +113,10 @@ export function DashboardMockup() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[10px]" style={{ color: 'var(--ink-3)' }}>
+              <div className="text-2xs" style={{ color: 'var(--ink-3)' }}>
                 April 2026 · Q2
               </div>
-              <div className="text-[15px] font-semibold" style={{ color: 'var(--ink-1)' }}>
+              <div className="text-sm font-semibold" style={{ color: 'var(--ink-1)' }}>
                 This week, in focus.
               </div>
             </div>
@@ -141,8 +141,8 @@ export function DashboardMockup() {
             {KPI_ROWS.map((kpi) => (
               <div key={kpi.label} className="panel">
                 <div className="stat-label">{kpi.label}</div>
-                <div className="num mt-1 text-[18px]">{kpi.value}</div>
-                <div className="text-[10px]" style={{ color: 'var(--ink-3)' }}>
+                <div className="num mt-1 text-lg">{kpi.value}</div>
+                <div className="text-2xs" style={{ color: 'var(--ink-3)' }}>
                   {kpi.sub}
                 </div>
               </div>
@@ -194,23 +194,23 @@ export function DashboardMockup() {
                       }}
                     />
                     <div>
-                      <div className="text-[12px] font-medium" style={{ color: 'var(--ink-1)' }}>
+                      <div className="text-xs font-medium" style={{ color: 'var(--ink-1)' }}>
                         {entry.title}
                       </div>
-                      <div className="text-[10px]" style={{ color: 'var(--ink-3)' }}>
+                      <div className="text-2xs" style={{ color: 'var(--ink-3)' }}>
                         {entry.sub}
                       </div>
                     </div>
                   </div>
                   {entry.live ? (
                     <span
-                      className="mono tabular-nums text-[12px] font-semibold"
+                      className="mono tabular-nums text-xs font-semibold"
                       style={{ color: '#22E07A', minWidth: '68px', textAlign: 'right' }}
                     >
                       {liveTime}
                     </span>
                   ) : (
-                    <span className="mono text-[12px]" style={{ color: 'var(--ink-2)' }}>
+                    <span className="mono text-xs" style={{ color: 'var(--ink-2)' }}>
                       {entry.time}
                     </span>
                   )}

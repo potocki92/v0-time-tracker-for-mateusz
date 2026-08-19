@@ -77,7 +77,7 @@ export function AuthShowcase() {
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-white/70">
               {BRAND.tagline}
             </p>
-            <h2 className="text-3xl font-semibold leading-[1.15] xl:text-[2.5rem]">
+            <h2 className="text-3xl font-semibold leading-[1.15] xl:text-h1">
               Skup się na pracy.
               <br />
               <span className="text-white/80">Resztą zajmiemy się my.</span>

@@ -41,7 +41,7 @@ export function KpiTile({ label, value, icon: Icon, meta, progress, accent = 'em
       </div>
       {/* Stały rozmiar zamiast płynnego `text-2xl` (clamp do 3rem w globals.css),
           przez który kwoty ucinały się w dwukolumnowej siatce na telefonie. */}
-      <p className="mt-2 truncate text-[26px] font-semibold leading-none tabular-nums tracking-tight text-white sm:text-[30px]">
+      <p className="mt-2 truncate text-3xl font-semibold leading-none tabular-nums tracking-tight text-white sm:text-4xl">
         {value}
       </p>
 
@@ -56,7 +56,7 @@ export function KpiTile({ label, value, icon: Icon, meta, progress, accent = 'em
       )}
 
       {meta && (
-        <p className="mt-2 truncate text-[11.5px] text-zinc-400 sm:text-xs">{meta}</p>
+        <p className="mt-2 truncate text-2xs text-zinc-400 sm:text-xs">{meta}</p>
       )}
     </div>
   )

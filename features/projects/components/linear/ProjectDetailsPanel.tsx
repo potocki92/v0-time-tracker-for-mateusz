@@ -50,7 +50,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
         <div className="flex shrink-0 items-center gap-1.5">
           <span
             className={cn(
-              'inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold',
+              'inline-flex items-center rounded-full px-2 py-0.5 text-2xs font-semibold',
               statusPill.className,
             )}
           >
@@ -58,7 +58,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
           </span>
           <span
             className={cn(
-              'inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold',
+              'inline-flex items-center rounded-full px-2 py-0.5 text-2xs font-semibold',
               priorityPill.className,
             )}
           >
@@ -68,14 +68,14 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       </header>
 
       <div className="mt-2">
-        <h3 className="text-[20px] font-semibold text-white">{project.name}</h3>
+        <h3 className="text-xl font-semibold text-white">{project.name}</h3>
         {project.description && (
-          <p className="mt-0.5 text-[12px] text-zinc-400">{project.description}</p>
+          <p className="mt-0.5 text-xs text-zinc-400">{project.description}</p>
         )}
       </div>
 
       <div className="mt-4 space-y-1.5">
-        <div className="flex items-center justify-between text-[11px] text-zinc-400">
+        <div className="flex items-center justify-between text-2xs text-zinc-400">
           <span>Postęp</span>
           <span className="tabular-nums text-zinc-200">{Math.round(progressPct)}%</span>
         </div>
@@ -94,17 +94,17 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       <div className={cn('mt-4 flex items-center gap-2 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
         <Avatar className={cn('h-7 w-7 border', LINEAR.border)}>
           <AvatarFallback
-            className="text-[11px] font-semibold text-white"
+            className="text-2xs font-semibold text-white"
             style={{ backgroundColor: clientColor }}
           >
             {clientInitials(clientName)}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             KLIENT
           </p>
-          <p className="truncate text-[13px] font-medium text-zinc-100">{clientName}</p>
+          <p className="truncate text-xs font-medium text-zinc-100">{clientName}</p>
         </div>
       </div>
 
@@ -116,10 +116,10 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       </dl>
 
       <div className={cn('mt-4 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
-        <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           BUDŻET
         </p>
-        <div className="mt-2 space-y-1.5 text-[12.5px]">
+        <div className="mt-2 space-y-1.5 text-xs">
           <Row
             label="Kwota"
             value={budget > 0 ? formatCurrency(budget, 'PLN') : '—'}
@@ -136,10 +136,10 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
 
       {project.address && (
         <div className={cn('mt-3 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
-          <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             ADRES
           </p>
-          <p className="mt-1.5 text-[13px] font-medium text-zinc-100">{project.address}</p>
+          <p className="mt-1.5 text-xs font-medium text-zinc-100">{project.address}</p>
         </div>
       )}
 
@@ -147,7 +147,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
         type="button"
         onClick={onEdit}
         className={cn(
-          'mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border text-[13px] font-semibold text-white transition',
+          'mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border text-xs font-semibold text-white transition',
           LINEAR.border,
           LINEAR.surfaceElevated,
           'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300',
@@ -160,7 +160,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       <button
         type="button"
         onClick={onDelete}
-        className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-transparent text-[12px] font-medium text-zinc-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+        className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-transparent text-xs font-medium text-zinc-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden />
         Usuń projekt
@@ -180,12 +180,12 @@ function DetailField({
 }) {
   return (
     <div className={cn('rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+      <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
         {label}
       </p>
       <p
         className={cn(
-          'mt-1.5 truncate text-[13px] font-medium text-zinc-100',
+          'mt-1.5 truncate text-xs font-medium text-zinc-100',
           danger && 'text-rose-300',
         )}
       >

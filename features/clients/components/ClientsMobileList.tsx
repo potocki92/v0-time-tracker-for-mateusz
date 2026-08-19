@@ -114,7 +114,7 @@ export function ClientsMobileList({
                 <SlidersHorizontal className="size-4" />
                 Filtruj
                 {activeFilterCount > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-5 px-2 text-[11px]">
+                  <Badge variant="secondary" className="ml-1 h-5 px-2 text-2xs">
                     {activeFilterCount}
                   </Badge>
                 )}
@@ -181,7 +181,7 @@ export function ClientsMobileList({
         <div className="space-y-4">
           {grouped.map(({ activity, items }) => (
             <section key={activity} className="space-y-2.5">
-              <h2 className="px-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+              <h2 className="px-1 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
                 {ACTIVITY_GROUP_LABELS[activity]} {items.length}
               </h2>
               <ul className="space-y-2.5">
@@ -242,7 +242,7 @@ function FilterChipsRow<T extends string>({
 }: FilterChipsRowProps<T>) {
   return (
     <div>
-      <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+      <p className="mb-1.5 text-2xs font-semibold uppercase tracking-wide text-zinc-500">
         {label}
       </p>
       <div

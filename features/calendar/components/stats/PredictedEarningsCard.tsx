@@ -29,12 +29,12 @@ export function PredictedEarningsCard({
       icon={<Wallet className="h-4 w-4" />}
       ariaLabel={`Przewidywany zarobek: ${formatCurrency(totalEarningsPLN, 'PLN')}; zrealizowano ${realizedSharePercent}%`}
     >
-      <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-[26px]">
+      <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
         {formatCurrency(totalEarningsPLN, 'PLN')}
       </p>
 
       <div className="mt-3 space-y-1.5">
-        <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
+        <div className="flex items-center justify-between text-2xs">
           <span className="text-zinc-500">
             Realnie {formatCurrency(realizedEarningsPLN, 'PLN')}
           </span>
@@ -46,7 +46,7 @@ export function PredictedEarningsCard({
           value={realizedSharePercent}
           className="h-1.5 bg-[#161616] [&>div]:bg-emerald-500"
         />
-        <p className="text-[10px] text-zinc-500 sm:text-[11px]">
+        <p className="text-2xs text-zinc-500">
           {hasPlan
             ? `Plan: ${formatCurrency(predictedEarningsPLN, 'PLN')} • ${predictedDays} ${pluralizeDays(
                 predictedDays,

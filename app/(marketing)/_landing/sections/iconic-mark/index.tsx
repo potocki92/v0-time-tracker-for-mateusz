@@ -73,7 +73,7 @@ export function IconicMarkSection() {
             A clock, considered.
           </h2>
           <p
-            className="mt-5 max-w-[560px] mx-auto text-[15px] sm:text-[17px] leading-[1.55]"
+            className="mt-5 max-w-[560px] mx-auto text-sm sm:text-lg leading-[1.55]"
             style={{ color: 'var(--ink-2)' }}
           >
             Every minute placed with intention. The mark below is the system itself — sixty ticks,
@@ -180,9 +180,9 @@ export function IconicMarkSection() {
         <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-[920px] mx-auto reveal-row">
           {MARK_STATS.map(({ val, label, green }) => (
             <div key={label} className="text-center">
-              <div className={`num text-[22px] font-semibold ${green ? 'em-text' : ''}`}>{val}</div>
+              <div className={`num text-2xl font-semibold ${green ? 'em-text' : ''}`}>{val}</div>
               <div
-                className="text-[10.5px] uppercase tracking-[.14em] mt-1"
+                className="text-2xs uppercase tracking-[.14em] mt-1"
                 style={{ color: 'var(--ink-3)' }}
               >
                 {label}

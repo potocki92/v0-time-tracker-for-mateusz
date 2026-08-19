@@ -63,7 +63,7 @@ export function InvoiceTotalsSummary() {
                     <span className={cn('inline-flex items-center gap-1.5')}>
                       {row.label}
                       {row.mode !== 'standard' ? (
-                        <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                        <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                           spec.
                         </span>
                       ) : null}
@@ -133,7 +133,7 @@ function TotalsCell({
         emphasis && 'border-emerald-500/40 bg-emerald-500/10',
       )}
     >
-      <dt className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+      <dt className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
         {label}
       </dt>
       <dd

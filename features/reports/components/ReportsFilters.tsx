@@ -68,7 +68,7 @@ export function ReportsFilters(props: Props) {
               <SlidersHorizontal aria-hidden className="size-4" />
               Filtry
               {props.activeCount > 0 && (
-                <span className="ml-1 rounded-full bg-white px-1.5 py-0.5 text-[10px] font-semibold text-black">
+                <span className="ml-1 rounded-full bg-white px-1.5 py-0.5 text-2xs font-semibold text-black">
                   {props.activeCount}
                 </span>
               )}

@@ -20,17 +20,17 @@ export function RecentEntries({ entries, onViewAll }: Props) {
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
           <div>
-            <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
               Ostatnie wpisy
             </h3>
-            <p className="text-[10px] text-zinc-600">Ostatnie 7 wpisów</p>
+            <p className="text-2xs text-zinc-600">Ostatnie 7 wpisów</p>
           </div>
           {onViewAll && (
             <button
               type="button"
               onClick={onViewAll}
               className={cn(
-                'group inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-emerald-400',
+                'group inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-emerald-400',
                 'transition-colors hover:bg-emerald-500/10 focus-visible:bg-emerald-500/10',
               )}
             >
@@ -71,10 +71,10 @@ function RecentRow({ entry }: { entry: RecentEntry }) {
   return (
     <li className="flex items-center gap-3 py-2.5">
       <div className="flex h-9 w-12 shrink-0 flex-col items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e]">
-        <span className="text-[8px] font-bold uppercase tracking-wider text-zinc-500">
+        <span className="text-2xs font-bold uppercase tracking-wider text-zinc-500">
           {monthLabel} · {dayLabel}
         </span>
-        <span className="text-[12px] font-bold leading-none text-white">{d}</span>
+        <span className="text-xs font-bold leading-none text-white">{d}</span>
       </div>
 
       <div className="min-w-0 flex-1">
@@ -82,9 +82,9 @@ function RecentRow({ entry }: { entry: RecentEntry }) {
           {entry.clientName ?? 'Bez klienta'}
         </div>
         {entry.notes ? (
-          <p className="line-clamp-1 text-[11px] text-zinc-400">{entry.notes}</p>
+          <p className="line-clamp-1 text-2xs text-zinc-400">{entry.notes}</p>
         ) : (
-          <p className="text-[11px] text-zinc-600 italic">brak notatki</p>
+          <p className="text-2xs text-zinc-600 italic">brak notatki</p>
         )}
       </div>
 
@@ -92,7 +92,7 @@ function RecentRow({ entry }: { entry: RecentEntry }) {
         <div className="text-xs font-semibold tabular-nums text-white">
           {entry.hours.toFixed(1)}h
         </div>
-        <div className="text-[10px] tabular-nums text-zinc-500">{amountStr}</div>
+        <div className="text-2xs tabular-nums text-zinc-500">{amountStr}</div>
       </div>
     </li>
   )

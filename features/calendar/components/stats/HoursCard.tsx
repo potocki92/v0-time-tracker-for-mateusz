@@ -19,13 +19,13 @@ export function HoursCard({ totalHours, baselineHours, progressPercent, isAhead 
         progressPercent,
       )}%)`}
     >
-      <p className="mt-2 text-2xl font-bold tabular-nums tracking-tight text-white sm:text-[26px]">
+      <p className="mt-2 text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
         {totalHours.toFixed(1)}
         <span className="ml-0.5 text-xs font-normal text-zinc-500 sm:text-sm">h</span>
       </p>
 
       <div className="mt-3 space-y-1.5">
-        <div className="flex items-center justify-between text-[10px] sm:text-[11px]">
+        <div className="flex items-center justify-between text-2xs">
           <span className="text-zinc-500">Cel: {baselineHours}h</span>
           <span
             className={cn(

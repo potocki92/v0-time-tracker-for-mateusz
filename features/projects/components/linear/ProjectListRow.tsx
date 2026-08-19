@@ -100,7 +100,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
         aria-hidden
         className={cn(
           'absolute inset-y-0 left-0 w-1',
-          isActive ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.45)]' : LINEAR.rail,
+          isActive ? 'bg-emerald-500 shadow-[0_0_10px_color-mix(in_oklab,var(--primary)_45%,transparent)]' : LINEAR.rail,
         )}
       />
 
@@ -117,20 +117,20 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
         <div className="min-w-0 flex-1">
           <p
             className={cn(
-              'line-clamp-2 text-[15px] font-semibold leading-snug',
+              'line-clamp-2 text-sm font-semibold leading-snug',
               isDone ? 'text-zinc-300' : 'text-white',
             )}
           >
             {project.name}
           </p>
           {project.description ? (
-            <p className="mt-1 line-clamp-1 text-[12px] text-zinc-400">{project.description}</p>
+            <p className="mt-1 line-clamp-1 text-xs text-zinc-400">{project.description}</p>
           ) : null}
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
           <span
             className={cn(
-              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold',
               statusPill.className,
             )}
           >
@@ -140,7 +140,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
           {project.priority === 'high' && (
             <span
               className={cn(
-                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold',
                 PROJECT_PRIORITY_PILL.high.className,
               )}
             >
@@ -151,7 +151,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
       </div>
 
       <div className="mt-3 space-y-1.5">
-        <div className="flex items-center justify-between text-[11px] text-zinc-400">
+        <div className="flex items-center justify-between text-2xs text-zinc-400">
           <span>Postęp</span>
           <span className="tabular-nums text-zinc-200">{Math.round(progressPct)}%</span>
         </div>
@@ -185,16 +185,16 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
         <div className="flex min-w-0 items-center gap-2">
           <Avatar className={cn('h-6 w-6 border', LINEAR.border)}>
             <AvatarFallback
-              className="text-[10px] font-semibold text-white"
+              className="text-2xs font-semibold text-white"
               style={{ backgroundColor: clientColor }}
             >
               {clientInitials(clientName)}
             </AvatarFallback>
           </Avatar>
-          <span className="truncate text-[12px] text-zinc-300">{clientName}</span>
+          <span className="truncate text-xs text-zinc-300">{clientName}</span>
         </div>
         {budget > 0 && (
-          <span className="shrink-0 text-[11.5px] tabular-nums text-zinc-400">
+          <span className="shrink-0 text-2xs tabular-nums text-zinc-400">
             {formatCurrency(budget, 'PLN')}
           </span>
         )}
@@ -206,12 +206,12 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
 function Stat({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+      <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
         {label}
       </p>
       <p
         className={cn(
-          'mt-0.5 text-[13px] font-semibold tabular-nums text-white',
+          'mt-0.5 text-xs font-semibold tabular-nums text-white',
           danger && 'text-rose-300',
         )}
       >

@@ -10,7 +10,7 @@ export function PricingSection() {
           <div className="eyebrow mb-4">Pricing</div>
           <h2 className="display display-md ink-gradient">Honest, like the hours.</h2>
           <p
-            className="mt-4 text-[15px] sm:text-[17px] max-w-[560px] mx-auto"
+            className="mt-4 text-sm sm:text-lg max-w-[560px] mx-auto"
             style={{ color: 'var(--ink-2)' }}
           >
             No per‑seat surprises. No &ldquo;talk to sales&rdquo; wall. Pay for the work, not the
@@ -27,7 +27,7 @@ export function PricingSection() {
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="pill chip-emerald !py-1 !px-2.5 !text-[10.5px]">
+                  <span className="pill chip-emerald !py-1 !px-2.5 !text-2xs">
                     <Sparkles className="h-2.5 w-2.5" /> Most popular
                   </span>
                 </div>
@@ -40,12 +40,12 @@ export function PricingSection() {
 
               <div className="flex items-baseline gap-1">
                 <span className="display display-sm num em-text">{plan.price}</span>
-                <span className="text-[12px]" style={{ color: 'var(--ink-3)' }}>
+                <span className="text-xs" style={{ color: 'var(--ink-3)' }}>
                   {plan.period}
                 </span>
               </div>
 
-              <p className="text-[13px] mt-3 leading-relaxed" style={{ color: 'var(--ink-3)' }}>
+              <p className="text-xs mt-3 leading-relaxed" style={{ color: 'var(--ink-3)' }}>
                 {plan.desc}
               </p>
 
@@ -59,7 +59,7 @@ export function PricingSection() {
 
               <div className="divider my-6" />
 
-              <ul className="space-y-2.5 text-[13px]" style={{ color: 'var(--ink-2)' }}>
+              <ul className="space-y-2.5 text-xs" style={{ color: 'var(--ink-2)' }}>
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
                     <Check className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: '#22E07A' }} />

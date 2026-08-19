@@ -84,16 +84,16 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
         <div className="flex items-center gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Faktury
           </p>
-          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-[11px] text-zinc-300">
+          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
             {invoices.length} · {periodShort}
           </span>
         </div>
         <Link
           href="/invoices"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
         >
           Zobacz wszystkie
           <ArrowUpRight className="h-3 w-3" aria-hidden />
@@ -127,19 +127,19 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="truncate text-[13px] font-medium leading-[1.35] text-white sm:text-sm">{inv.name}</p>
+                      <p className="truncate text-xs font-medium leading-[1.35] text-white sm:text-sm">{inv.name}</p>
                       <span
-                        className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${pill.className}`}
+                        className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold ${pill.className}`}
                       >
                         <pill.icon className="h-3 w-3" aria-hidden />
                         {pill.label}
                       </span>
                     </div>
                     {subtitle && (
-                      <p className="mt-0.5 truncate text-[11.5px] text-zinc-500 sm:text-xs">{subtitle}</p>
+                      <p className="mt-0.5 truncate text-2xs text-zinc-500 sm:text-xs">{subtitle}</p>
                     )}
                   </div>
-                  <span className="shrink-0 text-[13px] font-semibold tabular-nums text-white sm:text-sm">
+                  <span className="shrink-0 text-xs font-semibold tabular-nums text-white sm:text-sm">
                     {formatCurrency(inv.amount, inv.currency)}
                   </span>
                 </Link>

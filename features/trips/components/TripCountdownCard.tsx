@@ -26,13 +26,13 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
         className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
       >
         <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
             Wyjazdy
           </p>
           <button
             type="button"
             onClick={onManage}
-            className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+            className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
           >
             <Plus className="h-3 w-3" aria-hidden />
             Dodaj
@@ -71,13 +71,13 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
       className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
           Wyjazdy
         </p>
         <button
           type="button"
           onClick={onManage}
-          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-[11px] font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
         >
           <Settings2 className="h-3 w-3" aria-hidden />
           Zarządzaj
@@ -93,24 +93,24 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
             <Icon className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+            <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
               {heading}
             </p>
             {isToday ? (
-              <p className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-white sm:text-[28px]">
+              <p className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
                 {isAway ? 'Dzisiaj wracasz do domu' : 'Dzisiaj wyjeżdżasz'}
               </p>
             ) : (
               <p className="mt-1 flex items-baseline gap-2 text-white">
-                <span className="text-[40px] font-semibold leading-none tabular-nums sm:text-[44px]">
+                <span className="text-h1 font-semibold leading-none tabular-nums">
                   {state.days}
                 </span>
                 <span className="text-base font-medium text-zinc-400">{dayWord}</span>
               </p>
             )}
-            <p className="mt-1 truncate text-[13px] text-zinc-400">{subline}</p>
+            <p className="mt-1 truncate text-xs text-zinc-400">{subline}</p>
             {targetLabel ? (
-              <p className="mt-0.5 text-[12px] text-zinc-500">
+              <p className="mt-0.5 text-xs text-zinc-500">
                 {isAway ? 'Powrót: ' : 'Wyjazd: '}
                 <span className="text-zinc-300">{targetLabel}</span>
               </p>

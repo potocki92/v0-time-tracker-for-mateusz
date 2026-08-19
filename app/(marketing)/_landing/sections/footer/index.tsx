@@ -11,7 +11,7 @@ export function FooterSection() {
               <BrandMark />
             </div>
             <p
-              className="max-w-[280px] text-[12.5px] leading-relaxed"
+              className="max-w-[280px] text-xs leading-relaxed"
               style={{ color: 'var(--ink-3)' }}
             >
               The clock for independent work. Built in Düsseldorf, used everywhere.
@@ -25,7 +25,7 @@ export function FooterSection() {
               style={{ transitionDelay: `${(i + 1) * 60}ms` }}
             >
               <div className="stat-label mb-3">{group.title}</div>
-              <ul className="space-y-2 text-[12.5px]" style={{ color: 'var(--ink-2)' }}>
+              <ul className="space-y-2 text-xs" style={{ color: 'var(--ink-2)' }}>
                 {group.links.map(({ label, href }) => (
                   <li key={label}>
                     <a href={href} className="em-hover">
@@ -39,7 +39,7 @@ export function FooterSection() {
         </div>
 
         <div
-          className="mt-14 flex flex-col items-start justify-between gap-3 border-t pt-6 text-[11.5px] sm:flex-row sm:items-center"
+          className="mt-14 flex flex-col items-start justify-between gap-3 border-t pt-6 text-2xs sm:flex-row sm:items-center"
           style={{ borderColor: 'var(--hair)', color: 'var(--ink-3)' }}
         >
           <div>© 2026 TimeTracker GmbH · All rights reserved.</div>

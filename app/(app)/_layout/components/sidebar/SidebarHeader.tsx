@@ -33,10 +33,10 @@ export function AppSidebarHeader() {
             <BrandMark />
 
             <div className="flex min-w-0 flex-col leading-tight group-data-[collapsible=icon]:hidden">
-              <span className="truncate text-[13.5px] font-semibold tracking-tight">
+              <span className="truncate text-xs font-semibold tracking-tight">
                 TimeTracker
               </span>
-              <span className="truncate text-[10.5px] font-normal text-sidebar-foreground/55">
+              <span className="truncate text-2xs font-normal text-sidebar-foreground/55">
                 Workspace · Developer
               </span>
             </div>

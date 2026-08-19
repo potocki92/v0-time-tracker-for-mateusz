@@ -20,5 +20,5 @@ export const LINEAR = {
   textPrimary: 'text-white',
   textSecondary: 'text-zinc-300',
   textMuted: 'text-zinc-400',
-  eyebrow: 'text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400',
+  eyebrow: 'text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400',
 } as const

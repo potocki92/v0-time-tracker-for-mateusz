@@ -20,10 +20,10 @@ export function RealizedEarningsCard({
       icon={<Coins className="h-4 w-4" />}
       ariaLabel={`Zarobione do dziś: ${formatCurrency(realizedEarningsPLN, 'PLN')} w ${realizedDays} ${pluralizeDays(realizedDays)}`}
     >
-      <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-[26px]">
+      <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
         {formatCurrency(realizedEarningsPLN, 'PLN')}
       </p>
-      <p className="mt-3 text-[10px] text-zinc-500 sm:text-[11px]">
+      <p className="mt-3 text-2xs text-zinc-500">
         {realizedDays} {pluralizeDays(realizedDays)} • {realizedHours.toFixed(1)} h
       </p>
     </KPICard>

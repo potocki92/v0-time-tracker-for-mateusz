@@ -104,7 +104,7 @@ export function FormInput<TValues extends FieldValues>({
             {...commonProps}
             {...register(name)}
             className={cn(
-              'min-h-[112px] resize-none rounded-xl border-border/70 bg-background px-4 py-3 text-[0.95rem] shadow-sm transition',
+              'min-h-[112px] resize-none rounded-xl border-input-border bg-background px-4 py-3 text-sm shadow-sm transition',
               'focus-visible:border-primary/70 focus-visible:ring-primary/25',
               softInvalidClass,
               hasIcon && 'pl-11',
@@ -120,7 +120,7 @@ export function FormInput<TValues extends FieldValues>({
             )}
             type={effectiveType}
             className={cn(
-              'h-12 rounded-xl border-border/70 bg-background px-4 text-[0.95rem] shadow-sm transition',
+              'h-12 rounded-xl border-input-border bg-background px-4 text-sm shadow-sm transition',
               'focus-visible:border-primary/70 focus-visible:ring-primary/25',
               softInvalidClass,
               hasIcon && 'pl-11',
@@ -164,7 +164,7 @@ export function FormInput<TValues extends FieldValues>({
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -4, height: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="pt-0.5 text-[13px] text-destructive/75 dark:text-destructive/80"
+            className="pt-0.5 text-xs text-destructive/75 dark:text-destructive/80"
           >
             {error.message}
           </m.p>

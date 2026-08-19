@@ -160,13 +160,13 @@ export const EarningsCard = memo(function EarningsCard({
       <header className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+            <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
               Zarobki · {periodLabel}
             </p>
             {trend.percent !== null && (
               <span
                 className={cn(
-                  'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 tabular-nums',
+                  'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold ring-1 tabular-nums',
                   trendBg,
                   trendColor,
                 )}
@@ -177,7 +177,7 @@ export const EarningsCard = memo(function EarningsCard({
               </span>
             )}
             {privacyMode && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#161616] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-400 ring-1 ring-[#1f1f1f]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#161616] px-2 py-0.5 text-2xs font-medium uppercase tracking-wide text-zinc-400 ring-1 ring-[#1f1f1f]">
                 <EyeOff className="h-3 w-3" aria-hidden />
                 privacy
               </span>
@@ -186,17 +186,17 @@ export const EarningsCard = memo(function EarningsCard({
 
           <div className="mt-2 flex items-baseline gap-2">
             <span
-              className="text-[26px] font-semibold tabular-nums leading-[1.15] text-white sm:text-[32px] sm:font-bold sm:leading-tight"
+              className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-h1 sm:font-bold sm:leading-tight"
               aria-label={privacyMode ? 'Kwota ukryta' : undefined}
             >
               {totalPLNStr}
             </span>
           </div>
-          <p className="mt-1 text-[12.5px] leading-[1.4] text-zinc-500 tabular-nums">
+          <p className="mt-1 text-xs leading-[1.4] text-zinc-500 tabular-nums">
             ≈ {totalEURStr}
           </p>
 
-          <p className="mt-1 text-[11.5px] leading-[1.4] text-zinc-500 sm:text-xs">
+          <p className="mt-1 text-2xs leading-[1.4] text-zinc-500 sm:text-xs">
             {showCompareLine && (
               <>
                 <span className={isUp ? 'text-emerald-400' : 'text-red-400'}>
@@ -264,7 +264,7 @@ export const EarningsCard = memo(function EarningsCard({
 
           {/* Legenda compare — tylko gdy aktywny tryb i jest co pokazać */}
           {compareMode && trend.prevTotal > 0 && (
-            <div className="pointer-events-none absolute right-2 top-1 flex items-center gap-2 text-[10px] uppercase tracking-wide text-zinc-500">
+            <div className="pointer-events-none absolute right-2 top-1 flex items-center gap-2 text-2xs uppercase tracking-wide text-zinc-500">
               <span className="inline-flex items-center gap-1">
                 <span className="h-[2px] w-3 rounded-full bg-emerald-400" aria-hidden />
                 bieżący
@@ -304,12 +304,12 @@ function KpiTile({
         <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#161616] text-zinc-300 ring-1 ring-[#1f1f1f]">
           <Icon className="h-3.5 w-3.5" aria-hidden />
         </span>
-        {hint && <span className="text-[10px] font-medium uppercase tracking-wide">{hint}</span>}
+        {hint && <span className="text-2xs font-medium uppercase tracking-wide">{hint}</span>}
       </div>
-      <p className="mt-2 text-[14px] font-semibold tabular-nums leading-[1.15] text-white sm:text-[15px]">
+      <p className="mt-2 text-sm font-semibold tabular-nums leading-[1.15] text-white">
         {value}
       </p>
-      <p className="text-[10.5px] text-zinc-500 sm:text-[11px]">{label}</p>
+      <p className="text-2xs text-zinc-500">{label}</p>
     </div>
   )
 }

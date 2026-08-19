@@ -38,7 +38,7 @@ export function CalendarPageHeader({
           {MONTH_NAMES[currentMonth]} {currentYear}
         </span>
 
-        <div className="ml-auto flex items-center gap-2 text-[11px] text-zinc-500">
+        <div className="ml-auto flex items-center gap-2 text-2xs text-zinc-500">
           <span className="hidden sm:inline">
             {workDays} dni pracy • {totalEntries} wpisów
           </span>

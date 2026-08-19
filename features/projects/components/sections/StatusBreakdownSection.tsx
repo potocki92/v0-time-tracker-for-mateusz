@@ -22,7 +22,7 @@ export function StatusBreakdownSection() {
       badge={
         <span
           className={cn(
-            'rounded-md border px-2 py-0.5 text-[11px] text-zinc-300',
+            'rounded-md border px-2 py-0.5 text-2xs text-zinc-300',
             LINEAR.border,
             LINEAR.surfaceElevated,
           )}
@@ -55,8 +55,8 @@ export function StatusBreakdownSection() {
                     className="h-2 w-2 shrink-0 rounded-full"
                     style={{ backgroundColor: row.accent }}
                   />
-                  <span className="text-[12.5px] text-zinc-300">{row.label}</span>
-                  <span className="text-[12.5px] font-semibold tabular-nums text-white">
+                  <span className="text-xs text-zinc-300">{row.label}</span>
+                  <span className="text-xs font-semibold tabular-nums text-white">
                     {row.count}
                   </span>
                 </li>

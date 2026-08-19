@@ -7,10 +7,10 @@ export function ScreenInvoices() {
   return (
     <div className="flex h-full flex-col gap-3 p-4">
       <div className="flex items-center justify-between">
-        <div className="text-[13px] font-semibold" style={{ color: 'var(--ink-1)' }}>
+        <div className="text-xs font-semibold" style={{ color: 'var(--ink-1)' }}>
           Invoices · April
         </div>
-        <span className="chip-emerald text-[11px]">2 paid</span>
+        <span className="chip-emerald text-2xs">2 paid</span>
       </div>
 
       <div className="flex flex-col gap-0">
@@ -23,7 +23,7 @@ export function ScreenInvoices() {
             <div className="flex items-center gap-2.5">
               <FileEdit size={13} style={{ color: 'var(--ink-3)' }} />
               <div>
-                <div className="mono text-[11px] font-medium" style={{ color: 'var(--ink-1)' }}>
+                <div className="mono text-2xs font-medium" style={{ color: 'var(--ink-1)' }}>
                   {inv.id}
                 </div>
                 <div className="mt-0.5">
@@ -31,7 +31,7 @@ export function ScreenInvoices() {
                 </div>
               </div>
             </div>
-            <span className="num text-[13px]" style={{ color: 'var(--ink-1)' }}>
+            <span className="num text-xs" style={{ color: 'var(--ink-1)' }}>
               {inv.amount}
             </span>
           </div>
@@ -39,7 +39,7 @@ export function ScreenInvoices() {
       </div>
 
       <div className="mt-auto">
-        <a href="/auth/sign-up" className="cta-primary w-full justify-center text-center text-[12px]">
+        <a href="/auth/sign-up" className="cta-primary w-full justify-center text-center text-xs">
           Send 1 draft →
         </a>
       </div>

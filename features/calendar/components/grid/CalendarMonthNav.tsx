@@ -43,13 +43,13 @@ export function CalendarMonthNav({
               variant="ghost"
               size="sm"
               onClick={onToday}
-              className="h-6 px-2 text-[10px] font-semibold uppercase tracking-wide text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
+              className="h-6 px-2 text-2xs font-semibold uppercase tracking-wide text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
             >
               Dziś
             </Button>
           )}
           {isCurrentMonth && (
-            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-semibold text-emerald-400">
               Teraz
             </span>
           )}
@@ -71,7 +71,7 @@ export function CalendarMonthNav({
           <div
             key={day}
             className={cn(
-              'py-1 text-center text-[10px] font-medium uppercase tracking-widest sm:text-[11px]',
+              'py-1 text-center text-2xs font-medium uppercase tracking-widest',
               index >= 5 ? 'text-zinc-600' : 'text-zinc-500',
             )}
           >

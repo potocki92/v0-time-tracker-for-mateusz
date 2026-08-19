@@ -15,14 +15,14 @@ export function TestimonialSection() {
         </p>
         <div className="mt-9 flex items-center justify-center gap-3">
           <div
-            className="flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-semibold hair-strong"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold hair-strong"
             style={{ background: 'linear-gradient(135deg,#22E07A33,#0e1a12)', color: '#9CEEBE' }}
           >
             RG
           </div>
           <div className="text-left">
-            <div className="text-[13px] font-medium">Rafał Gawlik</div>
-            <div className="text-[11.5px]" style={{ color: 'var(--ink-3)' }}>
+            <div className="text-xs font-medium">Rafał Gawlik</div>
+            <div className="text-2xs" style={{ color: 'var(--ink-3)' }}>
               Independent contractor · Düsseldorf
             </div>
           </div>

@@ -449,7 +449,7 @@ export function DataTableToolbar<TData extends RowData>({
         >
           <span className="text-xs font-medium text-muted-foreground">
             Aktywne filtry
-            <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-[10px]">
+            <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-2xs">
               {activeChips.length + (globalFilter ? 1 : 0)}
             </Badge>
           </span>

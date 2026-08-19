@@ -91,9 +91,9 @@ export function DayCell({
       <div className="flex items-center justify-between">
         <span
           className={cn(
-            'text-[11px] font-semibold leading-none transition-colors sm:text-xs',
+            'text-2xs font-semibold leading-none transition-colors sm:text-xs',
             isToday
-              ? 'flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-black shadow-sm shadow-emerald-500/40'
+              ? 'flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-2xs text-black shadow-sm shadow-emerald-500/40'
               : 'text-zinc-400 group-hover:text-white',
           )}
         >
@@ -107,13 +107,13 @@ export function DayCell({
 
       {entry?.status === 'worked' && (
         <div className="relative mt-auto space-y-0.5">
-          <div className="text-[10px] font-bold leading-none text-white sm:text-[11px]">
+          <div className="text-2xs font-bold leading-none text-white">
             {client?.work_type === 'hourly'
               ? `${entry.hours}h`
               : `${entry.quantity} ${client?.unit ?? ''}`}
           </div>
           {earnings && earnings.amount > 0 && (
-            <div className="truncate text-[9px] font-medium leading-none text-zinc-400 sm:text-[10px]">
+            <div className="truncate text-2xs font-medium leading-none text-zinc-400">
               {formatCurrency(earnings.amount, earnings.currency)}
             </div>
           )}
@@ -130,7 +130,7 @@ export function DayCell({
       {entry && entry.status !== 'worked' && (
         <div
           className={cn(
-            'mt-auto w-fit rounded px-1 py-0.5 text-[8px] font-bold uppercase tracking-wider leading-none sm:text-[9px]',
+            'mt-auto w-fit rounded px-1 py-0.5 text-2xs font-bold uppercase tracking-wider leading-none',
             cfg?.pill,
           )}
         >

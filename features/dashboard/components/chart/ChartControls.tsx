@@ -41,7 +41,7 @@ export function ChartControls({
       >
         <TabsList aria-label="Grupowanie wykresu zarobków" className="h-7 w-full">
           {(Object.keys(GROUPING_LABELS) as Grouping[]).map((g) => (
-            <TabsTrigger key={g} value={g} className="min-w-0 flex-1 text-[11px]">
+            <TabsTrigger key={g} value={g} className="min-w-0 flex-1 text-2xs">
               <span className="sm:hidden">{GROUPING_LABELS[g].short}</span>
               <span className="hidden sm:inline">{GROUPING_LABELS[g].full}</span>
             </TabsTrigger>
@@ -55,7 +55,7 @@ export function ChartControls({
       >
         <TabsList aria-label="Zakres okresu wykresu" className="h-6 w-full bg-muted/40">
           {PERIOD_OPTIONS[grouping].map((opt) => (
-            <TabsTrigger key={opt.value} value={opt.value} className="min-w-0 flex-1 text-[10px]">
+            <TabsTrigger key={opt.value} value={opt.value} className="min-w-0 flex-1 text-2xs">
               {opt.label}
             </TabsTrigger>
           ))}

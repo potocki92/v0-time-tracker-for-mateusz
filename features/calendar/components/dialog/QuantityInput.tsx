@@ -19,7 +19,7 @@ export function QuantityInput({ unit, from, to, onChangeFrom, onChangeTo }: Prop
       </Label>
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Od</p>
+          <p className="mb-1 text-2xs uppercase tracking-wide text-muted-foreground">Od</p>
           <Input
             type="number"
             min={0}
@@ -31,7 +31,7 @@ export function QuantityInput({ unit, from, to, onChangeFrom, onChangeTo }: Prop
           />
         </div>
         <div>
-          <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Do</p>
+          <p className="mb-1 text-2xs uppercase tracking-wide text-muted-foreground">Do</p>
           <Input
             type="number"
             min={0}

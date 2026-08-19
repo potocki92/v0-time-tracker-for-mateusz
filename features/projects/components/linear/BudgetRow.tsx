@@ -31,16 +31,16 @@ export function BudgetRow({
     <li className="flex items-center gap-3 px-4 py-3 sm:px-5">
       <span aria-hidden className={cn('h-8 w-1 shrink-0 rounded-full', LINEAR.rail)} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[13px] font-medium text-white">{projectName}</p>
-        <p className="mt-0.5 text-[11.5px] text-zinc-400">
+        <p className="truncate text-xs font-medium text-white">{projectName}</p>
+        <p className="mt-0.5 text-2xs text-zinc-400">
           {Math.round(hours)} h · {formatCurrency(spent, 'PLN')} wydane
         </p>
       </div>
       <div className="shrink-0 text-right">
-        <p className="text-[13px] font-semibold tabular-nums text-white">
+        <p className="text-xs font-semibold tabular-nums text-white">
           {formatCurrency(budget, 'PLN')}
         </p>
-        <p className={cn('text-[11px] font-medium tabular-nums', tone)}>
+        <p className={cn('text-2xs font-medium tabular-nums', tone)}>
           {Math.round(utilization * 100)}%
         </p>
       </div>

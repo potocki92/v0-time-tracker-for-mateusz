@@ -41,14 +41,14 @@ function ContractorCard({ block }: { block: ContractorBlock }) {
       <header className="mb-3">
         <h3 className="text-sm font-semibold text-white print:text-black">{block.clientName}</h3>
         {block.client?.nip && (
-          <p className="text-[12px] text-zinc-400 print:text-gray-600">NIP: {block.client.nip}</p>
+          <p className="text-xs text-zinc-400 print:text-gray-600">NIP: {block.client.nip}</p>
         )}
         {address && (
-          <p className="text-[12px] text-zinc-400 print:text-gray-600">{address}</p>
+          <p className="text-xs text-zinc-400 print:text-gray-600">{address}</p>
         )}
       </header>
 
-      <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-[13px] sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
         {block.workLocations.length > 0 && (
           <Row label="Miejsce pracy">{block.workLocations.join('; ')}</Row>
         )}
@@ -67,7 +67,7 @@ function ContractorCard({ block }: { block: ContractorBlock }) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-[11px] uppercase tracking-wide text-zinc-500 print:text-gray-500">
+      <dt className="text-2xs uppercase tracking-wide text-zinc-500 print:text-gray-500">
         {label}
       </dt>
       <dd className="tabular-nums text-zinc-100 print:text-black">{children}</dd>

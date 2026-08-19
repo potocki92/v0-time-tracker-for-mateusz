@@ -169,7 +169,7 @@ export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) 
       {arrayError ? (
         <p
           role="alert"
-          className="text-[13px] text-destructive/75 dark:text-destructive/80"
+          className="text-xs text-destructive/75 dark:text-destructive/80"
         >
           {arrayError}
         </p>

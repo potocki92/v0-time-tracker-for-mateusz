@@ -135,7 +135,7 @@ export function InvoiceBuilderFields({
         </div>
 
         <p className="text-xs leading-relaxed text-muted-foreground">
-          Wskazówka: pola dat akceptują format <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">YYYY-MM-DD</code>.
+          Wskazówka: pola dat akceptują format <code className="rounded bg-muted px-1 py-0.5 font-mono text-2xs">YYYY-MM-DD</code>.
           Mobilne klawiatury otwierają natywny picker, gdy
           dotkniesz pola.
         </p>

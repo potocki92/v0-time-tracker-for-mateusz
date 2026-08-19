@@ -63,7 +63,7 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
 
       <div
         className={cn(
-          'flex items-stretch gap-0 rounded-xl border border-border/70 bg-background shadow-sm transition',
+          'flex items-stretch gap-0 rounded-xl border border-input-border bg-background shadow-sm transition',
           'focus-within:border-primary/70 focus-within:ring-2 focus-within:ring-primary/25',
           error && 'border-destructive/55 ring-destructive/10',
         )}
@@ -109,7 +109,7 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            'h-12 flex-1 rounded-l-none border-0 bg-transparent px-3 text-[0.95rem] shadow-none',
+            'h-12 flex-1 rounded-l-none border-0 bg-transparent px-3 text-sm shadow-none',
             'focus-visible:ring-0 focus-visible:ring-offset-0',
           )}
           {...register('phone_number')}
@@ -126,7 +126,7 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -4, height: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="pt-0.5 text-[13px] text-destructive/75 dark:text-destructive/80"
+            className="pt-0.5 text-xs text-destructive/75 dark:text-destructive/80"
           >
             {error}
           </m.p>

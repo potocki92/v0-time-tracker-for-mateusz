@@ -82,7 +82,7 @@ export function AuthField({
             [descId, error ? errorId : undefined].filter(Boolean).join(' ') || undefined
           }
           className={cn(
-            'h-12 rounded-xl border-border/70 bg-background px-4 text-[0.95rem] shadow-sm transition',
+            'h-12 rounded-xl border-input-border bg-background px-4 text-sm shadow-sm transition',
             'focus-visible:border-primary/70 focus-visible:ring-primary/25',
             'aria-invalid:border-destructive/55 aria-invalid:ring-destructive/10 dark:aria-invalid:ring-destructive/20',
             icon && 'pl-11',
@@ -124,7 +124,7 @@ export function AuthField({
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -4, height: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="pt-0.5 text-[13px] text-destructive/75 dark:text-destructive/80"
+            className="pt-0.5 text-xs text-destructive/75 dark:text-destructive/80"
           >
             {error}
           </m.p>
@@ -153,7 +153,7 @@ export function AuthSubmitButton({
       disabled={pending}
       className={cn(
         'relative mt-2 inline-flex h-12 w-full items-center justify-center gap-2 overflow-hidden',
-        'rounded-xl bg-primary px-5 text-[0.95rem] font-semibold text-primary-foreground tracking-tight',
+        'rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground tracking-tight',
         'shadow-md shadow-primary/20 transition-all duration-200',
         'hover:shadow-lg hover:shadow-primary/30 hover:brightness-[1.04] active:scale-[0.99]',
         'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',

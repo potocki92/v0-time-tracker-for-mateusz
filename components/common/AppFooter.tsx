@@ -46,7 +46,7 @@ export function AppFooter({
   const synced = syncedAt ? relative(now, syncedAt) : null
 
   return (
-    <p className="px-2 pt-2 text-center font-mono text-[10px] tracking-wider text-zinc-600">
+    <p className="px-2 pt-2 text-center font-mono text-2xs tracking-wider text-zinc-600">
       {appName}
       {synced && <> · zsynchronizowano {synced}</>}{' '}
       · {today} · {version}

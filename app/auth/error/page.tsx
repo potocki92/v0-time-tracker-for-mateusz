@@ -15,7 +15,7 @@ export default function AuthErrorPage() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-[2rem]">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-h1">
           Wystąpił błąd
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
