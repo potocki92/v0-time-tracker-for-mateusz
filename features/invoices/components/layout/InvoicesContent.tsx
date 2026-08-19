@@ -416,14 +416,14 @@ export function InvoicesContent() {
                     <FileText className="size-5" />
                   </EmptyMedia>
                   <EmptyTitle>Nie masz jeszcze faktur</EmptyTitle>
-                  <EmptyDescription>
+                  <EmptyDescription className="text-zinc-400">
                     Dodaj pierwszą fakturę, aby rozpocząć zarządzanie rozliczeniami.
                   </EmptyDescription>
                 </EmptyHeader>
                 <Button onClick={openCreate}>Dodaj pierwszą fakturę</Button>
               </Empty>
             ) : (
-              <div className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-500">
+              <div className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-400">
                 Brak faktur dopasowanych do filtrów.
               </div>
             )
@@ -477,7 +477,7 @@ export function InvoicesContent() {
               />
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-500">
+            <div className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-400">
               Wybierz fakturę z listy, aby zobaczyć szczegóły.
             </div>
           )}

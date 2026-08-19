@@ -131,8 +131,8 @@ export function EarningsSection() {
           onCopyAmount={handleCopyAmount}
         />
       </EarningsCardBoundary>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Przewidywane zarobki: <span className="font-medium text-foreground">{formatCurrency(projectedTotals.totalEarningsAllPLN, 'PLN')}</span>
+      <p className="mt-2 text-sm text-zinc-400">
+        Przewidywane zarobki: <span className="font-medium text-zinc-100">{formatCurrency(projectedTotals.totalEarningsAllPLN, 'PLN')}</span>
       </p>
 
       <GoalEditDialog

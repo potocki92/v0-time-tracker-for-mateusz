@@ -101,3 +101,55 @@ describe('e2e — wiring', () => {
     }
   })
 })
+
+describe('e2e — security and accessibility gates', () => {
+  const workflow = parse(read('.github/workflows/e2e.yml')) as {
+    jobs: Record<string, { steps: Array<{ run?: string; env?: Record<string, string> }> }>
+  }
+
+  it('runs the RLS suite in CI', () => {
+    const commands = workflow.jobs.e2e.steps.map((s) => s.run ?? '').join('\n')
+    expect(commands, 'test:rls musi byc w workflow — 11 testow bezpieczenstwa').toContain(
+      'npm run test:rls',
+    )
+  })
+
+  it('passes both RLS users to the suite', () => {
+    const rls = workflow.jobs.e2e.steps.find((s) => s.run?.includes('test:rls'))
+    for (const key of [
+      'TEST_SUPABASE_URL',
+      'TEST_SUPABASE_ANON_KEY',
+      'TEST_USER_A_EMAIL',
+      'TEST_USER_B_EMAIL',
+    ]) {
+      expect(rls?.env?.[key], `brak ${key}`).toBeDefined()
+    }
+  })
+
+  it('seeds both RLS users', () => {
+    const seed = read('e2e/seed.ts')
+    for (const key of ['TEST_USER_A_EMAIL', 'TEST_USER_B_EMAIL']) {
+      expect(seed, `seed musi zakladac ${key}`).toContain(key)
+    }
+    // Jeden zestaw zmiennych — `E2E_USER_*` bylo drugim, trzymanym recznie w synchronizacji.
+    expect(seed).not.toContain('E2E_USER_')
+    expect(read('e2e/fixtures/test-user.ts')).not.toContain('E2E_USER_')
+  })
+
+  it('scans the main routes with axe', () => {
+    const spec = read('e2e/a11y.spec.ts')
+    for (const route of ['/dashboard', '/calendar', '/clients', '/invoices']) {
+      expect(spec, `brak skanu ${route}`).toContain(route)
+    }
+    expect(spec).toContain('wcag2aa')
+  })
+
+  it('silences no axe rule without a written reason', () => {
+    const spec = read('e2e/a11y.spec.ts')
+    for (const m of spec.matchAll(/disableRules\(\[([^\]]+)\]\)/g)) {
+      if (m[1].trim() === '') continue
+      const before = spec.slice(Math.max(0, m.index! - 200), m.index!)
+      expect(before, `disableRules bez komentarza z uzasadnieniem`).toMatch(/\/\/|\/\*/)
+    }
+  })
+})

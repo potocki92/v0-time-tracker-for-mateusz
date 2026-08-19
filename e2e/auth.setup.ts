@@ -1,6 +1,6 @@
 import { expect, test as setup } from '@playwright/test'
 import { readFileSync } from 'node:fs'
-import { E2E_USER, STORAGE_STATE } from './fixtures/test-user'
+import { TEST_USER_A, STORAGE_STATE } from './fixtures/test-user'
 
 /**
  * Loguje sie raz i zapisuje ciasteczka do pliku. Kazdy kolejny test startuje
@@ -12,8 +12,8 @@ setup('authenticate', async ({ page }) => {
   // `exact: true` jest tu konieczne: przelacznik widocznosci hasla ma
   // aria-label "Pokaz haslo", wiec dopasowanie po fragmencie zlapaloby
   // dwa elementy i wywrocilo sie na strict mode.
-  await page.getByLabel('Email', { exact: true }).fill(E2E_USER.email)
-  await page.getByLabel('Hasło', { exact: true }).fill(E2E_USER.password)
+  await page.getByLabel('Email', { exact: true }).fill(TEST_USER_A.email)
+  await page.getByLabel('Hasło', { exact: true }).fill(TEST_USER_A.password)
   await page.getByRole('button', { name: 'Zaloguj się' }).click()
 
   await page.waitForURL('**/dashboard')

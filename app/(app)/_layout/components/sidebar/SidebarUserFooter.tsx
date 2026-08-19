@@ -56,7 +56,7 @@ export function SidebarUserFooter({ user, onLogout }: SidebarUserFooterProps) {
                 <span className="truncate text-xs font-medium text-sidebar-foreground">
                   {displayName}
                 </span>
-                <span className="truncate text-2xs text-sidebar-foreground/55">
+                <span className="truncate text-2xs text-sidebar-foreground/80">
                   {email}
                 </span>
               </div>

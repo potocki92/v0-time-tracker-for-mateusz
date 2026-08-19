@@ -23,7 +23,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { clientInitials, clientNameToColor } from '@/components/common/ClientDisplay'
+import {
+  clientInitials,
+  clientNameToColor,
+  readableTextColor,
+} from '@/components/common/ClientDisplay'
 import { formatCurrency } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
 import {
@@ -100,8 +104,8 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
           <div className="relative shrink-0">
             <Avatar className="size-11">
               <AvatarFallback
-                className="text-sm font-bold text-white"
-                style={{ background: color }}
+                className="text-sm font-bold"
+                style={{ background: color, color: readableTextColor(color) }}
               >
                 {initials}
               </AvatarFallback>
@@ -186,7 +190,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
 
       {/* Typ / waluta / liczba wpisów to metadane, nie nagłówek — jedna linia
           drobnym drukiem zamiast trzech pigułek konkurujących z nazwą. */}
-      <p className="mt-2.5 flex items-center gap-1.5 text-2xs text-zinc-500">
+      <p className="mt-2.5 flex items-center gap-1.5 text-2xs text-zinc-400">
         <span>{WORK_TYPE_LABELS[client.work_type]}</span>
         <span aria-hidden>·</span>
         <span>{client.currency}</span>
@@ -215,7 +219,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
           value={
             <>
               {formatCurrency(client.rate, client.currency)}
-              <span className="text-2xs font-normal text-zinc-500">/{unit}</span>
+              <span className="text-2xs font-normal text-zinc-400">/{unit}</span>
             </>
           }
         />
@@ -289,13 +293,13 @@ function Metric({
 }) {
   return (
     <div className="min-w-0">
-      <dt className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+      <dt className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
         {label}
       </dt>
       <dd
         className={cn(
           'mt-0.5 truncate text-xs font-semibold tabular-nums text-white',
-          empty && 'text-zinc-600',
+          empty && 'text-zinc-400',
         )}
       >
         {value}
@@ -312,7 +316,7 @@ function formatHours(hours: number): string {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <dt className="shrink-0 text-zinc-500">{label}</dt>
+      <dt className="shrink-0 text-zinc-400">{label}</dt>
       <dd className="min-w-0 truncate text-right font-medium text-zinc-200">{value}</dd>
     </div>
   )

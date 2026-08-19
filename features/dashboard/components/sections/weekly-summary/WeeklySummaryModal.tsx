@@ -54,7 +54,7 @@ function ContractorCard({ block }: { block: ContractorBlock }) {
         )}
         <Row label="Dni pracy (od – do)">
           {formatDate(block.workedFrom)} – {formatDate(block.workedTo)}
-          <span className="text-zinc-500 print:text-gray-500"> ({block.workedDaysCount} dni)</span>
+          <span className="text-zinc-400 print:text-gray-500"> ({block.workedDaysCount} dni)</span>
         </Row>
         <Row label="Godziny">{formatHours(block.totalHours)}</Row>
         <Row label="Stawka na fakturze">{block.rates.map(formatRate).join(', ')}</Row>
@@ -67,7 +67,7 @@ function ContractorCard({ block }: { block: ContractorBlock }) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-2xs uppercase tracking-wide text-zinc-500 print:text-gray-500">
+      <dt className="text-2xs uppercase tracking-wide text-zinc-400 print:text-gray-500">
         {label}
       </dt>
       <dd className="tabular-nums text-zinc-100 print:text-black">{children}</dd>
@@ -127,7 +127,7 @@ export function WeeklySummaryModal({
           </div>
 
           {summary.isEmpty ? (
-            <p className="py-8 text-center text-sm text-zinc-500 print:text-black">
+            <p className="py-8 text-center text-sm text-zinc-400 print:text-black">
               Brak przepracowanych dni w tym tygodniu.
             </p>
           ) : (

@@ -42,7 +42,7 @@ export function BottomNav() {
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40',
                   isActive
                     ? 'text-emerald-400'
-                    : 'text-zinc-500 hover:text-zinc-200',
+                    : 'text-zinc-400 hover:text-zinc-200',
                 )}
               >
                 <Icon className="h-5 w-5" aria-hidden />

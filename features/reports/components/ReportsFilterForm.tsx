@@ -25,14 +25,14 @@ const PRESETS: Array<{ value: PeriodPreset; label: string }> = [
 
 const FIELD_CLASSES =
   'h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] px-3 text-sm text-zinc-200 ' +
-  'placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 ' +
+  'placeholder:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 ' +
   'focus-visible:ring-zinc-500/60 disabled:opacity-50'
 
 function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
   return (
     <label
       htmlFor={htmlFor}
-      className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500"
+      className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400"
     >
       {children}
     </label>

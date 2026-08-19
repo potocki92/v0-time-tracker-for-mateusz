@@ -23,7 +23,7 @@ export function RealizedEarningsCard({
       <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
         {formatCurrency(realizedEarningsPLN, 'PLN')}
       </p>
-      <p className="mt-3 text-2xs text-zinc-500">
+      <p className="mt-3 text-2xs text-zinc-400">
         {realizedDays} {pluralizeDays(realizedDays)} • {realizedHours.toFixed(1)} h
       </p>
     </KPICard>

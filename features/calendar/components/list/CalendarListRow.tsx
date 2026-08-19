@@ -37,7 +37,7 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
       )}
     >
       <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-[#0e0e0e]">
-        <span className="text-2xs font-medium uppercase tracking-widest text-zinc-500">
+        <span className="text-2xs font-medium uppercase tracking-widest text-zinc-400">
           {['', 'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'][Number(m)]}
         </span>
         <span className="text-sm font-bold leading-none text-white">{Number(d)}</span>
@@ -51,9 +51,9 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
           {quantityLabel && (
             <span className="inline-flex items-center gap-1 text-2xs font-semibold text-white">
               {client?.work_type === 'hourly' ? (
-                <Clock className="h-3 w-3 text-zinc-500" />
+                <Clock className="h-3 w-3 text-zinc-400" />
               ) : (
-                <Layers className="h-3 w-3 text-zinc-500" />
+                <Layers className="h-3 w-3 text-zinc-400" />
               )}
               {quantityLabel}
             </span>

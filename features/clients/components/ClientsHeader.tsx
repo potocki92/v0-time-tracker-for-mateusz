@@ -99,7 +99,7 @@ export function ClientsHeader({
             value={workTypeFilter}
             onValueChange={(v) => onWorkTypeFilterChange(v as ClientsWorkTypeFilter)}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40" aria-label="Filtruj po typie rozliczenia">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -115,7 +115,7 @@ export function ClientsHeader({
             value={currencyFilter}
             onValueChange={(v) => onCurrencyFilterChange(v as ClientsCurrencyFilter)}
           >
-            <SelectTrigger className="w-36">
+            <SelectTrigger className="w-36" aria-label="Filtruj po walucie">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

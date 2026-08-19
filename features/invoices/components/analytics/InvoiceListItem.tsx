@@ -76,7 +76,7 @@ export function InvoiceListItem({
                 {numberLabel}
               </p>
               {period && (
-                <p className="truncate text-2xs text-zinc-500">{period}</p>
+                <p className="truncate text-2xs text-zinc-400">{period}</p>
               )}
             </div>
           </div>
@@ -96,7 +96,7 @@ export function InvoiceListItem({
         </div>
 
         <footer className="flex items-end justify-between gap-3 tabular-nums">
-          <div className="flex items-center gap-3 text-xs text-zinc-500">
+          <div className="flex items-center gap-3 text-xs text-zinc-400">
             {typeof hours === 'number' && hours > 0 && <span>{Math.round(hours)} h</span>}
             {dateLabel && <span>{dateLabel}</span>}
           </div>

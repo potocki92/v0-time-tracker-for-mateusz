@@ -16,10 +16,16 @@ export NEXT_PUBLIC_SUPABASE_URL="$API_URL"
 export NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY"
 export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
 
-export E2E_USER_EMAIL=e2e@example.test
-export E2E_USER_PASSWORD=e2e-local-password-1234
+# Jeden zestaw zmiennych dla seeda, E2E i testow RLS.
+export TEST_SUPABASE_URL="$API_URL"
+export TEST_SUPABASE_ANON_KEY="$ANON_KEY"
+export TEST_USER_A_EMAIL=a@example.test
+export TEST_USER_A_PASSWORD=e2e-local-a-1234
+export TEST_USER_B_EMAIL=b@example.test
+export TEST_USER_B_PASSWORD=e2e-local-b-1234
 
 npm run e2e:seed
+npm run test:rls               # 11 testow polityk RLS, ~1 s
 npm run build && npm run e2e
 ```
 
@@ -28,16 +34,17 @@ przegladarke.
 
 > `npm run build` czyta `NEXT_PUBLIC_*` w momencie budowania. Jesli trzymasz je
 > w `.env.local`, wystarczy wyeksportowac `SUPABASE_SERVICE_ROLE_KEY` i
-> `E2E_USER_*` — reszte Next wczyta sam.
+> `TEST_*` — reszte Next wczyta sam.
 
 ## Jak to jest poskladane
 
 | Plik | Rola |
 |---|---|
-| `seed.ts` | zaklada uzytkownika testowego, czysci jego dane, tworzy klienta `E2E Klient Testowy` i projekt |
+| `seed.ts` | zaklada **dwoch** uzytkownikow (A i B), czysci ich dane, kazdemu tworzy klienta i projekt |
 | `auth.setup.ts` | loguje sie **raz** i zapisuje sesje do `.auth/user.json` |
-| `fixtures/test-user.ts` | dane logowania z ENV (brak zmiennej = jasny blad, nie ciche `undefined`) |
+| `fixtures/test-user.ts` | dane logowania usera A z ENV (brak zmiennej = jasny blad, nie ciche `undefined`) |
 | `*.spec.ts` | cztery sciezki krytyczne |
+| `a11y.spec.ts` | skan axe (WCAG 2.1 AA) czterech tras panelu + kolejnosc focusa w logowaniu |
 
 Projekt `setup` jest zaleznoscia projektow `chromium` i `mobile`, wiec kazdy
 test startuje juz zalogowany — logowanie nie powtarza sie 10 razy.
@@ -54,8 +61,16 @@ testu nigdy by w niego nie trafil — projekt byl by cicho pusty. Pilnuje tego
 Blokada jest w kodzie celowo — pomylka w zmiennej srodowiskowej skasowalaby
 produkcyjne dane bez ostrzezenia.
 
-Konto testowe (`e2e@example.test`) istnieje wylacznie w efemerycznej bazie
-lokalnej i CI. **Nie podstawiaj tu zadnego sekretu produkcyjnego.**
+Konta testowe (`a@example.test`, `b@example.test`) istnieja wylacznie w efemerycznej
+bazie lokalnej i CI. **Nie podstawiaj tu zadnego sekretu produkcyjnego.**
+
+## Dwoch uzytkownikow
+
+E2E loguje sie tylko jako user A. User B istnieje dla `__test__/rls.test.ts`:
+bez jego klienta i projektu asercje "user A nie widzi cudzych rekordow"
+przechodzilyby na pustym zbiorze, czyli nie sprawdzalyby niczego. Suite RLS
+czyta te same zmienne `TEST_USER_A_*` co E2E — jeden zestaw zamiast dwoch
+trzymanych w synchronizacji.
 
 ## Zasady selektorow
 

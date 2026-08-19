@@ -73,7 +73,7 @@ export const EarningsMenu = memo(function EarningsMenu({
         sideOffset={6}
         className="min-w-[260px] rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-1.5 text-zinc-200 shadow-2xl"
       >
-        <DropdownMenuLabel className="px-2 pb-1 pt-1.5 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <DropdownMenuLabel className="px-2 pb-1 pt-1.5 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Karta Zarobki
         </DropdownMenuLabel>
 
@@ -95,12 +95,12 @@ export const EarningsMenu = memo(function EarningsMenu({
               <DropdownMenuItem onClick={onExportPdf} disabled={isExporting} className={ITEM_BASE}>
                 <FileText className="size-4 text-rose-400" aria-hidden />
                 <span>PDF</span>
-                <DropdownMenuShortcut className="text-zinc-500">⌘P</DropdownMenuShortcut>
+                <DropdownMenuShortcut className="text-zinc-400">⌘P</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onExportCsv} disabled={isExporting} className={ITEM_BASE}>
                 <FileSpreadsheet className="size-4 text-emerald-400" aria-hidden />
                 <span>CSV</span>
-                <DropdownMenuShortcut className="text-zinc-500">⌘E</DropdownMenuShortcut>
+                <DropdownMenuShortcut className="text-zinc-400">⌘E</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuSubContent>
           </DropdownMenuSub>
@@ -113,13 +113,13 @@ export const EarningsMenu = memo(function EarningsMenu({
           <DropdownMenuItem onClick={onCopyAmount} className={ITEM_BASE}>
             <Copy className="size-4 text-zinc-400" aria-hidden />
             <span>Skopiuj kwotę okresu</span>
-            <DropdownMenuShortcut className="text-zinc-500">⌘C</DropdownMenuShortcut>
+            <DropdownMenuShortcut className="text-zinc-400">⌘C</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator className="my-1 bg-[#1a1a1a]" />
 
-        <DropdownMenuLabel className="px-2 pb-1 pt-1 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <DropdownMenuLabel className="px-2 pb-1 pt-1 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Analiza
         </DropdownMenuLabel>
 

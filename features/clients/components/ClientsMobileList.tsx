@@ -128,7 +128,7 @@ export function ClientsMobileList({
               className="h-11 w-[11.5rem] shrink-0 gap-1.5 rounded-xl border-[#2a2a30] bg-[#101012] text-sm text-zinc-300 [&>span]:truncate"
               aria-label="Sortowanie listy klientów"
             >
-              <ArrowDownUp className="size-4 shrink-0 text-zinc-500" aria-hidden />
+              <ArrowDownUp className="size-4 shrink-0 text-zinc-400" aria-hidden />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -181,7 +181,7 @@ export function ClientsMobileList({
         <div className="space-y-4">
           {grouped.map(({ activity, items }) => (
             <section key={activity} className="space-y-2.5">
-              <h2 className="px-1 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+              <h2 className="px-1 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
                 {ACTIVITY_GROUP_LABELS[activity]} {items.length}
               </h2>
               <ul className="space-y-2.5">
@@ -242,7 +242,7 @@ function FilterChipsRow<T extends string>({
 }: FilterChipsRowProps<T>) {
   return (
     <div>
-      <p className="mb-1.5 text-2xs font-semibold uppercase tracking-wide text-zinc-500">
+      <p className="mb-1.5 text-2xs font-semibold uppercase tracking-wide text-zinc-400">
         {label}
       </p>
       <div

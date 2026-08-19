@@ -47,7 +47,7 @@ export function UpcomingCard({ items, onAdd }: Props) {
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Nadchodzące
         </p>
         <button
@@ -61,7 +61,7 @@ export function UpcomingCard({ items, onAdd }: Props) {
       </header>
 
       {items.length === 0 ? (
-        <div className="px-4 py-6 text-center text-sm text-zinc-500">
+        <div className="px-4 py-6 text-center text-sm text-zinc-400">
           Brak zaplanowanych wydarzeń.
         </div>
       ) : (
@@ -72,7 +72,7 @@ export function UpcomingCard({ items, onAdd }: Props) {
               <li key={it.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex w-10 flex-col items-center text-center">
                   <span className="text-sm font-semibold tabular-nums leading-[1.15] text-white sm:text-base sm:font-bold">{day}</span>
-                  <span className="text-2xs font-semibold tracking-wider text-zinc-500">
+                  <span className="text-2xs font-semibold tracking-wider text-zinc-400">
                     {month}
                   </span>
                 </div>
@@ -84,7 +84,7 @@ export function UpcomingCard({ items, onAdd }: Props) {
                     {CATEGORY_LABEL[it.category]}
                   </span>
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600" aria-hidden />
+                <ChevronRight className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden />
               </li>
             )
           })}

@@ -84,7 +84,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
     >
       <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
         <div className="flex items-center gap-2">
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Faktury
           </p>
           <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
@@ -101,7 +101,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
       </header>
 
       {visible.length === 0 ? (
-        <div className="px-4 py-6 text-center text-sm text-zinc-500">
+        <div className="px-4 py-6 text-center text-sm text-zinc-400">
           Brak faktur.
         </div>
       ) : (
@@ -136,7 +136,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
                       </span>
                     </div>
                     {subtitle && (
-                      <p className="mt-0.5 truncate text-2xs text-zinc-500 sm:text-xs">{subtitle}</p>
+                      <p className="mt-0.5 truncate text-2xs text-zinc-400 sm:text-xs">{subtitle}</p>
                     )}
                   </div>
                   <span className="shrink-0 text-xs font-semibold tabular-nums text-white sm:text-sm">
@@ -150,7 +150,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
       )}
 
       <footer className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-[#161616] px-4 py-3">
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-zinc-400">
           Łącznie wystawione ·{' '}
           {totals.length === 0 ? (
             <span className="font-semibold tabular-nums text-white">

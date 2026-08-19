@@ -45,8 +45,11 @@ export function AppFooter({
 
   const synced = syncedAt ? relative(now, syncedAt) : null
 
+  // Stopka pojawia sie i na tle strony (token), i wewnatrz twardo czarnych
+  // kontenerow /dashboard i /calendar. Zaden staly kolor nie ma 4.5:1 na obu,
+  // wiec dziedziczy kolor tekstu powierzchni i tylko go przygasza.
   return (
-    <p className="px-2 pt-2 text-center font-mono text-2xs tracking-wider text-zinc-600">
+    <p className="px-2 pt-2 text-center font-mono text-2xs tracking-wider opacity-70">
       {appName}
       {synced && <> · zsynchronizowano {synced}</>}{' '}
       · {today} · {version}

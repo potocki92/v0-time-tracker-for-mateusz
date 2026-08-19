@@ -20,11 +20,11 @@ export function ActiveStreakCard({ current, longestThisYear }: Props) {
     >
       <p className="mt-2 text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
         {current}
-        <span className="ml-1 text-xs font-medium text-zinc-500 sm:text-sm">
+        <span className="ml-1 text-xs font-medium text-zinc-400 sm:text-sm">
           {pluralizeDay(current)}
         </span>
       </p>
-      <p className="mt-3 text-2xs text-zinc-500">
+      <p className="mt-3 text-2xs text-zinc-400">
         Najdłuższy w tym roku ·{' '}
         <span className="font-semibold text-zinc-300 tabular-nums">
           {longestThisYear} d

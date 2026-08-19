@@ -27,7 +27,7 @@ export function LinearTopBar({
   return (
     <header className="sticky top-0 z-40 -mx-3 hidden border-b border-[#1a1a1a] bg-black/85 px-3 py-2 backdrop-blur-md md:-mx-4 md:flex md:items-center md:justify-between md:px-4">
       <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-xs">
-        <span className="text-zinc-500">{section}</span>
+        <span className="text-zinc-400">{section}</span>
         <ChevronRight className="h-3.5 w-3.5 text-zinc-700" aria-hidden />
         <span className="font-medium text-white">{page}</span>
       </nav>

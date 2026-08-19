@@ -41,7 +41,7 @@ export function InvoicesPagination({
           {fromIndex + 1}–{toIndex} z {totalCount}
         </span>
 
-        <label className="flex items-center gap-2 text-2xs text-zinc-500">
+        <label className="flex items-center gap-2 text-2xs text-zinc-400">
           <span>Na stronę</span>
           <select
             value={pageSize}

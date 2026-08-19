@@ -6,12 +6,17 @@ function required(name: string): string {
   return value
 }
 
-export const E2E_USER = {
+/**
+ * User A z seeda — jedyne konto, na ktore loguje sie E2E. Te same zmienne czyta
+ * suite RLS (`__test__/rls.test.ts`), stad prefiks `TEST_` zamiast `E2E_`:
+ * jeden zestaw zmiennych zamiast dwoch trzymanych w synchronizacji.
+ */
+export const TEST_USER_A = {
   get email() {
-    return required('E2E_USER_EMAIL')
+    return required('TEST_USER_A_EMAIL')
   },
   get password() {
-    return required('E2E_USER_PASSWORD')
+    return required('TEST_USER_A_PASSWORD')
   },
 }
 

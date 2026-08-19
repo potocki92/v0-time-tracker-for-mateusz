@@ -160,7 +160,7 @@ export const EarningsCard = memo(function EarningsCard({
       <header className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+            <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
               Zarobki · {periodLabel}
             </p>
             {trend.percent !== null && (
@@ -192,11 +192,11 @@ export const EarningsCard = memo(function EarningsCard({
               {totalPLNStr}
             </span>
           </div>
-          <p className="mt-1 text-xs leading-[1.4] text-zinc-500 tabular-nums">
+          <p className="mt-1 text-xs leading-[1.4] text-zinc-400 tabular-nums">
             ≈ {totalEURStr}
           </p>
 
-          <p className="mt-1 text-2xs leading-[1.4] text-zinc-500 sm:text-xs">
+          <p className="mt-1 text-2xs leading-[1.4] text-zinc-400 sm:text-xs">
             {showCompareLine && (
               <>
                 <span className={isUp ? 'text-emerald-400' : 'text-red-400'}>
@@ -233,7 +233,7 @@ export const EarningsCard = memo(function EarningsCard({
       </header>
 
       {/* ─────────────── KPI strip ─────────────── */}
-      <dl className="relative mt-3.5 grid grid-cols-3 gap-2">
+      <div className="relative mt-3.5 grid grid-cols-3 gap-2">
         <KpiTile
           icon={TrendingUp}
           label="Średnia / dzień pracy"
@@ -250,7 +250,7 @@ export const EarningsCard = memo(function EarningsCard({
           value={bestStr}
           hint={formatBestDayLabel(dailyStats.bestDay?.date ?? null)}
         />
-      </dl>
+      </div>
 
       {/* ─────────────── chart ─────────────── */}
       {hasSeries && (
@@ -264,7 +264,7 @@ export const EarningsCard = memo(function EarningsCard({
 
           {/* Legenda compare — tylko gdy aktywny tryb i jest co pokazać */}
           {compareMode && trend.prevTotal > 0 && (
-            <div className="pointer-events-none absolute right-2 top-1 flex items-center gap-2 text-2xs uppercase tracking-wide text-zinc-500">
+            <div className="pointer-events-none absolute right-2 top-1 flex items-center gap-2 text-2xs uppercase tracking-wide text-zinc-400">
               <span className="inline-flex items-center gap-1">
                 <span className="h-[2px] w-3 rounded-full bg-emerald-400" aria-hidden />
                 bieżący
@@ -300,7 +300,7 @@ function KpiTile({
 }) {
   return (
     <div className="rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] p-2.5">
-      <div className="flex items-center justify-between text-zinc-500">
+      <div className="flex items-center justify-between text-zinc-400">
         <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#161616] text-zinc-300 ring-1 ring-[#1f1f1f]">
           <Icon className="h-3.5 w-3.5" aria-hidden />
         </span>
@@ -309,7 +309,7 @@ function KpiTile({
       <p className="mt-2 text-sm font-semibold tabular-nums leading-[1.15] text-white">
         {value}
       </p>
-      <p className="text-2xs text-zinc-500">{label}</p>
+      <p className="text-2xs text-zinc-400">{label}</p>
     </div>
   )
 }

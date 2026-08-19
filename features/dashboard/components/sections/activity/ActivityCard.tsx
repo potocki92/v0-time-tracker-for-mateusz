@@ -83,7 +83,7 @@ export function ActivityCard({
       className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
     >
       <header className="flex items-center justify-between">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Aktywność
         </p>
         <Link
@@ -111,12 +111,12 @@ export function ActivityCard({
               >
                 <Icon className="h-3.5 w-3.5" aria-hidden />
               </span>
-              <span className="text-2xs font-medium text-zinc-500">{hint}</span>
+              <span className="text-2xs font-medium text-zinc-400">{hint}</span>
             </div>
             <p className="mt-2 text-xl font-semibold tabular-nums leading-[1.15] text-white sm:text-2xl sm:font-bold">
               {value}
             </p>
-            <p className="text-2xs text-zinc-500">{label}</p>
+            <p className="text-2xs text-zinc-400">{label}</p>
           </div>
         ))}
       </div>
@@ -138,7 +138,7 @@ export function ActivityCard({
               <p className="min-w-0 flex-1 text-xs leading-[1.45] text-white sm:text-sm">
                 {item.text}
               </p>
-              <span className="shrink-0 text-2xs text-zinc-500">
+              <span className="shrink-0 text-2xs text-zinc-400">
                 {item.ago}
               </span>
             </li>
