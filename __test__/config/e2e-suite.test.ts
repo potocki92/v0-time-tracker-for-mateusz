@@ -11,7 +11,7 @@ const config = read('playwright.config.ts')
 const specs = readdirSync(resolve(ROOT, 'e2e')).filter((f) => f.endsWith('.spec.ts'))
 
 /** Sciezki, ktorych zepsucie oznacza, ze produkt nie zarabia. */
-const CRITICAL_PATHS = ['auth', 'work-entry', 'invoice', 'export']
+const CRITICAL_PATHS = ['auth', 'work-entry', 'invoice', 'export', 'navigation']
 
 describe('e2e — suite covers the critical paths', () => {
   it('has one spec per critical path', () => {

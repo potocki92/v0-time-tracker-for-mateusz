@@ -52,3 +52,61 @@ To wynika z tego, ze Supabase server client czyta `cookies()`, wiec segment nie 
 byc prerenderowany. W Next 15 domyslne `experimental.staleTimes.dynamic` wynosi `0`,
 wiec takie segmenty **w ogole nie trafiaja do Router Cache klienta** — i to jest
 glowna przyczyna objawu opisanego wyzej.
+
+---
+
+# Po optymalizacji
+
+Pomiar po fazach 1-7 (`npm run verify`). Testy jednostkowe: **35 plikow / 437 testow**.
+
+## First Load JS — trasy `(app)`
+
+| Trasa | Size przed | Size po | First Load JS przed | First Load JS po |
+| --- | ---: | ---: | ---: | ---: |
+| `/calendar` | 272 B | 272 B | 204 kB | 204 kB |
+| `/clients` | 286 B | 286 B | 302 kB | 302 kB |
+| `/dashboard` | 282 B | 282 B | 228 kB | **227 kB** |
+| `/invoices` | 41.4 kB | 41.6 kB | 286 kB | 286 kB |
+| `/invoices/analytics` | 104 kB | 104 kB | 215 kB | 215 kB |
+| `/projects` | 344 B | 342 B | 187 kB | 187 kB |
+| `/reports` | 2.09 kB | 2.09 kB | 171 kB | 171 kB |
+
+Nowe trasy (route handlery odczytu, FAZA 5) — 161 B / 103 kB kazda:
+`/api/dashboard`, `/api/calendar`, `/api/clients`, `/api/projects`.
+
+Middleware: 85,7 kB → 85,6 kB.
+
+`npm run perf:budget:init` po zmianach wyprodukowal identyczny
+`performance-budgets.json` — spadek byl za maly, zeby ruszyc ktorykolwiek limit.
+
+## Czego szukac w tej tabeli — i czego w niej nie ma
+
+Rozmiar bundle **nie jest** miara tej optymalizacji i celowo prawie sie nie
+zmienil. Objawem byl czas i liczba round-tripow przy nawigacji, nie waga JS.
+Bundle mierzymy tylko po to, by potwierdzic, ze zmiany niczego nie *dolozyly*.
+
+## Co dala ktora faza
+
+| Faza | Zmiana | Efekt |
+| --- | --- | --- |
+| 1 | `experimental.staleTimes` (dynamic 120 s, static 300 s) | Powrot na sekcje odwiedzona w ciagu 2 minut nie robi zadania RSC ani nie pokazuje skeletonu. Glowna przyczyna objawu. |
+| 2 | `await prefetchQuery` zeszlo z default exportu do komponentu w `<Suspense>` | Powloka segmentu leci do przegladarki natychmiast, zamiast czekac na najwolniejsze zapytanie Supabase. `<Suspense>` na stronach przestal byc martwym kodem. |
+| 3 | `getClaims()` zamiast `getUser()` w middleware | Minus jeden round-trip do GoTrue na KAZDYM requescie RSC — **pod warunkiem** wlaczenia asymetrycznych kluczy JWT (patrz nizej). |
+| 4 | — | Pominieta: region projektu Supabase jest nieznany z poziomu repo. |
+| 5 | Odczyt na route handlerach GET zamiast Server Actions | Odpowiedz na "podaj dane" nie niesie juz przerenderowanego payloadu RSC calej trasy; odczyty przestaly byc serializowane jeden po drugim. |
+| 6 | `revalidatePath` → `invalidateQueries` | Mutacja odswieza wlasna domene zamiast kasowac caly Router Cache klienta. Bez tego FAZA 1 dawalaby zysk tylko do pierwszej edycji. |
+| 7 | `data-testid` na skeletonach, `e2e/navigation.spec.ts`, usuniete 13 martwych `<Suspense>` w `DashboardContent` | Regresja objawu jest teraz pilnowana testem; znika mnozenie warstw skeletonow. |
+
+## Warunek dla FAZY 3 — do zrobienia w panelu Supabase
+
+Authentication → JWT Keys → wlacz asymetryczne klucze (ECC P-256) i wykonaj
+rotacje. Przy kluczu symetrycznym `getClaims()` robi fallback na wywolanie
+sieciowe i FAZA 3 nie daje zadnego zysku (ale tez niczego nie psuje).
+
+## Otwarte — FAZA 4
+
+Region projektu Supabase (Project Settings → General → Region) trzeba odczytac
+recznie. Jesli baza stoi w EU, do `app/(app)/layout.tsx` nalezy dopisac
+`export const preferredRegion` — `fra1` dla `eu-central-1`, `dub1` dla
+`eu-west-1`, `lhr1` dla `eu-west-2`. Przy `us-east-1` nie zmieniamy nic:
+domyslny region Vercela to `iad1`, czyli juz obok bazy.

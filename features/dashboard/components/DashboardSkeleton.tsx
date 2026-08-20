@@ -15,6 +15,7 @@ export function DashboardSkeleton() {
   return (
     <div
       className="min-h-screen bg-black text-white"
+      data-testid="section-skeleton"
       aria-busy="true"
       aria-live="polite"
     >

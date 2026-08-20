@@ -5,7 +5,7 @@ const EVENT_CELLS = new Set([3, 10, 16, 24, 28])
 
 export function CalendarSkeleton() {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black" data-testid="section-skeleton">
       <div className="flex h-12 items-center gap-3 border-b border-[#1a1a1a] bg-black/80 px-4 sm:h-14">
         <Skeleton className="h-7 w-7 rounded-md skeleton" />
         <Skeleton className="h-4 w-32 skeleton" />
