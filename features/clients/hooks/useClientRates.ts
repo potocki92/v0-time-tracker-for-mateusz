@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { fetchClientRates } from '../services/clients.fetchers'
+import { fetchClientRatesAction } from '../actions'
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
 import { withEffectivePeriods } from '../domain/clients.selectors'
 import type { ClientRate } from '@/lib/types'
@@ -13,11 +13,11 @@ import type { ClientRateWithPeriod } from '../domain/clients.types'
  * (effective_to = kolejna data zmiany lub null dla aktualnie obowiązującej).
  * Graceful: jeśli tabela `client_rates` nie istnieje — [].
  */
-export function useClientRates(userId: string, clientId: string | null) {
+export function useClientRates(clientId: string | null) {
   const query = useQuery<ClientRate[]>({
     queryKey: QUERY_KEYS.clientRates(clientId ?? 'none'),
-    queryFn:  () => fetchClientRates(userId, clientId ?? undefined),
-    enabled:  Boolean(userId && clientId),
+    queryFn:  () => fetchClientRatesAction(clientId ?? undefined),
+    enabled:  Boolean(clientId),
     ...QUERY_CONFIG.clients,
   })
 
@@ -33,18 +33,17 @@ export function useClientRates(userId: string, clientId: string | null) {
  * Zbiorczy licznik historii stawek dla wszystkich klientów (do wyświetlenia
  * badge w tabeli: "3 stawki"). Jedno zapytanie dla całej listy.
  */
-export function useClientRatesMap(userId: string) {
+export function useClientRatesMap() {
   return useQuery<Record<string, number>>({
     queryKey: QUERY_KEYS.clientRates(),
     queryFn:  async () => {
-      const rows = await fetchClientRates(userId)
+      const rows = await fetchClientRatesAction()
       const map: Record<string, number> = {}
       for (const rate of rows) {
         map[rate.client_id] = (map[rate.client_id] ?? 0) + 1
       }
       return map
     },
-    enabled: Boolean(userId),
     ...QUERY_CONFIG.clients,
   })
 }

@@ -3,20 +3,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
-  addClientRate,
-  createClient,
-  deleteClient,
-  deleteClientRate,
-  fetchCurrentUserId,
-  updateClient,
-  type ClientMutationInput,
-} from '../services/clients.fetchers'
+  addClientRateAction,
+  createClientAction,
+  deleteClientAction,
+  deleteClientRateAction,
+  updateClientAction,
+} from '../actions'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
 import type { ClientFormData, ClientRateFormData } from '@/lib/types'
 
 /**
  * Mutacje CRUD klientów + historii stawek. Po sukcesie inwalidują całą
  * podprzestrzeń `dashboard-module` → dashboard i clients zobaczą świeże dane.
+ *
+ * Zapis robią Server Actions — `user_id` bierze się z sesji po stronie serwera,
+ * nie z parametru hooka.
  */
 
 function useInvalidateClients() {
@@ -29,18 +30,11 @@ function useInvalidateClients() {
   }
 }
 
-async function resolveUserId(userId?: string): Promise<string> {
-  return userId ?? (await fetchCurrentUserId())
-}
-
-export function useCreateClient(userId?: string) {
+export function useCreateClient() {
   const invalidate = useInvalidateClients()
   return useMutation({
     mutationKey: MUTATION_KEYS.client.create,
-    mutationFn:  async (form: ClientFormData) => {
-      const uid = await resolveUserId(userId)
-      return createClient({ ...form, user_id: uid } as ClientMutationInput)
-    },
+    mutationFn:  (form: ClientFormData) => createClientAction(form),
     onSuccess: () => {
       toast.success('Dodano klienta')
       invalidate()
@@ -51,14 +45,12 @@ export function useCreateClient(userId?: string) {
   })
 }
 
-export function useUpdateClient(userId?: string) {
+export function useUpdateClient() {
   const invalidate = useInvalidateClients()
   return useMutation({
     mutationKey: MUTATION_KEYS.client.update,
-    mutationFn:  async (args: { id: string; form: ClientFormData }) => {
-      const uid = await resolveUserId(userId)
-      return updateClient(args.id, { ...args.form, user_id: uid } as ClientMutationInput)
-    },
+    mutationFn:  (args: { id: string; form: ClientFormData }) =>
+      updateClientAction(args.id, args.form),
     onSuccess: () => {
       toast.success('Zaktualizowano klienta')
       invalidate()
@@ -73,7 +65,7 @@ export function useDeleteClient() {
   const invalidate = useInvalidateClients()
   return useMutation({
     mutationKey: MUTATION_KEYS.client.delete,
-    mutationFn:  (id: string) => deleteClient(id),
+    mutationFn:  (id: string) => deleteClientAction(id),
     onSuccess: () => {
       toast.success('Usunięto klienta')
       invalidate()
@@ -84,18 +76,15 @@ export function useDeleteClient() {
   })
 }
 
-export function useAddClientRate(userId?: string) {
+export function useAddClientRate() {
   const invalidate = useInvalidateClients()
   return useMutation({
     mutationKey: MUTATION_KEYS.client.addRate,
-    mutationFn:  async (args: {
+    mutationFn:  (args: {
       clientId:    string
       form:        ClientRateFormData
       makeCurrent: boolean
-    }) => {
-      const uid = await resolveUserId(userId)
-      return addClientRate(uid, args.clientId, args.form, args.makeCurrent)
-    },
+    }) => addClientRateAction(args.clientId, args.form, args.makeCurrent),
     onSuccess: () => {
       toast.success('Dodano nową stawkę')
       invalidate()
@@ -110,7 +99,7 @@ export function useDeleteClientRate() {
   const invalidate = useInvalidateClients()
   return useMutation({
     mutationKey: MUTATION_KEYS.client.deleteRate,
-    mutationFn:  (id: string) => deleteClientRate(id),
+    mutationFn:  (id: string) => deleteClientRateAction(id),
     onSuccess: () => {
       toast.success('Usunięto wpis historii stawki')
       invalidate()

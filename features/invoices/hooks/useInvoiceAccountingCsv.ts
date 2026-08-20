@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { Client, Invoice } from '@/lib/types'
-import { importInvoicesFromCsv } from '../services'
+import { importInvoicesFromCsvAction } from '../actions'
 import { INVOICES_MANAGER_QUERY_KEY, type ImportInvoiceCsvRow } from '../domain'
 
 const CSV_HEADERS = [
@@ -190,7 +190,7 @@ export function useInvoiceAccountingCsv({
     const raw = await file.text()
     const rows = parseInvoicesCsv(raw)
 
-    await importInvoicesFromCsv(rows)
+    await importInvoicesFromCsvAction(rows)
     await queryClient.invalidateQueries({ queryKey: INVOICES_MANAGER_QUERY_KEY })
 
     toast.success(`Zaimportowano ${rows.length} faktur`)

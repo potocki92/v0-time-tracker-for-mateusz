@@ -30,15 +30,14 @@ import {
 } from '../hooks/useClientMutations'
 
 type Props = {
-  userId: string
   client: Client | null
   open:   boolean
   onClose: () => void
 }
 
-export function RateHistoryDialog({ userId, client, open, onClose }: Props) {
-  const { rates, isLoading, isError } = useClientRates(userId, client?.id ?? null)
-  const addRate    = useAddClientRate(userId)
+export function RateHistoryDialog({ client, open, onClose }: Props) {
+  const { rates, isLoading, isError } = useClientRates(client?.id ?? null)
+  const addRate    = useAddClientRate()
   const deleteRate = useDeleteClientRate()
 
   const today = new Date().toISOString().slice(0, 10)

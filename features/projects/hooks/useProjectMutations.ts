@@ -5,12 +5,10 @@ import { toast } from 'sonner'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
 import type { ProjectFormData } from '@/lib/types'
 import {
-  createProject,
-  deleteProject,
-  fetchCurrentUser,
-  toProjectPayload,
-  updateProject,
-} from '../services/projects.fetchers'
+  createProjectAction,
+  deleteProjectAction,
+  updateProjectAction,
+} from '../actions'
 
 type SaveArgs = {
   editingId: string | null
@@ -34,11 +32,8 @@ export function useProjectMutations() {
       if (!formData.name.trim()) {
         throw new Error('Nazwa projektu jest wymagana')
       }
-      const user = await fetchCurrentUser()
-      const payload = toProjectPayload(user.id, formData)
-
-      if (editingId) await updateProject(editingId, payload)
-      else await createProject(payload)
+      if (editingId) await updateProjectAction(editingId, formData)
+      else await createProjectAction(formData)
 
       return { editingId }
     },
@@ -53,7 +48,7 @@ export function useProjectMutations() {
 
   const remove = useMutation({
     mutationKey: MUTATION_KEYS.project.delete,
-    mutationFn: (id: string) => deleteProject(id),
+    mutationFn: (id: string) => deleteProjectAction(id),
     onSuccess: async () => {
       toast.success('Projekt został usunięty')
       await invalidate()

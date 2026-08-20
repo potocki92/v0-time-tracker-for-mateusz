@@ -1,8 +1,7 @@
 'use client'
 
-import { updateDashboardPreferences } from '../services/preferences.service'
+import { updateDashboardPreferencesAction, type DashboardPreferences } from '../actions'
 import { usePreferencesStore } from '../hooks/usePreferencesStore'
-import { type DashboardPreferences } from '../services/preferences.service'
 
 export function syncPreferencesToSupabase(): Promise<void> {
   const state = usePreferencesStore.getState()
@@ -14,5 +13,5 @@ export function syncPreferencesToSupabase(): Promise<void> {
     displayCurrency: state.displayCurrency,
   }
 
-  return updateDashboardPreferences(payload)
+  return updateDashboardPreferencesAction(payload)
 }

@@ -80,6 +80,38 @@ describe('bundle hygiene — auth routes stay light', () => {
   })
 })
 
+describe('bundle hygiene — data access lives on the server', () => {
+  const appFiles = walk(resolve(ROOT, 'app/(app)'))
+    .concat(walk(resolve(ROOT, 'features')))
+    .map((f) => relative(ROOT, f))
+
+  it('never instantiates the Supabase browser client', () => {
+    const offenders = appFiles.filter((f) => read(f).includes('@/lib/supabase/client'))
+    expect(
+      offenders,
+      `supabase-js to 61,8 kB gzip na kazdej trasie; uzyj Server Action:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('never reaches for the service-role key outside the seed script', () => {
+    const offenders = appFiles.filter((f) => read(f).includes('SUPABASE_SERVICE_ROLE_KEY'))
+    expect(
+      offenders,
+      `service-role omija RLS — Server Actions uzywaja anon key + ciasteczek:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('revalidates after every mutating action', () => {
+    const actionFiles = appFiles.filter((f) => /\/actions\.ts$/.test(f))
+    expect(actionFiles.length, 'brak plikow actions.ts').toBeGreaterThan(0)
+    for (const file of actionFiles) {
+      const src = read(file)
+      if (!/\.(insert|update|delete|upsert)\(/.test(src)) continue
+      expect(src, `${file}: mutacja bez revalidatePath`).toContain('revalidatePath')
+    }
+  })
+})
+
 describe('bundle hygiene — providers are scoped to the app group', () => {
   it('mounts Providers in (app)/layout, not in the root layout', () => {
     expect(read('app/(app)/layout.tsx')).toContain('Providers')

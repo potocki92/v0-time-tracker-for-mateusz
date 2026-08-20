@@ -7,11 +7,11 @@ import { MUTATION_KEYS, QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
 
 import type { Trip } from '../domain'
 import {
-  deleteTripRecord,
-  fetchTrips,
-  insertTrip,
-  updateTripRecord,
-} from '../services'
+  deleteTripAction,
+  fetchTripsAction,
+  insertTripAction,
+  updateTripAction,
+} from '../actions'
 
 export interface UseTripsResult {
   trips: Trip[]
@@ -32,7 +32,7 @@ export function useTrips(): UseTripsResult {
 
   const { data, isSuccess } = useQuery<Trip[]>({
     queryKey: QUERY_KEYS.trips(),
-    queryFn: fetchTrips,
+    queryFn: fetchTripsAction,
     ...QUERY_CONFIG.trips,
   })
 
@@ -48,20 +48,20 @@ export function useTrips(): UseTripsResult {
 
   const addMutation = useMutation({
     mutationKey: MUTATION_KEYS.trip.create,
-    mutationFn: insertTrip,
+    mutationFn: insertTripAction,
     onSuccess: invalidate,
   })
 
   const updateMutation = useMutation({
     mutationKey: MUTATION_KEYS.trip.update,
     mutationFn: ({ id, patch }: { id: string; patch: Partial<Omit<Trip, 'id'>> }) =>
-      updateTripRecord(id, patch),
+      updateTripAction(id, patch),
     onSuccess: invalidate,
   })
 
   const removeMutation = useMutation({
     mutationKey: MUTATION_KEYS.trip.delete,
-    mutationFn: deleteTripRecord,
+    mutationFn: deleteTripAction,
     onSuccess: invalidate,
   })
 

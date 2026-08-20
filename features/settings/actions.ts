@@ -1,6 +1,27 @@
-import { createClient } from '@/lib/supabase/client'
-import { AVATARS_BUCKET, resolveAvatarUrl } from '@/lib/supabase/avatars'
-import type { AccountProfile, AccountSettingsFormValues, InvoiceSettings } from '../domain'
+'use server'
+
+import { revalidatePath } from 'next/cache'
+
+import { requireServerUser } from '@/lib/auth/server-user'
+import { createClient } from '@/lib/supabase/server'
+import { AVATARS_BUCKET } from '@/lib/supabase/avatars'
+import { resolveAvatarUrl } from '@/lib/supabase/avatars.server'
+import { invoiceSettingsSchema } from '@/lib/schemas/invoice-settings.schema'
+import {
+  accountSettingsSchema,
+  avatarFileSchema,
+  type AccountProfile,
+  type AccountSettingsFormValues,
+  type InvoiceSettings,
+} from './domain'
+
+/**
+ * Server Actions modulu Settings.
+ *
+ * `createClient()` z '@/lib/supabase/server' jedzie na anon key + ciasteczkach
+ * sesji, wiec RLS nadal decyduje, co wolno przeczytac i zapisac. Klucz
+ * service-role nie ma tu wstepu.
+ */
 
 type UserMetadata = {
   first_name?: string
@@ -13,40 +34,16 @@ type UserMetadata = {
 /** Sufit listy klientow w selectcie auto-fakturowania. */
 const MAX_AUTO_INVOICE_CLIENTS = 500
 
-const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = {
-  userPrefix: 'FV',
-  numberingPattern: 'FV/{SERIA}/{YYYY}/{MM}/{SEQ}',
-  series: 'A',
-  branch: 'HQ',
-  resetSequence: 'monthly',
-  defaultTemplate: 'classic',
-  templateAccentColor: '#1d4ed8',
-  templateFooter: 'Dziękujemy za współpracę.',
-  autoIssueEnabled: false,
-  dueDays: 7,
+const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
+
+/** Pierwszy komunikat walidacji — laduje w tym samym toascie, co bledy Supabase. */
+function firstIssue(error: { issues: { message: string }[] }, fallback: string): string {
+  return error.issues[0]?.message ?? fallback
 }
 
-async function getCurrentUser() {
-  const supabase = createClient()
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
-
-  if (error) {
-    throw new Error(`Błąd pobierania sesji: ${error.message}`)
-  }
-
-  if (!user) {
-    throw new Error('Brak aktywnej sesji użytkownika')
-  }
-
-  return { supabase, user }
-}
-
-export async function fetchAccountProfile(): Promise<AccountProfile> {
-  const { user, supabase } = await getCurrentUser()
+export async function fetchAccountProfileAction(): Promise<AccountProfile> {
+  const user = await requireServerUser()
+  const supabase = await createClient()
 
   const metadata = (user.user_metadata ?? {}) as UserMetadata
   const avatarPath = metadata.avatar_path ?? null
@@ -84,50 +81,81 @@ export async function fetchAccountProfile(): Promise<AccountProfile> {
   }
 }
 
-export async function updateAccountProfile(values: AccountSettingsFormValues) {
-  const { supabase, user } = await getCurrentUser()
+export async function updateAccountProfileAction(
+  values: AccountSettingsFormValues,
+): Promise<void> {
+  const parsed = accountSettingsSchema.safeParse(values)
+  if (!parsed.success) {
+    throw new Error(firstIssue(parsed.error, 'Nieprawidłowe dane profilu'))
+  }
 
+  const user = await requireServerUser()
+  const supabase = await createClient()
   const existingMetadata = (user.user_metadata ?? {}) as UserMetadata
 
   const { error } = await supabase.auth.updateUser({
     data: {
       ...existingMetadata,
-      first_name: values.firstName,
-      last_name: values.lastName,
-      username: values.username,
+      first_name: parsed.data.firstName,
+      last_name: parsed.data.lastName,
+      username: parsed.data.username,
     },
   })
 
   if (error) {
     throw new Error(`Nie udało się zapisać profilu: ${error.message}`)
   }
+
+  revalidatePath('/dashboard')
 }
 
-export async function updateInvoiceAutomationSettings(values: InvoiceSettings) {
-  const { supabase, user } = await getCurrentUser()
+export async function updateInvoiceAutomationSettingsAction(
+  values: InvoiceSettings,
+): Promise<void> {
+  const parsed = invoiceSettingsSchema.safeParse(values)
+  if (!parsed.success) {
+    throw new Error(firstIssue(parsed.error, 'Nieprawidłowe ustawienia faktur'))
+  }
+
+  const user = await requireServerUser()
+  const supabase = await createClient()
   const existingMetadata = (user.user_metadata ?? {}) as UserMetadata
 
   const { error } = await supabase.auth.updateUser({
     data: {
       ...existingMetadata,
-      invoice_settings: values,
+      invoice_settings: parsed.data,
     },
   })
 
   if (error) {
     throw new Error(`Nie udało się zapisać ustawień faktur: ${error.message}`)
   }
+
+  revalidatePath('/invoices')
 }
 
-export async function uploadAvatar(file: File): Promise<{ avatarPath: string; avatarUrl: string }> {
-  const { supabase, user } = await getCurrentUser()
+export async function uploadAvatarAction(
+  file: File,
+): Promise<{ avatarPath: string; avatarUrl: string }> {
+  const parsed = avatarFileSchema.safeParse(file)
+  if (!parsed.success) {
+    throw new Error(firstIssue(parsed.error, 'Nieprawidłowy plik'))
+  }
 
-  const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+  const user = await requireServerUser()
+  const supabase = await createClient()
+
+  const extension = parsed.data.name.split('.').pop()?.toLowerCase() || 'jpg'
   const avatarPath = `${user.id}/${crypto.randomUUID()}.${extension}`
 
   const { error: uploadError } = await supabase.storage
     .from(AVATARS_BUCKET)
-    .upload(avatarPath, file, { upsert: true, cacheControl: '3600', contentType: file.type })
+    .upload(avatarPath, parsed.data, {
+      upsert: true,
+      cacheControl: '3600',
+      contentType: parsed.data.type,
+    })
 
   if (uploadError) {
     throw new Error(`Nie udało się wgrać pliku: ${uploadError.message}`)
@@ -151,6 +179,8 @@ export async function uploadAvatar(file: File): Promise<{ avatarPath: string; av
   if (!avatarUrl) {
     throw new Error('Nie udało się wygenerować adresu avatara')
   }
+
+  revalidatePath('/dashboard')
 
   return { avatarPath, avatarUrl }
 }
