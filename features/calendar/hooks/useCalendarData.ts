@@ -1,8 +1,7 @@
 'use client'
 
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { fetchCalendarDataAction } from '../actions'
-import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
+import { QUERY_KEYS, QUERY_CONFIG, fetchJson } from '@/lib/query'
 import type { CalendarData } from '../domain/calendar.types'
 
 /**
@@ -12,7 +11,7 @@ import type { CalendarData } from '../domain/calendar.types'
 export function useCalendarData() {
   return useSuspenseQuery<CalendarData>({
     queryKey: QUERY_KEYS.calendar(),
-    queryFn: fetchCalendarDataAction,
+    queryFn: () => fetchJson<CalendarData>('/api/calendar'),
     ...QUERY_CONFIG.calendar,
   })
 }

@@ -1,19 +1,16 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
 import { createClient as createSupabase } from '@/lib/supabase/server'
 import type { Client, ClientFormData, ClientRate, ClientRateFormData } from '@/lib/types'
 import { CLIENT_COLORS } from './domain/clients.constants'
-import type { ClientsData } from './domain/clients.types'
 import {
   CLIENTS_CLIENT_COLUMNS,
   CLIENTS_CLIENT_RATE_COLUMNS,
   CLIENTS_MAX_CLIENT_RATES,
 } from './services/clients.columns'
-import { getClientsDataServer } from './services/clients.service.server'
 
 /**
  * Server Actions modulu Clients.
@@ -98,21 +95,6 @@ function toClientRow(userId: string, input: ClientPayload) {
   }
 }
 
-/** Rewalidacja tras, ktore czytaja klientow w Server Component. */
-function revalidateClients() {
-  revalidatePath('/clients')
-  revalidatePath('/projects')
-  revalidatePath('/calendar')
-  revalidatePath('/invoices')
-  revalidatePath('/dashboard')
-}
-
-// ── Queries ───────────────────────────────────────────────────────────────────
-
-export async function fetchClientsDataAction(): Promise<ClientsData> {
-  return getClientsDataServer()
-}
-
 /**
  * Historia stawek. Graceful fallback — jeśli tabela `client_rates` jeszcze nie istnieje
  * (migracja 005 nie została puszczona), zwracamy pustą tablicę zamiast wywracać cały widok.
@@ -172,7 +154,6 @@ export async function createClientAction(input: ClientFormData): Promise<Client>
 
   if (error) throw new Error(`createClient: ${error.message}`)
 
-  revalidateClients()
   return data as unknown as Client
 }
 
@@ -197,7 +178,6 @@ export async function updateClientAction(id: string, input: ClientFormData): Pro
 
   if (error) throw new Error(`updateClient: ${error.message}`)
 
-  revalidateClients()
   return data as unknown as Client
 }
 
@@ -210,7 +190,6 @@ export async function deleteClientAction(id: string): Promise<void> {
 
   if (error) throw new Error(`deleteClient: ${error.message}`)
 
-  revalidateClients()
 }
 
 /**
@@ -262,7 +241,6 @@ export async function addClientRateAction(
     if (updErr) throw new Error(`addClientRate/updateClient: ${updErr.message}`)
   }
 
-  revalidateClients()
   return data as unknown as ClientRate
 }
 
@@ -275,5 +253,4 @@ export async function deleteClientRateAction(id: string): Promise<void> {
 
   if (error) throw new Error(`deleteClientRate: ${error.message}`)
 
-  revalidateClients()
 }

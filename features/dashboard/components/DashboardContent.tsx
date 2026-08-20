@@ -1,6 +1,5 @@
 'use client'
 
-import { Suspense, type ReactNode } from 'react'
 import { TripsSection } from '@/features/trips'
 import {
   ActivitySection,
@@ -20,83 +19,57 @@ import {
   WeeklyGlanceSection,
   WeeklySummarySection,
 } from './sections'
-import {
-  ChartSkeleton,
-  HeaderSkeleton,
-  InvoicesSkeleton,
-  KpiSkeleton,
-  StatsSkeleton,
-} from './skeletons'
 
-type DashboardSectionProps = {
-  fallback: ReactNode
-  children: ReactNode
-}
-
-function DashboardSection({ fallback, children }: DashboardSectionProps) {
-  return <Suspense fallback={fallback}>{children}</Suspense>
-}
-
+/**
+ * Sekcje NIE maja wlasnych granic <Suspense>.
+ *
+ * Kazda z nich czyta `useDashboardData()` — ten sam klucz, ktory strona
+ * prefetchuje i hydruje — wiec zadna nie moze zawiesic sie osobno: zanim
+ * DashboardContent w ogole zaczyna renderowac, dane sa juz w cache.
+ * Trzynascie zagniezdzonych fallbackow bylo martwym kodem, ktory tylko
+ * mnozyl warstwy skeletonow. Granice zostaja dwie: `loading.tsx` (segment)
+ * i `<Suspense>` w page.tsx (dane).
+ *
+ * Wyjatek potwierdzajacy regule: `QuarterlySummarySection` ma wlasny klucz,
+ * ale czyta go zwyklym `useQuery` i sam rysuje swoj stan ladowania —
+ * tez nigdy nie zawiesza.
+ */
 export function DashboardContent() {
   return (
     <DashboardRangeProvider>
       <main className="min-h-screen bg-black text-white">
         <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3">
-          <DashboardSection fallback={<HeaderSkeleton />}>
-            <HeaderSection />
-          </DashboardSection>
+          <HeaderSection />
 
           <TripsSection />
 
-          <DashboardSection fallback={<KpiSkeleton />}>
-            <EarningsSection />
-          </DashboardSection>
+          <EarningsSection />
 
-          <DashboardSection fallback={<KpiSkeleton />}>
-            <GoalSection />
-          </DashboardSection>
+          <GoalSection />
 
-          <DashboardSection fallback={<ChartSkeleton />}>
-            <HoursSection />
-          </DashboardSection>
+          <HoursSection />
 
-          <DashboardSection fallback={<StatsSkeleton />}>
-            <EffectiveRateSection />
-          </DashboardSection>
+          <EffectiveRateSection />
 
-          <DashboardSection fallback={<StatsSkeleton />}>
-            <ActivitySection />
-          </DashboardSection>
+          <ActivitySection />
 
           <SectionHeader label="Harmonogram i rozliczenia" />
 
-          <DashboardSection fallback={<InvoicesSkeleton />}>
-            <ProjectsSection />
-          </DashboardSection>
+          <ProjectsSection />
 
-          <DashboardSection fallback={<InvoicesSkeleton />}>
-            <InvoicesSection />
-          </DashboardSection>
+          <InvoicesSection />
 
-          <DashboardSection fallback={<InvoicesSkeleton />}>
-            <QuarterlySummarySection />
-          </DashboardSection>
+          <QuarterlySummarySection />
 
-          <DashboardSection fallback={<InvoicesSkeleton />}>
-            <WeeklySummarySection />
-          </DashboardSection>
+          <WeeklySummarySection />
 
           <SectionHeader label="Wkrótce" />
 
-          <DashboardSection fallback={<InvoicesSkeleton />}>
-            <UpcomingSection />
-          </DashboardSection>
+          <UpcomingSection />
 
           <QuickActionsSection />
 
-          <DashboardSection fallback={<ChartSkeleton />}>
-            <WeeklyGlanceSection />
-          </DashboardSection>
+          <WeeklyGlanceSection />
 
           <Footer />
         </div>

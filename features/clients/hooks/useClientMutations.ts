@@ -27,6 +27,11 @@ function useInvalidateClients() {
     qc.invalidateQueries({ queryKey: QUERY_KEYS.clients() })
     qc.invalidateQueries({ queryKey: QUERY_KEYS.clientRates() })
     qc.invalidateQueries({ queryKey: QUERY_KEYS.dashboard() })
+    // Klient wystepuje takze w projektach, kalendarzu i fakturach — te trzy
+    // odswiezal wczesniej `revalidateClients()` po stronie serwera.
+    qc.invalidateQueries({ queryKey: QUERY_KEYS.projectsData() })
+    qc.invalidateQueries({ queryKey: QUERY_KEYS.calendar() })
+    qc.invalidateQueries({ queryKey: QUERY_KEYS.invoices() })
   }
 }
 

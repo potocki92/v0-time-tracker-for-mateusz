@@ -6,18 +6,34 @@ import {
 } from '@tanstack/react-query'
 import { DashboardContent, DashboardContentBoundary, DashboardSkeleton } from '@/features/dashboard'
 import { getDashboardDataServer } from '@/features/dashboard/server'
-// import { DashboardErrorBoundary } from './_components/DashboardErrorBoundary'
 import { QUERY_KEYS } from '@/lib/query/queryKeys'
 import { QUERY_CONFIG } from '@/lib/query/queryConfig'
-// import { getDashboardData } from './_services/dashboard.service'
 
-// Server Component — bez 'use client'
-export default async function DashboardPage() {
+/**
+ * Default export jest SYNCHRONICZNY celowo.
+ *
+ * Wczesniej `await prefetchQuery` stal w default exporcie, wiec Next nie mogl
+ * wyslac ani bajta payloadu RSC, dopoki nie wrocilo najwolniejsze z 5 zapytan
+ * Supabase. `<Suspense>` ponizej byl martwym kodem — promise byl juz rozwiazany,
+ * zanim React doszedl do renderu.
+ *
+ * Teraz powloka segmentu leci natychmiast, a dane dostreamowuja sie osobno.
+ */
+export default function DashboardPage() {
+  return (
+    <DashboardContentBoundary>
+      <Suspense fallback={<DashboardSkeleton />}>
+        <DashboardData />
+      </Suspense>
+    </DashboardContentBoundary>
+  )
+}
+
+async function DashboardData() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: QUERY_CONFIG.dashboard },
   })
 
-  // Prefetch na serwerze — user dostanie dane od razu
   await queryClient.prefetchQuery({
     queryKey: QUERY_KEYS.dashboard(),
     queryFn: getDashboardDataServer,
@@ -25,11 +41,7 @@ export default async function DashboardPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <DashboardContentBoundary>
-        <Suspense fallback={<DashboardSkeleton />}>
-          <DashboardContent />
-        </Suspense>
-      </DashboardContentBoundary>
+      <DashboardContent />
     </HydrationBoundary>
   )
 }

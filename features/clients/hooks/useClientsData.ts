@@ -1,8 +1,7 @@
 'use client'
 
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { fetchClientsDataAction } from '../actions'
-import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
+import { QUERY_KEYS, QUERY_CONFIG, fetchJson } from '@/lib/query'
 import type { ClientsData } from '../domain/clients.types'
 
 /**
@@ -12,7 +11,7 @@ import type { ClientsData } from '../domain/clients.types'
 export function useClientsData() {
   return useSuspenseQuery<ClientsData>({
     queryKey: QUERY_KEYS.clientsData(),
-    queryFn:  fetchClientsDataAction,
+    queryFn:  () => fetchJson<ClientsData>('/api/clients'),
     ...QUERY_CONFIG.clients,
   })
 }

@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function ClientsSkeleton() {
   return (
-    <div className="container space-y-6 px-4 py-6">
+    <div className="container space-y-6 px-4 py-6" data-testid="section-skeleton">
       <div className="sticky top-0 z-20 -mx-4 border-b bg-background/95 px-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
           <div className="space-y-1">

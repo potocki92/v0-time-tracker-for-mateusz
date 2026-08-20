@@ -6,10 +6,22 @@ import { ReportsContent, ReportsSkeleton } from '@/features/reports'
 // `DashboardContent` i reszta klienckiego dashboardu nie wpada do bundle'a raportow.
 import { getDashboardDataServer } from '@/features/dashboard/server'
 
-// Server Component — raporty czytają ten sam zbiór co dashboard
-// (`useDashboardData`), więc prefetchujemy go na serwerze zamiast czekać
-// na pełny fetch dopiero po hydracji.
-export default async function ReportsPage() {
+/**
+ * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default
+ * exporcie wstrzymywal caly payload RSC do czasu powrotu zapytan Supabase,
+ * przez co `<Suspense>` ponizej nigdy nie mial czego zawiesic.
+ */
+export default function ReportsPage() {
+  return (
+    <Suspense fallback={<ReportsSkeleton />}>
+      <ReportsData />
+    </Suspense>
+  )
+}
+
+// Raporty czytaja ten sam zbior co dashboard (`useDashboardData`), wiec
+// prefetchujemy ten sam klucz i konfiguracje.
+async function ReportsData() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: QUERY_CONFIG.dashboard },
   })
@@ -21,9 +33,7 @@ export default async function ReportsPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<ReportsSkeleton />}>
-        <ReportsContent />
-      </Suspense>
+      <ReportsContent />
     </HydrationBoundary>
   )
 }

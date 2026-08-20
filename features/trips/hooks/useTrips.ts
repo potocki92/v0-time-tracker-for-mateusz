@@ -41,10 +41,13 @@ export function useTrips(): UseTripsResult {
     [data],
   )
 
-  const invalidate = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.trips() }),
-    [queryClient],
-  )
+  // Wyjazd zmienia obraz kalendarza i pulpitu (dni wolne, przepracowany czas) —
+  // wczesniej robil to `revalidatePath('/calendar')` / `revalidatePath('/dashboard')`.
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.trips() })
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar() })
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard() })
+  }, [queryClient])
 
   const addMutation = useMutation({
     mutationKey: MUTATION_KEYS.trip.create,

@@ -1,12 +1,10 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
 import { createClient } from '@/lib/supabase/server'
-import type { Currency, DashboardData, Goal } from './types/dashboard.types'
-import { getDashboardDataServer } from './services/dashboard.service.server'
+import type { Currency, Goal } from './types/dashboard.types'
 
 /**
  * Server Actions modulu Dashboard.
@@ -32,10 +30,6 @@ const preferencesSchema = z.object({
   displayCurrency: CURRENCY,
 })
 
-export async function fetchDashboardDataAction(): Promise<DashboardData> {
-  return getDashboardDataServer()
-}
-
 export async function updateDashboardPreferencesAction(
   input: DashboardPreferences,
 ): Promise<void> {
@@ -58,6 +52,4 @@ export async function updateDashboardPreferencesAction(
   })
 
   if (error) throw error
-
-  revalidatePath('/dashboard')
 }

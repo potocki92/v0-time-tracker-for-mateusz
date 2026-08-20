@@ -1,6 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
@@ -49,11 +48,6 @@ function rowToTrip(row: TripRow): Trip {
   }
 }
 
-function revalidateTrips() {
-  revalidatePath('/calendar')
-  revalidatePath('/dashboard')
-}
-
 export async function fetchTripsAction(): Promise<Trip[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -85,7 +79,6 @@ export async function insertTripAction(input: Omit<Trip, 'id'>): Promise<Trip> {
 
   if (error) throw new Error(`insertTrip: ${error.message}`)
 
-  revalidateTrips()
   return rowToTrip(data as unknown as TripRow)
 }
 
@@ -114,7 +107,6 @@ export async function updateTripAction(
 
   if (error) throw new Error(`updateTripRecord: ${error.message}`)
 
-  revalidateTrips()
   return rowToTrip(data as unknown as TripRow)
 }
 
@@ -127,5 +119,4 @@ export async function deleteTripAction(id: string): Promise<void> {
 
   if (error) throw new Error(`deleteTripRecord: ${error.message}`)
 
-  revalidateTrips()
 }

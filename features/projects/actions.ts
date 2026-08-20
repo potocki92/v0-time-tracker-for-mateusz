@@ -1,13 +1,10 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
 import { createClient } from '@/lib/supabase/server'
 import type { ProjectFormData } from '@/lib/types'
-import type { ProjectsData } from './types/projects.types'
-import { getProjectsDataServer } from './services/projects.service.server'
 
 /**
  * Server Actions modulu Projects.
@@ -59,18 +56,6 @@ function toProjectRow(userId: string, formData: ProjectPayload) {
   }
 }
 
-function revalidateProjects() {
-  revalidatePath('/projects')
-  revalidatePath('/calendar')
-  revalidatePath('/dashboard')
-}
-
-// ── Queries ───────────────────────────────────────────────────────────────────
-
-export async function fetchProjectsDataAction(): Promise<ProjectsData> {
-  return getProjectsDataServer()
-}
-
 // ── Mutacje ───────────────────────────────────────────────────────────────────
 
 export async function createProjectAction(formData: ProjectFormData): Promise<void> {
@@ -83,7 +68,6 @@ export async function createProjectAction(formData: ProjectFormData): Promise<vo
   const { error } = await supabase.from('projects').insert(toProjectRow(user.id, parsed.data))
   if (error) throw new Error(`createProject: ${error.message}`)
 
-  revalidateProjects()
 }
 
 export async function updateProjectAction(
@@ -105,7 +89,6 @@ export async function updateProjectAction(
     .eq('id', parsedId.data)
   if (error) throw new Error(`updateProject: ${error.message}`)
 
-  revalidateProjects()
 }
 
 export async function deleteProjectAction(id: string): Promise<void> {
@@ -117,5 +100,4 @@ export async function deleteProjectAction(id: string): Promise<void> {
   const { error } = await supabase.from('projects').delete().eq('id', parsedId.data)
   if (error) throw new Error(`deleteProject: ${error.message}`)
 
-  revalidateProjects()
 }

@@ -125,6 +125,8 @@ export async function importInvoicesFromCsvAction(
   const { error } = await supabase.from('invoices').insert(payload)
   if (error) throw new Error(error.message)
 
-  revalidatePath('/invoices')
-  revalidatePath('/dashboard')
+  // Badge nieoplaconych faktur w sidebarze liczy sie serwerowo w layoucie
+  // panelu (`fetchUnpaidInvoicesCount`), poza React Query — jego trzeba
+  // odswiezyc rewalidacja. Reszte robi invalidateQueries w useInvoiceMutations.
+  revalidatePath('/(app)', 'layout')
 }

@@ -28,6 +28,9 @@ export function useUpdateProfile() {
     onSuccess: async () => {
       toast.success('Zapisano ustawienia konta')
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.accountProfile() })
+      // Dashboard wita uzytkownika po imieniu (`resolveUserName` czyta
+      // `user_metadata`), wiec zmiana profilu musi uniewaznic takze jego dane.
+      await qc.invalidateQueries({ queryKey: QUERY_KEYS.dashboard() })
     },
     onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : 'Nie udało się zapisać profilu')

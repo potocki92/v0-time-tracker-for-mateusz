@@ -443,8 +443,10 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     }
   }
 
-  revalidatePath('/invoices')
-  revalidatePath('/dashboard')
+  // Badge nieoplaconych faktur w sidebarze liczy sie serwerowo w layoucie
+  // panelu (`fetchUnpaidInvoicesCount`), poza React Query — jego trzeba
+  // odswiezyc rewalidacja. Reszte robi invalidateQueries w useInvoiceMutations.
+  revalidatePath('/(app)', 'layout')
 }
 
 export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
@@ -584,8 +586,10 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
     }
   }
 
-  revalidatePath('/invoices')
-  revalidatePath('/dashboard')
+  // Badge nieoplaconych faktur w sidebarze liczy sie serwerowo w layoucie
+  // panelu (`fetchUnpaidInvoicesCount`), poza React Query — jego trzeba
+  // odswiezyc rewalidacja. Reszte robi invalidateQueries w useInvoiceMutations.
+  revalidatePath('/(app)', 'layout')
 
   return { created, skipped, periodStart: firstPeriodStart, periodEnd: firstPeriodEnd }
 }
@@ -616,8 +620,10 @@ export async function deleteInvoiceAction(invoiceId: string) {
     await removeInvoicePdf(supabase, storagePath)
   }
 
-  revalidatePath('/invoices')
-  revalidatePath('/dashboard')
+  // Badge nieoplaconych faktur w sidebarze liczy sie serwerowo w layoucie
+  // panelu (`fetchUnpaidInvoicesCount`), poza React Query — jego trzeba
+  // odswiezyc rewalidacja. Reszte robi invalidateQueries w useInvoiceMutations.
+  revalidatePath('/(app)', 'layout')
 }
 
 export async function updateInvoicePaidStatusAction(invoiceId: string, isPaid: boolean) {
@@ -632,8 +638,10 @@ export async function updateInvoicePaidStatusAction(invoiceId: string, isPaid: b
 
   if (error) throw new Error(error.message)
 
-  revalidatePath('/invoices')
-  revalidatePath('/dashboard')
+  // Badge nieoplaconych faktur w sidebarze liczy sie serwerowo w layoucie
+  // panelu (`fetchUnpaidInvoicesCount`), poza React Query — jego trzeba
+  // odswiezyc rewalidacja. Reszte robi invalidateQueries w useInvoiceMutations.
+  revalidatePath('/(app)', 'layout')
 }
 
 /**
@@ -660,6 +668,8 @@ export async function updateInvoiceStatusAction(
 
   if (error) throw new Error(error.message)
 
-  revalidatePath('/invoices')
-  revalidatePath('/dashboard')
+  // Badge nieoplaconych faktur w sidebarze liczy sie serwerowo w layoucie
+  // panelu (`fetchUnpaidInvoicesCount`), poza React Query — jego trzeba
+  // odswiezyc rewalidacja. Reszte robi invalidateQueries w useInvoiceMutations.
+  revalidatePath('/(app)', 'layout')
 }

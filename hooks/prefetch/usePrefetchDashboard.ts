@@ -2,8 +2,8 @@
 
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { fetchDashboardDataAction } from '@/features/dashboard'
-import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
+import type { DashboardData } from '@/features/dashboard/domain'
+import { QUERY_KEYS, QUERY_CONFIG, fetchJson } from '@/lib/query'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -35,7 +35,7 @@ export function usePrefetchDashboard(): UsePrefetchDashboardReturn {
   const prefetch = useCallback(async (): Promise<void> => {
     await queryClient.prefetchQuery({
       queryKey: QUERY_KEYS.dashboard(),
-      queryFn:  fetchDashboardDataAction,
+      queryFn:  () => fetchJson<DashboardData>('/api/dashboard'),
       staleTime: QUERY_CONFIG.dashboard.staleTime,
     })
   }, [queryClient])

@@ -1,13 +1,11 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
 import { createClient } from '@/lib/supabase/server'
 import type { WorkEntry } from '@/lib/types'
-import type { CalendarData, EntryFormValues } from './domain/calendar.types'
-import { getCalendarDataServer } from './services/calendar.service.server'
+import type { EntryFormValues } from './domain/calendar.types'
 
 /**
  * Server Actions modulu Calendar.
@@ -48,18 +46,6 @@ function firstIssue(error: z.ZodError, fallback: string): string {
   return error.issues[0]?.message ?? fallback
 }
 
-function revalidateCalendar() {
-  revalidatePath('/calendar')
-  revalidatePath('/dashboard')
-  revalidatePath('/reports')
-}
-
-// ── Queries ───────────────────────────────────────────────────────────────────
-
-export async function fetchCalendarDataAction(): Promise<CalendarData> {
-  return getCalendarDataServer()
-}
-
 // ── Mutacje ───────────────────────────────────────────────────────────────────
 
 export async function saveWorkEntryAction(input: SaveWorkEntryInput): Promise<WorkEntry> {
@@ -98,7 +84,6 @@ export async function saveWorkEntryAction(input: SaveWorkEntryInput): Promise<Wo
   const { data, error } = await query
   if (error) throw new Error(`upsertWorkEntry: ${error.message}`)
 
-  revalidateCalendar()
   return data as WorkEntry
 }
 
@@ -111,5 +96,4 @@ export async function deleteWorkEntryAction(entryId: string): Promise<void> {
 
   if (error) throw new Error(`deleteWorkEntry: ${error.message}`)
 
-  revalidateCalendar()
 }
