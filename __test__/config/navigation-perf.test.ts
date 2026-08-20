@@ -95,3 +95,28 @@ describe('nawigacja — middleware nie robi round-tripu do GoTrue', () => {
     expect(layout).toMatch(/redirect\('\/auth\/login'\)/)
   })
 })
+
+describe('nawigacja — odczyt nie idzie przez Server Actions', () => {
+  const DATA_HOOKS = walk(resolve(ROOT, 'features'))
+    .concat(walk(resolve(ROOT, 'hooks')))
+    .filter((f) => /use(Dashboard|Calendar|Clients|Projects)Data\.ts$|usePrefetchDashboard\.ts$/.test(f))
+
+  it('znajduje hooki odczytu, ktore ma pilnowac', () => {
+    expect(DATA_HOOKS.length, 'test stracil cel — sprawdz sciezki').toBeGreaterThanOrEqual(5)
+  })
+
+  it('zaden hook odczytu nie uzywa Server Action jako queryFn', () => {
+    const offenders = DATA_HOOKS.filter((f) => /Action\b/.test(read(f)))
+    expect(
+      offenders,
+      `Server Actions sa serializowane i doklejaja re-render RSC calej trasy do kazdego odczytu.\nUzyj route handlera GET + fetchJson:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('kazdy route handler odczytu wylacza cache HTTP', () => {
+    const routes = walk(resolve(ROOT, 'app/api')).filter((f) => /route\.ts$/.test(f))
+    for (const route of routes) {
+      expect(read(route), `${route}: dane per-sesja nie moga trafic do cache`).toMatch(/no-store/)
+    }
+  })
+})

@@ -1,8 +1,7 @@
 'use client'
 
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
-import { fetchProjectsDataAction } from '../actions'
+import { QUERY_CONFIG, QUERY_KEYS, fetchJson } from '@/lib/query'
 import type { ProjectsData } from '../types/projects.types'
 
 /**
@@ -12,7 +11,7 @@ import type { ProjectsData } from '../types/projects.types'
 export function useProjectsData() {
   return useSuspenseQuery<ProjectsData>({
     queryKey: QUERY_KEYS.projectsData(),
-    queryFn: fetchProjectsDataAction,
+    queryFn: () => fetchJson<ProjectsData>('/api/projects'),
     ...QUERY_CONFIG.projects,
   })
 }

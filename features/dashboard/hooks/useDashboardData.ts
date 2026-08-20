@@ -1,8 +1,7 @@
 'use client'
 
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { fetchDashboardDataAction } from '../actions'
-import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
+import { QUERY_KEYS, QUERY_CONFIG, fetchJson } from '@/lib/query'
 import type { DashboardData } from '../types/dashboard.types'
 
 /**
@@ -13,7 +12,7 @@ import type { DashboardData } from '../types/dashboard.types'
 export function useDashboardData() {
   return useSuspenseQuery<DashboardData>({
     queryKey: QUERY_KEYS.dashboard(),
-    queryFn:  fetchDashboardDataAction,
+    queryFn:  () => fetchJson<DashboardData>('/api/dashboard'),
     ...QUERY_CONFIG.dashboard,
     retry: (failureCount, error) => {
       // Nie ponawiaj po rate limit — poczekaj na Retry-After

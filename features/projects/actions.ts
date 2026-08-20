@@ -6,8 +6,6 @@ import { z } from 'zod'
 import { requireServerUser } from '@/lib/auth/server-user'
 import { createClient } from '@/lib/supabase/server'
 import type { ProjectFormData } from '@/lib/types'
-import type { ProjectsData } from './types/projects.types'
-import { getProjectsDataServer } from './services/projects.service.server'
 
 /**
  * Server Actions modulu Projects.
@@ -63,12 +61,6 @@ function revalidateProjects() {
   revalidatePath('/projects')
   revalidatePath('/calendar')
   revalidatePath('/dashboard')
-}
-
-// ── Queries ───────────────────────────────────────────────────────────────────
-
-export async function fetchProjectsDataAction(): Promise<ProjectsData> {
-  return getProjectsDataServer()
 }
 
 // ── Mutacje ───────────────────────────────────────────────────────────────────

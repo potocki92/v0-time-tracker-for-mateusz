@@ -6,8 +6,7 @@ import { z } from 'zod'
 import { requireServerUser } from '@/lib/auth/server-user'
 import { createClient } from '@/lib/supabase/server'
 import type { WorkEntry } from '@/lib/types'
-import type { CalendarData, EntryFormValues } from './domain/calendar.types'
-import { getCalendarDataServer } from './services/calendar.service.server'
+import type { EntryFormValues } from './domain/calendar.types'
 
 /**
  * Server Actions modulu Calendar.
@@ -52,12 +51,6 @@ function revalidateCalendar() {
   revalidatePath('/calendar')
   revalidatePath('/dashboard')
   revalidatePath('/reports')
-}
-
-// ── Queries ───────────────────────────────────────────────────────────────────
-
-export async function fetchCalendarDataAction(): Promise<CalendarData> {
-  return getCalendarDataServer()
 }
 
 // ── Mutacje ───────────────────────────────────────────────────────────────────

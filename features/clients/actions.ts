@@ -7,13 +7,11 @@ import { requireServerUser } from '@/lib/auth/server-user'
 import { createClient as createSupabase } from '@/lib/supabase/server'
 import type { Client, ClientFormData, ClientRate, ClientRateFormData } from '@/lib/types'
 import { CLIENT_COLORS } from './domain/clients.constants'
-import type { ClientsData } from './domain/clients.types'
 import {
   CLIENTS_CLIENT_COLUMNS,
   CLIENTS_CLIENT_RATE_COLUMNS,
   CLIENTS_MAX_CLIENT_RATES,
 } from './services/clients.columns'
-import { getClientsDataServer } from './services/clients.service.server'
 
 /**
  * Server Actions modulu Clients.
@@ -105,12 +103,6 @@ function revalidateClients() {
   revalidatePath('/calendar')
   revalidatePath('/invoices')
   revalidatePath('/dashboard')
-}
-
-// ── Queries ───────────────────────────────────────────────────────────────────
-
-export async function fetchClientsDataAction(): Promise<ClientsData> {
-  return getClientsDataServer()
 }
 
 /**
