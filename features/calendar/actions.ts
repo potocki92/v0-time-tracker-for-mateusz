@@ -1,6 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
@@ -47,12 +46,6 @@ function firstIssue(error: z.ZodError, fallback: string): string {
   return error.issues[0]?.message ?? fallback
 }
 
-function revalidateCalendar() {
-  revalidatePath('/calendar')
-  revalidatePath('/dashboard')
-  revalidatePath('/reports')
-}
-
 // ── Mutacje ───────────────────────────────────────────────────────────────────
 
 export async function saveWorkEntryAction(input: SaveWorkEntryInput): Promise<WorkEntry> {
@@ -91,7 +84,6 @@ export async function saveWorkEntryAction(input: SaveWorkEntryInput): Promise<Wo
   const { data, error } = await query
   if (error) throw new Error(`upsertWorkEntry: ${error.message}`)
 
-  revalidateCalendar()
   return data as WorkEntry
 }
 
@@ -104,5 +96,4 @@ export async function deleteWorkEntryAction(entryId: string): Promise<void> {
 
   if (error) throw new Error(`deleteWorkEntry: ${error.message}`)
 
-  revalidateCalendar()
 }
