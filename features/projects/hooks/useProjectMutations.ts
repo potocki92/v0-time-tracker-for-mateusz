@@ -23,8 +23,14 @@ type SaveArgs = {
 export function useProjectMutations() {
   const queryClient = useQueryClient()
 
-  const invalidate = () =>
+  // Kalendarz i dashboard tez pokazuja projekty (wybor projektu we wpisie,
+  // KPI na pulpicie) — wczesniej odswiezal je `revalidatePath('/calendar')`
+  // i `revalidatePath('/dashboard')` po stronie serwera.
+  const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.projectsData() })
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.calendar() })
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard() })
+  }
 
   const save = useMutation({
     mutationKey: MUTATION_KEYS.project.update,
