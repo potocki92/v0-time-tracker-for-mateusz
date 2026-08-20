@@ -1,6 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
@@ -96,15 +95,6 @@ function toClientRow(userId: string, input: ClientPayload) {
   }
 }
 
-/** Rewalidacja tras, ktore czytaja klientow w Server Component. */
-function revalidateClients() {
-  revalidatePath('/clients')
-  revalidatePath('/projects')
-  revalidatePath('/calendar')
-  revalidatePath('/invoices')
-  revalidatePath('/dashboard')
-}
-
 /**
  * Historia stawek. Graceful fallback — jeśli tabela `client_rates` jeszcze nie istnieje
  * (migracja 005 nie została puszczona), zwracamy pustą tablicę zamiast wywracać cały widok.
@@ -164,7 +154,6 @@ export async function createClientAction(input: ClientFormData): Promise<Client>
 
   if (error) throw new Error(`createClient: ${error.message}`)
 
-  revalidateClients()
   return data as unknown as Client
 }
 
@@ -189,7 +178,6 @@ export async function updateClientAction(id: string, input: ClientFormData): Pro
 
   if (error) throw new Error(`updateClient: ${error.message}`)
 
-  revalidateClients()
   return data as unknown as Client
 }
 
@@ -202,7 +190,6 @@ export async function deleteClientAction(id: string): Promise<void> {
 
   if (error) throw new Error(`deleteClient: ${error.message}`)
 
-  revalidateClients()
 }
 
 /**
@@ -254,7 +241,6 @@ export async function addClientRateAction(
     if (updErr) throw new Error(`addClientRate/updateClient: ${updErr.message}`)
   }
 
-  revalidateClients()
   return data as unknown as ClientRate
 }
 
@@ -267,5 +253,4 @@ export async function deleteClientRateAction(id: string): Promise<void> {
 
   if (error) throw new Error(`deleteClientRate: ${error.message}`)
 
-  revalidateClients()
 }
