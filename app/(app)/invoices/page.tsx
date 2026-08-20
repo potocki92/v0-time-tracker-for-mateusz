@@ -6,7 +6,20 @@ import { INVOICES_MANAGER_QUERY_KEY } from '@/features/invoices/domain'
 import { getInvoicesDataServer } from '@/features/invoices/server'
 import InvoicesSkeleton from './loading'
 
-export default async function InvoicesPage() {
+/**
+ * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default
+ * exporcie wstrzymywal caly payload RSC do czasu powrotu zapytan Supabase,
+ * przez co `<Suspense>` ponizej nigdy nie mial czego zawiesic.
+ */
+export default function InvoicesPage() {
+  return (
+    <Suspense fallback={<InvoicesSkeleton />}>
+      <InvoicesData />
+    </Suspense>
+  )
+}
+
+async function InvoicesData() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: QUERY_CONFIG.invoices },
   })
@@ -18,9 +31,7 @@ export default async function InvoicesPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense fallback={<InvoicesSkeleton />}>
-        <InvoicesContent />
-      </Suspense>
+      <InvoicesContent />
     </HydrationBoundary>
   )
 }

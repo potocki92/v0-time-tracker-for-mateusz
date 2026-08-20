@@ -4,10 +4,22 @@ import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
 import { ProjectsContent, ProjectsContentBoundary, ProjectsSkeleton } from '@/features/projects'
 import { getProjectsDataServer } from '@/features/projects/server'
 
-// Server Component — bez 'use client'.
-// Prefetch po stronie serwera + hydracja React Query → user dostaje
-// dane od razu, a sekcje renderują się synchronicznie po hydracji.
-export default async function ProjectsPage() {
+/**
+ * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default
+ * exporcie wstrzymywal caly payload RSC do czasu powrotu zapytan Supabase,
+ * przez co `<Suspense>` ponizej nigdy nie mial czego zawiesic.
+ */
+export default function ProjectsPage() {
+  return (
+    <ProjectsContentBoundary>
+      <Suspense fallback={<ProjectsSkeleton />}>
+        <ProjectsData />
+      </Suspense>
+    </ProjectsContentBoundary>
+  )
+}
+
+async function ProjectsData() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: QUERY_CONFIG.projects },
   })
@@ -19,11 +31,7 @@ export default async function ProjectsPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProjectsContentBoundary>
-        <Suspense fallback={<ProjectsSkeleton />}>
-          <ProjectsContent />
-        </Suspense>
-      </ProjectsContentBoundary>
+      <ProjectsContent />
     </HydrationBoundary>
   )
 }

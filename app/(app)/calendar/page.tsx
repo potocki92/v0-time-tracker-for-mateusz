@@ -9,8 +9,22 @@ import { QUERY_CONFIG } from '@/lib/query/queryConfig'
 import { CalendarContent, CalendarContentBoundary, CalendarSkeleton } from '@/features/calendar'
 import { getCalendarDataServer } from '@/features/calendar/server'
 
-// Server Component — prefetch w HydrationBoundary, analogicznie do dashboardu
-export default async function CalendarPage() {
+/**
+ * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default
+ * exporcie wstrzymywal caly payload RSC do czasu powrotu zapytan Supabase,
+ * przez co `<Suspense>` ponizej nigdy nie mial czego zawiesic.
+ */
+export default function CalendarPage() {
+  return (
+    <CalendarContentBoundary>
+      <Suspense fallback={<CalendarSkeleton />}>
+        <CalendarData />
+      </Suspense>
+    </CalendarContentBoundary>
+  )
+}
+
+async function CalendarData() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: QUERY_CONFIG.calendar },
   })
@@ -22,11 +36,7 @@ export default async function CalendarPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <CalendarContentBoundary>
-        <Suspense fallback={<CalendarSkeleton />}>
-          <CalendarContent />
-        </Suspense>
-      </CalendarContentBoundary>
+      <CalendarContent />
     </HydrationBoundary>
   )
 }

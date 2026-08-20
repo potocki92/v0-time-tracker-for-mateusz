@@ -35,3 +35,39 @@ describe('nawigacja — Router Cache', () => {
     ).toBeGreaterThan(0)
   })
 })
+
+describe('nawigacja — prefetch nie blokuje streamu RSC', () => {
+  it('zaden page.tsx w (app) nie ma await prefetchQuery w default exporcie', () => {
+    const offenders = APP_PAGES.filter((f) => {
+      const src = read(f)
+      if (!/prefetchQuery/.test(src)) return false
+      return /export\s+default\s+async\s+function/.test(src)
+    })
+    expect(
+      offenders,
+      `async default export + prefetchQuery = caly segment czeka na Supabase zanim cokolwiek poleci do przegladarki.\nPrzenies await do komponentu-dziecka wewnatrz <Suspense>:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('kazda strona z prefetchem ma granice <Suspense>', () => {
+    const offenders = APP_PAGES.filter((f) => {
+      const src = read(f)
+      return /prefetchQuery/.test(src) && !/<Suspense/.test(src)
+    })
+    expect(
+      offenders,
+      `prefetch bez granicy Suspense — nie ma czego streamowac:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('kazda strona z prefetchem oddaje dane przez HydrationBoundary', () => {
+    const offenders = APP_PAGES.filter((f) => {
+      const src = read(f)
+      return /prefetchQuery/.test(src) && !/HydrationBoundary/.test(src)
+    })
+    expect(
+      offenders,
+      `prefetch bez HydrationBoundary = dane zostaja na serwerze, klient fetchuje drugi raz:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+})
