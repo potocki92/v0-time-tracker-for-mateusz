@@ -120,3 +120,25 @@ describe('nawigacja — odczyt nie idzie przez Server Actions', () => {
     }
   })
 })
+
+describe('nawigacja — mutacje nie kasuja calego Router Cache', () => {
+  const ACTION_FILES = walk(resolve(ROOT, 'features')).filter((f) =>
+    /actions\.ts$|\.service\.server\.ts$/.test(f),
+  )
+
+  it('nie revaliduje sciezek trasy panelu — od tego jest invalidateQueries', () => {
+    const offenders: string[] = []
+    for (const file of ACTION_FILES) {
+      for (const m of read(file).matchAll(/revalidatePath\(\s*['"]([^'"]+)['"]/g)) {
+        // Dozwolony wyjatek: layout panelu renderuje badge nieoplaconych faktur
+        // serwerowo, poza React Query — jego musi odswiezyc revalidatePath.
+        if (m[1] === '/(app)') continue
+        offenders.push(`${file}: revalidatePath('${m[1]}')`)
+      }
+    }
+    expect(
+      offenders,
+      `revalidatePath czysci CALY Router Cache klienta — po kazdej edycji wszystkie sekcje laduja sie od zera.\nUzyj queryClient.invalidateQueries po stronie klienta:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+})
