@@ -5,16 +5,16 @@ import { toast } from 'sonner'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
 import type { AccountSettingsFormValues, InvoiceSettings } from '../domain'
 import {
-  fetchAccountProfile,
-  updateAccountProfile,
-  updateInvoiceAutomationSettings,
-  uploadAvatar,
-} from '../services'
+  fetchAccountProfileAction,
+  updateAccountProfileAction,
+  updateInvoiceAutomationSettingsAction,
+  uploadAvatarAction,
+} from '../actions'
 
 export function useProfile() {
   return useQuery({
     queryKey: QUERY_KEYS.accountProfile(),
-    queryFn: fetchAccountProfile,
+    queryFn: fetchAccountProfileAction,
     retry: 1,
   })
 }
@@ -24,7 +24,7 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationKey: MUTATION_KEYS.account.updateProfile,
-    mutationFn: (values: AccountSettingsFormValues) => updateAccountProfile(values),
+    mutationFn: (values: AccountSettingsFormValues) => updateAccountProfileAction(values),
     onSuccess: async () => {
       toast.success('Zapisano ustawienia konta')
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.accountProfile() })
@@ -40,7 +40,7 @@ export function useUpdateAvatar() {
 
   return useMutation({
     mutationKey: MUTATION_KEYS.account.uploadAvatar,
-    mutationFn: (file: File) => uploadAvatar(file),
+    mutationFn: (file: File) => uploadAvatarAction(file),
     onSuccess: async () => {
       toast.success('Avatar został zaktualizowany')
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.accountProfile() })
@@ -56,7 +56,7 @@ export function useUpdateInvoiceAutomationSettings() {
 
   return useMutation({
     mutationKey: MUTATION_KEYS.account.updateInvoiceSettings,
-    mutationFn: (values: InvoiceSettings) => updateInvoiceAutomationSettings(values),
+    mutationFn: (values: InvoiceSettings) => updateInvoiceAutomationSettingsAction(values),
     onSuccess: async () => {
       toast.success('Zapisano ustawienia automatyzacji faktur')
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.accountProfile() })

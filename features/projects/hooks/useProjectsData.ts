@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
-import { getProjectsData } from '../services/projects.service'
+import { fetchProjectsDataAction } from '../actions'
 import type { ProjectsData } from '../types/projects.types'
 
 /**
@@ -12,7 +12,7 @@ import type { ProjectsData } from '../types/projects.types'
 export function useProjectsData() {
   return useSuspenseQuery<ProjectsData>({
     queryKey: QUERY_KEYS.projectsData(),
-    queryFn: getProjectsData,
+    queryFn: fetchProjectsDataAction,
     ...QUERY_CONFIG.projects,
   })
 }

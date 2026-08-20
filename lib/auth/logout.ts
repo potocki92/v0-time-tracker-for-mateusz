@@ -15,7 +15,7 @@
 
 import type { QueryClient } from '@tanstack/react-query'
 
-import { createClient } from '@/lib/supabase/client'
+import { signOutAction } from '@/lib/auth/actions'
 import { usePreferencesStore } from '@/features/dashboard'
 import { useUiStore } from '@/hooks/stores/useUiStore'
 
@@ -24,11 +24,9 @@ const LOGIN_PATH = '/auth/login'
 const PERSISTED_STORE_KEYS = ['user-preferences', 'ui-state'] as const
 
 export async function performLogout(queryClient?: QueryClient): Promise<void> {
-  const supabase = createClient()
-
   // 1. Server-side session invalidation. `global` revokes the refresh token.
   try {
-    await supabase.auth.signOut({ scope: 'global' })
+    await signOutAction()
   } catch {
     // Offline / już wygasła – nie blokujemy lokalnego cleanupu.
   }

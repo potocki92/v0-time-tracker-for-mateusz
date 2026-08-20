@@ -11,7 +11,6 @@ import {
   useDeleteClient,
   useUpdateClient,
 } from '../hooks/useClientMutations'
-import { useCurrentUser } from '@/hooks/auth/useCurrentUser'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { ClientsHeader } from './ClientsHeader'
 import { ClientsStats } from './ClientsStats'
@@ -33,9 +32,7 @@ import type { ClientWithStats } from '../domain/clients.types'
 
 export function ClientsContent() {
   const { data }                    = useClientsData()
-  const { data: authUser }          = useCurrentUser()
-  const userId                      = authUser?.id ?? null
-  const { data: rateHistoryMap = {} } = useClientRatesMap(userId ?? '')
+  const { data: rateHistoryMap = {} } = useClientRatesMap()
   const isMobile                    = useIsMobile()
 
   const {
@@ -54,8 +51,8 @@ export function ClientsContent() {
     visible,
   } = useClientsFilters(data.clients, data.workEntries, rateHistoryMap)
 
-  const createMutation = useCreateClient(userId ?? undefined)
-  const updateMutation = useUpdateClient(userId ?? undefined)
+  const createMutation = useCreateClient()
+  const updateMutation = useUpdateClient()
   const deleteMutation = useDeleteClient()
 
   const [formOpen,      setFormOpen]      = useState(false)
@@ -232,7 +229,6 @@ export function ClientsContent() {
       />
 
       <RateHistoryDialog
-        userId={userId ?? ''}
         client={historyClient}
         open={Boolean(historyClient)}
         onClose={() => setHistoryClient(null)}

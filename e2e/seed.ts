@@ -84,7 +84,15 @@ async function ensureUser({
 
   const { error: projectError } = await admin
     .from('projects')
-    .insert({ user_id: userId, client_id: createdClient.id, name: projectName, status: 'active' })
+    // `status` musi byc jedna z wartosci `ProjectStatus` — kolumna nie ma CHECK-a,
+    // wiec 'active' zapisywalo sie cicho, a `/projects` wywracalo sie na
+    // `PROJECT_STATUS_PILL['active']` (undefined.className).
+    .insert({
+      user_id: userId,
+      client_id: createdClient.id,
+      name: projectName,
+      status: 'in_progress',
+    })
   if (projectError) throw projectError
 
   return userId

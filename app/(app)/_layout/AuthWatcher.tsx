@@ -2,9 +2,8 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
 
-import { createClient } from '@/lib/supabase/client'
+import { hasActiveSessionAction } from '@/lib/auth/actions'
 
 /**
  * Pilnuje wygaśnięcia sesji już po wyrenderowaniu panelu.
@@ -15,23 +14,41 @@ import { createClient } from '@/lib/supabase/client'
  * przy wejściu zajmuje się teraz serwerowy layout; tutaj zostaje wyłącznie
  * reakcja na sign-out (np. z innej karty). Komponent nic nie renderuje,
  * więc niczego nie blokuje.
+ *
+ * Sondą jest Server Action zamiast `onAuthStateChange` — subskrypcja GoTrue
+ * wymagałaby browserowego klienta Supabase, czyli 61,8 kB gzip na każdej
+ * trasie panelu. Sesja siedzi w ciasteczkach, więc pytamy o nią serwer, gdy
+ * karta wraca na wierzch: to moment, w którym sign-out z innej karty i tak
+ * musi być widoczny.
  */
 export function AuthWatcher() {
   const router = useRouter()
 
   useEffect(() => {
-    const supabase = createClient()
+    let cancelled = false
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
-      if (event === 'SIGNED_OUT' || !session?.user) {
-        // performLogout robi twardy redirect; tutaj fallback dla zewnętrznego sign-out.
-        router.replace('/auth/login')
+    async function check() {
+      if (document.visibilityState !== 'visible') return
+
+      try {
+        const active = await hasActiveSessionAction()
+        if (!cancelled && !active) {
+          // performLogout robi twardy redirect; tutaj fallback dla zewnętrznego sign-out.
+          router.replace('/auth/login')
+        }
+      } catch {
+        // Offline / chwilowy błąd sieci — nie wyrzucamy użytkownika z panelu.
       }
-    })
+    }
 
-    return () => subscription.unsubscribe()
+    window.addEventListener('focus', check)
+    document.addEventListener('visibilitychange', check)
+
+    return () => {
+      cancelled = true
+      window.removeEventListener('focus', check)
+      document.removeEventListener('visibilitychange', check)
+    }
   }, [router])
 
   return null
