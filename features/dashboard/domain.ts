@@ -11,5 +11,4 @@ export type {
   Currency,
   Goal,
   DashboardData,
-  UseDashboardDataReturn,
 } from './types/dashboard.types'

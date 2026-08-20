@@ -10,7 +10,7 @@
  * po hydracji podmieniłby dane na minimalnie inny zbiór.
  */
 
-export const WORK_ENTRIES_WINDOW_MONTHS = 24
+const WORK_ENTRIES_WINDOW_MONTHS = 24
 
 /** Zwraca `YYYY-MM-01` — początek okna wpisów pracy (włącznie). */
 export function getWorkEntriesWindowStart(now: Date = new Date()): string {

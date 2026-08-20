@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/client'
-import { fetchCurrentEurRate } from '@/lib/api/eurRate'
 import { getWorkEntriesWindowStart } from '@/lib/date/work-entries-window'
 import type { Client, Invoice, Project, WorkEntry } from '@/lib/types'
 import type { WorkEntriesFilter } from '@/lib/query/queryKeys'
@@ -89,45 +88,6 @@ export async function fetchClients(userId: string): Promise<Client[]> {
   return (data ?? []) as unknown as Client[]
 }
 
-export async function fetchEurRate(): Promise<number | null> {
-  return fetchCurrentEurRate()
-}
-
-
-
-export async function fetchWorkEntriesPage(userId: string, page: number, pageSize = 50) {
-  const from = page * pageSize
-  const to = from + pageSize - 1
-
-  const { data, error } = await getSupabase()
-    .from('work_entries')
-    .select(DASHBOARD_WORK_ENTRY_COLUMNS)
-    .eq('user_id', userId)
-    .order('date', { ascending: false })
-    .range(from, to)
-
-  if (error) throw new Error(`fetchWorkEntriesPage: ${error.message}`)
-  const items = (data ?? []) as unknown as WorkEntry[]
-
-  return {
-    items,
-    nextPage: items.length === pageSize ? page + 1 : undefined,
-  }
-}
-
-// ── Mutacje ───────────────────────────────────────────────────────────────────
-
-export async function updateInvoicePaid(invoiceId: string): Promise<void> {
-  const user = await fetchCurrentUser()
-  const paidDate = new Date().toISOString().slice(0, 10)
-  const { error } = await getSupabase()
-    .from('invoices')
-    .update({ is_paid: true, status: 'PAID', paid_date: paidDate })
-    .eq('id', invoiceId)
-    .eq('user_id', user.id)
-
-  if (error) throw new Error(`updateInvoicePaid: ${error.message}`)
-}
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 

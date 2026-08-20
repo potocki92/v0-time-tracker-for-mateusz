@@ -84,7 +84,7 @@ const TAX_ID_COUNTRY_PATTERNS: ReadonlyArray<{
   { code: 'CH', patterns: [/^CHE-\d{3}\.\d{3}\.\d{3}( (MWST|TVA|IVA))?$/i] },
 ]
 
-export function inferCountryCodeFromTaxId(taxId: string | null | undefined): string | null {
+function inferCountryCodeFromTaxId(taxId: string | null | undefined): string | null {
   const normalized = taxId?.trim()
   if (!normalized) return null
 

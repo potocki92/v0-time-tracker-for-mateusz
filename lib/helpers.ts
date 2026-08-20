@@ -7,13 +7,6 @@ export function formatCurrency(amount: number, currency: 'PLN' | 'EUR'): string 
   }).format(amount)
 }
 
-export function formatNumber(num: number, decimals = 2): string {
-  return new Intl.NumberFormat('pl-PL', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  }).format(num)
-}
-
 export function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate()
 }
@@ -31,31 +24,8 @@ export function formatDate(date: string): string {
   })
 }
 
-export function formatDateShort(date: string): string {
-  return new Date(date).toLocaleDateString('pl-PL', {
-    day: 'numeric',
-    month: 'short'
-  })
-}
-
 export function getMonthKey(year: number, month: number): string {
   return `${year}-${String(month + 1).padStart(2, '0')}`
-}
-
-export function parseMonthKey(key: string): { year: number; month: number } {
-  const [year, month] = key.split('-').map(Number)
-  return { year, month: month - 1 }
-}
-
-
-export function generateId(): string {
-  return crypto.randomUUID()
-}
-
-export function isToday(date: string): boolean {
-  const today = new Date()
-  const d = new Date(date)
-  return d.toDateString() === today.toDateString()
 }
 
 export function isFutureDate(date: string): boolean {

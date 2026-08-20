@@ -20,8 +20,6 @@ export const accountSettingsSchema = z.object({
     .regex(/^[a-z0-9_.-]+$/, 'Użyj tylko małych liter, cyfr oraz znaków: _ . -'),
 })
 
-export type AccountSettingsSchema = z.infer<typeof accountSettingsSchema>
-
 export const avatarFileSchema = z
   .instanceof(File)
   .refine((file) => file.size <= 2 * 1024 * 1024, 'Maksymalny rozmiar to 2MB')

@@ -1,5 +1,4 @@
 const NBP_URL = 'https://api.nbp.pl/api/exchangerates/rates/A/EUR/?format=json'
-const FALLBACK_RATE = 4.3 // last-resort
 
 interface NbpResponse {
   rates: Array<{ mid: number; effectiveDate: string }>
@@ -24,4 +23,3 @@ export async function fetchCurrentEurRate(): Promise<number | null> {
   }
 }
 
-export const EUR_RATE_FALLBACK = FALLBACK_RATE

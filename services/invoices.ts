@@ -62,14 +62,6 @@ export async function uploadInvoicePdfWithMeta({
   return { filePath, publicUrl: publicData.publicUrl, bucket }
 }
 
-/**
- * @deprecated Prefer uploadInvoicePdfWithMeta — keeps the file path for cleanup.
- * Retained so older callers keep compiling until migrated.
- */
-export async function uploadInvoicePdf(params: UploadInvoicePdfParams): Promise<string> {
-  const { publicUrl } = await uploadInvoicePdfWithMeta(params)
-  return publicUrl
-}
 
 /** Best-effort removal of an uploaded PDF. Never throws. Returns true on success. */
 export async function removeInvoicePdf(

@@ -2,9 +2,7 @@ import {
   organizationLd,
   websiteLd,
   softwareApplicationLd,
-  breadcrumbLd,
   serializeJsonLd,
-  type BreadcrumbItem,
 } from '@/lib/seo/json-ld'
 
 interface JsonLdProps {
@@ -22,20 +20,16 @@ function JsonLd({ id, data }: JsonLdProps) {
   )
 }
 
-export function OrganizationJsonLd() {
+function OrganizationJsonLd() {
   return <JsonLd id="ld-organization" data={organizationLd()} />
 }
 
-export function WebsiteJsonLd() {
+function WebsiteJsonLd() {
   return <JsonLd id="ld-website" data={websiteLd()} />
 }
 
-export function SoftwareApplicationJsonLd() {
+function SoftwareApplicationJsonLd() {
   return <JsonLd id="ld-software" data={softwareApplicationLd()} />
-}
-
-export function BreadcrumbJsonLd({ items }: { items: BreadcrumbItem[] }) {
-  return <JsonLd id="ld-breadcrumb" data={breadcrumbLd(items)} />
 }
 
 /** Wstrzykuje wszystkie globalne węzły JSON-LD (Organization + WebSite + Software). */

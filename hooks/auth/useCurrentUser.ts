@@ -38,8 +38,3 @@ export function useCurrentUser() {
   })
 }
 
-export function useRequireUser(): User {
-  const { data: user } = useCurrentUser()
-  if (!user) throw new Error('useRequireUser used without authenticated user')
-  return user
-}

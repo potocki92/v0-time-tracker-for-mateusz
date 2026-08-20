@@ -17,8 +17,6 @@ export const loginSchema = z.object({
   email:    emailField,
   password: z.string().min(1, 'Hasło jest wymagane'),
 })
-export type LoginInput = z.infer<typeof loginSchema>
-
 export const signUpSchema = z
   .object({
     fullName: z
@@ -33,4 +31,3 @@ export const signUpSchema = z
     path:    ['confirmPassword'],
     message: 'Hasła muszą być identyczne',
   })
-export type SignUpInput = z.infer<typeof signUpSchema>

@@ -14,6 +14,8 @@
     "config": ["playwright.config.ts"],
     "entry": ["e2e/**/*.@(spec|setup).ts"]
   },
+  "ignoreExportsUsedInFile": { "interface": true, "type": true },
+  "ignoreIssues": { "components/ui/**": ["exports", "types"] },
   "ignore": ["mobile/**", "docs/**"],
   "ignoreDependencies": ["autoprefixer", "eslint-config-next"]
 }

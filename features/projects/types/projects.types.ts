@@ -83,37 +83,3 @@ export type ProjectsFiltersState = {
   search: string
   status: ProjectStatusFilter
 }
-
-/**
- * Per-client aggregation — exported through the public module API
- * so that the clients module can consume it without breaking the
- * "no cross-feature imports" rule (clients module wires its own
- * fetcher and reuses the pure selector).
- */
-export type ClientProjectAggregate = {
-  clientId: string
-  clientName: string
-  totalProjects: number
-  activeProjects: number
-  completedProjects: number
-  totalBudget: number
-  totalSpent: number
-  budgetUtilization: number
-  hoursLogged: number
-  averageProgress: number
-  isOverBudget: boolean
-}
-
-export type ProjectActivityKind =
-  | 'created'
-  | 'completed'
-  | 'hours_logged'
-  | 'milestone'
-
-export type ProjectActivityItem = {
-  id: string
-  kind: ProjectActivityKind
-  message: string
-  projectName: string | null
-  occurredAt: string
-}

@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
-import { uploadInvoicePdf } from '@/services/invoices'
 import type { Client, Invoice } from '@/lib/types'
-import type { ImportInvoiceCsvRow, InvoiceFormValues, InvoiceSettings } from '../../domain'
+import type { ImportInvoiceCsvRow, InvoiceSettings } from '../../domain'
 import {
   INVOICES_CLIENT_COLUMNS,
   INVOICES_INVOICE_COLUMNS,
@@ -72,7 +71,7 @@ export async function fetchInvoicesAndClients(): Promise<{ invoices: Invoice[]; 
   }
 }
 
-export async function createClientIfNeeded(
+async function createClientIfNeeded(
   name: string,
   options?: { userId?: string; supabase?: ReturnType<typeof createClient> },
 ): Promise<string | null> {
@@ -111,67 +110,6 @@ export async function createClientIfNeeded(
 
   if (error) throw new Error(error.message)
   return data.id
-}
-
-export async function saveInvoice({ invoiceId, values }: { invoiceId?: string; values: InvoiceFormValues }) {
-  const supabase = createClient()
-  const userId = (await fetchCurrentUserId(supabase)).id
-
-  const resolvedClientId =
-    values.client_id ??
-    (await createClientIfNeeded(values.new_client_name, {
-      userId,
-      supabase,
-    }))
-
-  const pdfUrl = values.file
-    ? await uploadInvoicePdf({
-        supabase,
-        userId,
-        file: values.file,
-      })
-    : null
-
-  const payload = {
-    user_id: userId,
-    client_id: resolvedClientId,
-    name: values.name.trim(),
-    invoice_number: values.invoice_number.trim() || null,
-    recipient: values.recipient.trim() || null,
-    billing_period: values.billing_period.trim() || null,
-    issue_date: values.invoice_date,
-    amount: values.amount,
-    currency: values.currency,
-    is_paid: values.is_paid,
-    file_url: pdfUrl,
-    notes: values.notes.trim() || null,
-    template_key: values.template_key,
-  }
-
-  if (invoiceId) {
-    const { error } = await supabase
-      .from('invoices')
-      .update({ ...payload, file_url: pdfUrl ?? undefined })
-      .eq('id', invoiceId)
-      .eq('user_id', userId)
-
-    if (error) throw new Error(error.message)
-    return
-  }
-
-  const { error } = await supabase.from('invoices').insert(payload)
-  if (error) throw new Error(error.message)
-}
-
-export async function deleteInvoice(invoiceId: string) {
-  const supabase = createClient()
-  const userId = (await fetchCurrentUserId(supabase)).id
-  const { error } = await supabase
-    .from('invoices')
-    .delete()
-    .eq('id', invoiceId)
-    .eq('user_id', userId)
-  if (error) throw new Error(error.message)
 }
 
 export async function importInvoicesFromCsv(rows: ImportInvoiceCsvRow[]) {

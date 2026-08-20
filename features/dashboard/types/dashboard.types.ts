@@ -19,11 +19,6 @@ export type DashboardData = {
   projects: Project[]
 }
 
-export type UseDashboardDataReturn = {
-  loading: boolean
-  data: DashboardData
-}
-
 export type ChartDataItem = {
   label: string
   earningsPLN: number

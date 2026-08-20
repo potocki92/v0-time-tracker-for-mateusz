@@ -9,6 +9,7 @@ const knip = JSON.parse(read('knip.json')) as {
   entry?: string[]
   next?: { entry?: string[] }
   ignore?: string[]
+  ignoreIssues?: Record<string, string[]>
 }
 
 const pkg = JSON.parse(read('package.json')) as {
@@ -56,6 +57,14 @@ describe('dead code — knip config', () => {
     }
   })
 
+  // Etap 9: components/ui to vendorowany shadcn — jego pelne API jest celowe,
+  // wiec wylaczamy tam tylko exports/types. Pliki i zaleznosci nadal sa bramkowane.
+  it('scopes ignoreIssues to the vendored UI kit only', () => {
+    const patterns = Object.keys(knip.ignoreIssues ?? {})
+    expect(patterns).toEqual(['components/ui/**'])
+    expect(knip.ignoreIssues?.['components/ui/**']).not.toContain('files')
+  })
+
   // Usun ten test, jesli w zadaniu 6 wybrales wariant B.
   it('registers the service worker, which the browser loads directly', () => {
     expect(knip.entry ?? []).toContain('public/sw.js')
@@ -71,6 +80,11 @@ describe('dead code — pipeline', () => {
   it('exposes a deadcode script wired into verify', () => {
     expect(pkg.scripts.deadcode).toContain('knip')
     expect(pkg.scripts.verify).toContain('npm run deadcode')
+  })
+
+  it('gates unused exports and types, not just files', () => {
+    expect(pkg.scripts.deadcode).toContain('exports')
+    expect(pkg.scripts.deadcode).toContain('types')
   })
 
   it('runs the dead-code gate in CI', () => {

@@ -146,7 +146,7 @@ export function selectClientMonthStats(
   return { hours, earnings, days }
 }
 
-export function formatClientAddress(c: Client): string | null {
+function formatClientAddress(c: Client): string | null {
   const line2 = [c.postal_code, c.city].filter(Boolean).join(' ').trim()
   const full = [c.address?.trim(), line2].filter(Boolean).join(', ')
   return full.length > 0 ? full : null

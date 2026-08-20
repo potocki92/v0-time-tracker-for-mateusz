@@ -104,7 +104,7 @@ function multiplyMoney(m: MoneyAmount, factor: number): MoneyAmount {
   return money(roundHalfAwayFromZero(product, QUANTITY_SCALE), m.currency)
 }
 
-export function fromMajor(value: number, currency: InvoiceBuilderCurrency): MoneyAmount {
+function fromMajor(value: number, currency: InvoiceBuilderCurrency): MoneyAmount {
   if (!Number.isFinite(value)) return zeroMoney(currency)
   return money(toBigIntRounded(value * 100), currency)
 }
@@ -134,7 +134,7 @@ export function resolveVatRate(line: Pick<LineItemInput, 'vat_mode' | 'vat_rate'
 }
 
 /** Stable human-readable label for each VAT bucket in the summary table. */
-export function vatBucketLabel(mode: VatMode, rate: number): string {
+function vatBucketLabel(mode: VatMode, rate: number): string {
   switch (mode) {
     case 'zw':
       return 'zw.'

@@ -19,7 +19,7 @@ import { createClient } from '@/lib/supabase/client'
 import { usePreferencesStore } from '@/features/dashboard'
 import { useUiStore } from '@/hooks/stores/useUiStore'
 
-export const LOGIN_PATH = '/auth/login'
+const LOGIN_PATH = '/auth/login'
 
 const PERSISTED_STORE_KEYS = ['user-preferences', 'ui-state'] as const
 

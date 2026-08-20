@@ -33,4 +33,3 @@ export const QUERY_KEYS = {
   trips:       () => [...QUERY_KEYS.all(), 'trips']          as const,
 } as const
 
-export type QueryKey = ReturnType<(typeof QUERY_KEYS)[keyof typeof QUERY_KEYS]>

@@ -1,4 +1,4 @@
-export { DashboardRangeProvider, useDashboardRange } from './shared/DashboardRangeContext'
+export { DashboardRangeProvider } from './shared/DashboardRangeContext'
 export { HeaderSection } from './header/HeaderSection'
 export { EarningsSection } from './earnings/EarningsSection'
 export { GoalSection } from './goal/GoalSection'
