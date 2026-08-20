@@ -1,6 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
@@ -53,6 +52,4 @@ export async function updateDashboardPreferencesAction(
   })
 
   if (error) throw error
-
-  revalidatePath('/dashboard')
 }
