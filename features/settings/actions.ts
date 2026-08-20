@@ -106,7 +106,9 @@ export async function updateAccountProfileAction(
     throw new Error(`Nie udało się zapisać profilu: ${error.message}`)
   }
 
-  revalidatePath('/dashboard')
+  // Imie w AppShellu renderuje sie serwerowo w layoucie panelu, poza React
+  // Query — to jedyna czesc, ktorej invalidateQueries nie odswiezy.
+  revalidatePath('/(app)', 'layout')
 }
 
 export async function updateInvoiceAutomationSettingsAction(
@@ -132,7 +134,6 @@ export async function updateInvoiceAutomationSettingsAction(
     throw new Error(`Nie udało się zapisać ustawień faktur: ${error.message}`)
   }
 
-  revalidatePath('/invoices')
 }
 
 export async function uploadAvatarAction(
@@ -180,7 +181,8 @@ export async function uploadAvatarAction(
     throw new Error('Nie udało się wygenerować adresu avatara')
   }
 
-  revalidatePath('/dashboard')
+  // Avatar w AppShellu przychodzi z serwerowego layoutu, nie z React Query.
+  revalidatePath('/(app)', 'layout')
 
   return { avatarPath, avatarUrl }
 }
