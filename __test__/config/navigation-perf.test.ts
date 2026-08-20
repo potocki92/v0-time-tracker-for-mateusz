@@ -71,3 +71,27 @@ describe('nawigacja — prefetch nie blokuje streamu RSC', () => {
     ).toEqual([])
   })
 })
+
+describe('nawigacja — middleware nie robi round-tripu do GoTrue', () => {
+  const proxy = read('lib/supabase/proxy.ts')
+
+  it('weryfikuje sesje lokalnie przez getClaims', () => {
+    expect(
+      proxy,
+      'middleware odpala sie na kazdym requescie RSC — getUser() to round-trip sieciowy przy kazdej nawigacji',
+    ).toMatch(/getClaims\(\)/)
+  })
+
+  it('nie wola getUser() w middleware', () => {
+    expect(
+      proxy.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ''),
+      'getUser() w middleware duplikuje to, co layout robi juz przez getServerUser()',
+    ).not.toMatch(/auth\.getUser\(\)/)
+  })
+
+  it('autoryzacja zostaje w serwerowym layoucie', () => {
+    const layout = read('app/(app)/layout.tsx')
+    expect(layout).toMatch(/getServerUser\(\)/)
+    expect(layout).toMatch(/redirect\('\/auth\/login'\)/)
+  })
+})

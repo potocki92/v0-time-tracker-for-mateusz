@@ -31,15 +31,22 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // Do not run code between createServerClient and the auth call below.
 
-  // IMPORTANT: If you remove getUser() and you use server-side rendering
-  // with the Supabase client, your users may be randomly logged out.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // `getClaims()` zamiast `getUser()`: weryfikuje JWT lokalnie przez JWKS,
+  // bez round-tripu do GoTrue. Middleware odpala sie na KAZDYM zadaniu —
+  // takze na kazdym requescie RSC przy nawigacji — wiec ten round-trip
+  // placilismy przy kazdym kliknieciu w sidebarze, jeszcze przed layoutem,
+  // ktory i tak wola `getServerUser()`.
+  //
+  // Rola middleware jest tu wylacznie odswiezenie ciasteczek sesji.
+  // Autoryzacja zostaje w `app/(app)/layout.tsx` (`getServerUser()` -> redirect).
+  //
+  // WARUNEK: projekt Supabase musi miec asymetryczne klucze podpisu JWT
+  // (Dashboard -> Authentication -> JWT Keys -> migracja na ECC P-256).
+  // Przy kluczu symetrycznym getClaims() robi fallback na wywolanie sieciowe
+  // i nic nie zyskujemy — patrz docs/perf-baseline.md.
+  await supabase.auth.getClaims()
 
   // NOTE:
   // We intentionally do not force unauthenticated redirects here for app routes.
@@ -49,7 +56,6 @@ export async function updateSession(request: NextRequest) {
   //
   // `/` (landing) jest obsługiwane po stronie page.tsx (server component),
   // dzięki czemu CDN może cache'ować publiczny landing bez nadmiarowych redirectów.
-  void user
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:
