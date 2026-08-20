@@ -1,6 +1,5 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { requireServerUser } from '@/lib/auth/server-user'
@@ -57,12 +56,6 @@ function toProjectRow(userId: string, formData: ProjectPayload) {
   }
 }
 
-function revalidateProjects() {
-  revalidatePath('/projects')
-  revalidatePath('/calendar')
-  revalidatePath('/dashboard')
-}
-
 // ── Mutacje ───────────────────────────────────────────────────────────────────
 
 export async function createProjectAction(formData: ProjectFormData): Promise<void> {
@@ -75,7 +68,6 @@ export async function createProjectAction(formData: ProjectFormData): Promise<vo
   const { error } = await supabase.from('projects').insert(toProjectRow(user.id, parsed.data))
   if (error) throw new Error(`createProject: ${error.message}`)
 
-  revalidateProjects()
 }
 
 export async function updateProjectAction(
@@ -97,7 +89,6 @@ export async function updateProjectAction(
     .eq('id', parsedId.data)
   if (error) throw new Error(`updateProject: ${error.message}`)
 
-  revalidateProjects()
 }
 
 export async function deleteProjectAction(id: string): Promise<void> {
@@ -109,5 +100,4 @@ export async function deleteProjectAction(id: string): Promise<void> {
   const { error } = await supabase.from('projects').delete().eq('id', parsedId.data)
   if (error) throw new Error(`deleteProject: ${error.message}`)
 
-  revalidateProjects()
 }

@@ -101,13 +101,28 @@ describe('bundle hygiene — data access lives on the server', () => {
     ).toEqual([])
   })
 
-  it('revalidates after every mutating action', () => {
+  // Niezmiennik bez zmian: zadna mutacja nie moze zostawic nieswiezych danych.
+  // Zmienil sie mechanizm — `revalidatePath` kasowal CALY Router Cache klienta,
+  // wiec po kazdej edycji wszystkie sekcje ladowaly sie od zera (patrz
+  // navigation-perf.test.ts). Odswiezanie robi teraz punktowe
+  // `invalidateQueries` w hooku mutacji danej domeny.
+  it('invalidates the cache after every mutating action', () => {
     const actionFiles = appFiles.filter((f) => /\/actions\.ts$/.test(f))
     expect(actionFiles.length, 'brak plikow actions.ts').toBeGreaterThan(0)
     for (const file of actionFiles) {
       const src = read(file)
       if (!/\.(insert|update|delete|upsert)\(/.test(src)) continue
-      expect(src, `${file}: mutacja bez revalidatePath`).toContain('revalidatePath')
+
+      const domain = file.slice(0, file.lastIndexOf('/'))
+      const invalidatesInDomain = appFiles.some(
+        (f) => f.startsWith(`${domain}/`) && read(f).includes('invalidateQueries'),
+      )
+      // `revalidatePath` zostaje dozwolony tam, gdzie mutacja zmienia cos
+      // renderowanego serwerowo poza React Query — badge w layoucie panelu.
+      expect(
+        invalidatesInDomain || src.includes('revalidatePath'),
+        `${file}: mutacja bez inwalidacji cache — dodaj invalidateQueries w hooku tej domeny`,
+      ).toBe(true)
     }
   })
 })
