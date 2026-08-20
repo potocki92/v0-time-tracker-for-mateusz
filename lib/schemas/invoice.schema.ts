@@ -23,4 +23,3 @@ export const invoiceSchema = z
     },
   )
 
-export type InvoiceInput = z.infer<typeof invoiceSchema>

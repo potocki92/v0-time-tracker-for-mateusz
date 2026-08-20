@@ -8,7 +8,7 @@ import type { TimeRange } from '../types/dashboard.types'
 /**
  * Wszystkie dozwolone wartości jako const tuple — nuqs potrzebuje literałów.
  */
-export const TIME_RANGES = [
+const TIME_RANGES = [
   'current_week',
   'previous_week',
   'current_month',

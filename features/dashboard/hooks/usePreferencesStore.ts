@@ -117,19 +117,12 @@ export const selectEurRate = (s: PreferencesStore): number => {
   if (s.useLiveRate && s.liveEurRate !== null) return s.liveEurRate
   return s.eurToPln
 }
-export const selectGoal = (s: PreferencesStore): Goal | null => s.goal
 
 // ── Selektory atomowe (preferowane) ──────────────────────────────────────────
-export const useEurToPln        = () => usePreferencesStore((s) => s.eurToPln)
-export const useUseLiveRate     = () => usePreferencesStore((s) => s.useLiveRate)
-export const useLiveEurRate     = () => usePreferencesStore((s) => s.liveEurRate)
 export const useGoal            = () => usePreferencesStore((s) => s.goal)
-export const useDisplayCurrency = () => usePreferencesStore((s) => s.displayCurrency)
 
 // Akcje są stabilne (Zustand nie rerenderuje)
-export const useSetEurToPln     = () => usePreferencesStore((s) => s.setEurToPln)
 export const useSetGoal         = () => usePreferencesStore((s) => s.setGoal)
-export const useToggleLiveRate  = () => usePreferencesStore((s) => s.toggleLiveRate)
 
 // Convenience hook — ZAWSZE z useShallow gdy zwracasz obiekt
 export function useEffectiveEurRate(): number {

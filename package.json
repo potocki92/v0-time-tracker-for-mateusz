@@ -19,7 +19,7 @@
     "e2e:ui": "playwright test --ui",
     "e2e:seed": "tsx e2e/seed.ts",
     "verify": "npm run typecheck && npm run lint && npm run deadcode && npm run test && npm run build && npm run perf:budget",
-    "deadcode": "knip --include files,dependencies",
+    "deadcode": "knip --include files,dependencies,exports,types",
     "deadcode:all": "knip",
     "perf:budget": "node scripts/check-performance-budgets.mjs",
     "perf:budget:init": "node scripts/check-performance-budgets.mjs --init"
@@ -72,7 +72,6 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
     "@eslint/eslintrc": "^3.3.6",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.1.9",

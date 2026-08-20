@@ -3,13 +3,13 @@ import type { Trip, TripCountdownState } from './trips.types'
 const ISO_RE = /^\d{4}-\d{2}-\d{2}$/
 
 /** Parsuje YYYY-MM-DD do dnia UTC, by uniknąć przesunięć strefy czasowej. */
-export function parseIsoDate(iso: string): Date {
+function parseIsoDate(iso: string): Date {
   if (!ISO_RE.test(iso)) throw new Error(`Niepoprawna data ISO: ${iso}`)
   const [y, m, d] = iso.split('-').map(Number)
   return new Date(Date.UTC(y, m - 1, d))
 }
 
-export function toIsoDate(date: Date): string {
+function toIsoDate(date: Date): string {
   const y = date.getUTCFullYear()
   const m = String(date.getUTCMonth() + 1).padStart(2, '0')
   const d = String(date.getUTCDate()).padStart(2, '0')

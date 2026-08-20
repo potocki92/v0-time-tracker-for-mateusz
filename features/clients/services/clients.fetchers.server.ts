@@ -1,12 +1,9 @@
 import 'server-only'
 import { createClient as createSupabase } from '@/lib/supabase/server'
-import { requireServerUser } from '@/lib/auth/server-user'
 import { getWorkEntriesWindowStart } from '@/lib/date/work-entries-window'
-import type { Client, ClientRate, WorkEntry } from '@/lib/types'
+import type { Client, WorkEntry } from '@/lib/types'
 import {
   CLIENTS_CLIENT_COLUMNS,
-  CLIENTS_CLIENT_RATE_COLUMNS,
-  CLIENTS_MAX_CLIENT_RATES,
   CLIENTS_MAX_CLIENTS,
   CLIENTS_MAX_WORK_ENTRIES,
   CLIENTS_WORK_ENTRY_COLUMNS,
@@ -48,24 +45,4 @@ export async function fetchWorkEntriesForClientsServer(): Promise<WorkEntry[]> {
 
   if (error) throw new Error(`fetchWorkEntriesForClientsServer: ${error.message}`)
   return (data ?? []) as unknown as WorkEntry[]
-}
-
-export async function fetchClientRatesServer(userId: string): Promise<ClientRate[]> {
-  const supabase = await getSupabase()
-  const { data, error } = await supabase
-    .from('client_rates')
-    .select(CLIENTS_CLIENT_RATE_COLUMNS)
-    .eq('user_id', userId)
-    .order('effective_from', { ascending: false })
-    .limit(CLIENTS_MAX_CLIENT_RATES)
-
-  if (error) {
-    if ((error as { code?: string }).code === '42P01') return []
-    throw new Error(`fetchClientRatesServer: ${error.message}`)
-  }
-  return (data ?? []) as unknown as ClientRate[]
-}
-
-export async function fetchCurrentUserIdServer(): Promise<string> {
-  return (await requireServerUser()).id
 }

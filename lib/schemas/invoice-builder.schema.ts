@@ -41,7 +41,7 @@ const taxId = z
   .trim()
   .regex(/^[A-Z0-9 ./-]{4,30}$/i, 'Niepoprawny NIP / VAT ID')
 
-export const counterpartySchema = z.object({
+const counterpartySchema = z.object({
   name: z.string().trim().min(1, 'Nazwa nabywcy jest wymagana').max(200),
   tax_id: taxId.optional().or(z.literal('')),
   country_code: z
@@ -55,8 +55,6 @@ export const counterpartySchema = z.object({
   email: z.string().trim().email('Niepoprawny e-mail').optional().or(z.literal('')),
   is_vat_eu: z.boolean().default(false),
 })
-export type Counterparty = z.infer<typeof counterpartySchema>
-
 export const lineItemSchema = z
   .object({
     /** Stable client-side id used by dnd-kit & React keys. Not persisted. */
@@ -86,7 +84,7 @@ export const lineItemSchema = z
   })
 export type LineItemInput = z.infer<typeof lineItemSchema>
 
-export const paymentSchema = z.object({
+const paymentSchema = z.object({
   method: z.enum(PAYMENT_METHODS).default('bank_transfer'),
   /** IBAN or local account number. Spaces allowed for readability. */
   bank_account: z
@@ -104,8 +102,6 @@ export const paymentSchema = z.object({
     .optional()
     .or(z.literal('')),
 })
-export type PaymentDetails = z.infer<typeof paymentSchema>
-
 export const invoiceBuilderSchema = z
   .object({
     invoice_number: z.string().trim().min(1, 'Numer faktury jest wymagany').max(50),

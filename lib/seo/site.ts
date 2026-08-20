@@ -60,8 +60,6 @@ export const SITE = {
   },
 } as const
 
-export type SiteConfig = typeof SITE
-
 export function absoluteUrl(path = '/'): string {
   if (!path.startsWith('/')) path = `/${path}`
   return `${SITE.url}${path}`

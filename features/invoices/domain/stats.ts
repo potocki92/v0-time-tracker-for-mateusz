@@ -94,7 +94,7 @@ const POLISH_MONTHS_SHORT = [
   'Gru',
 ] as const
 
-export function polishMonthFull(monthIndex: number): string {
+function polishMonthFull(monthIndex: number): string {
   return POLISH_MONTHS_FULL[monthIndex] ?? ''
 }
 

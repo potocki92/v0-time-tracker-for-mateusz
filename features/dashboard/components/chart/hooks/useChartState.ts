@@ -42,7 +42,7 @@ const DEFAULT_PERIOD: Record<Grouping, Period> = {
   quarterly: 'year',
 }
 
-export function getRangeFromPeriod(period: Period): DateRange {
+function getRangeFromPeriod(period: Period): DateRange {
   const now = new Date()
   const y = now.getFullYear()
   const m = now.getMonth()

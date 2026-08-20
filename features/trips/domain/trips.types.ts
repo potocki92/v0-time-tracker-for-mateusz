@@ -15,7 +15,7 @@ export interface Trip {
   destination?: string
 }
 
-export type TripCountdownMode = 'away' | 'home' | 'no_trips'
+type TripCountdownMode = 'away' | 'home' | 'no_trips'
 
 export interface TripCountdownState {
   /** Tryb licznika — czy aktualnie jesteśmy w trasie, czy w domu. */

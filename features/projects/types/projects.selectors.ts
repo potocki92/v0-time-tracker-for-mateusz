@@ -5,7 +5,6 @@ import {
   PROJECT_STATUS_ACCENT,
 } from './projects.constants'
 import type {
-  ClientProjectAggregate,
   FeaturedProject,
   ProjectBudgetRow,
   ProjectBudgetUtilization,
@@ -309,60 +308,4 @@ export function selectFilteredRows(
       (row.project.description ?? '').toLowerCase().includes(query)
     )
   })
-}
-
-// ── Per-client aggregation (clients module integration point) ────────────────
-
-export function selectClientProjectAggregates(data: ProjectsData): ClientProjectAggregate[] {
-  const byId = buildClientIndex(data.clients)
-  const rowsByClient = new Map<string, ProjectListRow[]>()
-  const allRows = selectProjectListRows(data)
-
-  for (const row of allRows) {
-    const key = row.project.client_id ?? '__none__'
-    const bucket = rowsByClient.get(key)
-    if (bucket) bucket.push(row)
-    else rowsByClient.set(key, [row])
-  }
-
-  const aggregates: ClientProjectAggregate[] = []
-  for (const [clientId, rows] of rowsByClient) {
-    const totalBudget = rows.reduce((sum, r) => sum + r.budget, 0)
-    const totalSpent = rows.reduce((sum, r) => sum + r.budget * r.budgetUtilization, 0)
-    const hoursLogged = rows.reduce((sum, r) => sum + r.hoursLogged, 0)
-    const totalProjects = rows.length
-    const activeProjects = rows.filter((r) => r.project.status === 'in_progress').length
-    const completedProjects = rows.filter((r) => r.project.status === 'completed').length
-    const averageProgress = totalProjects
-      ? Math.round(rows.reduce((sum, r) => sum + r.progressPct, 0) / totalProjects)
-      : 0
-    const utilization = totalBudget > 0 ? totalSpent / totalBudget : 0
-
-    aggregates.push({
-      clientId,
-      clientName:
-        clientId === '__none__' ? NO_CLIENT_LABEL : byId.get(clientId)?.name ?? UNKNOWN_CLIENT_LABEL,
-      totalProjects,
-      activeProjects,
-      completedProjects,
-      totalBudget,
-      totalSpent,
-      budgetUtilization: utilization,
-      hoursLogged,
-      averageProgress,
-      isOverBudget: utilization > 1,
-    })
-  }
-
-  aggregates.sort((a, b) => b.totalBudget - a.totalBudget)
-  return aggregates
-}
-
-export function selectClientProjectAggregate(
-  data: ProjectsData,
-  clientId: string,
-): ClientProjectAggregate | null {
-  return (
-    selectClientProjectAggregates(data).find((agg) => agg.clientId === clientId) ?? null
-  )
 }

@@ -89,24 +89,6 @@ export function softwareApplicationLd(): JsonLdNode {
   }
 }
 
-export interface BreadcrumbItem {
-  name: string
-  path: string
-}
-
-export function breadcrumbLd(items: BreadcrumbItem[]): JsonLdNode {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: item.name,
-      item: absoluteUrl(item.path),
-    })),
-  }
-}
-
 /**
  * Serializuje JSON-LD bezpiecznie do wstrzyknięcia w `<script>`.
  * Escape-uje `<` aby zapobiec zamknięciu taga w treści.

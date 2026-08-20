@@ -5,8 +5,8 @@ import { z } from 'zod'
  * and returned by supabase.auth.getUser(). Always `safeParse` from unknown — never cast.
  */
 
-export const INVOICE_TEMPLATE_KEYS = ['classic', 'modern', 'minimal'] as const
-export const RESET_SEQUENCE_VALUES = ['yearly', 'monthly'] as const
+const INVOICE_TEMPLATE_KEYS = ['classic', 'modern', 'minimal'] as const
+const RESET_SEQUENCE_VALUES = ['yearly', 'monthly'] as const
 
 export const invoiceSettingsSchema = z.object({
   userPrefix: z.string().trim().min(1).max(10).default('FV'),
@@ -26,7 +26,7 @@ export const invoiceSettingsSchema = z.object({
 
 export type InvoiceSettingsInput = z.infer<typeof invoiceSettingsSchema>
 
-export const userMetadataInvoiceSchema = z
+const userMetadataInvoiceSchema = z
   .object({
     invoice_settings: invoiceSettingsSchema.partial().optional(),
   })

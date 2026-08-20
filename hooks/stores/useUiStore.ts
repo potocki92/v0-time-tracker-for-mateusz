@@ -78,8 +78,6 @@ export const useUiStore = create<UiState & UiActions>()(
 )
 
 // Selektory atomowe
-export const useDashboardRange = () => useUiStore((s) => s.dashboardRange)
-export const useSetRange       = () => useUiStore((s) => s.setRange)
 export const useModalState     = (id: ModalId) => useUiStore((s) => s.modals[id])
 export const useOpenModal      = () => useUiStore((s) => s.openModal)
 export const useCloseModal     = () => useUiStore((s) => s.closeModal)

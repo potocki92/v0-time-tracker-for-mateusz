@@ -70,4 +70,3 @@ export const QUERY_CLIENT_DEFAULTS = {
   },
 } as const
 
-export type QueryConfigKey = keyof typeof QUERY_CONFIG

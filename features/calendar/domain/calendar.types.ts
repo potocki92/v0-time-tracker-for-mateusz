@@ -15,11 +15,6 @@ export type CalendarData = {
   workEntries: WorkEntry[]
 }
 
-export type UseCalendarDataReturn = {
-  loading: boolean
-  data: CalendarData
-}
-
 export type CalendarStats = {
   totalHours: number
   /** Godziny już zrealizowane (wpisy `real` do dziś włącznie). */
@@ -123,11 +118,6 @@ export type EntryFormValues = {
   quantityFrom: number
   quantityTo: number
   notes: string
-}
-
-export type EntryMutationPayload = EntryFormValues & {
-  date: string
-  existingId?: string
 }
 
 export type StatusVisualConfig = {

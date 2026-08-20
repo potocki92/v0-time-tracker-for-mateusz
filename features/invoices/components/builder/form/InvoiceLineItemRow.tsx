@@ -14,7 +14,6 @@ import {
 } from '@/lib/finance/invoice-builder-engine'
 import {
   type InvoiceBuilderValues,
-  VAT_MODES,
   type VatMode,
 } from '@/lib/schemas/invoice-builder.schema'
 
@@ -255,5 +254,3 @@ const VAT_MODE_OPTIONS: ReadonlyArray<{ value: VatMode; label: React.ReactNode; 
   { value: 'rc',       label: 'Reverse charge',     description: 'Odwrotne obciążenie (UE/eksport)' },
 ] as const
 
-// Static export so other components don't have to re-derive the modes list.
-export { VAT_MODES, VAT_MODE_OPTIONS }

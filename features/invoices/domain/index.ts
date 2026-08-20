@@ -1,5 +1,4 @@
 export * from './invoices.types'
-export * from './utils'
 export * from './stats'
 
 // Typ podsumowania kwartalu mieszka przy serwisie serwerowym, ale jest czystym

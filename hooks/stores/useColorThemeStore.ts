@@ -16,7 +16,7 @@ interface ColorThemeState {
   setTheme: (theme: ColorThemeId) => void
 }
 
-export const useColorThemeStore = create<ColorThemeState>()(
+const useColorThemeStore = create<ColorThemeState>()(
   persist(
     (set) => ({
       theme: DEFAULT_COLOR_THEME,

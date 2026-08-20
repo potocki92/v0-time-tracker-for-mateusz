@@ -13,7 +13,7 @@ export function toPublicAvatarUrl(path: string | null | undefined): string | nul
   return data.publicUrl ?? null
 }
 
-export async function createSignedAvatarUrl(
+async function createSignedAvatarUrl(
   path: string | null | undefined,
   expiresIn: number = SIGNED_URL_TTL_SECONDS,
 ): Promise<string | null> {

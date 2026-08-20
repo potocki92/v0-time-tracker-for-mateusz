@@ -2,7 +2,6 @@ import type { Client, CURRENCY, Invoice, InvoiceLifecycleStatus } from '@/lib/ty
 
 export type BillingQuarter = 'Q1' | 'Q2' | 'Q3' | 'Q4'
 
-export const BILLING_QUARTERS: readonly BillingQuarter[] = ['Q1', 'Q2', 'Q3', 'Q4'] as const
 
 /** Map a 1-based month into its calendar quarter. */
 export function quarterFromMonthNumber(month: number): BillingQuarter {
