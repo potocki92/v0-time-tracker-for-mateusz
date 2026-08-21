@@ -32,6 +32,17 @@ const QUERY_PROFILES = {
 export const QUERY_CONFIG = {
   dashboard: {
     ...QUERY_PROFILES.warm,
+    // Alt+Tab na PC to dziesiatki przelaczen dziennie, a queryFn dashboardu
+    // to Server Action — kazda odpowiedz niesie przerenderowany payload RSC
+    // calej trasy, nie sam JSON. Dane pracy nie zmieniaja sie z minuty na
+    // minute, wiec staleTime 5 min + refetchOnReconnect wystarcza.
+    //
+    // Swiezosc po edycji w innej sekcji zapewnia inwalidacja z Etapu 3,
+    // nie focus okna.
+    //
+    // Jesli read path przejdzie na route handler GET (plan wydajnosciowy),
+    // ten wyjatek mozna cofnac — wtedy refetch kosztuje jeden JSON.
+    refetchOnWindowFocus: false,
   },
   calendar: {
     ...QUERY_PROFILES.warm,

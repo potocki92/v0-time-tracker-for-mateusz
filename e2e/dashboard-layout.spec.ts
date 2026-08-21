@@ -88,3 +88,31 @@ test('szerszy ekran daje krotsza strone', async ({ page }) => {
     'przy xl: szyna przestaje zajmowac wlasny wiersz — strona ma sie o niego skrocic',
   ).toBeGreaterThan(narrow.rail.height * 0.8)
 })
+
+test('podmiana skeletonu nie przesuwa ukladu', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openDashboard(page)
+
+  const cls = await page.evaluate(
+    () =>
+      new Promise<number>((resolve) => {
+        let total = 0
+        new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            const shift = entry as PerformanceEntry & { value: number; hadRecentInput: boolean }
+            if (!shift.hadRecentInput) total += shift.value
+          }
+          // `buffered: true` dorzuca przesuniecia sprzed zalozenia obserwatora,
+          // czyli te z podmiany skeletonu na tresc — o nie tu chodzi.
+        }).observe({ type: 'layout-shift', buffered: true })
+
+        // Okno obserwacji zyje w KONTEKSCIE STRONY, nie w spec'u:
+        // __test__/config/e2e-suite.test.ts sluszne blokuje page.waitForTimeout,
+        // bo to zrodlo flaków. Tu nie ma na co czekac przez expect — CLS to
+        // wielkosc zbierana w czasie, nie stan, ktory kiedys nastapi.
+        setTimeout(() => resolve(total), 2500)
+      }),
+  )
+
+  expect(cls, `CLS ${cls.toFixed(4)} — prog "dobry" wg Core Web Vitals to 0.1`).toBeLessThan(0.1)
+})
