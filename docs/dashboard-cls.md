@@ -102,6 +102,57 @@ wartości to model pudełkowy przy pełnych danych i 1440 px, nie pomiar.
 | `EffectiveRateSection` | ~310 px (4 klientów; mniej klientów = niżej) |
 | `GoalSection` | ~270 px |
 
+## Przypisanie skeletonu do slotu
+
+`DashboardSkeleton` ma teraz tyle samo pozycji co `DashboardContent` i w tej
+samej kolejności. Wysokość skeletonu jest dokładna; wysokość karty to szacunek
+z modelu pudełkowego przy PEŁNYCH danych i 1440 px.
+
+| Slot w treści | Skeleton | skeleton | karta (szac.) | różnica |
+|---|---|---|---|---|
+| `TripsSection` | `InvoicesSkeleton` | 221 | ~200 | +21 |
+| `EarningsSection` | `KpiSkeleton` | 286 | ~490 | −204 |
+| `GoalSection` | `KpiSkeleton` | 286 | ~270 | +16 |
+| `EffectiveRateSection` | `KpiSkeleton` | 286 | ~310 | −24 |
+| `HoursSection` | `ChartSkeleton` | 188 | ~800 | −612 |
+| `ActivitySection` | `ChartSkeleton` | 188 | ~320 | −132 |
+| `SectionHeader` ×2 | `SkeletonBlock` 15 px | 15 | 15 | 0 |
+| `ProjectsSection` | `InvoicesSkeleton` | 221 | ~307 | −86 |
+| `InvoicesSection` | `InvoicesSkeleton` | 221 | ~372 | −151 |
+| `QuarterlySummarySection` | `InvoicesSkeleton` | 221 | ~307 | −86 |
+| `WeeklySummarySection` | `InvoicesSkeleton` | 221 | ~325 | −104 |
+| `WeeklyGlanceSection` | `ChartSkeleton` | 188 | ~400 | −212 |
+| `UpcomingSection` | `InvoicesSkeleton` | 221 | ~319 | −98 |
+| `QuickActionsSection` | `StatsSkeleton` | 92 | ~245 | −153 |
+
+Skeleton jest systematycznie NIŻSZY od pełnej karty i tak zostanie. Powód nie
+jest do naprawienia doborem wysokości: ta sama karta ma ~90 px w stanie pustym
+(`px-4 py-6 text-center` — „brak danych") i kilkaset przy komplecie wpisów.
+Skeleton dopasowany do pełnych danych psułby wejście nowego użytkownika, i
+odwrotnie. Dlatego odwzorowana jest LICZBA, KOLEJNOŚĆ i MIEJSCE W SIATCE sekcji
+— to one decydują o przesunięciu — a nie wysokość każdej karty z osobna.
+
+Trzy komórki pasa KPI dostają `KpiSkeleton`, nie `KpiSkeleton ×2 + StatsSkeleton`:
+`StatsSkeleton` ma 92 px przy karcie ~310 px, a `KpiSkeleton` 286 px. Nierówny
+pas KPI w skeletonie rozjeżdżałby też wiersz siatki.
+
+## Kroki pominięte
+
+**KROK 5 (`content-visibility`) i KROK 6 (`next/dynamic`) — nie wykonane.**
+
+Obie bramki są pomiarowe: KROK 5 wolno zacommitować dopiero, gdy najdłuższe
+zadanie main thread spadnie o ≥10%, a KROK 6 wolno zacząć dopiero, gdy pomiar
+pokaże, że koszt siedzi w JS, a nie w malowaniu. Bez przeglądarki nie ma jak
+tego rozstrzygnąć, a `content-visibility` z błędnym `contain-intrinsic-size`
+SAM generuje CLS — czyli cofa KROK 2. Wejście w to na ślepo byłoby zamianą
+zmierzonego problemu na niezmierzony.
+
+Dwie rzeczy do sprawdzenia, zanim ktokolwiek wróci do KROKU 6: wykres
+`WeeklyGlanceSection` JUŻ jest w osobnym chunku — `chart/EarningsChart.tsx:18`
+ładuje ciało wykresu przez `next/dynamic` z placeholderem `h-[260px]`. Kandydat
+numer jeden z listy jest więc w dużej części odhaczony i pomiar prawdopodobnie
+pokaże mniej, niż zakłada plan.
+
 ## Znaleziska poboczne
 
 - `features/dashboard/components/sections/hours/HoursCard.tsx` rysuje heatmapę
