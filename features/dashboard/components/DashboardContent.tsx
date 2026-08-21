@@ -1,5 +1,7 @@
 'use client'
 
+import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 import { TripsSection } from '@/features/trips'
 import {
   ActivitySection,
@@ -35,6 +37,27 @@ import {
  * ale czyta go zwyklym `useQuery` i sam rysuje swoj stan ladowania —
  * tez nigdy nie zawiesza.
  */
+
+type DashboardCellProps = {
+  /** Klasy col-span. Grid ma na mobile jedna kolumne, wiec span podaje sie od `lg:`. */
+  className?: string
+  children: ReactNode
+}
+
+/**
+ * Komorka gridu. Dwa powody, dla ktorych ten <div> musi istniec:
+ *
+ * 1. `min-w-0` — dziecko gridu ma domyslnie `min-width: auto`, wiec wykres
+ *    albo tabela szersza od kolumny rozpycha caly uklad zamiast sie skurczyc.
+ *
+ * 2. EarningsSection, GoalSection i TripsSection zwracaja FRAGMENTY z kilkoma
+ *    rodzenstwami. Bez wrappera kazde rodzenstwo staloby sie osobna komorka
+ *    gridu i uklad by sie rozjechal.
+ */
+function DashboardCell({ className, children }: DashboardCellProps) {
+  return <div className={cn('min-w-0', className)}>{children}</div>
+}
+
 export function DashboardContent() {
   return (
     <DashboardRangeProvider>

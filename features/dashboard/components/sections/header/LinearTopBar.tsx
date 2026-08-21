@@ -24,8 +24,11 @@ export function LinearTopBar({
 }: Props) {
   const { section, page } = usePageLabel()
 
+  // Ujemny margines musi isc para w pare z paddingiem kontenera dashboardu
+  // (`px-3 sm:px-4 xl:px-8`), inaczej od `xl:` pasek przestaje siegac krawedzi
+  // i zostaja dwie 16-pikselowe szczeliny po bokach.
   return (
-    <header className="sticky top-0 z-40 -mx-3 hidden border-b border-hairline bg-surface-0/85 px-3 py-2 backdrop-blur-md md:-mx-4 md:flex md:items-center md:justify-between md:px-4">
+    <header className="sticky top-0 z-40 -mx-3 hidden border-b border-hairline bg-surface-0/85 px-3 py-2 backdrop-blur-md md:-mx-4 md:flex md:items-center md:justify-between md:px-4 xl:-mx-8 xl:px-8">
       <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-xs">
         <span className="text-zinc-400">{section}</span>
         <ChevronRight className="h-3.5 w-3.5 text-zinc-700" aria-hidden />
