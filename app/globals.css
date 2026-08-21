@@ -45,6 +45,31 @@
   --border: oklch(0.91 0.005 240);
   --input: oklch(0.91 0.005 240);
   --input-border: oklch(0.60 0.008 240);
+  /* ── Skala powierzchni panelu ──────────────────────────────────────────
+   * Osobna od --background/--card, ktore obsluguja shadcn i strefe publiczna.
+   * Panel jest ciemny niezaleznie od schematu, wiec bloki light i dark maja
+   * tu te same wartosci — az do Etapu 1b, ktory zmigruje kolory tekstu.
+   *
+   * Emerald jest paleta domyslna, wiec skala odwzorowuje 1:1 hexy, ktore byly
+   * dotad wpisane recznie w klasach:
+   *   surface-0 #000000  tlo strony
+   *   surface-1 #0a0a0a  karta
+   *   surface-2 #0e0e0e  kafelek wewnatrz karty, pill
+   *   surface-3 ~#151515 hover, wypelnienie ikony
+   *   hairline  ~#1c1c1c kontur domyslny
+   *   hairline-strong #262626 kontur hover / focus
+   *
+   * Jedyne odstepstwo od 1:1: --hairline stoi na L 0.226 zamiast 0.218
+   * (#1a1a1a). Przy 0.218 kontrast konturu do karty wypadal 1.138:1, ponizej
+   * progu 1.15:1 z __test__/config/design-tokens.test.ts — kontur na granicy
+   * niewidocznosci. Roznica to ΔL 0.8%, ponizej progu dostrzegalnosci.
+   */
+  --surface-0: oklch(0 0 0);
+  --surface-1: oklch(0.145 0 0);
+  --surface-2: oklch(0.164 0 0);
+  --surface-3: oklch(0.195 0 0);
+  --hairline: oklch(0.226 0 0);
+  --hairline-strong: oklch(0.269 0 0);
   --shadow-color: oklch(0.14 0.005 240 / 0.12);
   --ring: oklch(0.52 0.18 160);
   --chart-1: oklch(0.55 0.18 160);
@@ -89,6 +114,13 @@
   --border: oklch(0.90 0.02 230);
   --input: oklch(0.90 0.02 230);
   --input-border: oklch(0.60 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0.02 0.006 250);
+  --surface-1: oklch(0.145 0.015 250);
+  --surface-2: oklch(0.164 0.015 250);
+  --surface-3: oklch(0.195 0.016 250);
+  --hairline: oklch(0.226 0.016 250);
+  --hairline-strong: oklch(0.269 0.018 250);
   --shadow-color: oklch(0.14 0.005 240 / 0.12);
   --ring: oklch(0.52 0.18 230);
   --chart-1: oklch(0.55 0.18 230);
@@ -133,6 +165,13 @@
   --border: oklch(0.91 0.02 50);
   --input: oklch(0.91 0.02 50);
   --input-border: oklch(0.60 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0.02 0.006 25);
+  --surface-1: oklch(0.145 0.014 25);
+  --surface-2: oklch(0.164 0.014 25);
+  --surface-3: oklch(0.195 0.015 25);
+  --hairline: oklch(0.226 0.015 25);
+  --hairline-strong: oklch(0.269 0.017 25);
   --shadow-color: oklch(0.14 0.005 240 / 0.12);
   --ring: oklch(0.52 0.20 35);
   --chart-1: oklch(0.64 0.20 35);
@@ -177,6 +216,13 @@
   --border: oklch(0.90 0.02 300);
   --input: oklch(0.90 0.02 300);
   --input-border: oklch(0.60 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0.02 0.006 300);
+  --surface-1: oklch(0.145 0.014 300);
+  --surface-2: oklch(0.164 0.014 300);
+  --surface-3: oklch(0.195 0.015 300);
+  --hairline: oklch(0.226 0.015 300);
+  --hairline-strong: oklch(0.269 0.017 300);
   --shadow-color: oklch(0.14 0.005 240 / 0.12);
   --ring: oklch(0.55 0.22 295);
   --chart-1: oklch(0.55 0.22 295);
@@ -221,6 +267,13 @@
   --border: oklch(0.90 0 0);
   --input: oklch(0.90 0 0);
   --input-border: oklch(0.60 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0 0 0);
+  --surface-1: oklch(0.145 0 0);
+  --surface-2: oklch(0.164 0 0);
+  --surface-3: oklch(0.195 0 0);
+  --hairline: oklch(0.226 0 0);
+  --hairline-strong: oklch(0.269 0 0);
   --shadow-color: oklch(0.14 0.005 240 / 0.12);
   --ring: oklch(0.40 0 0);
   --chart-1: oklch(0.30 0 0);
@@ -279,6 +332,13 @@
   --border: oklch(0.24 0.01 250);
   --input: oklch(0.24 0.01 250);
   --input-border: oklch(0.50 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0 0 0);
+  --surface-1: oklch(0.145 0 0);
+  --surface-2: oklch(0.164 0 0);
+  --surface-3: oklch(0.195 0 0);
+  --hairline: oklch(0.226 0 0);
+  --hairline-strong: oklch(0.269 0 0);
   --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.78 0.18 160);
   --chart-1: oklch(0.65 0.20 160);
@@ -322,6 +382,13 @@
   --border: oklch(0.25 0.03 250);
   --input: oklch(0.25 0.03 250);
   --input-border: oklch(0.50 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0.02 0.006 250);
+  --surface-1: oklch(0.145 0.015 250);
+  --surface-2: oklch(0.164 0.015 250);
+  --surface-3: oklch(0.195 0.016 250);
+  --hairline: oklch(0.226 0.016 250);
+  --hairline-strong: oklch(0.269 0.018 250);
   --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.80 0.15 230);
   --chart-1: oklch(0.70 0.17 230);
@@ -365,6 +432,13 @@
   --border: oklch(0.26 0.025 25);
   --input: oklch(0.26 0.025 25);
   --input-border: oklch(0.50 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0.02 0.006 25);
+  --surface-1: oklch(0.145 0.014 25);
+  --surface-2: oklch(0.164 0.014 25);
+  --surface-3: oklch(0.195 0.015 25);
+  --hairline: oklch(0.226 0.015 25);
+  --hairline-strong: oklch(0.269 0.017 25);
   --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.72 0.18 35);
   --chart-1: oklch(0.72 0.18 35);
@@ -408,6 +482,13 @@
   --border: oklch(0.25 0.025 300);
   --input: oklch(0.25 0.025 300);
   --input-border: oklch(0.50 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0.02 0.006 300);
+  --surface-1: oklch(0.145 0.014 300);
+  --surface-2: oklch(0.164 0.014 300);
+  --surface-3: oklch(0.195 0.015 300);
+  --hairline: oklch(0.226 0.015 300);
+  --hairline-strong: oklch(0.269 0.017 300);
   --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.80 0.17 295);
   --chart-1: oklch(0.68 0.22 295);
@@ -451,6 +532,13 @@
   --border: oklch(0.24 0 0);
   --input: oklch(0.24 0 0);
   --input-border: oklch(0.50 0.008 240);
+  /* ── Skala powierzchni panelu ── */
+  --surface-0: oklch(0 0 0);
+  --surface-1: oklch(0.145 0 0);
+  --surface-2: oklch(0.164 0 0);
+  --surface-3: oklch(0.195 0 0);
+  --hairline: oklch(0.226 0 0);
+  --hairline-strong: oklch(0.269 0 0);
   --shadow-color: oklch(0 0 0 / 0.55);
   --ring: oklch(0.72 0 0);
   --chart-1: oklch(0.88 0 0);
@@ -536,6 +624,16 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-input-border: var(--input-border);
+  /* Skala powierzchni panelu — daje bg-surface-0..3, border-hairline,
+   * divide-hairline, ring-hairline-strong oraz warianty z kryciem
+   * (bg-surface-0/85). Bez tego zmienne zyja w :root, ale Tailwind
+   * nie generuje z nich zadnej klasy. */
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
