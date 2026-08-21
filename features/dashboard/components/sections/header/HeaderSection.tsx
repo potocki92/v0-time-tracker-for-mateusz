@@ -1,18 +1,19 @@
 'use client'
 
-import { useDashboardData } from '../../../hooks'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import { selectUserName } from '../../../hooks/dashboardSelectors'
 import { HeroGreeting } from './HeroGreeting'
 import { LinearTopBar } from './LinearTopBar'
 import { useDashboardRange } from '../shared/DashboardRangeContext'
 
 export function HeaderSection() {
-  const { data } = useDashboardData()
+  const userName = useDashboardSlice(selectUserName)
   const { range, setRange } = useDashboardRange()
 
   return (
     <>
       <LinearTopBar />
-      <HeroGreeting userName={data.userName} range={range} onChangeRange={setRange} />
+      <HeroGreeting userName={userName} range={range} onChangeRange={setRange} />
     </>
   )
 }

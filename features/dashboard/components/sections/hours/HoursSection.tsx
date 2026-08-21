@@ -1,13 +1,9 @@
 'use client'
 
-import { useDashboardData } from '../../../hooks'
-import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
-import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
-import { useDashboardTotals } from '../../../hooks/useDashboardTotal'
-import { usePeriodLabel } from '../../../hooks/usePeriodLabel'
 import { ChartErrorBoundary } from '../../errors'
 import { HoursCard } from './HoursCard'
 import { useDashboardRange } from '../shared/DashboardRangeContext'
+import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
 const DEFAULT_TARGET_BY_RANGE: Record<string, number> = {
   current_week: 40,
@@ -24,14 +20,9 @@ function periodShort(label: string): string {
 }
 
 export function HoursSection() {
-  const { data } = useDashboardData()
-  const { range, dateRange } = useDashboardRange()
-  const filtered = useFilteredEntries(data.workEntries, dateRange)
-  const { realized, predicted } = useRealizedEntries(filtered)
-  const totals = useDashboardTotals(realized, data.clients)
-  const predictedTotals = useDashboardTotals(predicted, data.clients)
+  const { range } = useDashboardRange()
+  const { realized, totals, predictedTotals, periodLabel } = useDashboardDerived()
   const target = DEFAULT_TARGET_BY_RANGE[range] ?? 160
-  const periodLabel = usePeriodLabel(range)
 
   return (
     <ChartErrorBoundary>

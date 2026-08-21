@@ -1,6 +1,10 @@
 'use client'
 
-import { useDashboardData } from '../../../hooks'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import {
+  selectClients,
+  selectWorkEntries,
+} from '../../../hooks/dashboardSelectors'
 import { useEffectiveEurRate } from '../../../hooks/usePreferencesStore'
 import { EarningsChart } from '../../chart/EarningsChart'
 
@@ -10,13 +14,14 @@ import { EarningsChart } from '../../chart/EarningsChart'
  * Stan przechowywany w URL (nuqs) — bookmarkowalny, niezależny od KPI.
  */
 export function WeeklyGlanceSection() {
-  const { data } = useDashboardData()
+  const workEntries = useDashboardSlice(selectWorkEntries)
+  const clients = useDashboardSlice(selectClients)
   const eurRate = useEffectiveEurRate()
 
   return (
     <EarningsChart
-      workEntries={data.workEntries}
-      clients={data.clients}
+      workEntries={workEntries}
+      clients={clients}
       eurToPlnRate={eurRate}
     />
   )

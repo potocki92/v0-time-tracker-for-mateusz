@@ -3,13 +3,10 @@
 import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { useDashboardData } from '../../../hooks'
-import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
-import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import { selectClients } from '../../../hooks/dashboardSelectors'
 import { useEarningsTrend } from '../../../hooks/useEarningsTrend'
 import { useEarningsSparkline } from '../../../hooks/useEarningsSparkline'
-import { usePeriodLabel } from '../../../hooks/usePeriodLabel'
-import { useDashboardTotals } from '../../../hooks/useDashboardTotal'
 import {
   selectEurRate,
   useEffectiveEurRate,
@@ -26,27 +23,27 @@ import { formatCurrency } from '@/lib/helpers'
 import { GoalEditDialog } from '../../card/GoalEditDialog'
 import { EarningsCardBoundary } from '../../errors'
 import { EarningsCard } from './EarningsCard'
-import { useDashboardRange } from '../shared/DashboardRangeContext'
+import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
 function periodShort(label: string): string {
   return label.split(' ').slice(-1)[0] ?? label
 }
 
 export function EarningsSection() {
-  const { data } = useDashboardData()
-  const { range, dateRange, prevRange } = useDashboardRange()
-  const { workEntries, clients } = data
+  const clients = useDashboardSlice(selectClients)
   const router = useRouter()
 
-  const filtered = useFilteredEntries(workEntries, dateRange)
-  const prevFiltered = useFilteredEntries(workEntries, prevRange)
-  const { realized: realFiltered, predicted: projectedEntries } = useRealizedEntries(filtered)
-  const { realized: realPrevFiltered } = useRealizedEntries(prevFiltered)
-  const totals = useDashboardTotals(realFiltered, clients)
+  const {
+    realized: realFiltered,
+    prevRealized: realPrevFiltered,
+    totals,
+    predictedTotals: projectedTotals,
+    periodLabel,
+  } = useDashboardDerived()
+
   const trend = useEarningsTrend(realFiltered, realPrevFiltered, clients)
   const sparklineData = useEarningsSparkline(realFiltered, clients)
   const prevSparklineData = useEarningsSparkline(realPrevFiltered, clients)
-  const periodLabel = usePeriodLabel(range)
   const eurRate = useEffectiveEurRate()
   const eurRateForExport = usePreferencesStore(selectEurRate)
   const currentGoal = useGoal()
@@ -66,7 +63,6 @@ export function EarningsSection() {
   const [goalDialogOpen, setGoalDialogOpen] = useState(false)
 
   const totalEUR = eurRate > 0 ? totals.totalEarningsAllPLN / eurRate : 0
-  const projectedTotals = useDashboardTotals(projectedEntries, clients)
 
   const handleExportCsv = useCallback(() => {
     try {
