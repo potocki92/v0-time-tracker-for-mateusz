@@ -27,7 +27,6 @@ yarn-error.log*
 next-env.d.ts
 # Playwright
 e2e/.auth/
-e2e/visual-baseline.spec.ts-snapshots/
 e2e/.results/
 e2e/.report/
 playwright-report/
