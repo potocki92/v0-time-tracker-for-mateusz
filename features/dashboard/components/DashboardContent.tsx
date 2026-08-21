@@ -1,5 +1,7 @@
 'use client'
 
+import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 import { TripsSection } from '@/features/trips'
 import {
   ActivitySection,
@@ -34,6 +36,27 @@ import {
  * ale czyta go zwyklym `useQuery` i sam rysuje swoj stan ladowania —
  * tez nigdy nie zawiesza.
  */
+
+type DashboardCellProps = {
+  /** Klasy col-span. Grid ma na mobile jedna kolumne, wiec span podaje sie od `lg:`. */
+  className?: string
+  children: ReactNode
+}
+
+/**
+ * Komorka gridu. Dwa powody, dla ktorych ten <div> musi istniec:
+ *
+ * 1. `min-w-0` — dziecko gridu ma domyslnie `min-width: auto`, wiec wykres
+ *    albo tabela szersza od kolumny rozpycha caly uklad zamiast sie skurczyc.
+ *
+ * 2. EarningsSection, GoalSection i TripsSection zwracaja FRAGMENTY z kilkoma
+ *    rodzenstwami. Bez wrappera kazde rodzenstwo staloby sie osobna komorka
+ *    gridu i uklad by sie rozjechal.
+ */
+function DashboardCell({ className, children }: DashboardCellProps) {
+  return <div className={cn('min-w-0', className)}>{children}</div>
+}
+
 export function DashboardContent() {
   return (
     <DashboardRangeProvider>
@@ -42,38 +65,75 @@ export function DashboardContent() {
           i lamie nawigacje czytnika ekranu. Pozostale sekcje (Calendar,
           Projects, Reports) uzywaja tu <div> — to wyrownanie do nich. */}
       <div className="min-h-screen bg-surface-0 text-white">
-        <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3">
+        {/* max-width dopiero od `xl:` — nizej i tak nie ma z czego przycinac,
+            a dashboard byl jedyna sekcja panelu bez zadnego limitu szerokosci. */}
+        <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3 xl:max-w-[1440px] xl:px-8">
+          {/*
+            HeaderSection zostaje POZA gridem i BEZ wrappera <div>.
+            LinearTopBar w srodku ma `sticky top-0`, a sticky przykleja sie
+            wylacznie w granicach swojego rodzica — owiniecie go w komorke
+            o wysokosci naglowka zabiloby przyklejanie.
+          */}
           <HeaderSection />
 
-          <TripsSection />
+          <div data-dashboard-grid className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <DashboardCell className="lg:col-span-12">
+              <TripsSection />
+            </DashboardCell>
 
-          <EarningsSection />
+            {/* Pas KPI — trzy rowne karty od 1024 px */}
+            <DashboardCell className="lg:col-span-4">
+              <EarningsSection />
+            </DashboardCell>
 
-          <GoalSection />
+            <DashboardCell className="lg:col-span-4">
+              <GoalSection />
+            </DashboardCell>
 
-          <HoursSection />
+            <DashboardCell className="lg:col-span-4">
+              <EffectiveRateSection />
+            </DashboardCell>
 
-          <EffectiveRateSection />
+            {/* Kolumna glowna: wykresy i listy, ktore potrzebuja szerokosci */}
+            <div
+              data-dashboard-main
+              className="min-w-0 space-y-4 lg:col-span-12 xl:col-span-8"
+            >
+              <HoursSection />
 
-          <ActivitySection />
+              <ActivitySection />
 
-          <SectionHeader label="Harmonogram i rozliczenia" />
+              <SectionHeader label="Harmonogram i rozliczenia" />
 
-          <ProjectsSection />
+              <ProjectsSection />
 
-          <InvoicesSection />
+              <InvoicesSection />
 
-          <QuarterlySummarySection />
+              <QuarterlySummarySection />
 
-          <WeeklySummarySection />
+              <WeeklySummarySection />
 
-          <SectionHeader label="Wkrótce" />
+              <WeeklyGlanceSection />
+            </div>
 
-          <UpcomingSection />
+            {/*
+              Szyna. Komorka NIE dostaje `self-start` — musi rozciagnac sie
+              na wysokosc wiersza, zeby wewnetrzny `sticky` mial po czym jechac.
+              Sticky siedzi na DZIECKU komorki, nie na samej komorce.
+            */}
+            <div
+              data-dashboard-rail
+              className="min-w-0 lg:col-span-12 xl:col-span-4"
+            >
+              <div className="space-y-4 xl:sticky xl:top-4">
+                <SectionHeader label="Wkrótce" />
 
-          <QuickActionsSection />
+                <UpcomingSection />
 
-          <WeeklyGlanceSection />
+                <QuickActionsSection />
+              </div>
+            </div>
+          </div>
 
           <Footer />
         </div>
