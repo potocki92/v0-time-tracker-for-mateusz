@@ -1,4 +1,8 @@
 export { DashboardRangeProvider } from './shared/DashboardRangeContext'
+export {
+  DashboardDerivedProvider,
+  useDashboardDerived,
+} from './shared/DashboardDerivedContext'
 export { HeaderSection } from './header/HeaderSection'
 export { EarningsSection } from './earnings/EarningsSection'
 export { GoalSection } from './goal/GoalSection'
