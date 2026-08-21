@@ -125,7 +125,10 @@ export function DashboardContent() {
               data-dashboard-rail
               className="min-w-0 lg:col-span-12 xl:col-span-4"
             >
-              <div className="space-y-4 xl:sticky xl:top-4">
+              {/* top-16 = 64 px, a nie 16 px: LinearTopBar ma zmierzone 49 px
+                  wysokosci i `z-40`, wiec szyna przyklejona nizej wjezdzalaby
+                  pod niego i chowala naglowek "Wkrotce". 64 - 49 = 15 px luzu. */}
+              <div className="space-y-4 xl:sticky xl:top-16">
                 <SectionHeader label="Wkrótce" />
 
                 <UpcomingSection />
