@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { cn } from '@/lib/utils'
+import { usePrefetchRoute } from '@/hooks/prefetch'
 import { NAV_SECTIONS, PINNED_ITEMS } from '../../config/nav.config'
 import { NavBadge, NavItem, NavSection, PinnedItem } from '../../types/nav.types'
 
@@ -124,6 +125,11 @@ function NavRow({
   count?: number
 }) {
   const Icon = item.icon
+  // Hook per wiersz zamiast jednego w SidebarNav: 11 instancji to 11 odczytow
+  // contextu (tanie), a alternatywa to przewlekanie handlerow przez
+  // NavSectionGroup do NavRow. Kazdy wiersz ma tez wlasny timer, wiec
+  // opuszczenie jednego linku nie kasuje zamiaru na drugim.
+  const { onHoverIntent, onFocusIntent, cancelIntent } = usePrefetchRoute()
   const showCount = count != null && count > 0
   const showBadgeLabel = Boolean(item.badge?.label)
   const hasQuickAction = Boolean(item.quickAction)
@@ -145,7 +151,13 @@ function NavRow({
           hasQuickAction && 'pr-9',
         )}
       >
-        <Link href={item.href}>
+        <Link
+          href={item.href}
+          onMouseEnter={onHoverIntent(item.href)}
+          onMouseLeave={cancelIntent}
+          onFocus={onFocusIntent(item.href)}
+          onBlur={cancelIntent}
+        >
           <Icon strokeWidth={1.6} />
           <span className="flex-1 truncate">{item.label}</span>
 

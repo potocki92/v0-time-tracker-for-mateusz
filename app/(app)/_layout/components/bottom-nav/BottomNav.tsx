@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { BOTTOM_NAV_ITEMS } from './BottomNav.constants'
 import { cn } from '@/lib/utils'
-import { usePrefetchDashboard } from '@/hooks/prefetch'
+import { usePrefetchRoute } from '@/hooks/prefetch'
 
 /**
  * Globalny dolny pasek nawigacyjny — widoczny wyłącznie na urządzeniach
@@ -20,7 +20,7 @@ import { usePrefetchDashboard } from '@/hooks/prefetch'
  */
 export function BottomNav() {
   const pathname = usePathname()
-  const { prefetchOnHover } = usePrefetchDashboard()
+  const { onHoverIntent, onFocusIntent, cancelIntent } = usePrefetchRoute()
 
   return (
     <nav
@@ -28,15 +28,17 @@ export function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-50 block border-t border-hairline bg-surface-0/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
     >
       <ul className="flex h-[var(--app-bar-height)] items-stretch" role="list">
-        {BOTTOM_NAV_ITEMS.map(({ href, label, icon: Icon, prefetch }) => {
+        {BOTTOM_NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href
           return (
             <li key={href} className="flex-1">
               <Link
                 href={href}
                 aria-current={isActive ? 'page' : undefined}
-                onMouseEnter={prefetch ? prefetchOnHover : undefined}
-                onFocus={prefetch ? prefetchOnHover : undefined}
+                onMouseEnter={onHoverIntent(href)}
+                onMouseLeave={cancelIntent}
+                onFocus={onFocusIntent(href)}
+                onBlur={cancelIntent}
                 className={cn(
                   'flex h-full flex-col items-center justify-center gap-1 px-1 text-2xs font-medium leading-[1.1] transition-colors',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40',

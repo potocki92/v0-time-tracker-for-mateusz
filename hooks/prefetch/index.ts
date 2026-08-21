@@ -1,1 +1,1 @@
-export { usePrefetchDashboard } from './usePrefetchDashboard'
+export { usePrefetchRoute } from './usePrefetchRoute'

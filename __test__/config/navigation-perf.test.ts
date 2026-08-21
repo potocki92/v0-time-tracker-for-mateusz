@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 const ROOT = process.cwd()
 const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8')
+const stripComments = (src: string) => src.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')
 
 function walk(dir: string, acc: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
@@ -97,16 +98,24 @@ describe('nawigacja — middleware nie robi round-tripu do GoTrue', () => {
 })
 
 describe('nawigacja — odczyt nie idzie przez Server Actions', () => {
+  // usePrefetchDashboard zostal zastapiony przez usePrefetchRoute + rejestr
+  // tras. Cel testu sie nie zmienil, przesunelo sie miejsce: queryFn prefetchu
+  // definiuje teraz prefetchRegistry, wiec to on jest sciezka odczytu, ktora
+  // trzeba pilnowac.
   const DATA_HOOKS = walk(resolve(ROOT, 'features'))
     .concat(walk(resolve(ROOT, 'hooks')))
-    .filter((f) => /use(Dashboard|Calendar|Clients|Projects)Data\.ts$|usePrefetchDashboard\.ts$/.test(f))
+    .filter((f) =>
+      /use(Dashboard|Calendar|Clients|Projects)Data\.ts$|usePrefetchRoute\.ts$|prefetchRegistry\.ts$/.test(f),
+    )
 
   it('znajduje hooki odczytu, ktore ma pilnowac', () => {
     expect(DATA_HOOKS.length, 'test stracil cel — sprawdz sciezki').toBeGreaterThanOrEqual(5)
   })
 
   it('zaden hook odczytu nie uzywa Server Action jako queryFn', () => {
-    const offenders = DATA_HOOKS.filter((f) => /Action\b/.test(read(f)))
+    // Bez komentarzy: uzasadnienie, DLACZEGO gdzies nie ma Server Action, samo
+    // zawiera te fraze. Ten sam zabieg co przy getUser() nizej.
+    const offenders = DATA_HOOKS.filter((f) => /Action\b/.test(stripComments(read(f))))
     expect(
       offenders,
       `Server Actions sa serializowane i doklejaja re-render RSC calej trasy do kazdego odczytu.\nUzyj route handlera GET + fetchJson:\n${offenders.join('\n')}`,
