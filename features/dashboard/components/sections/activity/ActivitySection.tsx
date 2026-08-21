@@ -4,13 +4,15 @@ import { useMemo } from 'react'
 import type { Client, Invoice, WorkEntry } from '@/lib/types'
 import { isRealizedEntry } from '@/lib/finance/realization'
 import { getTodayLocalDateString } from '@/lib/helpers'
-import { useDashboardData } from '../../../hooks'
-import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
-import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
-import { useDashboardTotals } from '../../../hooks/useDashboardTotal'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import {
+  selectClients,
+  selectInvoices,
+  selectWorkEntries,
+} from '../../../hooks/dashboardSelectors'
 import { StatsErrorBoundary } from '../../errors'
 import { ActivityCard, type ActivityItem } from './ActivityCard'
-import { useDashboardRange } from '../shared/DashboardRangeContext'
+import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
 function relTime(iso: string): string {
   const t = new Date(iso).getTime()
@@ -90,11 +92,10 @@ function buildFeed(
 }
 
 export function ActivitySection() {
-  const { data } = useDashboardData()
-  const { dateRange } = useDashboardRange()
-  const filtered = useFilteredEntries(data.workEntries, dateRange)
-  const { realized } = useRealizedEntries(filtered)
-  const totals = useDashboardTotals(realized, data.clients)
+  const workEntries = useDashboardSlice(selectWorkEntries)
+  const clients = useDashboardSlice(selectClients)
+  const invoices = useDashboardSlice(selectInvoices)
+  const { realized, totals } = useDashboardDerived()
 
   const clientsInPeriod = useMemo(
     () => new Set(realized.map((e) => e.client_id).filter(Boolean)).size,
@@ -102,8 +103,8 @@ export function ActivitySection() {
   )
 
   const defaultClientsCount = useMemo(
-    () => data.clients.filter((c) => c.is_default).length,
-    [data.clients],
+    () => clients.filter((c) => c.is_default).length,
+    [clients],
   )
 
   const activeJobs = useMemo(() => {
@@ -112,13 +113,13 @@ export function ActivitySection() {
   }, [realized])
 
   const totalJobs = useMemo(() => {
-    const ids = new Set(data.workEntries.map((e) => e.project_id).filter(Boolean))
+    const ids = new Set(workEntries.map((e) => e.project_id).filter(Boolean))
     return Math.max(activeJobs, ids.size)
-  }, [data.workEntries, activeJobs])
+  }, [workEntries, activeJobs])
 
   const feed = useMemo(
-    () => buildFeed(data.workEntries, data.invoices, data.clients, getTodayLocalDateString()),
-    [data.workEntries, data.invoices, data.clients],
+    () => buildFeed(workEntries, invoices, clients, getTodayLocalDateString()),
+    [workEntries, invoices, clients],
   )
 
   const absences = totals.vacationDays + totals.sickDays
@@ -126,7 +127,7 @@ export function ActivitySection() {
   return (
     <StatsErrorBoundary>
       <ActivityCard
-        clientsCount={clientsInPeriod || data.clients.length}
+        clientsCount={clientsInPeriod || clients.length}
         defaultClientsCount={defaultClientsCount}
         activeJobs={activeJobs}
         totalJobs={totalJobs || 0}

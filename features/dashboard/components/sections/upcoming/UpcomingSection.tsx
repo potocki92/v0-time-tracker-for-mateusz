@@ -1,7 +1,11 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useDashboardData } from '../../../hooks'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import {
+  selectInvoices,
+  selectWorkEntries,
+} from '../../../hooks/dashboardSelectors'
 import { UpcomingCard, type UpcomingItem } from './UpcomingCard'
 
 function safeDate(s: string | null | undefined): Date | null {
@@ -12,14 +16,15 @@ function safeDate(s: string | null | undefined): Date | null {
 }
 
 export function UpcomingSection() {
-  const { data } = useDashboardData()
+  const workEntries = useDashboardSlice(selectWorkEntries)
+  const invoices = useDashboardSlice(selectInvoices)
 
   const items = useMemo<UpcomingItem[]>(() => {
     const now = Date.now()
     const out: UpcomingItem[] = []
 
     // Future absences from work entries
-    for (const e of data.workEntries) {
+    for (const e of workEntries) {
       if (e.status !== 'vacation' && e.status !== 'sick_leave') continue
       const d = safeDate(e.date)
       if (!d || d.getTime() < now) continue
@@ -35,7 +40,7 @@ export function UpcomingSection() {
     }
 
     // Upcoming invoice due dates (unpaid)
-    for (const inv of data.invoices) {
+    for (const inv of invoices) {
       if (inv.is_paid) continue
       const d = safeDate(inv.due_date)
       if (!d || d.getTime() < now) continue
@@ -48,7 +53,7 @@ export function UpcomingSection() {
     }
 
     return out.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 4)
-  }, [data.workEntries, data.invoices])
+  }, [workEntries, invoices])
 
   return <UpcomingCard items={items} />
 }

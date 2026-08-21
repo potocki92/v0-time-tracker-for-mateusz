@@ -1,25 +1,24 @@
 'use client'
 
 import { useMemo } from 'react'
-import { useDashboardData } from '../../../hooks'
-import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
-import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import { selectClients } from '../../../hooks/dashboardSelectors'
 import { ProjectsCard, type ProjectItem, type ProjectStatus } from './ProjectsCard'
-import { useDashboardRange } from '../shared/DashboardRangeContext'
+import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
 const STATUS_PALETTE = ['#ef4444', '#22c55e', '#3b82f6', '#a855f7', '#f59e0b']
 
 export function ProjectsSection() {
-  const { data } = useDashboardData()
-  const { dateRange } = useDashboardRange()
-  const filtered = useFilteredEntries(data.workEntries, dateRange)
-  const { realized: realizedAll } = useRealizedEntries(data.workEntries)
-  const { realized: realizedFiltered } = useRealizedEntries(filtered)
+  const clients = useDashboardSlice(selectClients)
+  // `realizedAll` ignoruje zakres — lista projektow ma obejmowac wszystko,
+  // co kiedykolwiek bylo robione. Zakres decyduje tylko o tym, ktore z nich
+  // sa oznaczone jako aktywne (`realized`).
+  const { realizedAll, realized: realizedFiltered } = useDashboardDerived()
 
   const projects = useMemo<ProjectItem[]>(() => {
     // The data model doesn't expose explicit projects. We approximate
     // them from work entries grouped by project_id (label = notes / client name).
-    const clientMap = new Map(data.clients.map((c) => [c.id, c]))
+    const clientMap = new Map(clients.map((c) => [c.id, c]))
     type Acc = {
       id: string
       name: string
@@ -68,7 +67,7 @@ export function ProjectsSection() {
         color: c?.color || STATUS_PALETTE[i % STATUS_PALETTE.length],
       }
     })
-  }, [realizedAll, data.clients, realizedFiltered])
+  }, [realizedAll, clients, realizedFiltered])
 
   const totalActive = projects.filter((p) => p.status === 'in_progress').length
 

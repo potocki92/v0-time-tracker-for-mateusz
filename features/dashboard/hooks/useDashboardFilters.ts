@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useQueryStates, parseAsStringLiteral } from 'nuqs'
 import { getDateRange, getPrevRange } from '@/lib/date/dateRange'
 import type { TimeRange } from '../types/dashboard.types'
@@ -37,12 +37,19 @@ export function useDashboardFilters() {
   const dateRange = useMemo(() => getDateRange(query.range), [query.range])
   const prevRange = useMemo(() => getPrevRange(dateRange), [dateRange])
 
-  return {
-    range: query.range,
-    dateRange,
-    prevRange,
-    setRange: (range: TimeRange) => setQuery({ range }),
-  }
+  const setRange = useCallback(
+    (range: TimeRange) => setQuery({ range }),
+    [setQuery],
+  )
+
+  // Literal obiektu tworzony przy kazdym renderze trafial jako `value`
+  // do DashboardFiltersContext, wiec KAZDY konsument useDashboardRange()
+  // re-renderowal sie przy kazdym renderze providera — takze wtedy,
+  // gdy zakres sie nie zmienil.
+  return useMemo(
+    () => ({ range: query.range, dateRange, prevRange, setRange }),
+    [query.range, dateRange, prevRange, setRange],
+  )
 }
 
 export type DashboardFilters = ReturnType<typeof useDashboardFilters>

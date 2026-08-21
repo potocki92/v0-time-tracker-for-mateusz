@@ -3,6 +3,7 @@
 import { TripsSection } from '@/features/trips'
 import {
   ActivitySection,
+  DashboardDerivedProvider,
   DashboardRangeProvider,
   EarningsSection,
   EffectiveRateSection,
@@ -37,47 +38,52 @@ import {
 export function DashboardContent() {
   return (
     <DashboardRangeProvider>
-      {/* Nie <main> — AppShell renderuje juz landmark main z id="main-content",
-          na ktory celuje skip-link. Zagniezdzony drugi main duplikuje landmark
-          i lamie nawigacje czytnika ekranu. Pozostale sekcje (Calendar,
-          Projects, Reports) uzywaja tu <div> — to wyrownanie do nich. */}
-      <div className="min-h-screen bg-surface-0 text-white">
-        <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3">
-          <HeaderSection />
+      {/* Pochodne (filtr zakresu, podzial na zrealizowane/planowane, sumy)
+          licza sie tu raz i ida w dol przez context. Provider siedzi WEWNATRZ
+          DashboardRangeProvider, bo czyta z niego zakres. */}
+      <DashboardDerivedProvider>
+        {/* Nie <main> — AppShell renderuje juz landmark main z id="main-content",
+            na ktory celuje skip-link. Zagniezdzony drugi main duplikuje landmark
+            i lamie nawigacje czytnika ekranu. Pozostale sekcje (Calendar,
+            Projects, Reports) uzywaja tu <div> — to wyrownanie do nich. */}
+        <div className="min-h-screen bg-surface-0 text-white">
+          <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3">
+            <HeaderSection />
 
-          <TripsSection />
+            <TripsSection />
 
-          <EarningsSection />
+            <EarningsSection />
 
-          <GoalSection />
+            <GoalSection />
 
-          <HoursSection />
+            <HoursSection />
 
-          <EffectiveRateSection />
+            <EffectiveRateSection />
 
-          <ActivitySection />
+            <ActivitySection />
 
-          <SectionHeader label="Harmonogram i rozliczenia" />
+            <SectionHeader label="Harmonogram i rozliczenia" />
 
-          <ProjectsSection />
+            <ProjectsSection />
 
-          <InvoicesSection />
+            <InvoicesSection />
 
-          <QuarterlySummarySection />
+            <QuarterlySummarySection />
 
-          <WeeklySummarySection />
+            <WeeklySummarySection />
 
-          <SectionHeader label="Wkrótce" />
+            <SectionHeader label="Wkrótce" />
 
-          <UpcomingSection />
+            <UpcomingSection />
 
-          <QuickActionsSection />
+            <QuickActionsSection />
 
-          <WeeklyGlanceSection />
+            <WeeklyGlanceSection />
 
-          <Footer />
+            <Footer />
+          </div>
         </div>
-      </div>
+      </DashboardDerivedProvider>
     </DashboardRangeProvider>
   )
 }

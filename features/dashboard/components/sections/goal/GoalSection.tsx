@@ -9,15 +9,16 @@ import {
 import { isRealizedEntry } from '@/lib/finance/realization'
 import { formatCurrency, getTodayLocalDateString } from '@/lib/helpers'
 import type { WorkEntry } from '@/lib/types'
-import { useDashboardData } from '../../../hooks'
-import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
-import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
-import { useDashboardTotals } from '../../../hooks/useDashboardTotal'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import {
+  selectClients,
+  selectWorkEntries,
+} from '../../../hooks/dashboardSelectors'
 import { useEffectiveEurRate, useGoal } from '../../../hooks/usePreferencesStore'
 import { GoalCardBoundary } from '../../errors'
 import { GoalEditDialog } from '../../card/GoalEditDialog'
 import { MonthlyGoalCard } from './MonthlyGoalCard'
-import { useDashboardRange } from '../shared/DashboardRangeContext'
+import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
 function calcStreak(entries: WorkEntry[], todayIso: string): number {
   // Count consecutive realized worked days backward from today.
@@ -43,14 +44,14 @@ function calcStreak(entries: WorkEntry[], todayIso: string): number {
 }
 
 export function GoalSection() {
-  const { data } = useDashboardData()
-  const { dateRange } = useDashboardRange()
+  // `clients` nadal potrzebne: findGoalReachedDate liczy skumulowany zarobek
+  // po wpisach, wiec musi znac stawki. `workEntries` — bo seria idzie po
+  // wszystkich wpisach, nie tylko po tych z zakresu.
+  const clients = useDashboardSlice(selectClients)
+  const workEntries = useDashboardSlice(selectWorkEntries)
   const goal = useGoal()
   const eurRate = useEffectiveEurRate()
-  const filtered = useFilteredEntries(data.workEntries, dateRange)
-  const { realized, predicted } = useRealizedEntries(filtered)
-  const totals = useDashboardTotals(realized, data.clients)
-  const predictedTotals = useDashboardTotals(predicted, data.clients)
+  const { realized, totals, predictedTotals } = useDashboardDerived()
   const [editing, setEditing] = useState(false)
 
   const progress = useMemo(
@@ -59,14 +60,14 @@ export function GoalSection() {
   )
 
   const reachedDate = useMemo(
-    () => findGoalReachedDate(realized, data.clients, goal, eurRate),
-    [realized, data.clients, goal, eurRate],
+    () => findGoalReachedDate(realized, clients, goal, eurRate),
+    [realized, clients, goal, eurRate],
   )
 
   // Seria liczona po wszystkich zrealizowanych wpisach (nie tylko z zakresu).
   const streakDays = useMemo(
-    () => calcStreak(data.workEntries, getTodayLocalDateString()),
-    [data.workEntries],
+    () => calcStreak(workEntries, getTodayLocalDateString()),
+    [workEntries],
   )
 
   const target = goal?.amount ?? 0
