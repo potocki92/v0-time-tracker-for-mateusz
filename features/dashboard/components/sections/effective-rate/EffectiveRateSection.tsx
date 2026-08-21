@@ -2,12 +2,10 @@
 
 import { useMemo } from 'react'
 import { fallbackFromClient } from '@/lib/finance/entry-calculations'
-import { useDashboardData } from '../../../hooks'
-import { useFilteredEntries } from '../../../hooks/useFilteredEntries'
-import { useRealizedEntries } from '../../../hooks/useRealizedEntries'
-import { usePeriodLabel } from '../../../hooks/usePeriodLabel'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import { selectClients } from '../../../hooks/dashboardSelectors'
 import { EffectiveRateCard, type ClientRate } from './EffectiveRateCard'
-import { useDashboardRange } from '../shared/DashboardRangeContext'
+import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
 const FALLBACK_COLORS = [
   '#f59e0b',
@@ -29,14 +27,11 @@ function periodShort(label: string): string {
  * są pomijani: dla nich pojęcie "bazowej stawki w EUR" nie istnieje.
  */
 export function EffectiveRateSection() {
-  const { data } = useDashboardData()
-  const { range, dateRange } = useDashboardRange()
-  const filtered = useFilteredEntries(data.workEntries, dateRange)
-  const { realized } = useRealizedEntries(filtered)
-  const periodLabel = usePeriodLabel(range)
+  const clients = useDashboardSlice(selectClients)
+  const { realized, periodLabel } = useDashboardDerived()
 
   const { rates, blendedRate } = useMemo(() => {
-    const clientMap = new Map(data.clients.map((c) => [c.id, c]))
+    const clientMap = new Map(clients.map((c) => [c.id, c]))
     type Acc = { hours: number; clientId: string }
     const map = new Map<string, Acc>()
 
@@ -82,7 +77,7 @@ export function EffectiveRateSection() {
 
     const blended = eurHours > 0 ? eurEarnings / eurHours : 0
     return { rates: list, blendedRate: blended }
-  }, [realized, data.clients])
+  }, [realized, clients])
 
   return (
     <EffectiveRateCard

@@ -2,11 +2,12 @@
 
 import { useMemo } from 'react'
 import type { Invoice } from '@/lib/types'
-import { useDashboardData } from '../../../hooks'
-import { usePeriodLabel } from '../../../hooks/usePeriodLabel'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import { selectInvoices } from '../../../hooks/dashboardSelectors'
 import { InvoicesErrorBoundary } from '../../errors'
 import { InvoicesCard } from './InvoicesCard'
 import { useDashboardRange } from '../shared/DashboardRangeContext'
+import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
 function periodShort(label: string): string {
   const words = label.split(' ')
@@ -34,9 +35,9 @@ function refTime(inv: Invoice): number {
 }
 
 export function InvoicesSection() {
-  const { data } = useDashboardData()
-  const { range, dateRange } = useDashboardRange()
-  const periodLabel = usePeriodLabel(range)
+  const invoices = useDashboardSlice(selectInvoices)
+  const { dateRange } = useDashboardRange()
+  const { periodLabel } = useDashboardDerived()
 
   const visible = useMemo(() => {
     const { from, to } = dateRange
@@ -46,7 +47,7 @@ export function InvoicesSection() {
     const inRange: Invoice[] = []
     const openOutsideRange: Invoice[] = []
 
-    for (const inv of data.invoices) {
+    for (const inv of invoices) {
       const t = refTime(inv)
       const within = t >= fromMs && t <= toMs
       if (within) {
@@ -70,7 +71,7 @@ export function InvoicesSection() {
 
       return refTime(b) - refTime(a)
     })
-  }, [data.invoices, dateRange])
+  }, [invoices, dateRange])
 
   return (
     <InvoicesErrorBoundary>

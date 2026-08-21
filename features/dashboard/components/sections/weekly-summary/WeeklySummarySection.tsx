@@ -2,7 +2,12 @@
 
 import { useMemo, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
-import { useDashboardData } from '../../../hooks'
+import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
+import {
+  selectClients,
+  selectProjects,
+  selectWorkEntries,
+} from '../../../hooks/dashboardSelectors'
 import { buildWeeklySummary, type ContractorBlock } from '../../../lib/weekly-summary'
 import { getWeekStart } from '@/lib/date/week'
 import { WeeklySummaryModal } from './WeeklySummaryModal'
@@ -15,7 +20,9 @@ import { formatDate, formatHours, formatRate, formatTotals } from './presentatio
  * (druk/PDF, kopiowanie, nawigacja ◀/▶ po poprzednich tygodniach).
  */
 export function WeeklySummarySection() {
-  const { data } = useDashboardData()
+  const workEntries = useDashboardSlice(selectWorkEntries)
+  const clients = useDashboardSlice(selectClients)
+  const projects = useDashboardSlice(selectProjects)
   const [open, setOpen] = useState(false)
   const [weekOffset, setWeekOffset] = useState(0) // 0 = bieżący tydzień, ujemne = wstecz
 
@@ -26,8 +33,8 @@ export function WeeklySummarySection() {
   }, [weekOffset])
 
   const summary = useMemo(
-    () => buildWeeklySummary(data.workEntries, data.clients, weekStart, undefined, data.projects),
-    [data.workEntries, data.clients, data.projects, weekStart],
+    () => buildWeeklySummary(workEntries, clients, weekStart, undefined, projects),
+    [workEntries, clients, projects, weekStart],
   )
 
   return (
