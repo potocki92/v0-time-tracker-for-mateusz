@@ -4,6 +4,10 @@ Zrzuty wszystkich sekcji panelu w dwoch viewportach — material do przegladu
 wizualnego zmian w UI. Kazdy przebieg nadpisuje te same pliki, wiec `git diff`
 na tym katalogu pokazuje, co realnie zmienilo sie na ekranie.
 
+> **Pliki PNG nie sa jeszcze w repo.** Generuje je `e2e/screenshots.spec.ts`,
+> ktory potrzebuje dzialajacej aplikacji i zalogowanego konta testowego —
+> patrz sekcja nizej. Do tego czasu miniatury w tabeli beda puste.
+
 ## Jak je odswiezyc
 
 ```bash
