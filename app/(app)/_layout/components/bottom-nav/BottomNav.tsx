@@ -25,7 +25,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Nawigacja główna"
-      className="fixed bottom-0 left-0 right-0 z-50 block border-t border-[#1a1a1a] bg-black/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 block border-t border-hairline bg-surface-0/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
     >
       <ul className="flex h-[var(--app-bar-height)] items-stretch" role="list">
         {BOTTOM_NAV_ITEMS.map(({ href, label, icon: Icon, prefetch }) => {

@@ -21,7 +21,7 @@ export function KPICard({ label, icon, className, children, ariaLabel }: Props) 
     <div
       aria-label={ariaLabel}
       className={cn(
-        'relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-3 sm:p-4',
+        'relative overflow-hidden rounded-lg border border-hairline bg-surface-1 p-3 sm:p-4',
         className,
       )}
     >

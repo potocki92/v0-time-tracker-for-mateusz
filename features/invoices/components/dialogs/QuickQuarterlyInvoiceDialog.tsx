@@ -224,7 +224,7 @@ export function QuickQuarterlyInvoiceDialog({
                 </EmptyHeader>
               </Empty>
             ) : (
-              <ul className="divide-y divide-[#1a1a1a]" role="list">
+              <ul className="divide-y divide-hairline" role="list">
                 {quarters.map((q) => {
                   const disabled = q.invoiced || q.amount <= 0
                   const isSelected = selectedId === q.id
@@ -238,8 +238,8 @@ export function QuickQuarterlyInvoiceDialog({
                           'flex w-full items-start gap-3 px-4 py-3 text-left transition',
                           disabled
                             ? 'cursor-not-allowed opacity-60'
-                            : 'hover:bg-[#0e0e0e]',
-                          isSelected && 'bg-[#161616]',
+                            : 'hover:bg-surface-2',
+                          isSelected && 'bg-surface-3',
                         )}
                       >
                         <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border">

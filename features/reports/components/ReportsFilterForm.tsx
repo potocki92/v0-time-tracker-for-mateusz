@@ -24,7 +24,7 @@ const PRESETS: Array<{ value: PeriodPreset; label: string }> = [
 ]
 
 const FIELD_CLASSES =
-  'h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] px-3 text-sm text-zinc-200 ' +
+  'h-11 w-full rounded-xl border border-hairline bg-surface-2 px-3 text-sm text-zinc-200 ' +
   'placeholder:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 ' +
   'focus-visible:ring-zinc-500/60 disabled:opacity-50'
 
@@ -59,7 +59,7 @@ export function ReportsFilterForm({
           role="tablist"
           aria-label="Zakres czasu"
           id="reports-preset"
-          className="grid grid-cols-4 gap-1 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] p-1"
+          className="grid grid-cols-4 gap-1 rounded-xl border border-hairline bg-surface-1 p-1"
         >
           {PRESETS.map((p) => {
             const active = filters.preset === p.value
@@ -74,7 +74,7 @@ export function ReportsFilterForm({
                   'h-9 rounded-lg text-xs font-medium transition-colors ' +
                   (active
                     ? 'bg-white text-black'
-                    : 'text-zinc-400 hover:bg-[#141414] hover:text-zinc-200')
+                    : 'text-zinc-400 hover:bg-surface-3 hover:text-zinc-200')
                 }
               >
                 {p.label}

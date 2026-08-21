@@ -61,7 +61,7 @@ export function AllProjectsSection({
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-[#212126] hover:text-white"
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-hairline-strong hover:text-white"
           >
             <X className="h-3 w-3" aria-hidden />
             Reset
@@ -117,7 +117,7 @@ export function AllProjectsSection({
             <button
               type="button"
               onClick={() => setSearch('')}
-              className="absolute right-1.5 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-zinc-400 transition hover:bg-[#212126] hover:text-white"
+              className="absolute right-1.5 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-zinc-400 transition hover:bg-hairline-strong hover:text-white"
               aria-label="Wyczyść wyszukiwanie"
             >
               <X className="h-4 w-4" aria-hidden />

@@ -26,7 +26,7 @@ export function ProjectDeleteDialog({ project, isDeleting, onCancel, onConfirm }
           Sheetem (z-50) razem z własnym, przyciemnionym overlayem. */}
       <DialogContent
         className="z-[60] sm:max-w-md"
-        overlayClassName="z-[60] bg-black/60 backdrop-blur-sm"
+        overlayClassName="z-[60] bg-surface-0/60 backdrop-blur-sm"
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

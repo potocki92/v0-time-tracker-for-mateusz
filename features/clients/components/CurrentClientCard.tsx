@@ -78,7 +78,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
         </span>
         {client.is_default && (
           <span
-            className="inline-flex items-center gap-1 rounded-full bg-[#17171a] px-2 py-0.5 text-2xs font-semibold text-zinc-300 ring-1 ring-[#2a2a30]"
+            className="inline-flex items-center gap-1 rounded-full bg-surface-3 px-2 py-0.5 text-2xs font-semibold text-zinc-300 ring-1 ring-hairline-strong"
             title="Klient domyślny dla nowych wpisów"
           >
             <Star className="h-3 w-3 fill-amber-500 text-amber-500" aria-hidden />

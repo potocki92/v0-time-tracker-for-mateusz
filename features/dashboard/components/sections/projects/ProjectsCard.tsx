@@ -43,20 +43,20 @@ export function ProjectsCard({ projects, totalActive }: Props) {
   return (
     <section
       aria-label="Projekty"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
+      className="rounded-lg border border-hairline bg-surface-1"
     >
-      <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
+      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
         <div className="flex items-center gap-2">
           <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Projekty
           </p>
-          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
+          <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
             {totalActive} aktywne
           </span>
         </div>
         <Link
           href="/projects"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
         >
           Zobacz wszystkie
           <ArrowUpRight className="h-3 w-3" aria-hidden />
@@ -68,14 +68,14 @@ export function ProjectsCard({ projects, totalActive }: Props) {
           Brak projektów.
         </div>
       ) : (
-        <ul role="list" className="divide-y divide-[#161616]">
+        <ul role="list" className="divide-y divide-hairline">
           {projects.map((p) => {
             const pill = STATUS_PILL[p.status]
             return (
               <li key={p.id}>
                 <Link
                   href={`/projects?id=${encodeURIComponent(p.id)}`}
-                  className="flex items-center gap-3 px-4 py-3 transition hover:bg-[#0c0c0c]"
+                  className="flex items-center gap-3 px-4 py-3 transition hover:bg-surface-1"
                 >
                   <span
                     aria-hidden

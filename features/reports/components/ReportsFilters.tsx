@@ -55,7 +55,7 @@ export function ReportsFilters(props: Props) {
   return (
     <section
       aria-label="Filtry raportu"
-      className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-3 sm:p-4"
+      className="rounded-2xl border border-hairline bg-surface-1 p-3 sm:p-4"
     >
       {/* Mobile control bar — desktop ukrywa */}
       <div className="flex items-center gap-2 md:hidden">
@@ -63,7 +63,7 @@ export function ReportsFilters(props: Props) {
           <SheetTrigger asChild>
             <button
               type="button"
-              className="relative inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] px-3 text-sm font-medium text-zinc-200 transition-colors active:bg-[#141414]"
+              className="relative inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-hairline bg-surface-2 px-3 text-sm font-medium text-zinc-200 transition-colors active:bg-surface-3"
             >
               <SlidersHorizontal aria-hidden className="size-4" />
               Filtry
@@ -77,9 +77,9 @@ export function ReportsFilters(props: Props) {
 
           <SheetContent
             side="bottom"
-            className="max-h-[88vh] rounded-t-2xl border-[#1a1a1a] bg-[#0a0a0a] text-zinc-200"
+            className="max-h-[88vh] rounded-t-2xl border-hairline bg-surface-1 text-zinc-200"
           >
-            <SheetHeader className="border-b border-[#1a1a1a] px-4 py-3">
+            <SheetHeader className="border-b border-hairline px-4 py-3">
               <SheetTitle className="text-base text-white">Filtry raportu</SheetTitle>
               <SheetDescription className="text-xs text-zinc-400">
                 Dopasuj zakres i przekroje danych
@@ -90,11 +90,11 @@ export function ReportsFilters(props: Props) {
               <ReportsFilterForm {...formProps} />
             </div>
 
-            <div className="flex gap-2 border-t border-[#1a1a1a] p-4">
+            <div className="flex gap-2 border-t border-hairline p-4">
               <button
                 type="button"
                 onClick={props.onReset}
-                className="h-11 flex-1 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] text-sm text-zinc-300 active:bg-[#141414]"
+                className="h-11 flex-1 rounded-xl border border-hairline bg-surface-2 text-sm text-zinc-300 active:bg-surface-3"
               >
                 Reset
               </button>
@@ -117,7 +117,7 @@ export function ReportsFilters(props: Props) {
             'inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border px-3 text-sm font-medium transition-colors ' +
             (props.filters.compare
               ? 'border-white/20 bg-white text-black'
-              : 'border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 active:bg-[#141414]')
+              : 'border-hairline bg-surface-2 text-zinc-300 active:bg-surface-3')
           }
         >
           <TrendingUp aria-hidden className="size-4" />
@@ -129,7 +129,7 @@ export function ReportsFilters(props: Props) {
             type="button"
             onClick={props.onReset}
             aria-label="Wyczyść filtry"
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400 active:bg-[#141414]"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-hairline bg-surface-2 text-zinc-400 active:bg-surface-3"
           >
             <X aria-hidden className="size-4" />
           </button>
@@ -139,7 +139,7 @@ export function ReportsFilters(props: Props) {
       {/* Desktop inline form */}
       <div className="hidden md:block">
         <ReportsFilterForm {...formProps} />
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#1a1a1a] pt-4">
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-hairline pt-4">
           <button
             type="button"
             onClick={props.onToggleCompare}
@@ -148,7 +148,7 @@ export function ReportsFilters(props: Props) {
               'inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors ' +
               (props.filters.compare
                 ? 'border-white/20 bg-white text-black'
-                : 'border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 hover:bg-[#141414]')
+                : 'border-hairline bg-surface-2 text-zinc-300 hover:bg-surface-3')
             }
           >
             <TrendingUp aria-hidden className="size-4" />

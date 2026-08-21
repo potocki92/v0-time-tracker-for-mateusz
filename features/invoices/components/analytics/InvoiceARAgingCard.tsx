@@ -36,7 +36,7 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
   }
 
   return (
-    <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
+    <section className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5">
       <header className="flex items-center justify-between gap-3">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           NALEŻNOŚCI · WIEKOWANIE
@@ -44,7 +44,7 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
         <button
           type="button"
           aria-label="Więcej opcji wiekowania"
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition hover:bg-[#141414] hover:text-zinc-200"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition hover:bg-surface-3 hover:text-zinc-200"
         >
           <MoreHorizontal className="h-4 w-4" aria-hidden />
         </button>
@@ -59,7 +59,7 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
         </span>
       </div>
 
-      <div className="mt-4 flex h-2 w-full overflow-hidden rounded-full bg-[#141414]">
+      <div className="mt-4 flex h-2 w-full overflow-hidden rounded-full bg-surface-3">
         {total > 0 ? (
           SEGMENTS.map((seg) => {
             const value = segmentValues[seg.key]
@@ -75,7 +75,7 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
             )
           })
         ) : (
-          <span className="w-full bg-[#141414]" />
+          <span className="w-full bg-surface-3" />
         )}
       </div>
 

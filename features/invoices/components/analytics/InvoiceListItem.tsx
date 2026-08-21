@@ -51,10 +51,10 @@ export function InvoiceListItem({
   return (
     <article
       className={cn(
-        'rounded-2xl border bg-[#0a0a0a] p-4 transition',
+        'rounded-2xl border bg-surface-1 p-4 transition',
         selected
           ? 'border-emerald-500/40 ring-1 ring-emerald-500/20'
-          : 'border-[#1a1a1a] hover:border-[#262626]',
+          : 'border-hairline hover:border-hairline-strong',
       )}
     >
       <button
@@ -67,7 +67,7 @@ export function InvoiceListItem({
           <div className="flex min-w-0 items-center gap-2.5">
             <span
               aria-hidden
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400"
             >
               <FileText className="h-4 w-4" />
             </span>
@@ -91,7 +91,7 @@ export function InvoiceListItem({
           </span>
         </header>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#161616] pt-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-hairline pt-3">
           <p className="truncate text-xs font-medium text-zinc-200">{clientName}</p>
         </div>
 

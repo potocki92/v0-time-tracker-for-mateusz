@@ -26,7 +26,7 @@ export function CalendarMonthNav({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 shrink-0 border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 hover:bg-[#161616] hover:text-white"
+          className="h-8 w-8 shrink-0 border-hairline bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
           onClick={onPrev}
           aria-label="Poprzedni miesiąc"
         >
@@ -58,7 +58,7 @@ export function CalendarMonthNav({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8 shrink-0 border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 hover:bg-[#161616] hover:text-white"
+          className="h-8 w-8 shrink-0 border-hairline bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
           onClick={onNext}
           aria-label="Następny miesiąc"
         >

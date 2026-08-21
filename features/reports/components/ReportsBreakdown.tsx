@@ -13,7 +13,7 @@ export function ReportsBreakdown({ items }: Props) {
   return (
     <section
       aria-label="Podział na projekty"
-      className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5"
+      className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5"
     >
       <header className="flex items-center justify-between gap-3">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
@@ -58,7 +58,7 @@ function BreakdownRow({ item }: { item: ProjectUsage }) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={`${item.label}: ${Math.round(item.share)}%`}
-        className="h-1.5 w-full overflow-hidden rounded-full bg-[#161616]"
+        className="h-1.5 w-full overflow-hidden rounded-full bg-surface-3"
       >
         <div
           className="h-full rounded-full bg-gradient-to-r from-zinc-300 to-white"
@@ -71,7 +71,7 @@ function BreakdownRow({ item }: { item: ProjectUsage }) {
 
 function EmptyState() {
   return (
-    <div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#1a1a1a] bg-[#0e0e0e] px-4 py-10 text-center">
+    <div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-hairline bg-surface-2 px-4 py-10 text-center">
       <FolderOpen aria-hidden className="size-6 text-zinc-400" />
       <p className="text-sm text-zinc-400">Brak danych w wybranym zakresie</p>
       <p className="text-xs text-zinc-400">Zmień filtry, aby zobaczyć podział pracy</p>

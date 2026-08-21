@@ -72,7 +72,7 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
       <div
         role="tablist"
         aria-label="Okres"
-        className="inline-flex rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-1"
+        className="inline-flex rounded-lg border border-hairline bg-surface-1 p-1"
       >
         {TABS.map((t) => {
           const active = range === t.value
@@ -85,7 +85,7 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
               onClick={() => onChangeRange(t.value)}
               className={
                 active
-                  ? 'rounded-md bg-[#161616] px-3 py-1.5 text-2xs font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)] sm:px-3.5 sm:text-xs'
+                  ? 'rounded-md bg-surface-3 px-3 py-1.5 text-2xs font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)] sm:px-3.5 sm:text-xs'
                   : 'rounded-md px-3 py-1.5 text-2xs font-medium text-zinc-400 transition hover:text-zinc-200 sm:px-3.5 sm:text-xs'
               }
             >

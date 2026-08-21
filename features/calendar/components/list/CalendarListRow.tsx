@@ -32,11 +32,11 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
       type="button"
       onClick={() => onClick?.(entry)}
       className={cn(
-        'group flex w-full items-center gap-3 rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-3 text-left',
-        'transition-all hover:border-[#262626] hover:shadow-sm active:scale-[0.99]',
+        'group flex w-full items-center gap-3 rounded-lg border border-hairline bg-surface-1 p-3 text-left',
+        'transition-all hover:border-hairline-strong hover:shadow-sm active:scale-[0.99]',
       )}
     >
-      <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-[#0e0e0e]">
+      <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-surface-2">
         <span className="text-2xs font-medium uppercase tracking-widest text-zinc-400">
           {['', 'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'][Number(m)]}
         </span>

@@ -15,7 +15,7 @@ export function TimeByProject({ projects }: Props) {
   const total = projects.reduce((sum, p) => sum + p.amountPLN, 0)
 
   return (
-    <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
+    <Card className="rounded-lg border-hairline bg-surface-1 py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
           <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
@@ -69,7 +69,7 @@ function ProjectRow({ project }: { project: ProjectAggregate }) {
       </div>
 
       <div
-        className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#161616]"
+        className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-3"
         role="progressbar"
         aria-valuenow={percent}
         aria-valuemin={0}

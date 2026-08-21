@@ -44,16 +44,16 @@ export function UpcomingCard({ items, onAdd }: Props) {
   return (
     <section
       aria-label="Nadchodzące"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
+      className="rounded-lg border border-hairline bg-surface-1"
     >
-      <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
+      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Nadchodzące
         </p>
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+          className="inline-flex items-center gap-1 rounded-md border border-hairline bg-surface-2 px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3"
         >
           <Plus className="h-3 w-3" aria-hidden />
           Dodaj
@@ -65,7 +65,7 @@ export function UpcomingCard({ items, onAdd }: Props) {
           Brak zaplanowanych wydarzeń.
         </div>
       ) : (
-        <ul role="list" className="divide-y divide-[#161616]">
+        <ul role="list" className="divide-y divide-hairline">
           {items.map((it) => {
             const { day, month } = dayLabel(it.date)
             return (

@@ -27,7 +27,7 @@ export function InvoicesPageHeader({
           {monthLabel} {year} · CYKL {cycleLabel}
         </p>
         <div
-          className="inline-flex gap-0.5 rounded-full border border-[#1a1a1a] bg-[#0a0a0a] p-0.5"
+          className="inline-flex gap-0.5 rounded-full border border-hairline bg-surface-1 p-0.5"
           role="tablist"
           aria-label="Waluta faktur"
         >

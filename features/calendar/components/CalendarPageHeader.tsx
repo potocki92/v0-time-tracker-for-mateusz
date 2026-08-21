@@ -23,7 +23,7 @@ export function CalendarPageHeader({
   totalEntries,
 }: Props) {
   return (
-    <div className="sticky top-0 z-30 border-b border-[#1a1a1a] bg-black/80 backdrop-blur-sm">
+    <div className="sticky top-0 z-30 border-b border-hairline bg-surface-0/80 backdrop-blur-sm">
       <div className="container flex h-12 items-center gap-2.5 px-4 sm:h-14 sm:gap-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500/10">
@@ -32,7 +32,7 @@ export function CalendarPageHeader({
           <h1 className="text-sm font-semibold tracking-tight text-white">Kalendarz</h1>
         </div>
 
-        <Separator orientation="vertical" className="h-5 bg-[#1a1a1a]" />
+        <Separator orientation="vertical" className="h-5 bg-hairline" />
 
         <span className="truncate text-xs text-zinc-400">
           {MONTH_NAMES[currentMonth]} {currentYear}
@@ -42,7 +42,7 @@ export function CalendarPageHeader({
           <span className="hidden sm:inline">
             {workDays} dni pracy • {totalEntries} wpisów
           </span>
-          <span className="sm:hidden rounded-full bg-[#161616] px-2 py-0.5 font-medium text-zinc-300">
+          <span className="sm:hidden rounded-full bg-surface-3 px-2 py-0.5 font-medium text-zinc-300">
             {workDays}d
           </span>
         </div>

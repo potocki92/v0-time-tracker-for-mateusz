@@ -169,7 +169,7 @@ export function CalendarContent() {
   )
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-surface-0 text-white">
       <CalendarPageHeader
         currentMonth={nav.currentMonth}
         currentYear={nav.currentYear}
@@ -191,7 +191,7 @@ export function CalendarContent() {
           onValueChange={(v) => setView(v as CalendarView)}
           className="space-y-3"
         >
-          <Card className="overflow-hidden rounded-lg border-[#1a1a1a] bg-[#0a0a0a] shadow-none">
+          <Card className="overflow-hidden rounded-lg border-hairline bg-surface-1 shadow-none">
             <CardContent className="space-y-3 p-3 sm:p-4">
               <CalendarMonthNav
                 currentMonth={nav.currentMonth}
@@ -207,18 +207,18 @@ export function CalendarContent() {
               <div className="flex justify-center">
                 <TabsList
                   aria-label="Widok kalendarza"
-                  className="h-9 rounded-full border border-[#1a1a1a] bg-[#0e0e0e] p-0.5 shadow-inner"
+                  className="h-9 rounded-full border border-hairline bg-surface-2 p-0.5 shadow-inner"
                 >
                   <TabsTrigger
                     value="month"
-                    className="h-8 gap-1.5 rounded-full px-4 text-xs text-zinc-400 data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                    className="h-8 gap-1.5 rounded-full px-4 text-xs text-zinc-400 data-[state=active]:bg-hairline data-[state=active]:text-white data-[state=active]:shadow-sm"
                   >
                     <LayoutGrid className="h-3.5 w-3.5" />
                     Miesiąc
                   </TabsTrigger>
                   <TabsTrigger
                     value="list"
-                    className="h-8 gap-1.5 rounded-full px-4 text-xs text-zinc-400 data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                    className="h-8 gap-1.5 rounded-full px-4 text-xs text-zinc-400 data-[state=active]:bg-hairline data-[state=active]:text-white data-[state=active]:shadow-sm"
                   >
                     <List className="h-3.5 w-3.5" />
                     Lista

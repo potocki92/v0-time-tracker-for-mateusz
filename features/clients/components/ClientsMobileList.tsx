@@ -108,7 +108,7 @@ export function ClientsMobileList({
           <CollapsibleTrigger asChild>
             <Button
               variant="outline"
-              className="h-11 flex-1 justify-between gap-2 rounded-xl border-[#2a2a30] bg-[#101012] text-sm font-medium text-zinc-300 hover:bg-[#17171a] hover:text-white"
+              className="h-11 flex-1 justify-between gap-2 rounded-xl border-hairline-strong bg-surface-2 text-sm font-medium text-zinc-300 hover:bg-surface-3 hover:text-white"
             >
               <span className="flex items-center gap-2">
                 <SlidersHorizontal className="size-4" />
@@ -125,7 +125,7 @@ export function ClientsMobileList({
 
           <Select value={sortKey} onValueChange={(v) => onSortChange(v as ClientsSortKey)}>
             <SelectTrigger
-              className="h-11 w-[11.5rem] shrink-0 gap-1.5 rounded-xl border-[#2a2a30] bg-[#101012] text-sm text-zinc-300 [&>span]:truncate"
+              className="h-11 w-[11.5rem] shrink-0 gap-1.5 rounded-xl border-hairline-strong bg-surface-2 text-sm text-zinc-300 [&>span]:truncate"
               aria-label="Sortowanie listy klientów"
             >
               <ArrowDownUp className="size-4 shrink-0 text-zinc-400" aria-hidden />
@@ -142,7 +142,7 @@ export function ClientsMobileList({
         </div>
 
         <CollapsibleContent className="data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
-          <div className="mt-2 space-y-3 rounded-xl border border-[#2a2a30] bg-[#101012] p-3">
+          <div className="mt-2 space-y-3 rounded-xl border border-hairline-strong bg-surface-2 p-3">
             <FilterChipsRow
               label="Status"
               options={STATUS_FILTER_OPTIONS}
@@ -217,7 +217,7 @@ export function ClientsMobileList({
       {hasMore && (
         <Button
           variant="outline"
-          className="h-11 w-full rounded-xl border-[#2a2a30] bg-[#101012] text-zinc-300 hover:bg-[#17171a] hover:text-white"
+          className="h-11 w-full rounded-xl border-hairline-strong bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
           onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
         >
           Pokaż więcej ({clients.length - visibleCount})
@@ -263,7 +263,7 @@ function FilterChipsRow<T extends string>({
                 'min-h-9 shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
                 active
                   ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
-                  : 'border-[#2a2a30] bg-[#151519] text-zinc-400 hover:bg-[#17171a] hover:text-zinc-200',
+                  : 'border-hairline-strong bg-surface-3 text-zinc-400 hover:bg-surface-3 hover:text-zinc-200',
               )}
             >
               {opt.label}
