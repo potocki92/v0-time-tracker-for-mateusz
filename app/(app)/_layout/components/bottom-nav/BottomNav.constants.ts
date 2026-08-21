@@ -9,10 +9,9 @@ import type { BottomNavItem } from './BottomNav.types'
 
 export const BOTTOM_NAV_ITEMS: readonly BottomNavItem[] = [
   {
-    href:     '/dashboard',
-    label:    'Pulpit',
-    icon:     LayoutDashboard,
-    prefetch: true,
+    href:  '/dashboard',
+    label: 'Pulpit',
+    icon:  LayoutDashboard,
   },
   {
     href:  '/calendar',

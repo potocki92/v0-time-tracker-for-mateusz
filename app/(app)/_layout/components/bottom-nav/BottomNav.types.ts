@@ -7,6 +7,4 @@ export interface BottomNavItem {
   label: string
   /** Ikona Lucide */
   icon:  ComponentType<{ className?: string }>
-  /** Czy ten link powinien prefetchować dane na hover */
-  prefetch?: boolean
 }
