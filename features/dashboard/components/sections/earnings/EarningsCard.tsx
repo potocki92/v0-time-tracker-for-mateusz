@@ -154,7 +154,7 @@ export const EarningsCard = memo(function EarningsCard({
   return (
     <section
       aria-label="Zarobki"
-      className="relative overflow-hidden rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
+      className="relative overflow-hidden rounded-lg border border-hairline bg-surface-1 p-4"
     >
       {/* ─────────────── HEADER ─────────────── */}
       <header className="relative flex items-start justify-between gap-3">
@@ -177,7 +177,7 @@ export const EarningsCard = memo(function EarningsCard({
               </span>
             )}
             {privacyMode && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#161616] px-2 py-0.5 text-2xs font-medium uppercase tracking-wide text-zinc-400 ring-1 ring-[#1f1f1f]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface-3 px-2 py-0.5 text-2xs font-medium uppercase tracking-wide text-zinc-400 ring-1 ring-hairline">
                 <EyeOff className="h-3 w-3" aria-hidden />
                 privacy
               </span>
@@ -299,9 +299,9 @@ function KpiTile({
   hint?: string
 }) {
   return (
-    <div className="rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] p-2.5">
+    <div className="rounded-lg border border-hairline bg-surface-2 p-2.5">
       <div className="flex items-center justify-between text-zinc-400">
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#161616] text-zinc-300 ring-1 ring-[#1f1f1f]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-surface-3 text-zinc-300 ring-1 ring-hairline">
           <Icon className="h-3.5 w-3.5" aria-hidden />
         </span>
         {hint && <span className="text-2xs font-medium uppercase tracking-wide">{hint}</span>}

@@ -37,7 +37,7 @@ function ContractorCard({ block }: { block: ContractorBlock }) {
     .join(', ')
 
   return (
-    <section className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4 print:border-gray-300 print:bg-white">
+    <section className="rounded-lg border border-hairline bg-surface-1 p-4 print:border-gray-300 print:bg-white">
       <header className="mb-3">
         <h3 className="text-sm font-semibold text-white print:text-black">{block.clientName}</h3>
         {block.client?.nip && (

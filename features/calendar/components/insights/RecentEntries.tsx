@@ -16,7 +16,7 @@ const MONTH_SHORT = ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wr
 
 export function RecentEntries({ entries, onViewAll }: Props) {
   return (
-    <Card className="rounded-lg border-[#1a1a1a] bg-[#0a0a0a] py-0 shadow-none">
+    <Card className="rounded-lg border-hairline bg-surface-1 py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
           <div>
@@ -46,7 +46,7 @@ export function RecentEntries({ entries, onViewAll }: Props) {
             <p className="text-xs text-zinc-400">Brak ostatnich wpisów</p>
           </div>
         ) : (
-          <ul className="mt-3 divide-y divide-[#161616]">
+          <ul className="mt-3 divide-y divide-hairline">
             {entries.map((entry) => (
               <RecentRow key={entry.id} entry={entry} />
             ))}
@@ -70,7 +70,7 @@ function RecentRow({ entry }: { entry: RecentEntry }) {
 
   return (
     <li className="flex items-center gap-3 py-2.5">
-      <div className="flex h-9 w-12 shrink-0 flex-col items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e]">
+      <div className="flex h-9 w-12 shrink-0 flex-col items-center justify-center rounded-md border border-hairline bg-surface-2">
         <span className="text-2xs font-bold uppercase tracking-wider text-zinc-400">
           {monthLabel} · {dayLabel}
         </span>

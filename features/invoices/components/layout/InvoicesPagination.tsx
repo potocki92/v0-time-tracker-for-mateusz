@@ -35,7 +35,7 @@ export function InvoicesPagination({
   const canNext   = pageIndex < pageCount - 1
 
   return (
-    <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-3 sm:flex-row">
+    <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-1 px-4 py-3 sm:flex-row">
       <div className="flex items-center gap-3 text-xs text-zinc-400">
         <span className="tabular-nums">
           {fromIndex + 1}–{toIndex} z {totalCount}
@@ -46,7 +46,7 @@ export function InvoicesPagination({
           <select
             value={pageSize}
             onChange={(event) => onPageSizeChange(Number(event.target.value))}
-            className="h-8 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 text-xs text-zinc-200 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-8 rounded-md border border-hairline bg-surface-2 px-2 text-xs text-zinc-200 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           >
             {PAGE_SIZE_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -64,9 +64,9 @@ export function InvoicesPagination({
           disabled={!canPrev}
           aria-label="Poprzednia strona"
           className={cn(
-            'inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 transition',
+            'inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition',
             'hover:border-emerald-500/40 hover:text-emerald-300',
-            'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#1a1a1a] disabled:hover:text-zinc-300',
+            'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-hairline disabled:hover:text-zinc-300',
           )}
         >
           <ChevronLeft className="h-4 w-4" aria-hidden />
@@ -82,9 +82,9 @@ export function InvoicesPagination({
           disabled={!canNext}
           aria-label="Następna strona"
           className={cn(
-            'inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 transition',
+            'inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition',
             'hover:border-emerald-500/40 hover:text-emerald-300',
-            'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#1a1a1a] disabled:hover:text-zinc-300',
+            'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-hairline disabled:hover:text-zinc-300',
           )}
         >
           <ChevronRight className="h-4 w-4" aria-hidden />

@@ -8,7 +8,7 @@ export function SectionHeader({ label }: Props) {
       <p className="text-2xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
         {label}
       </p>
-      <span aria-hidden className="h-px flex-1 bg-[#1a1a1a]" />
+      <span aria-hidden className="h-px flex-1 bg-hairline" />
     </div>
   )
 }

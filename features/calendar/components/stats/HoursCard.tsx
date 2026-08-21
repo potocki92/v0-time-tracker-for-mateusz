@@ -39,7 +39,7 @@ export function HoursCard({ totalHours, baselineHours, progressPercent, isAhead 
         <Progress
           aria-label="Realizacja celu godzinowego"
           value={progressPercent}
-          className="h-1.5 bg-[#161616] transition-colors [&>div]:bg-emerald-500"
+          className="h-1.5 bg-surface-3 transition-colors [&>div]:bg-emerald-500"
         />
       </div>
     </KPICard>

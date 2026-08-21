@@ -80,7 +80,7 @@ export function InvoiceDetailsPanel({
     : `mailto:?subject=${encodeURIComponent(`Faktura ${numberLabel}`)}`
 
   return (
-    <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
+    <section className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5">
       <header className="flex items-center justify-between gap-3">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           FAKTURA
@@ -152,7 +152,7 @@ export function InvoiceDetailsPanel({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Pobierz PDF"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
             >
               <Download className="h-3.5 w-3.5" aria-hidden />
             </a>
@@ -161,7 +161,7 @@ export function InvoiceDetailsPanel({
             type="button"
             onClick={onEdit}
             aria-label="Edytuj fakturę"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
           >
             <Pencil className="h-3.5 w-3.5" aria-hidden />
           </button>
@@ -169,7 +169,7 @@ export function InvoiceDetailsPanel({
             type="button"
             onClick={() => navigator.clipboard?.writeText(numberLabel)}
             aria-label="Skopiuj numer"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
           >
             <Copy className="h-3.5 w-3.5" aria-hidden />
           </button>
@@ -183,7 +183,7 @@ export function InvoiceDetailsPanel({
         <DetailField label="TERMIN" value={due} />
       </dl>
 
-      <div className="mt-4 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
+      <div className="mt-4 rounded-xl border border-hairline bg-surface-2 p-3">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           POZYCJE
         </p>
@@ -195,7 +195,7 @@ export function InvoiceDetailsPanel({
             </span>
           </li>
         </ul>
-        <div className="mt-3 space-y-1.5 border-t border-[#161616] pt-3 text-xs">
+        <div className="mt-3 space-y-1.5 border-t border-hairline pt-3 text-xs">
           <Row label="Suma netto" value={formatCurrency(net || gross, invoice.currency)} />
           <Row
             label="VAT"
@@ -210,7 +210,7 @@ export function InvoiceDetailsPanel({
         </div>
       </div>
 
-      <div className="mt-4 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
+      <div className="mt-4 rounded-xl border border-hairline bg-surface-2 p-3">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           AKTYWNOŚĆ
         </p>
@@ -231,7 +231,7 @@ export function InvoiceDetailsPanel({
         className={cn(
           'mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl text-xs font-semibold transition',
           isPaid
-            ? 'border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-200 hover:border-amber-500/40 hover:text-amber-300'
+            ? 'border border-hairline bg-surface-2 text-zinc-200 hover:border-amber-500/40 hover:text-amber-300'
             : 'bg-emerald-500 text-black shadow-[0_0_22px_-6px_color-mix(in_oklab,var(--primary)_60%,transparent)] hover:bg-emerald-400',
           isTogglingPaid && 'opacity-60',
         )}
@@ -252,7 +252,7 @@ export function InvoiceDetailsPanel({
       <div className="mt-2 grid grid-cols-2 gap-2">
         <a
           href={mailHref}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] text-xs font-medium text-zinc-200 transition hover:border-[#262626] hover:text-white"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-hairline bg-surface-2 text-xs font-medium text-zinc-200 transition hover:border-hairline-strong hover:text-white"
         >
           <Mail className="h-4 w-4" aria-hidden />
           E-mail
@@ -260,7 +260,7 @@ export function InvoiceDetailsPanel({
         <button
           type="button"
           onClick={() => window.print()}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] text-xs font-medium text-zinc-200 transition hover:border-[#262626] hover:text-white"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-hairline bg-surface-2 text-xs font-medium text-zinc-200 transition hover:border-hairline-strong hover:text-white"
         >
           <Printer className="h-4 w-4" aria-hidden />
           Drukuj
@@ -281,7 +281,7 @@ export function InvoiceDetailsPanel({
 
 function DetailField({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[#1a1a1a] bg-[#0e0e0e] p-3">
+    <div className="rounded-xl border border-hairline bg-surface-2 p-3">
       <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
         {label}
       </p>

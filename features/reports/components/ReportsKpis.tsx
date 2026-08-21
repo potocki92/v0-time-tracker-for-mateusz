@@ -50,7 +50,7 @@ type CardProps = {
 
 function KpiCard({ label, value, hint, trend, icon: Icon }: CardProps) {
   return (
-    <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:p-5">
+    <div className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5">
       <div className="flex items-center justify-between">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           {label}

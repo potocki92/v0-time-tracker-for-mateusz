@@ -36,7 +36,7 @@ export function CalendarGrid({
             key={`empty-${i}`}
             className={cn(
               'h-16 rounded-lg sm:h-24',
-              isWeekend ? 'bg-[#0e0e0e]' : '',
+              isWeekend ? 'bg-surface-2' : '',
             )}
             aria-hidden
           />

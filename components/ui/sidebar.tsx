@@ -187,7 +187,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          overlayClassName="bg-black/40 backdrop-blur-md supports-[backdrop-filter]:bg-black/30"
+          overlayClassName="bg-surface-0/40 backdrop-blur-md supports-[backdrop-filter]:bg-surface-0/30"
           className="bg-sidebar/95 text-sidebar-foreground w-(--sidebar-width) border-sidebar-border/60 p-0 backdrop-blur-xl supports-[backdrop-filter]:bg-sidebar/85 [&>button]:hidden"
           style={
             {

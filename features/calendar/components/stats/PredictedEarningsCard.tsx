@@ -45,7 +45,7 @@ export function PredictedEarningsCard({
         <Progress
           aria-label="Udział zrealizowanych zarobków w prognozie"
           value={realizedSharePercent}
-          className="h-1.5 bg-[#161616] [&>div]:bg-emerald-500"
+          className="h-1.5 bg-surface-3 [&>div]:bg-emerald-500"
         />
         <p className="text-2xs text-zinc-400">
           {hasPlan

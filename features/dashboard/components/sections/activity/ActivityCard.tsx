@@ -80,7 +80,7 @@ export function ActivityCard({
   return (
     <section
       aria-label="Aktywność"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
+      className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
       <header className="flex items-center justify-between">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
@@ -88,7 +88,7 @@ export function ActivityCard({
         </p>
         <Link
           href="/calendar"
-          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+          className="inline-flex items-center gap-1 rounded-md border border-hairline bg-surface-2 px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3"
         >
           Zobacz wszystkie
         </Link>
@@ -98,7 +98,7 @@ export function ActivityCard({
         {tiles.map(({ icon: Icon, label, value, hint, accent }) => (
           <div
             key={label}
-            className="group rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] p-3 transition hover:border-[#262626] hover:bg-[#111]"
+            className="group rounded-lg border border-hairline bg-surface-2 p-3 transition hover:border-hairline-strong hover:bg-surface-3"
           >
             <div className="flex items-center justify-between">
               <span
@@ -106,7 +106,7 @@ export function ActivityCard({
                   'flex h-6 w-6 items-center justify-center rounded-md',
                   accent
                     ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20'
-                    : 'bg-[#161616] text-zinc-400 ring-1 ring-[#1f1f1f]',
+                    : 'bg-surface-3 text-zinc-400 ring-1 ring-hairline',
                 )}
               >
                 <Icon className="h-3.5 w-3.5" aria-hidden />
@@ -122,7 +122,7 @@ export function ActivityCard({
       </div>
 
       {feed.length > 0 && (
-        <ul role="list" className="mt-4 divide-y divide-[#161616]">
+        <ul role="list" className="mt-4 divide-y divide-hairline">
           {feed.map((item) => (
             <li
               key={item.id}

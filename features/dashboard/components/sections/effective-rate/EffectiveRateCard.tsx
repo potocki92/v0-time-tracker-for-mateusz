@@ -29,13 +29,13 @@ export function EffectiveRateCard({
   return (
     <section
       aria-label="Stawka efektywna"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
+      className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
       <header className="flex items-center justify-between">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Stawka efektywna
         </p>
-        <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-400">
+        <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-400">
           {periodShort}
         </span>
       </header>
@@ -69,7 +69,7 @@ export function EffectiveRateCard({
                   <span className="text-xs font-normal text-zinc-400"> /h</span>
                 </span>
               </div>
-              <div className="h-1 w-full overflow-hidden rounded-full bg-[#161616]">
+              <div className="h-1 w-full overflow-hidden rounded-full bg-surface-3">
                 <div
                   className="h-full rounded-full"
                   style={{

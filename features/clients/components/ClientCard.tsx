@@ -114,7 +114,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
               aria-hidden
               title={ACTIVITY_LABELS[activity]}
               className={cn(
-                'absolute -bottom-0.5 -right-0.5 size-3 rounded-full ring-2 ring-[#151519]',
+                'absolute -bottom-0.5 -right-0.5 size-3 rounded-full ring-2 ring-surface-3',
                 ACTIVITY_DOT[activity],
               )}
             />

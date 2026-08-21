@@ -73,15 +73,15 @@ export function DayCell({
         tripMarker ? `, wyjazd${tripMarker.destination ? ` ${tripMarker.destination}` : ''}` : ''
       }`}
       className={cn(
-        'group relative isolate flex h-16 w-full flex-col overflow-hidden border bg-[#0a0a0a] p-1.5 text-left sm:h-24 sm:p-2',
+        'group relative isolate flex h-16 w-full flex-col overflow-hidden border bg-surface-1 p-1.5 text-left sm:h-24 sm:p-2',
         tripRounding,
         'transition-all duration-200 motion-reduce:transition-none',
         entry
-          ? `border-l-[3px] ${cfg?.border} border-y border-r border-[#1a1a1a] ${cfg?.bg}`
-          : 'border-[#1a1a1a] hover:border-[#262626] hover:bg-[#0e0e0e]',
+          ? `border-l-[3px] ${cfg?.border} border-y border-r border-hairline ${cfg?.bg}`
+          : 'border-hairline hover:border-hairline-strong hover:bg-surface-2',
         isToday &&
           'border-emerald-500/60 ring-2 ring-emerald-500/40 ring-offset-1 ring-offset-black shadow-[0_0_0_1px_#22c55e] before:absolute before:inset-0 before:rounded-[inherit] before:bg-emerald-500/5 before:pointer-events-none',
-        isWeekend && !entry && 'bg-[#0e0e0e]',
+        isWeekend && !entry && 'bg-surface-2',
         'cursor-pointer hover:shadow-sm hover:-translate-y-px active:scale-[0.97]',
         isFuture && 'opacity-80',
       )}

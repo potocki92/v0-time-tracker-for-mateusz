@@ -19,7 +19,7 @@ type Cell = {
 }
 
 const LEVEL_CLASSES: Record<Cell['level'], string> = {
-  0: 'bg-[#101410] border border-[#1a1a1a]',
+  0: 'bg-[#101410] border border-hairline',
   1: 'bg-emerald-900/70 border border-emerald-900/30',
   2: 'bg-emerald-700 border border-emerald-700/40',
   3: 'bg-emerald-500 border border-emerald-500/40 shadow-[0_0_8px_-2px_color-mix(in_oklab,var(--primary)_50%,transparent)]',
@@ -95,7 +95,7 @@ export function HoursCard({
   return (
     <section
       aria-label="Godziny"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
+      className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
       <header className="flex items-start justify-between gap-3">
         <div>
@@ -122,7 +122,7 @@ export function HoursCard({
       </header>
 
       <div className="mt-4">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#161616]">
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
           <div
             className="h-full rounded-full bg-emerald-500"
             style={{

@@ -30,20 +30,20 @@ export function QuarterlySummaryCard() {
   return (
     <section
       aria-label="Kwartały"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
+      className="rounded-lg border border-hairline bg-surface-1"
     >
-      <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
+      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
         <div className="flex items-center gap-2">
           <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Kwartały
           </p>
-          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
+          <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
             ostatnie 4
           </span>
         </div>
         <Link
           href="/invoices"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
         >
           Wystaw fakturę
           <ArrowUpRight className="h-3 w-3" aria-hidden />
@@ -63,7 +63,7 @@ export function QuarterlySummaryCard() {
           Brak danych do podsumowania.
         </div>
       ) : (
-        <ul role="list" className="divide-y divide-[#161616]">
+        <ul role="list" className="divide-y divide-hairline">
           {data.map((q) => (
             <QuarterRow key={q.id} quarter={q} />
           ))}
@@ -91,7 +91,7 @@ function QuarterRow({ quarter: q }: { quarter: OverallQuarterSummary }) {
             ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
             : q.workedDays > 0
               ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
-              : 'border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400')
+              : 'border-hairline bg-surface-2 text-zinc-400')
         }
       >
         {q.invoiced ? (

@@ -52,7 +52,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
           <span
             className={cn(
               'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold',
-              'bg-[#17171a] text-zinc-200 ring-1 ring-[#2a2a30]',
+              'bg-surface-3 text-zinc-200 ring-1 ring-hairline-strong',
             )}
           >
             <Pin className="h-3 w-3" aria-hidden />

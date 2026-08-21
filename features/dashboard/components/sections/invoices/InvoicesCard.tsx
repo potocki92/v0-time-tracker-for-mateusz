@@ -80,20 +80,20 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
   return (
     <section
       aria-label="Faktury"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a]"
+      className="rounded-lg border border-hairline bg-surface-1"
     >
-      <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3">
+      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
         <div className="flex items-center gap-2">
           <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Faktury
           </p>
-          <span className="rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-0.5 text-2xs text-zinc-300">
+          <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
             {invoices.length} · {periodShort}
           </span>
         </div>
         <Link
           href="/invoices"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-[#141414] hover:text-white"
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
         >
           Zobacz wszystkie
           <ArrowUpRight className="h-3 w-3" aria-hidden />
@@ -105,7 +105,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
           Brak faktur.
         </div>
       ) : (
-        <ul role="list" className="divide-y divide-[#161616]">
+        <ul role="list" className="divide-y divide-hairline">
           {visible.map((inv) => {
             const key = statusFromInvoice(inv)
             const pill = STATUS_PILL[key]
@@ -117,11 +117,11 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
               <li key={inv.id}>
                 <Link
                   href="/invoices"
-                  className="flex items-center gap-3 px-4 py-3 transition hover:bg-[#0c0c0c]"
+                  className="flex items-center gap-3 px-4 py-3 transition hover:bg-surface-1"
                 >
                   <span
                     aria-hidden
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400"
                   >
                     <FileText className="h-4 w-4" />
                   </span>
@@ -149,7 +149,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
         </ul>
       )}
 
-      <footer className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-[#161616] px-4 py-3">
+      <footer className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-hairline px-4 py-3">
         <p className="text-xs text-zinc-400">
           Łącznie wystawione ·{' '}
           {totals.length === 0 ? (
@@ -169,7 +169,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
         </p>
         <Link
           href="/invoices?action=new"
-          className="inline-flex items-center gap-1 rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] px-2.5 py-1.5 text-xs font-semibold text-white transition hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300"
+          className="inline-flex items-center gap-1 rounded-lg border border-hairline bg-surface-2 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300"
         >
           <Plus className="h-3.5 w-3.5" aria-hidden />
           Nowa

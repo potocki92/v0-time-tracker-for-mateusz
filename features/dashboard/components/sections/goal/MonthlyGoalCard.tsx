@@ -72,7 +72,7 @@ export function MonthlyGoalCard({
   return (
     <section
       aria-label="Cel miesięczny"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
+      className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
       <header className="flex items-center justify-between">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
@@ -82,7 +82,7 @@ export function MonthlyGoalCard({
           type="button"
           aria-label="Edytuj cel miesięczny"
           onClick={onEdit}
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400 transition hover:bg-[#141414] hover:text-white"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-400 transition hover:bg-surface-3 hover:text-white"
         >
           <Pencil className="h-3.5 w-3.5" aria-hidden />
         </button>
@@ -107,13 +107,13 @@ export function MonthlyGoalCard({
       </div>
 
       <div className="mt-3.5 grid grid-cols-2 gap-2">
-        <div className="rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] px-3 py-2.5">
+        <div className="rounded-lg border border-hairline bg-surface-2 px-3 py-2.5">
           <p className="text-2xs font-semibold uppercase tracking-wider text-zinc-400">Nadwyżka</p>
           <p className="mt-1 text-base font-semibold tabular-nums text-emerald-400">
             +{formatCurrency(surplus, currency)}
           </p>
         </div>
-        <div className="rounded-lg border border-[#1a1a1a] bg-[#0e0e0e] px-3 py-2.5">
+        <div className="rounded-lg border border-hairline bg-surface-2 px-3 py-2.5">
           <p className="text-2xs font-semibold uppercase tracking-wider text-zinc-400">Seria</p>
           <p className="mt-1 text-base font-semibold tabular-nums text-white">
             {streakDays} dni

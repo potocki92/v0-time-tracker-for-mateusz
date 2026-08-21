@@ -33,13 +33,13 @@ export function QuickActions() {
   return (
     <section
       aria-label="Szybkie akcje"
-      className="rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-4"
+      className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
       <header className="flex items-center justify-between">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Szybkie akcje
         </p>
-        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#1a1a1a] bg-[#0e0e0e] text-zinc-400">
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-400">
           <Command className="h-3.5 w-3.5" aria-hidden />
         </span>
       </header>
@@ -51,8 +51,8 @@ export function QuickActions() {
             href={href}
             className={`group relative flex items-start gap-3 overflow-hidden rounded-lg border p-3 transition ${
               highlight
-                ? 'border-[#1a1a1a] bg-[#0e120e] hover:border-emerald-500/40 hover:bg-emerald-500/[0.08]'
-                : 'border-[#1a1a1a] bg-[#0e0e0e] hover:border-[#262626] hover:bg-[#111]'
+                ? 'border-hairline bg-[#0e120e] hover:border-emerald-500/40 hover:bg-emerald-500/[0.08]'
+                : 'border-hairline bg-surface-2 hover:border-hairline-strong hover:bg-surface-3'
             }`}
           >
             {highlight && (

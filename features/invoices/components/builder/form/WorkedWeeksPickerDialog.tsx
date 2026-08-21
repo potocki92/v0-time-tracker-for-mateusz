@@ -171,13 +171,13 @@ export function WorkedWeeksPickerDialog({
                 </EmptyHeader>
               </Empty>
             ) : (
-              <ul className="divide-y divide-[#1a1a1a]" role="list">
+              <ul className="divide-y divide-hairline" role="list">
                 {weeks.map((week) => {
                   const checked = selected.has(week.id)
                   return (
                     <li key={week.id}>
                       <label
-                        className="flex cursor-pointer items-start gap-3 px-4 py-3 transition hover:bg-[#0e0e0e]"
+                        className="flex cursor-pointer items-start gap-3 px-4 py-3 transition hover:bg-surface-2"
                         htmlFor={`week-${week.id}`}
                       >
                         <Checkbox

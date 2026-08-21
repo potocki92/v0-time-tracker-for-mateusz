@@ -60,7 +60,7 @@ const TITLE_DESCRIPTION = 'Uzupełnij podstawowe dane, budżet oraz terminy real
  * przyciemniony overlay — inaczej druga warstwa zlewałaby się z pierwszą.
  */
 const STACKED_LAYER = 'z-[60]'
-const STACKED_OVERLAY = 'z-[60] bg-black/60 backdrop-blur-sm'
+const STACKED_OVERLAY = 'z-[60] bg-surface-0/60 backdrop-blur-sm'
 /** Listy selectów portalują się do body z bazowym z-50, więc bez podbicia
  *  chowają się pod overlayem formularza — kliknięcie trafiało w overlay. */
 const STACKED_POPOVER = 'z-[70]'

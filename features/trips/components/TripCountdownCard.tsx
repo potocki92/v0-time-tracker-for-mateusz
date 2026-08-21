@@ -23,16 +23,16 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
     return (
       <section
         aria-label="Wyjazdy"
-        className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
+        className="rounded-2xl border border-hairline bg-surface-1"
       >
-        <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
+        <header className="flex items-center justify-between border-b border-hairline px-4 py-3 sm:px-5">
           <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             Wyjazdy
           </p>
           <button
             type="button"
             onClick={onManage}
-            className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+            className="inline-flex items-center gap-1 rounded-md border border-hairline bg-surface-2 px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3"
           >
             <Plus className="h-3 w-3" aria-hidden />
             Dodaj
@@ -68,16 +68,16 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
   return (
     <section
       aria-label="Licznik wyjazdu"
-      className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a]"
+      className="rounded-2xl border border-hairline bg-surface-1"
     >
-      <header className="flex items-center justify-between border-b border-[#161616] px-4 py-3 sm:px-5">
+      <header className="flex items-center justify-between border-b border-hairline px-4 py-3 sm:px-5">
         <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
           Wyjazdy
         </p>
         <button
           type="button"
           onClick={onManage}
-          className="inline-flex items-center gap-1 rounded-md border border-[#1a1a1a] bg-[#0e0e0e] px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-[#262626] hover:bg-[#141414]"
+          className="inline-flex items-center gap-1 rounded-md border border-hairline bg-surface-2 px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3"
         >
           <Settings2 className="h-3 w-3" aria-hidden />
           Zarządzaj

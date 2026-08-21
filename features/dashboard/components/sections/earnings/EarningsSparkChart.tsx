@@ -29,7 +29,7 @@ function makeChartTooltip(privacyMode: boolean, compareMode: boolean) {
       row.forecast !== null && Number.isFinite(row.forecast) && !Number.isFinite(row.cumulative)
 
     return (
-      <div className="rounded-lg border border-[#1f1f1f] bg-[#0a0a0a] px-2.5 py-1.5 text-xs shadow-2xl">
+      <div className="rounded-lg border border-hairline bg-surface-1 px-2.5 py-1.5 text-xs shadow-2xl">
         <p className="font-medium text-white">{row.label}</p>
         <p className={cn('tabular-nums', isForecast ? 'text-zinc-400' : 'text-emerald-400')}>
           {maskValue(formatCurrency(value, 'PLN'), privacyMode)}

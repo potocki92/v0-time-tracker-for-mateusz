@@ -21,7 +21,7 @@ export function ClientsSkeleton() {
 
       {/* Karta „Aktualny zleceniodawca" — bez niej lista podskakiwała
           o własną wysokość w momencie dojścia danych. */}
-      <div className="space-y-3 rounded-2xl border border-[#2a2a30] bg-[#101012] p-4">
+      <div className="space-y-3 rounded-2xl border border-hairline-strong bg-surface-2 p-4">
         <Skeleton className="h-4 w-44" />
         <div className="flex items-center gap-3">
           <Skeleton className="size-11 rounded-full" />

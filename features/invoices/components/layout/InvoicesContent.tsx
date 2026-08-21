@@ -344,7 +344,7 @@ export function InvoicesContent() {
               variant="outline"
               size="icon"
               aria-label="Więcej akcji"
-              className="h-10 w-10 shrink-0 rounded-xl border-[#1a1a1a] bg-[#0a0a0a] text-zinc-300 hover:border-[#262626] hover:bg-[#0e0e0e] hover:text-white"
+              className="h-10 w-10 shrink-0 rounded-xl border-hairline bg-surface-1 text-zinc-300 hover:border-hairline-strong hover:bg-surface-2 hover:text-white"
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
@@ -410,7 +410,7 @@ export function InvoicesContent() {
 
           {filteredInvoices.length === 0 ? (
             data.invoices.length === 0 ? (
-              <Empty className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a]">
+              <Empty className="rounded-2xl border border-dashed border-hairline bg-surface-1">
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
                     <FileText className="size-5" />
@@ -423,7 +423,7 @@ export function InvoicesContent() {
                 <Button onClick={openCreate}>Dodaj pierwszą fakturę</Button>
               </Empty>
             ) : (
-              <div className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-400">
+              <div className="rounded-2xl border border-dashed border-hairline bg-surface-1 px-4 py-10 text-center text-sm text-zinc-400">
                 Brak faktur dopasowanych do filtrów.
               </div>
             )
@@ -477,7 +477,7 @@ export function InvoicesContent() {
               />
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-[#1f1f1f] bg-[#0a0a0a] px-4 py-10 text-center text-sm text-zinc-400">
+            <div className="rounded-2xl border border-dashed border-hairline bg-surface-1 px-4 py-10 text-center text-sm text-zinc-400">
               Wybierz fakturę z listy, aby zobaczyć szczegóły.
             </div>
           )}
@@ -490,7 +490,7 @@ export function InvoicesContent() {
       >
         <SheetContent
           side="bottom"
-          className="max-h-[90dvh] overflow-y-auto rounded-t-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-0 lg:hidden"
+          className="max-h-[90dvh] overflow-y-auto rounded-t-2xl border border-hairline bg-surface-1 p-0 lg:hidden"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Szczegóły faktury</SheetTitle>
