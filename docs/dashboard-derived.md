@@ -67,3 +67,76 @@ ma WLASNY `useMemo` w WLASNYM komponencie. React memoizuje per instancja hooka,
 nie per argument — szesc sekcji pytajacych o to samo dostaje szesc niezaleznych
 cache'y. `calculateTotals` dodatkowo buduje `new Map(clients.map(...))` przy kazdym
 wywolaniu, wiec koszt to nie tylko przebieg po wpisach.
+
+## Po konsolidacji
+
+Ta sama jedna zmiana zakresu, po Etapie 3:
+
+| Licznik | Przed | Po | Gdzie zostalo |
+|---|---:|---:|---|
+| filtr po dacie | 7 | **2** | `computeDashboardDerived` — biezacy i poprzedni zakres |
+| `partitionByRealization` | 7 | **3** | `computeDashboardDerived` — filtered, prevFiltered, wszystkie wpisy |
+| `calculateTotals` | 9 | **4** | provider ×2 (zrealizowane + planowane), `useEarningsTrend` ×2 |
+
+### Dlaczego partycjonowanie stoi na 3, a nie na 2
+
+Trzecie wywolanie to `realizedAll` — zrealizowane wpisy BEZ filtra zakresu.
+Sekcja Projekty buduje z nich liste projektow "kiedykolwiek", a zakresem decyduje
+tylko o tym, ktore z nich sa aktywne. Bez tego pola lista projektow gubilaby
+wszystko spoza biezacego zakresu, czyli zmienialaby to, co widac na ekranie.
+
+Wczesniej to wywolanie tez istnialo (`useRealizedEntries(data.workEntries)`
+w `ProjectsSection`) i mialo deps `[workEntries]`, wiec przy zmianie zakresu
+sie nie przeliczalo — teraz przelicza, bo siedzi w tym samym memo co reszta.
+Zejscie do 2 wymagaloby drugiego `useMemo` w providerze, z deps
+`[workEntries, todayIso]`. Test `__test__/config/dashboard-derived.test.ts`
+pilnuje dokladnie jednego `useMemo`, wiec to swiadomy wybor: jedno miejsce
+wyliczen kosztem jednego przebiegu O(N) wiecej.
+
+### Dlaczego calculateTotals stoi na 4, a nie na 2
+
+Dwa nadmiarowe wywolania siedza w `useEarningsTrend`. `calculateMonthlyTotals`
+to alias `calculateTotals`, a trend potrzebuje z niego jednego pola —
+`totalEarningsAllPLN` dla biezacego i poprzedniego okresu. Biezacy okres jest
+juz policzony w `derived.totals`; brakuje tylko sum dla `prevRealized`.
+
+Kandydat na Etap 3b: dodac `prevTotals` do `DashboardDerived` i zmienic
+`useEarningsTrend` tak, zeby przyjmowal dwa gotowe `MonthlyTotals` zamiast
+dwoch tablic wpisow. To zdejmuje oba wywolania i schodzi do 2.
+
+`useEarningsSparkline` NIE wola `calculateTotals` — ma wlasna agregacje dzienna
+przez `calculateEarnings`. Jest wolany dwa razy, ale z roznym wejsciem
+(biezacy i poprzedni okres), wiec nie ma tu duplikacji do usuniecia.
+
+### Co zostalo poza providerem i dlaczego
+
+- `useChartMetrics` (wykres) — 2 filtry + 2 partycjonowania, ale na WLASNYM
+  zakresie z `useChartState`. Naglowek dashboardu go nie rusza, wiec przy zmianie
+  zakresu nie przelicza sie w ogole. Dlatego `useFilteredEntries`
+  i `useRealizedEntries` zyja dalej — knip nie zglosil ich jako martwych.
+- `buildWeeklySummary` — jedno partycjonowanie, deps `[workEntries, clients,
+  projects, weekStart]`, wiec zakres go nie dotyczy.
+
+## Bundle
+
+First Load JS (gzip) trasy `/(app)/dashboard/page`, wg `npm run perf:budget`:
+
+| | kB |
+|---|---:|
+| przed (be6a8a3) | 265.2 |
+| po | 265.5 |
+
+Refaktor, wiec plasko — +0.3 kB to koszt jednego dodatkowego contextu.
+
+## Martwe hooki
+
+Knip po migracji zglosil trzy pliki, wszystkie usuniete:
+
+- `features/dashboard/hooks/useDashboardTotal.ts`
+- `features/dashboard/hooks/usePeriodLabel.ts`
+- `features/dashboard/hooks/index.ts` — barrel przestal miec konsumentow, bo
+  sekcje importuja z konkretnych sciezek
+
+`useFilteredEntries.ts` i `useRealizedEntries.ts` ZOSTAJA — ich konsumentem jest
+`useChartMetrics`. To wciaz modul dashboardu, wiec nikt spoza feature'a na nich
+nie polega.
