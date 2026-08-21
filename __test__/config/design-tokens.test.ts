@@ -70,6 +70,70 @@ describe('design tokens — WCAG contrast across every theme', () => {
   }
 })
 
+const SURFACE_STEPS = [
+  'surface-0',
+  'surface-1',
+  'surface-2',
+  'surface-3',
+  'hairline',
+  'hairline-strong',
+] as const
+
+describe('design tokens — skala powierzchni panelu', () => {
+  it('kazdy motyw definiuje pelna skale', () => {
+    for (const [name, vars] of Object.entries(themes)) {
+      for (const step of SURFACE_STEPS) {
+        expect(vars[step], `${name} nie definiuje --${step}`).toBeDefined()
+      }
+    }
+  })
+
+  it('skala rosnie monotonicznie — kazdy stopien jasniejszy od poprzedniego', () => {
+    for (const [name, vars] of Object.entries(themes)) {
+      const steps = SURFACE_STEPS.map((s) => [s, luminance(vars[s])] as const)
+      for (let i = 1; i < steps.length; i++) {
+        expect(
+          steps[i][1],
+          `${name}: --${steps[i][0]} nie jest jasniejszy niz --${steps[i - 1][0]} — hierarchia glebi sie rozjezdza`,
+        ).toBeGreaterThan(steps[i - 1][1])
+      }
+    }
+  })
+
+  it('kontur odroznia sie od powierzchni, ktora obramowuje', () => {
+    for (const [name, vars] of Object.entries(themes)) {
+      expect(
+        Number(contrast(vars['hairline'], vars['surface-1']).toFixed(3)),
+        `${name}: kontur na karcie jest niewidoczny`,
+      ).toBeGreaterThan(1.15)
+      expect(
+        Number(contrast(vars['hairline-strong'], vars['surface-2']).toFixed(3)),
+        `${name}: kontur hover na kafelku jest niewidoczny`,
+      ).toBeGreaterThan(1.2)
+    }
+  })
+
+  it('biel i zinc-400 zachowuja kontrast AA na kazdym stopniu skali', () => {
+    // Tekst na panelu jest jeszcze zahardkodowany (text-white / text-zinc-400).
+    // Ten test pilnuje, ze kazdy nowy stopien skali go udzwignie — dzieki temu
+    // Etap 1b (migracja tekstu) bedzie podmiana klas, a nie polowaniem na kontrast.
+    const WHITE = 'oklch(1 0 0)'
+    const ZINC_400 = 'oklch(0.7118 0.0129 286.1)'
+    for (const [name, vars] of Object.entries(themes)) {
+      for (const step of ['surface-1', 'surface-2', 'surface-3'] as const) {
+        expect(
+          Number(contrast(WHITE, vars[step]).toFixed(2)),
+          `${name}: biel na --${step}`,
+        ).toBeGreaterThanOrEqual(4.5)
+        expect(
+          Number(contrast(ZINC_400, vars[step]).toFixed(2)),
+          `${name}: tekst pomocniczy na --${step}`,
+        ).toBeGreaterThanOrEqual(4.5)
+      }
+    }
+  })
+})
+
 describe('design tokens — the scale is actually used', () => {
   function walk(dir: string, acc: string[] = []): string[] {
     for (const entry of readdirSync(dir)) {
@@ -81,6 +145,12 @@ describe('design tokens — the scale is actually used', () => {
   }
 
   const components = ['app', 'features', 'components'].flatMap((d) => walk(resolve(ROOT, d)))
+
+  /** Moduly palet trzymane w .ts — `walk` zbiera wylacznie .tsx. */
+  const SURFACE_TOKEN_MODULES = [
+    'features/projects/components/linear/linear.tokens.ts',
+    'features/clients/components/clients.tokens.ts',
+  ]
 
   it('has no arbitrary font sizes outside the type scale', () => {
     const offenders: string[] = []
@@ -108,6 +178,33 @@ describe('design tokens — the scale is actually used', () => {
     for (const step of ['xs', 'sm', 'md', 'lg', 'xl']) {
       expect(css, `brak --shadow-${step}`).toContain(`--shadow-${step}:`)
     }
+  })
+
+  it('nie hardkoduje powierzchni ani konturow panelu', () => {
+    const SURFACE_HEX =
+      /\b(?:bg|border|divide|ring)-\[#(?:0a0a0a|0c0c0c|0e0e0e|101012|111|141414|151519|161616|17171a|1a1a1a|1f1f1f|212126|262626|2a2a30)\]/g
+    const offenders: string[] = []
+    // Palety modulow Projects i Clients mieszkaja w .ts, wiec `components`
+    // (samo .tsx) by ich nie objal — a to wlasnie tam literaly siedzialy najglebiej.
+    for (const file of [...components, ...SURFACE_TOKEN_MODULES]) {
+      const hits = readFileSync(resolve(ROOT, file), 'utf8').match(SURFACE_HEX)
+      if (hits) offenders.push(`${file}  (${[...new Set(hits)].join(', ')})`)
+    }
+    expect(
+      offenders,
+      `literal hex omija motyw — uzyj bg-surface-0..3 / border-hairline / border-hairline-strong:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('nie uzywa bg-black w panelu', () => {
+    // Landing (app/(marketing)) to osobna strefa wizualna — jego nie dotyczy.
+    const offenders = components
+      .filter((f) => f.startsWith('features/') || f.startsWith('app/(app)'))
+      .filter((f) => /\bbg-black(\/\d+)?\b/.test(readFileSync(resolve(ROOT, f), 'utf8')))
+    expect(
+      offenders,
+      `tlo strony panelu to --surface-0, nie czern absolutna:\n${offenders.join('\n')}`,
+    ).toEqual([])
   })
 
   it('keeps every step of the type scale distinct', () => {
