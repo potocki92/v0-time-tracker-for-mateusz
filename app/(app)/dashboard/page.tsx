@@ -8,6 +8,9 @@ import { DashboardContent, DashboardContentBoundary, DashboardSkeleton } from '@
 import { getDashboardDataServer } from '@/features/dashboard/server'
 import { QUERY_KEYS } from '@/lib/query/queryKeys'
 import { QUERY_CONFIG } from '@/lib/query/queryConfig'
+import { workspaceMetadata } from '@/lib/workspace/sections'
+
+export const metadata = workspaceMetadata('dashboard')
 
 /**
  * Default export jest SYNCHRONICZNY celowo.

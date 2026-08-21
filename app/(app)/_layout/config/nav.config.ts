@@ -11,79 +11,57 @@ import {
   Workflow,
   Sparkles,
 } from 'lucide-react'
-import { NavSection, PinnedItem } from '../types/nav.types'
+import {
+  WORKSPACE_GROUP_LABELS,
+  WORKSPACE_SECTIONS,
+  sectionHref,
+  type WorkspaceGroup,
+  type WorkspaceSegment,
+} from '@/lib/workspace/sections'
+import { NavItem, NavQuickAction, NavSection, PinnedItem } from '../types/nav.types'
 
 /**
  * Konfiguracja nawigacji bocznej.
  *
- * Sekcje:
- *  • Workspace  — codzienna praca (Pulpit, Kalendarz, Projekty, Klienci, Faktury)
- *  • Insights   — analityka (Raporty, Cele, Zarobki, Asystent AI)
- *  • Automation — moduły zwiększające postrzeganą wartość produktu (Integracje,
- *    Automatyzacje). Tutaj projektant aplikacji "obiecuje" auto-fakturowanie,
- *    Slack/Trello sync etc. — to są dźwignie do up-sellu.
- *
- * Każdy element może mieć:
- *  • `quickAction` — szybki "+" na hover (Projekty, Klienci),
- *  • `badge`       — wskaźnik (np. nieopłacone faktury, "Beta", "Nowość").
+ * Kolejnosc, etykiety, skroty i badge'e pochodza z rejestru sekcji
+ * (`lib/workspace/sections.ts`) — ten sam rejestr zasila breadcrumb w
+ * naglowku i dolna nawigacje. Tutaj zostaje wylacznie warstwa prezentacji:
+ * ikona i inline Quick Action ("+").
  */
-export const NAV_SECTIONS: NavSection[] = [
-  {
-    id: 'workspace',
-    label: 'Obszar roboczy',
-    items: [
-      { href: '/dashboard', label: 'Pulpit',    icon: LayoutDashboard, shortcut: 'D' },
-      { href: '/calendar',  label: 'Kalendarz', icon: Calendar,        shortcut: 'C' },
-      {
-        href: '/projects',
-        label: 'Projekty',
-        icon: FolderKanban,
-        shortcut: 'P',
-        quickAction: { href: '/projects?new=1', label: 'Dodaj projekt' },
-      },
-      {
-        href: '/clients',
-        label: 'Klienci',
-        icon: Users,
-        quickAction: { href: '/clients?new=1', label: 'Dodaj klienta' },
-      },
-      { href: '/invoices', label: 'Faktury', icon: FileText, shortcut: 'I' },
-    ],
-  },
-  {
-    id: 'insights',
-    label: 'Statystyki',
-    items: [
-      { href: '/reports', label: 'Raporty', icon: LineChart },
-      { href: '#goals',    label: 'Cele',    icon: Target },
-      { href: '#earnings', label: 'Zarobki', icon: Wallet },
-      {
-        href: '#ai-assistant',
-        label: 'Asystent AI',
-        icon: Sparkles,
-        badge: { label: 'Beta' },
-      },
-    ],
-  },
-  {
-    id: 'automation',
-    label: 'Automatyzacja',
-    items: [
-      {
-        href: '#integrations',
-        label: 'Integracje',
-        icon: Plug,
-        badge: { label: 'Slack · Trello' },
-      },
-      {
-        href: '#automations',
-        label: 'Automatyzacje',
-        icon: Workflow,
-        badge: { label: 'Nowość' },
-      },
-    ],
-  },
-]
+const SECTION_ICONS: Record<WorkspaceSegment, NavItem['icon']> = {
+  dashboard:      LayoutDashboard,
+  calendar:       Calendar,
+  projects:       FolderKanban,
+  clients:        Users,
+  invoices:       FileText,
+  reports:        LineChart,
+  goals:          Target,
+  earnings:       Wallet,
+  'ai-assistant': Sparkles,
+  integrations:   Plug,
+  automations:    Workflow,
+}
+
+/** Szybki "+" na hover — tylko tam, gdzie sekcja ma formularz dodawania. */
+const SECTION_QUICK_ACTIONS: Partial<Record<WorkspaceSegment, NavQuickAction>> = {
+  projects: { href: '/projects?new=1', label: 'Dodaj projekt' },
+  clients:  { href: '/clients?new=1',  label: 'Dodaj klienta' },
+}
+
+const GROUP_ORDER: WorkspaceGroup[] = ['workspace', 'stats', 'automation']
+
+export const NAV_SECTIONS: NavSection[] = GROUP_ORDER.map((group) => ({
+  id: group,
+  label: WORKSPACE_GROUP_LABELS[group],
+  items: WORKSPACE_SECTIONS.filter((section) => section.group === group).map((section) => ({
+    href: sectionHref(section),
+    label: section.label,
+    icon: SECTION_ICONS[section.segment],
+    shortcut: section.shortcut,
+    quickAction: SECTION_QUICK_ACTIONS[section.segment],
+    badge: section.badge ? { label: section.badge } : undefined,
+  })),
+}))
 
 /**
  * Pinned: szybkie skróty do najczęściej używanych zasobów (projektów / klientów).

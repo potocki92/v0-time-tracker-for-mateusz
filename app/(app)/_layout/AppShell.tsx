@@ -5,10 +5,13 @@ import dynamic from 'next/dynamic'
 import { useQueryClient } from '@tanstack/react-query'
 import type { User } from '@supabase/supabase-js'
 
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { WorkspaceHeader } from '@/components/workspace/workspace-header'
+import { WorkspaceHeaderSlotProvider } from '@/components/workspace/workspace-header-slot'
 import { performLogout } from '@/lib/auth/logout'
 import { AppSidebar } from './components/sidebar/AppSidebar'
-import { MobileHeader } from './components/sidebar/MobileHeader'
+import { ThemeToggle } from './components/theme/ThemeToggle'
+import { UserMenu } from './components/user/UserMenu'
 import { BottomNav } from './components/bottom-nav'
 import { AuthWatcher } from './AuthWatcher'
 
@@ -30,6 +33,11 @@ interface AppShellProps {
  * Interaktywna powłoka panelu. Autoryzację robi serwerowy layout — tutaj
  * nie ma już żadnej bramki `loading`, więc treść strony trafia do HTML
  * od razu, bez czekania na hydrację.
+ *
+ * `WorkspaceHeader` stoi tu, nad `<main>`, więc każda trasa panelu dostaje
+ * dokładnie jeden nagłówek. Chrome mobilny (hamburger, motyw, menu
+ * użytkownika) wjeżdża do niego slotami — na desktopie te same funkcje daje
+ * sidebar, dlatego znikają razem z nim.
  */
 export function AppShell({ user, badges, children }: AppShellProps) {
   const queryClient = useQueryClient()
@@ -46,10 +54,20 @@ export function AppShell({ user, badges, children }: AppShellProps) {
       <AppSidebar user={user} onLogout={logout} badges={badges} />
       {/* SidebarInset: wypycha content gdy sidebar rozwinięty */}
       <SidebarInset>
-        <MobileHeader user={user} onLogout={logout} />
-        <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
-          {children}
-        </main>
+        <WorkspaceHeaderSlotProvider>
+          <WorkspaceHeader
+            leading={<SidebarTrigger className="-ml-1 md:hidden" />}
+            trailing={
+              <div className="flex items-center gap-2 md:hidden">
+                <ThemeToggle />
+                <UserMenu user={user} onLogout={logout} />
+              </div>
+            }
+          />
+          <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+            {children}
+          </main>
+        </WorkspaceHeaderSlotProvider>
       </SidebarInset>
       <SettingsDrawer />
       <BottomNav />

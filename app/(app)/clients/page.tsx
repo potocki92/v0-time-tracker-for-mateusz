@@ -7,6 +7,9 @@ import {
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query'
 import { ClientsContent, ClientsContentBoundary, ClientsSkeleton } from '@/features/clients'
 import { getClientsDataServer } from '@/features/clients/server'
+import { workspaceMetadata } from '@/lib/workspace/sections'
+
+export const metadata = workspaceMetadata('clients')
 
 /**
  * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default

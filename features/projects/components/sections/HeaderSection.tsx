@@ -1,6 +1,7 @@
 'use client'
 
 import { Plus, Upload } from 'lucide-react'
+import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
 import { cn } from '@/lib/utils'
 import { LINEAR } from '../linear/linear.tokens'
 
@@ -10,15 +11,14 @@ type HeaderSectionProps = {
 }
 
 /**
- * Slim action bar — celowo bez wielkiego nagłówka i eyebrow,
- * bo nagłówek modułu obsługuje globalny app-shell (sidebar/topbar).
- * Tutaj zostają wyłącznie akcje primary/secondary.
+ * Akcje modułu Projekty. Renderują się przez portal w `WorkspaceHeader`,
+ * więc przycisk stoi w jednym pasku z breadcrumbem, a nie luzem nad treścią.
  */
 export function HeaderSection({ onCreate, onExport }: HeaderSectionProps) {
   if (!onCreate && !onExport) return null
 
   return (
-    <div className="flex flex-wrap items-center justify-end gap-2">
+    <WorkspaceHeaderActions>
       {onExport && (
         <button
           type="button"
@@ -47,6 +47,6 @@ export function HeaderSection({ onCreate, onExport }: HeaderSectionProps) {
           Nowy projekt
         </button>
       )}
-    </div>
+    </WorkspaceHeaderActions>
   )
 }

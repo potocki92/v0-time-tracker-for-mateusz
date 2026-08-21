@@ -1,6 +1,7 @@
 'use client'
 
 import { Plus, Search } from 'lucide-react'
+import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -54,16 +55,19 @@ export function ClientsHeader({
       : `${visibleCount} z ${totalCount} ${pluralize(totalCount)}`
 
   return (
-    <div className="sticky top-0 z-20 -mx-4 border-b bg-background/95 px-4 pb-4 pt-2 backdrop-blur">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Klienci</h1>
-          <p className="text-sm text-muted-foreground">{countLabel}</p>
-        </div>
-        <Button onClick={onAddClient} className="w-full sm:w-auto">
+    // `top-14` zamiast `top-0`: nad tym paskiem stoi teraz przyklejony
+    // WorkspaceHeader (h-14) i tytul chowalby sie pod nim.
+    <div className="sticky top-14 z-20 -mx-4 border-b bg-background/95 px-4 pb-4 pt-2 backdrop-blur">
+      <WorkspaceHeaderActions>
+        <Button size="sm" onClick={onAddClient}>
           <Plus className="mr-2 h-4 w-4" />
           Dodaj klienta
         </Button>
+      </WorkspaceHeaderActions>
+
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Klienci</h1>
+        <p className="text-sm text-muted-foreground">{countLabel}</p>
       </div>
 
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">

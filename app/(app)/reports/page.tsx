@@ -5,6 +5,9 @@ import { ReportsContent, ReportsSkeleton } from '@/features/reports'
 // Wejscie serwerowe, nie kliencki barrel `@/features/dashboard` — dzieki temu
 // `DashboardContent` i reszta klienckiego dashboardu nie wpada do bundle'a raportow.
 import { getDashboardDataServer } from '@/features/dashboard/server'
+import { workspaceMetadata } from '@/lib/workspace/sections'
+
+export const metadata = workspaceMetadata('reports')
 
 /**
  * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default

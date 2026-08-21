@@ -3,6 +3,9 @@ import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query
 import { QUERY_CONFIG, QUERY_KEYS } from '@/lib/query'
 import { ProjectsContent, ProjectsContentBoundary, ProjectsSkeleton } from '@/features/projects'
 import { getProjectsDataServer } from '@/features/projects/server'
+import { workspaceMetadata } from '@/lib/workspace/sections'
+
+export const metadata = workspaceMetadata('projects')
 
 /**
  * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default

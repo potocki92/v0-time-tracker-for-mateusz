@@ -15,7 +15,7 @@ import { usePrefetchRoute } from '@/hooks/prefetch'
  * zakładką — celowo minimalistycznie, zgodnie z linearowym stylem
  * dashboardu.
  *
- * Wysokość paska jest spięta z `MobileHeader` przez wspólny token
+ * Wysokość paska jest spięta z nagłówkiem obszaru roboczego przez wspólny token
  * `--app-bar-height` w `globals.css`.
  */
 export function BottomNav() {

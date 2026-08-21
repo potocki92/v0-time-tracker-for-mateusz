@@ -46,8 +46,8 @@ describe('dashboard — uklad desktopowy', () => {
   })
 
   it('naglowek zostaje poza komorka gridu', () => {
-    // LinearTopBar ma sticky top-0. Sticky dziala tylko w granicach rodzica,
-    // wiec owiniecie naglowka w komorke o jego wlasnej wysokosci = koniec sticky.
+    // HeroGreeting nie jest komorka siatki — wrzucenie go do <DashboardCell>
+    // wciagneloby powitanie w pas KPI i przesunelo caly wiersz.
     const beforeGrid = src.split('data-dashboard-grid')[0]
     expect(beforeGrid, 'HeaderSection ma stac przed kontenerem gridu').toContain(
       '<HeaderSection />',
@@ -64,15 +64,15 @@ describe('dashboard — uklad desktopowy', () => {
     expect(rail, 'sticky musi siedziec na dziecku komorki').toMatch(/xl:sticky/)
   })
 
-  it('offset szyny nie wjezdza pod LinearTopBar', () => {
-    // LinearTopBar: py-2 (16) + h-8 (32) + border-b (1) = 49 px, z-40.
-    // Zmierzone w przegladarce; ponizej tej wartosci szyna chowa sie za paskiem.
+  it('offset szyny nie wjezdza pod naglowek obszaru roboczego', () => {
+    // WorkspaceHeader: h-14 (56 px) + border-b (1) = 57 px, z-30.
+    // Ponizej tej wartosci szyna chowa sie za naglowkiem.
     const rail = src.split('data-dashboard-rail')[1] ?? ''
     const top = rail.match(/xl:top-(\d+)/)?.[1]
     expect(top, 'brak xl:top na przyklejonym dziecku szyny').toBeDefined()
     expect(
       Number(top) * 4,
-      'offset w px musi przekraczac 49 px wysokosci topbara',
-    ).toBeGreaterThan(49)
+      'offset w px musi przekraczac 57 px wysokosci naglowka',
+    ).toBeGreaterThan(57)
   })
 })

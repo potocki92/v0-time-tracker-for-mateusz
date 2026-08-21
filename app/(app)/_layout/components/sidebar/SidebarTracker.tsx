@@ -7,21 +7,18 @@
  * w stanie zatrzymanym i tyka tylko, gdy `running === true`. Przyciski
  * Start / Stop są jedynym źródłem prawdy — żaden useEffect nie nadpisuje
  * tego stanu.
+ *
+ * Sam stan siedzi w `useTimerStore`, nie w tym komponencie — przycisk timera
+ * w nagłówku obszaru roboczego pokazuje ten sam licznik.
  */
 
-import * as React from 'react'
 import { Play, Square } from 'lucide-react'
 import { useSidebar } from '@/components/ui/sidebar'
+import { useElapsedSeconds, useTimerStore } from '@/hooks/stores/useTimerStore'
 import { cn } from '@/lib/utils'
 
 interface SidebarTrackerProps {
   label?: string
-  /** Czy tracker ma startować już uruchomiony (domyślnie false). */
-  defaultRunning?: boolean
-  /** Liczba sekund startowych. */
-  initialSeconds?: number
-  /** Wywoływane przy zmianie stanu running (true=start, false=stop). */
-  onToggle?: (running: boolean) => void
 }
 
 const formatHMS = (total: number) => {
@@ -34,27 +31,13 @@ const formatHMS = (total: number) => {
 
 export function SidebarTracker({
   label = 'Śledzenie · Im Winkel 51',
-  defaultRunning = false,
-  initialSeconds = 0,
-  onToggle,
 }: SidebarTrackerProps) {
   const { state, isMobile } = useSidebar()
   const isCollapsed = state === 'collapsed' && !isMobile
 
-  const [running, setRunning] = React.useState(defaultRunning)
-  const [tick, setTick] = React.useState(initialSeconds)
-
-  React.useEffect(() => {
-    if (!running) return
-    const id = window.setInterval(() => setTick((s) => s + 1), 1000)
-    return () => window.clearInterval(id)
-  }, [running])
-
-  const toggle = () => {
-    const next = !running
-    setRunning(next)
-    onToggle?.(next)
-  }
+  const running = useTimerStore((s) => s.running)
+  const toggle = useTimerStore((s) => s.toggle)
+  const tick = useElapsedSeconds()
 
   if (isCollapsed) {
     return (

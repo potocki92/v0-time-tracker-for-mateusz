@@ -5,6 +5,9 @@ import { InvoicesContent } from '@/features/invoices'
 import { INVOICES_MANAGER_QUERY_KEY } from '@/features/invoices/domain'
 import { getInvoicesDataServer } from '@/features/invoices/server'
 import InvoicesSkeleton from './loading'
+import { workspaceMetadata } from '@/lib/workspace/sections'
+
+export const metadata = workspaceMetadata('invoices')
 
 /**
  * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default
