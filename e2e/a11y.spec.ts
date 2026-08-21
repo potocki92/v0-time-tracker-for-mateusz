@@ -44,3 +44,27 @@ test('formularz logowania jest obslugiwalny z klawiatury', async ({ page }) => {
   await page.keyboard.press('Tab')
   await expect(page.getByRole('button', { name: 'Zaloguj się' })).toBeFocused()
 })
+
+/**
+ * Reguly landmarkow siedza w tagu `best-practice`, ktorego glowny skan
+ * powyzej nie obejmuje. Wlaczamy je punktowo — celowo waskim `withRules`,
+ * a nie rozszerzeniem `withTags`, zeby nie wciagnac calego dlugu
+ * best-practice do bramki jednym ruchem.
+ */
+for (const route of ROUTES) {
+  test(`${route} ma dokladnie jeden landmark main`, async ({ page }) => {
+    await page.goto(route)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+
+    const { violations } = await new AxeBuilder({ page })
+      .withRules(['landmark-one-main', 'landmark-unique', 'landmark-no-duplicate-main'])
+      .analyze()
+
+    const summary = violations
+      .map((v) => `${v.id} — ${v.nodes.length}x\n    ${v.helpUrl}`)
+      .join('\n  ')
+
+    expect(violations, `landmarki na ${route}:\n  ${summary}`).toEqual([])
+  })
+}
+

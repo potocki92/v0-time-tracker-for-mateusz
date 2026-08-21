@@ -37,7 +37,11 @@ import {
 export function DashboardContent() {
   return (
     <DashboardRangeProvider>
-      <main className="min-h-screen bg-surface-0 text-white">
+      {/* Nie <main> — AppShell renderuje juz landmark main z id="main-content",
+          na ktory celuje skip-link. Zagniezdzony drugi main duplikuje landmark
+          i lamie nawigacje czytnika ekranu. Pozostale sekcje (Calendar,
+          Projects, Reports) uzywaja tu <div> — to wyrownanie do nich. */}
+      <div className="min-h-screen bg-surface-0 text-white">
         <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3">
           <HeaderSection />
 
@@ -73,7 +77,7 @@ export function DashboardContent() {
 
           <Footer />
         </div>
-      </main>
+      </div>
     </DashboardRangeProvider>
   )
 }
