@@ -9,11 +9,20 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useCloseModal, useModalState } from '@/hooks/stores/useUiStore'
-import { useProfile, useUpdateAvatar, useUpdateInvoiceAutomationSettings, useUpdateProfile } from '../hooks'
+import {
+  useProfile,
+  useSendWeeklySummaryEmail,
+  useUpdateAvatar,
+  useUpdateInvoiceAutomationSettings,
+  useUpdateProfile,
+  useUpdateWeeklySummaryEmail,
+  useWeeklySummaryEmail,
+} from '../hooks'
 import { AppearanceSettings } from './AppearanceSettings'
 import { AvatarUpload } from './AvatarUpload'
 import { InvoiceAutomationSettings } from './InvoiceAutomationSettings'
 import { ProfileForm } from './ProfileForm'
+import { WeeklySummaryEmailSettings } from './WeeklySummaryEmailSettings'
 
 function SettingsSkeleton() {
   return (
@@ -46,8 +55,12 @@ export function SettingsDrawer() {
   const updateProfile = useUpdateProfile()
   const updateAvatar = useUpdateAvatar()
   const updateInvoiceSettings = useUpdateInvoiceAutomationSettings()
+  const weeklySummaryQuery = useWeeklySummaryEmail()
+  const updateWeeklySummary = useUpdateWeeklySummaryEmail()
+  const sendWeeklySummary = useSendWeeklySummaryEmail()
 
   const profile = profileQuery.data
+  const weeklySummary = weeklySummaryQuery.data
 
   return (
     <Sheet open={modal.open} onOpenChange={(open) => !open && closeModal('settings')}>
@@ -99,6 +112,18 @@ export function SettingsDrawer() {
                 }}
               />
             </>
+          )}
+
+          {weeklySummary && (
+            <WeeklySummaryEmailSettings
+              settings={weeklySummary}
+              isSaving={updateWeeklySummary.isPending}
+              isSending={sendWeeklySummary.isPending}
+              onSave={async (values) => {
+                await updateWeeklySummary.mutateAsync(values)
+              }}
+              onSendNow={() => sendWeeklySummary.mutate()}
+            />
           )}
         </div>
       </SheetContent>

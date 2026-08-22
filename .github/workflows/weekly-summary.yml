@@ -1,0 +1,50 @@
+# .github/workflows/weekly-summary.yml
+#
+# Cotygodniowy skrot przepracowanego tygodnia dla ksiegowej.
+# Wola endpoint aplikacji, ktory sklada dokladnie ten sam tekst,
+# co przycisk „Kopiuj" w podsumowaniu tygodnia.
+#
+# Sekrety repozytorium:
+#   APP_URL     — adres wdrozenia, np. https://time-tracker-mateusz.vercel.app
+#   CRON_SECRET — ten sam sekret, co w zmiennych srodowiskowych aplikacji
+
+name: Weekly Summary Email
+
+on:
+  schedule:
+    # Sobota 16:00 UTC = 18:00 czasu polskiego w lecie (17:00 zima).
+    # GitHub Actions liczy cron wylacznie w UTC — bez przelaczania na DST.
+    - cron: '0 16 * * 6'
+  # Reczne uruchomienie z GitHub UI. Powtorka tego samego tygodnia nie wysle
+  # dubla — endpoint pilnuje `last_sent_week_*`.
+  workflow_dispatch:
+
+jobs:
+  send-weekly-summary:
+    name: Send Weekly Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Invoke endpoint
+        run: |
+          RESPONSE=$(curl --silent --show-error --fail \
+            --request POST \
+            --url "${{ secrets.APP_URL }}/api/cron/weekly-summary" \
+            --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            --header "Content-Type: application/json" \
+            --data '{}')
+
+          echo "Response: $RESPONSE"
+
+          echo "$RESPONSE" | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          if 'error' in data:
+              print(f'ERROR: {data[\"error\"]}')
+              sys.exit(1)
+          print(f'Sent: {data.get(\"sent\", 0)}, Skipped: {data.get(\"skipped\", 0)}, Failed: {data.get(\"failed\", 0)}')
+          if data.get('failed', 0):
+              print('\n'.join(data.get('errors', [])))
+              sys.exit(1)
+          "

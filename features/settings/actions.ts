@@ -7,12 +7,16 @@ import { createClient } from '@/lib/supabase/server'
 import { AVATARS_BUCKET } from '@/lib/supabase/avatars'
 import { resolveAvatarUrl } from '@/lib/supabase/avatars.server'
 import { invoiceSettingsSchema } from '@/lib/schemas/invoice-settings.schema'
+import { sendMail } from '@/lib/email/mailer'
+import { renderWeeklySummaryEmail } from '@/features/dashboard/server'
 import {
   accountSettingsSchema,
   avatarFileSchema,
+  weeklySummaryEmailSchema,
   type AccountProfile,
   type AccountSettingsFormValues,
   type InvoiceSettings,
+  type WeeklySummaryEmailSettings,
 } from './domain'
 
 /**
@@ -134,6 +138,78 @@ export async function updateInvoiceAutomationSettingsAction(
     throw new Error(`Nie udało się zapisać ustawień faktur: ${error.message}`)
   }
 
+}
+
+const WEEKLY_SUMMARY_TABLE = 'weekly_summary_email_settings'
+
+export async function fetchWeeklySummaryEmailAction(): Promise<WeeklySummaryEmailSettings> {
+  const user = await requireServerUser()
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from(WEEKLY_SUMMARY_TABLE)
+    .select('enabled, recipient_email')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (error) {
+    throw new Error(`Nie udało się pobrać ustawień skrótu tygodnia: ${error.message}`)
+  }
+
+  return {
+    enabled: data?.enabled ?? false,
+    recipientEmail: data?.recipient_email ?? '',
+  }
+}
+
+export async function updateWeeklySummaryEmailAction(
+  values: WeeklySummaryEmailSettings,
+): Promise<void> {
+  const parsed = weeklySummaryEmailSchema.safeParse(values)
+  if (!parsed.success) {
+    throw new Error(firstIssue(parsed.error, 'Nieprawidłowe ustawienia skrótu tygodnia'))
+  }
+
+  const user = await requireServerUser()
+  const supabase = await createClient()
+
+  const { error } = await supabase.from(WEEKLY_SUMMARY_TABLE).upsert(
+    {
+      user_id: user.id,
+      enabled: parsed.data.enabled,
+      recipient_email: parsed.data.recipientEmail || null,
+    },
+    { onConflict: 'user_id' },
+  )
+
+  if (error) {
+    throw new Error(`Nie udało się zapisać ustawień skrótu tygodnia: ${error.message}`)
+  }
+}
+
+/**
+ * Wysylka na zadanie — ten sam tekst, ktory automat sle w sobote.
+ *
+ * Nie dotyka `last_sent_*`: proba z ustawien ma nie zabrac ksiegowej
+ * cotygodniowego maila.
+ */
+export async function sendWeeklySummaryEmailNowAction(): Promise<{ recipient: string }> {
+  const settings = await fetchWeeklySummaryEmailAction()
+  if (!settings.recipientEmail) {
+    throw new Error('Najpierw zapisz adres e-mail odbiorcy')
+  }
+
+  const user = await requireServerUser()
+  const supabase = await createClient()
+  const email = await renderWeeklySummaryEmail(supabase, user.id)
+
+  if (email.isEmpty) {
+    throw new Error('Brak przepracowanych dni w tym tygodniu — nie ma czego wysłać')
+  }
+
+  await sendMail({ to: settings.recipientEmail, subject: email.subject, text: email.text })
+
+  return { recipient: settings.recipientEmail }
 }
 
 export async function uploadAvatarAction(

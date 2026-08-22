@@ -10,7 +10,13 @@
 import path from 'node:path'
 import { defineConfig } from 'vitest/config'
 
-const alias = { '@': path.resolve(__dirname, '.') }
+const alias = {
+  '@': path.resolve(__dirname, '.'),
+  // Next podstawia pod `server-only` pusty modul warunkiem `react-server`;
+  // poza nim pakiet celowo rzuca. Bez tego aliasu testy nie tkna zadnego
+  // modulu `*.server.ts`.
+  'server-only': path.resolve(__dirname, 'node_modules/server-only/empty.js'),
+}
 
 export default defineConfig({
   resolve: { alias },
