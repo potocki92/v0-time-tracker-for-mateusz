@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { useMemo } from 'react'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import { Card, CardContent } from '@/components/ui/card'
@@ -43,9 +44,7 @@ export function HoursPerWeekChart({
     <Card className="rounded-lg border-hairline bg-surface-1 py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between gap-2">
-          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
-            Godziny tygodniowo
-          </h3>
+          <SectionEyebrow as="h3">Godziny tygodniowo</SectionEyebrow>
           <span className="rounded-full border border-hairline bg-surface-2 px-2 py-0.5 text-2xs font-medium capitalize text-zinc-400">
             {monthName}
           </span>

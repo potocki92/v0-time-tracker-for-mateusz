@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { ArrowUpRight, ClipboardList } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/helpers'
@@ -20,9 +21,7 @@ export function RecentEntries({ entries, onViewAll }: Props) {
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
           <div>
-            <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
-              Ostatnie wpisy
-            </h3>
+            <SectionEyebrow as="h3">Ostatnie wpisy</SectionEyebrow>
             <p className="text-2xs text-zinc-400">Ostatnie 7 wpisów</p>
           </div>
           {onViewAll && (

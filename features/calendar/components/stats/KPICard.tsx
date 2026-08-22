@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
@@ -26,9 +27,7 @@ export function KPICard({ label, icon, className, children, ariaLabel }: Props) 
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-2xs font-medium uppercase tracking-[0.14em] text-zinc-400">
-          {label}
-        </p>
+        <SectionEyebrow>{label}</SectionEyebrow>
         <div
           className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 sm:h-9 sm:w-9"
           aria-hidden

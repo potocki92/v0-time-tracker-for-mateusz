@@ -18,14 +18,18 @@ export function SectionEyebrow({
   children,
   className,
   as: Tag = 'p',
+  id,
 }: {
   children: ReactNode
   className?: string
   as?: ElementType
+  /** Eyebrow bywa celem `aria-labelledby` sekcji — bez `id` znika etykieta landmarku. */
+  id?: string
 }) {
   return (
     <Tag
       data-slot="eyebrow"
+      id={id}
       className={cn(LINEAR.eyebrow, className)}
     >
       {children}

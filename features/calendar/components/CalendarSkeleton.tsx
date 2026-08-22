@@ -1,3 +1,4 @@
+import { PageContainer } from '@/components/common/section/PageContainer'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -11,7 +12,7 @@ export function CalendarSkeleton() {
         <Skeleton className="h-4 w-32 skeleton" />
       </div>
 
-      <div className="container space-y-4 px-4 py-4 sm:space-y-5 sm:py-6">
+      <PageContainer>
         {/* 4 KPI bento cards */}
         <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
@@ -78,7 +79,7 @@ export function CalendarSkeleton() {
             </Card>
           ))}
         </div>
-      </div>
+      </PageContainer>
     </div>
   )
 }

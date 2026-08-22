@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Card, CardContent } from '@/components/ui/card'
 import { Briefcase } from 'lucide-react'
 import { formatCurrency } from '@/lib/helpers'
@@ -18,9 +19,7 @@ export function TimeByProject({ projects }: Props) {
     <Card className="rounded-lg border-hairline bg-surface-1 py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
-          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
-            Czas wg projektu
-          </h3>
+          <SectionEyebrow as="h3">Czas wg projektu</SectionEyebrow>
           <span className="text-2xs font-semibold tabular-nums text-zinc-300">
             {formatCurrency(total, 'PLN')}
           </span>

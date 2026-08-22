@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { CalendarInsights } from '../../domain/calendar.types'
@@ -31,12 +32,9 @@ export function MonthInsights({ monthName, insights, onViewAllEntries }: Props) 
       className="space-y-3 sm:space-y-4"
     >
       <div className="flex items-baseline justify-between gap-2 px-1">
-        <h2
-          id="month-insights-heading"
-          className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400"
-        >
+        <SectionEyebrow as="h2" id="month-insights-heading">
           Podsumowanie miesiąca
-        </h2>
+        </SectionEyebrow>
         <span className="text-2xs capitalize text-zinc-400">
           {monthName}
         </span>

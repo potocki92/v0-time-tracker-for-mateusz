@@ -1,5 +1,6 @@
 'use client'
 
+import { PageContainer } from '@/components/common/section/PageContainer'
 import { useCallback, useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -177,7 +178,7 @@ export function CalendarContent() {
         totalEntries={monthEntries.length}
       />
 
-      <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
+      <PageContainer>
         <CalendarStatsErrorBoundary>
           <CalendarStats
             {...stats}
@@ -263,7 +264,7 @@ export function CalendarContent() {
         />
 
         <AppFooter />
-      </div>
+      </PageContainer>
 
       <DayEntryDialog
         open={dialog.isOpen}
