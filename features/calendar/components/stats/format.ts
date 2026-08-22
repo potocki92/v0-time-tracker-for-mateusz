@@ -1,8 +1,6 @@
-export function pluralizeDays(n: number): string {
-  return n === 1 ? 'dzień' : 'dni'
-}
+import { formatCount } from '@/lib/format'
 
-/** Grosze/centy → jednostki główne dla `formatCurrency`. */
-export function toMajorUnits(minor: number): number {
-  return minor / 100
+/** "1 dzień" / "2 dni" / "5 dni" — odmiana idzie przez Intl.PluralRules. */
+export function countDays(count: number): string {
+  return formatCount(count, ['dzień', 'dni', 'dni'])
 }

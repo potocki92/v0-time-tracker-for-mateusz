@@ -119,7 +119,7 @@ describe('renderWeeklySummaryEmail', () => {
 
     const email = await renderWeeklySummaryEmail(supabase, 'u1')
 
-    expect(email.subject).toBe('Podsumowanie tygodnia KW 34/2026 (17.08 – 23.08.2026)')
+    expect(email.subject).toBe('Podsumowanie tygodnia KW 34/2026 (17-23.08.2026)')
     expect(email.weekNumber).toBe(34)
     expect(email.weekYear).toBe(2026)
     expect(email.isEmpty).toBe(false)

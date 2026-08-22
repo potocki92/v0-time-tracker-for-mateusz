@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { TrendingUp } from 'lucide-react'
 import type { CURRENCY } from '@/lib/types'
-import { formatCurrency } from '@/lib/helpers'
+import { formatMoney, toMinor } from '@/lib/format'
 import type { CashflowMonth } from '../../domain/stats'
 
 interface InvoiceCashflowCardProps {
@@ -43,7 +43,7 @@ export function InvoiceCashflowCard({
 
       <div className="mt-3 flex items-baseline gap-2">
         <span className="text-3xl font-semibold tracking-tight tabular-nums text-white sm:text-4xl">
-          {formatCurrency(total, currency)}
+          {formatMoney(toMinor(total), currency)}
         </span>
         <span className="text-xs text-zinc-400">łącznie wystawione</span>
       </div>
@@ -66,7 +66,7 @@ export function InvoiceCashflowCard({
                 }
                 style={{ height: `${Math.round(ratio * 100)}%` }}
                 role="img"
-                aria-label={`${m.label}: ${formatCurrency(m.total, currency)}`}
+                aria-label={`${m.label}: ${formatMoney(toMinor(m.total), currency)}`}
               />
             </div>
           )

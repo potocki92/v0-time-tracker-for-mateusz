@@ -2,7 +2,7 @@
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Pencil } from 'lucide-react'
-import { formatCurrency } from '@/lib/helpers'
+import { formatCount, formatMoney, formatMoneyDelta, formatPercent, toMinor } from '@/lib/format'
 import type { Currency } from '../../../types/dashboard.types'
 
 type Props = {
@@ -31,7 +31,7 @@ function CircularProgress({ value }: { value: number }) {
         viewBox={`0 0 ${size} ${size}`}
         className="-rotate-90"
         role="img"
-        aria-label={`${clamped.toFixed(0)}% celu miesięcznego`}
+        aria-label={`${formatPercent(clamped / 100)} celu miesięcznego`}
       >
         <circle cx={size / 2} cy={size / 2} r={radius} stroke="var(--surface-3)" strokeWidth={stroke} fill="none" />
         <circle
@@ -51,7 +51,9 @@ function CircularProgress({ value }: { value: number }) {
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="text-xl font-bold tabular-nums text-white">{clamped.toFixed(0)}%</span>
+        <span className="text-xl font-bold tabular-nums text-white">
+          {formatPercent(clamped / 100)}
+        </span>
       </div>
     </div>
   )
@@ -92,16 +94,18 @@ export function MonthlyGoalCard({
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium leading-[1.3] text-white sm:text-sm">{headline}</p>
           <p className="mt-1 text-xl font-semibold tabular-nums leading-[1.2] text-white sm:text-2xl sm:font-bold">
-            {formatCurrency(target, currency)}
+            {formatMoney(toMinor(target), currency)}
           </p>
           {reachedDate && reached ? (
             <p className="text-2xs leading-[1.35] text-zinc-400 sm:text-xs">Osiągnięty {reachedDate}</p>
           ) : (
             <p className="text-2xs leading-[1.35] text-zinc-400 sm:text-xs">
-              Aktualnie {formatCurrency(current, currency)}
+              Aktualnie {formatMoney(toMinor(current), currency)}
             </p>
           )}
-          <p className="mt-1 text-2xs leading-[1.35] text-zinc-400">z {formatCurrency(target, currency)}</p>
+          <p className="mt-1 text-2xs leading-[1.35] text-zinc-400">
+            z {formatMoney(toMinor(target), currency)}
+          </p>
         </div>
       </div>
 
@@ -109,13 +113,13 @@ export function MonthlyGoalCard({
         <div className="rounded-lg border border-hairline bg-surface-2 px-3 py-2.5">
           <p className="text-2xs font-semibold uppercase tracking-wider text-zinc-400">Nadwyżka</p>
           <p className="mt-1 text-base font-semibold tabular-nums text-[var(--chart-1)]">
-            +{formatCurrency(surplus, currency)}
+            {formatMoneyDelta(toMinor(surplus), currency)}
           </p>
         </div>
         <div className="rounded-lg border border-hairline bg-surface-2 px-3 py-2.5">
           <p className="text-2xs font-semibold uppercase tracking-wider text-zinc-400">Seria</p>
           <p className="mt-1 text-base font-semibold tabular-nums text-white">
-            {streakDays} dni
+            {formatCount(streakDays, ['dzień', 'dni', 'dni'])}
           </p>
         </div>
       </div>

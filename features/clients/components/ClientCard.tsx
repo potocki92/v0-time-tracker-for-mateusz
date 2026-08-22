@@ -29,7 +29,7 @@ import {
   clientNameToColor,
   readableTextColor,
 } from '@/components/common/ClientDisplay'
-import { formatCurrency } from '@/lib/helpers'
+import { formatHours, formatMoney, toMinor } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
   ACTIVITY_DOT,
@@ -219,7 +219,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
           label="Stawka"
           value={
             <>
-              {formatCurrency(client.rate, client.currency)}
+              {formatMoney(toMinor(client.rate), client.currency)}
               <span className="text-2xs font-normal text-zinc-400">/{unit}</span>
             </>
           }
@@ -227,14 +227,14 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
         <Metric label="Ostatni wpis" value={lastEntry ?? '—'} empty={!lastEntry} />
         <Metric
           label="Godziny"
-          value={client.totalHours > 0 ? `${formatHours(client.totalHours)} h` : '—'}
+          value={client.totalHours > 0 ? `${formatHours(client.totalHours)}` : '—'}
           empty={client.totalHours <= 0}
         />
         <Metric
           label="Zarobek"
           value={
             client.totalEarningsInClientCurrency > 0
-              ? formatCurrency(client.totalEarningsInClientCurrency, client.currency)
+              ? formatMoney(toMinor(client.totalEarningsInClientCurrency), client.currency)
               : '—'
           }
           empty={client.totalEarningsInClientCurrency <= 0}
@@ -305,11 +305,6 @@ function Metric({
       </dd>
     </div>
   )
-}
-
-/** 7.5 → „7,5", 8 → „8" — bez zbędnego „,00" przy pełnych godzinach. */
-function formatHours(hours: number): string {
-  return Number.isInteger(hours) ? String(hours) : hours.toFixed(1).replace('.', ',')
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {

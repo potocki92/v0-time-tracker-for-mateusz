@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ClientDisplay } from '@/components/common/ClientDisplay'
-import { formatCurrency } from '@/lib/helpers'
+import { formatCount, formatHours, formatMoney, toMinor } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { ClientWithStats } from '../domain/clients.types'
 import {
@@ -25,11 +25,6 @@ export type ClientsTableMeta = {
   onEdit: (client: ClientWithStats) => void
   onDelete: (client: ClientWithStats) => void
   onShowHistory: (client: ClientWithStats) => void
-}
-
-/** 7.5 → „7,5", 816 → „816" — bez zbędnego „,00" przy pełnych godzinach. */
-function formatHours(hours: number): string {
-  return Number.isInteger(hours) ? String(hours) : hours.toFixed(1).replace('.', ',')
 }
 
 export const columns: ColumnDef<ClientWithStats>[] = [
@@ -74,7 +69,7 @@ export const columns: ColumnDef<ClientWithStats>[] = [
       const unit = row.original.work_type === 'hourly' ? 'h' : (row.original.unit ?? 'szt')
       return (
         <div className="font-semibold tabular-nums">
-          {formatCurrency(row.original.rate, row.original.currency)}
+          {formatMoney(toMinor(row.original.rate), row.original.currency)}
           <span className="text-xs font-normal text-muted-foreground">/{unit}</span>
         </div>
       )
@@ -88,7 +83,7 @@ export const columns: ColumnDef<ClientWithStats>[] = [
     size: 140,
     cell: ({ row }) =>
       row.original.totalEarningsInClientCurrency > 0
-        ? formatCurrency(row.original.totalEarningsInClientCurrency, row.original.currency)
+        ? formatMoney(toMinor(row.original.totalEarningsInClientCurrency), row.original.currency)
         : '—',
   },
   {
@@ -101,7 +96,11 @@ export const columns: ColumnDef<ClientWithStats>[] = [
     // na tyle, że treść wchodziła w sąsiednią.
     cell: ({ row }) =>
       row.original.totalHours > 0
-        ? `${formatHours(row.original.totalHours)} h · ${row.original.totalDays} dni`
+        ? `${formatHours(row.original.totalHours)} · ${formatCount(row.original.totalDays, [
+            'dzień',
+            'dni',
+            'dni',
+          ])}`
         : '—',
   },
   {

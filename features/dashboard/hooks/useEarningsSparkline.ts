@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { WorkEntry, Client } from '@/lib/types'
 import { calculateEarnings } from '@/lib/finance/earnings'
+import { formatDate } from '@/lib/format'
 import { selectEurRate, usePreferencesStore } from './usePreferencesStore'
 
 export type SparklinePoint = {
@@ -37,10 +38,7 @@ export function useEarningsSparkline(
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, value]) => ({
         date,
-        label: new Date(date).toLocaleDateString('pl-PL', {
-          day: 'numeric',
-          month: 'short',
-        }),
+        label: formatDate(date, 'dayMonth'),
         value: Math.round(value * 100) / 100,
       }))
   }, [entries, clients, eurRate])

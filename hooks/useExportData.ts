@@ -61,8 +61,8 @@ function buildRows(
         client:      client?.name        ?? '—',
         project:     entry.project_id    ?? '—',
         hours:       entry.hours         ?? 0,
-        earningsPLN: Number(earnings.amountInPLN.toFixed(2)),
-        earningsEUR: Number(earnings.amountInEUR.toFixed(2)),
+        earningsPLN: Math.round(earnings.amountInPLN * 100) / 100,
+        earningsEUR: Math.round(earnings.amountInEUR * 100) / 100,
         status:      entry.status,
       }
     })

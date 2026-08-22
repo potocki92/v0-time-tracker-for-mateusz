@@ -2,6 +2,7 @@
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { SURFACE } from '@/components/ui/tokens'
+import { formatCount, formatHours, formatNumber } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { ArrowDownRight, ArrowUpRight, Clock4, type LucideIcon, Minus, Percent, Sigma } from 'lucide-react'
 import type { ReportSummary } from '../lib/types'
@@ -38,7 +39,9 @@ function TrendBadge({ trend }: { trend: Trend }) {
   return (
     <span className={`inline-flex items-center gap-1 text-2xs font-medium ${tone}`}>
       <Icon aria-hidden className="size-3" />
-      {trend.direction === 'flat' ? 'bez zmian' : `${trend.value.toFixed(1)}%`}
+      {trend.direction === 'flat'
+        ? 'bez zmian'
+        : `${formatNumber(trend.value, { decimals: 1 })}%`}
     </span>
   )
 }
@@ -79,14 +82,18 @@ export function ReportsKpis({ summary, compareOn }: Props) {
     >
       <KpiCard
         label="Łącznie godzin"
-        value={`${summary.totalHours.toFixed(1)}h`}
-        hint={compareOn ? `Poprzednio: ${summary.prevHours.toFixed(1)}h` : `${summary.workedCount} wpisów`}
+        value={formatHours(summary.totalHours)}
+        hint={
+          compareOn
+            ? `Poprzednio: ${formatHours(summary.prevHours)}`
+            : formatCount(summary.workedCount, ['wpis', 'wpisy', 'wpisów'])
+        }
         trend={trend}
         icon={Sigma}
       />
       <KpiCard
         label="Średnia / dzień"
-        value={`${summary.avgPerActiveDay.toFixed(1)}h`}
+        value={formatHours(summary.avgPerActiveDay)}
         hint="W aktywne dni"
         icon={Clock4}
       />

@@ -1,6 +1,6 @@
 'use client'
 
-import { formatCurrency } from '@/lib/helpers'
+import { formatMoney, toMinor } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
   BUDGET_OVERSPEND_THRESHOLD,
@@ -44,10 +44,10 @@ export function BudgetUtilizationSection() {
     >
       <div className={cn('border-b px-4 py-4 sm:px-5', LINEAR.borderInset)}>
         <p className="text-2xl font-semibold tabular-nums tracking-tight text-white sm:text-3xl">
-          {formatCurrency(utilisation.totalSpent, 'PLN')}
+          {formatMoney(toMinor(utilisation.totalSpent), 'PLN')}
         </p>
         <p className="mt-1 text-xs text-zinc-400">
-          z {formatCurrency(utilisation.totalBudget, 'PLN')} w umowach ·{' '}
+          z {formatMoney(toMinor(utilisation.totalBudget), 'PLN')} w umowach ·{' '}
           {utilisation.contractedCount}{' '}
           {utilisation.contractedCount === 1 ? 'projekt' : 'projektów'}
         </p>

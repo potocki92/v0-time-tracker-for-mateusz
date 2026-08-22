@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { Pencil, Pin } from 'lucide-react'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { formatCurrency } from '@/lib/helpers'
+import { formatDate, formatMoney, NO_DATA, toMinor } from '@/lib/format'
 import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import {
@@ -22,10 +22,8 @@ type FeaturedProjectCardProps = {
 }
 
 function formatStartedAt(date: string | null): string {
-  if (!date) return ''
-  const d = new Date(date)
-  if (Number.isNaN(d.getTime())) return ''
-  return d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short', year: 'numeric' })
+  const label = formatDate(date?.slice(0, 10), 'long')
+  return label === NO_DATA ? '' : label
 }
 
 export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardProps) {
@@ -126,8 +124,8 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
 
           <Metric
             label="Wykorzystany budżet"
-            value={budget > 0 ? formatCurrency(budgetSpent, 'PLN') : '—'}
-            meta={budget > 0 ? `z ${formatCurrency(budget, 'PLN')}` : 'Brak budżetu'}
+            value={budget > 0 ? formatMoney(toMinor(budgetSpent), 'PLN') : '—'}
+            meta={budget > 0 ? `z ${formatMoney(toMinor(budget), 'PLN')}` : 'Brak budżetu'}
             danger={budget > 0 && isAtRisk}
             empty={budget <= 0}
           />

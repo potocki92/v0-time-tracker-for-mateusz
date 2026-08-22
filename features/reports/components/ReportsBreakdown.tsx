@@ -2,6 +2,7 @@
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { SURFACE } from '@/components/ui/tokens'
+import { formatHours, formatPercent } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { FolderOpen } from 'lucide-react'
 import type { ProjectUsage } from '../lib/types'
@@ -48,9 +49,10 @@ function BreakdownRow({ item }: { item: ProjectUsage }) {
       <div className="flex items-center justify-between gap-3">
         <span className="min-w-0 truncate text-sm text-zinc-200">{item.label}</span>
         <span className="shrink-0 tabular-nums text-sm text-zinc-300">
-          {item.hours.toFixed(1)}
-          <span className="text-xs text-zinc-400">h</span>
-          <span className="ml-2 text-xs text-zinc-400">{Math.round(item.share)}%</span>
+          {formatHours(item.hours)}
+          <span className="ml-2 text-xs text-zinc-400">
+            {formatPercent(item.share / 100)}
+          </span>
         </span>
       </div>
       <div

@@ -6,14 +6,9 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowUpRight, CheckCircle2, Clock, FileWarning, Loader2 } from 'lucide-react'
 import { fetchOverallQuartersAction } from '@/features/invoices'
 import type { OverallQuarterSummary } from '@/features/invoices/domain'
-import { formatCurrency } from '@/lib/helpers'
+import { formatHours, formatMoney, toMinor } from '@/lib/format'
 
 const QUERY_KEY = ['dashboard-module', 'data', 'quarterly-summary'] as const
-
-function formatHours(hours: number) {
-  if (!Number.isFinite(hours) || hours === 0) return '0 h'
-  return `${hours.toLocaleString('pl-PL', { maximumFractionDigits: 1 })} h`
-}
 
 /**
  * Quarter-by-quarter snapshot for the dashboard. Surfaces the four most recent
@@ -75,10 +70,10 @@ export function QuarterlySummaryCard() {
 function QuarterRow({ quarter: q }: { quarter: OverallQuarterSummary }) {
   const earningsLabel =
     q.earningsEUR > 0 && q.earningsPLN > 0
-      ? `${formatCurrency(q.earningsPLN, 'PLN')} · ${formatCurrency(q.earningsEUR, 'EUR')}`
+      ? `${formatMoney(toMinor(q.earningsPLN), 'PLN')} · ${formatMoney(toMinor(q.earningsEUR), 'EUR')}`
       : q.earningsEUR > 0
-        ? formatCurrency(q.earningsEUR, 'EUR')
-        : formatCurrency(q.earningsPLN, 'PLN')
+        ? formatMoney(toMinor(q.earningsEUR), 'EUR')
+        : formatMoney(toMinor(q.earningsPLN), 'PLN')
 
   return (
     <li className="flex items-start gap-3 px-4 py-3">

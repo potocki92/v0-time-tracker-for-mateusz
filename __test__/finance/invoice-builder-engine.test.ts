@@ -171,6 +171,6 @@ describe('formatMoney', () => {
       items: [line({ quantity: 1, unit_price_net: 100, vat_rate: 23 })],
     })
     expect(formatMoney(totals.gross)).toMatch(/123,00/) // pl-PL formatting
-    expect(formatMoney(totals.gross)).toMatch(/€/)
+    expect(formatMoney(totals.gross)).toMatch(/EUR/)
   })
 })

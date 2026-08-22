@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { UNASSIGNED_PROJECT_ID } from '@/lib/metrics/adapter'
+import { formatIsoWeekShort } from '@/lib/format'
 import { isoWeekKey } from '@/lib/metrics/period'
 import type { MonthMetrics } from '@/lib/metrics/types'
 import type { Client, Project, WorkEntry } from '@/lib/types'
@@ -38,7 +39,7 @@ export function useCalendarInsights({
     const currentWeek = isoWeekKey(metrics.today)
     return metrics.byWeek.map((week) => ({
       key: week.isoWeek,
-      label: `W${week.isoWeek.split('-W')[1]}`,
+      label: formatIsoWeekShort(week.isoWeek),
       hours: week.hours,
       isCurrent: week.isoWeek === currentWeek,
     }))

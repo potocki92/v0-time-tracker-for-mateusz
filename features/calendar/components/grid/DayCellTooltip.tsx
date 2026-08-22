@@ -1,8 +1,8 @@
 import { CalendarDays, Clock, Banknote, FileText, Layers } from 'lucide-react'
 import type { Client, CURRENCY, WorkEntry } from '@/lib/types'
-import { formatCurrency } from '@/lib/helpers'
+import { formatDate, formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { MONTH_ABBR, STATUS_CONFIG } from '../../domain/calendar.constants'
+import { STATUS_CONFIG } from '../../domain/calendar.constants'
 import type { WorkStatus } from '../../domain/calendar.types'
 import { stringToColor } from './clientColor'
 
@@ -12,12 +12,9 @@ interface Props {
   entry: WorkEntry
   client?: Client
   earnings: Earnings
-  day: number
-  month: number
-  year: number
 }
 
-export function DayCellTooltip({ entry, client, earnings, day, month, year }: Props) {
+export function DayCellTooltip({ entry, client, earnings }: Props) {
   const cfg = STATUS_CONFIG[entry.status as WorkStatus]
 
   return (
@@ -25,7 +22,7 @@ export function DayCellTooltip({ entry, client, earnings, day, month, year }: Pr
       <div className="flex items-center gap-2 border-b bg-muted/50 px-3 py-2">
         <CalendarDays className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
         <span className="font-medium text-foreground">
-          {day} {MONTH_ABBR[month]} {year}
+          {formatDate(entry.date, 'long')}
         </span>
         <span className={cn('ml-auto rounded px-1.5 py-0.5 text-2xs font-semibold', cfg?.pill)}>
           {cfg?.label}
@@ -81,11 +78,14 @@ export function DayCellTooltip({ entry, client, earnings, day, month, year }: Pr
             <Banknote className="h-3 w-3 shrink-0" />
             <span>
               <span className="font-semibold text-foreground">
-                {formatCurrency(earnings.amount, earnings.currency as CURRENCY)}
+                {formatMoney(
+                  Math.round(earnings.amount * 100),
+                  earnings.currency as CURRENCY,
+                )}
               </span>
               {earnings.currency !== 'PLN' && (
                 <span className="text-2xs text-muted-foreground ml-1">
-                  ≈ {formatCurrency(earnings.amountInPLN, 'PLN')}
+                  ≈ {formatMoney(Math.round(earnings.amountInPLN * 100), 'PLN')}
                 </span>
               )}
             </span>

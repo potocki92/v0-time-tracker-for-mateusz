@@ -5,7 +5,7 @@ import { Banknote, Clock, Trophy, Users } from 'lucide-react'
 import { StatTile } from '@/components/common/stat/StatTile'
 import { useEffectiveEurRate } from '@/features/dashboard'
 import { calculateEarnings } from '@/lib/finance/earnings'
-import { formatCurrency } from '@/lib/helpers'
+import { formatCount, formatHours, formatMoney, toMinor } from '@/lib/format'
 import type { WorkEntry } from '@/lib/types'
 import { deriveActivity } from '../domain/clients.selectors'
 import type { ClientWithStats } from '../domain/clients.types'
@@ -81,15 +81,15 @@ export function ClientsStats({ clients, workEntries }: Props) {
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <StatTile
         label="Zarobek (mies.)"
-        value={formatCurrency(stats.monthTotalPLN, 'PLN')}
+        value={formatMoney(toMinor(stats.monthTotalPLN), 'PLN')}
         icon={Banknote}
-        meta={stats.monthEUR > 0 ? `w tym ${formatCurrency(stats.monthEUR, 'EUR')}` : undefined}
+        meta={stats.monthEUR > 0 ? `w tym ${formatMoney(toMinor(stats.monthEUR), 'EUR')}` : undefined}
       />
       <StatTile
         label="Godziny (mies.)"
-        value={stats.monthHours > 0 ? `${formatHours(stats.monthHours)} h` : '0 h'}
+        value={stats.monthHours > 0 ? `${formatHours(stats.monthHours)}` : '0 h'}
         icon={Clock}
-        meta={stats.monthDays > 0 ? `${stats.monthDays} ${pluralizeDays(stats.monthDays)} roboczych` : 'Brak wpisów'}
+        meta={stats.monthDays > 0 ? `${formatCount(stats.monthDays, ['dzień', 'dni', 'dni'])} roboczych` : 'Brak wpisów'}
       />
       <StatTile
         label="Aktywni"
@@ -103,7 +103,7 @@ export function ClientsStats({ clients, workEntries }: Props) {
         icon={Trophy}
         meta={
           stats.top && stats.top.totalEarningsInClientCurrency > 0
-            ? formatCurrency(stats.top.totalEarningsInClientCurrency, stats.top.currency)
+            ? formatMoney(toMinor(stats.top.totalEarningsInClientCurrency), stats.top.currency)
             : undefined
         }
         compact
@@ -116,10 +116,3 @@ function toPln(amount: number, currency: 'PLN' | 'EUR', eurRate: number): number
   return currency === 'EUR' ? amount * eurRate : amount
 }
 
-function formatHours(hours: number): string {
-  return Number.isInteger(hours) ? String(hours) : hours.toFixed(1).replace('.', ',')
-}
-
-function pluralizeDays(count: number): string {
-  return count === 1 ? 'dzień' : 'dni'
-}

@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { formatCurrency } from '@/lib/helpers'
+import { formatMoney, toMinor } from '@/lib/format'
 import type { Client, ClientRateFormData } from '@/lib/types'
 import { useClientRates } from '../hooks/useClientRates'
 import {
@@ -109,7 +109,7 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold tabular-nums">
-                            {formatCurrency(r.rate, r.currency)}
+                            {formatMoney(toMinor(r.rate), r.currency)}
                             <span className="text-xs font-normal text-muted-foreground">
                               /{r.work_type === 'hourly' ? 'h' : (r.unit ?? 'szt')}
                             </span>
@@ -255,7 +255,7 @@ function CurrentOnly({ client }: { client: Client }) {
     <div className="rounded-md border p-3">
       <div className="flex items-center gap-2">
         <span className="font-semibold tabular-nums">
-          {formatCurrency(client.rate, client.currency)}
+          {formatMoney(toMinor(client.rate), client.currency)}
           <span className="text-xs font-normal text-muted-foreground">/{unit}</span>
         </span>
         <Badge variant="secondary" className="text-2xs">Aktualna</Badge>

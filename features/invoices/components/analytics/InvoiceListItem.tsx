@@ -4,14 +4,13 @@ import { SURFACE } from '@/components/ui/tokens'
 import { FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Client, Invoice } from '@/lib/types'
-import { formatCurrency } from '@/lib/helpers'
+import { formatDate, formatMoney, NO_DATA, toMinor } from '@/lib/format'
 import { displayInvoiceNumber } from '@/lib/finance/invoice-number'
 import {
   INVOICE_STATUS_LABELS_PL,
   InvoiceStatus,
   deriveInvoiceStatus,
 } from '@/lib/finance/invoice-status'
-import { polishMonthShort } from '../../domain/stats'
 
 interface InvoiceListItemProps {
   invoice: Invoice
@@ -30,10 +29,8 @@ const STATUS_PILL: Record<InvoiceStatus, string> = {
 }
 
 function formatShortDate(iso: string | null | undefined): string {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  return `${polishMonthShort(d.getMonth())} ${d.getDate()}`
+  const label = formatDate(iso?.slice(0, 10), 'dayMonth')
+  return label === NO_DATA ? '' : label
 }
 
 export function InvoiceListItem({
@@ -103,7 +100,7 @@ export function InvoiceListItem({
             {dateLabel && <span>{dateLabel}</span>}
           </div>
           <span className="text-sm font-semibold text-white">
-            {formatCurrency(invoice.amount, invoice.currency)}
+            {formatMoney(toMinor(invoice.amount), invoice.currency)}
           </span>
         </footer>
       </button>

@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { formatCount, formatHours, formatMoney, toMinor, type Currency } from '@/lib/format'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarRange, Check, Loader2 } from 'lucide-react'
 
@@ -38,17 +39,8 @@ interface QuickQuarterlyInvoiceDialogProps {
   onSubmit: (values: InvoiceFormValues) => Promise<void> | void
 }
 
-function formatHours(hours: number) {
-  if (!Number.isFinite(hours) || hours === 0) return '0 h'
-  return `${hours.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} h`
-}
-
 function formatAmount(amount: number, currency: string) {
-  return new Intl.NumberFormat('pl-PL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 2,
-  }).format(amount)
+  return formatMoney(toMinor(amount), currency as Currency)
 }
 
 /**
@@ -99,25 +91,26 @@ export function QuickQuarterlyInvoiceDialog({
     const todayIso = new Date().toISOString().slice(0, 10)
     const description =
       selectedQuarter.workType === 'piecework'
-        ? `Praca ${selectedQuarter.quarter} ${selectedQuarter.year} (${selectedQuarter.start} – ${selectedQuarter.end}) — ${selectedQuarter.quantity.toLocaleString('pl-PL')} szt.`
-        : `Praca ${selectedQuarter.quarter} ${selectedQuarter.year} (${selectedQuarter.start} – ${selectedQuarter.end}) — ${selectedQuarter.hours.toLocaleString('pl-PL')} h`
+        ? `Praca ${selectedQuarter.quarter} ${selectedQuarter.year} (${selectedQuarter.start} – ${selectedQuarter.end}) — ${formatCount(selectedQuarter.quantity, ['szt.', 'szt.', 'szt.'])}`
+        : `Praca ${selectedQuarter.quarter} ${selectedQuarter.year} (${selectedQuarter.start} – ${selectedQuarter.end}) — ${formatHours(selectedQuarter.hours)}`
     const quantity =
       selectedQuarter.workType === 'piecework'
         ? selectedQuarter.quantity || 1
         : selectedQuarter.hours || 1
     const unit_price_net =
-      quantity > 0 ? Number((selectedQuarter.amount / quantity).toFixed(2)) : 0
+      quantity > 0 ? Math.round((selectedQuarter.amount / quantity) * 100) / 100 : 0
     const lineItem = {
       description,
       unit:           selectedQuarter.workType === 'piecework' ? 'szt.' : 'h',
-      quantity:       Number(quantity.toFixed(3)),
+      quantity:       Math.round(quantity * 1000) / 1000,
       unit_price_net,
       vat_rate:       0,
     }
 
-    const grossTotal = Number(
-      (lineItem.quantity * lineItem.unit_price_net * (1 + lineItem.vat_rate / 100)).toFixed(2),
-    )
+    const grossTotal =
+      Math.round(
+        lineItem.quantity * lineItem.unit_price_net * (1 + lineItem.vat_rate / 100) * 100,
+      ) / 100
 
     const values: InvoiceFormValues = {
       name:            `${selectedClient.name} — ${selectedQuarter.quarter} ${selectedQuarter.year}`,

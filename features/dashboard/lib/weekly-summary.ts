@@ -1,5 +1,6 @@
 import type { Client, CURRENCY, Project, WorkEntry } from '@/lib/types'
 import { getISOWeekNumber, getISOWeekYear, getWeekRange } from '@/lib/date/week'
+import { formatDateRange } from '@/lib/format'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import { partitionByRealization } from '@/lib/finance/realization'
 import {
@@ -70,9 +71,7 @@ function toDateKey(d: Date): string {
 }
 
 function formatRangeLabel(start: Date, end: Date): string {
-  const dm = (d: Date) =>
-    d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })
-  return `${dm(start)} – ${dm(end)}.${end.getFullYear()}`
+  return formatDateRange(toDateKey(start), toDateKey(end))
 }
 
 function dedupeRates(entries: WorkEntry[], fallback: EntryCalculationFallback): AppliedRate[] {

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { formatNumber } from '@/lib/format'
 import { calculateInvoiceAnalytics } from '@/lib/finance/invoice-analytics'
 import type { Client, Invoice } from '@/lib/types'
 import { AnalyticsCards } from './_components/AnalyticsCards'
@@ -56,7 +57,7 @@ export default async function InvoicesAnalyticsPage() {
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Analityka faktur</h1>
         <p className="text-sm text-muted-foreground">
-          Przegląd przychodów, DSO, top klientów i statusów. Kwoty przeliczone na PLN wg kursu {eurRate.toFixed(2)}.
+          Przegląd przychodów, DSO, top klientów i statusów. Kwoty przeliczone na PLN wg kursu {formatNumber(eurRate, { decimals: 2 })}.
         </p>
       </header>
 

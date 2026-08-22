@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { ArrowUpRight, ClipboardList } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { formatCurrency } from '@/lib/helpers'
-import { DAY_NAMES } from '@/lib/types'
+import { formatDayBadge, formatHours, formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { RecentEntry } from '../../domain/calendar.types'
 
@@ -13,8 +12,6 @@ interface Props {
   entries: RecentEntry[]
   onViewAll?: () => void
 }
-
-const MONTH_SHORT = ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru']
 
 export function RecentEntries({ entries, onViewAll }: Props) {
   return (
@@ -59,23 +56,19 @@ export function RecentEntries({ entries, onViewAll }: Props) {
 }
 
 function RecentRow({ entry }: { entry: RecentEntry }) {
-  const [y, m, d] = entry.date.split('-').map(Number)
-  const date = new Date(y, m - 1, d)
-  const dow = (date.getDay() + 6) % 7 // Pn = 0
-  const dayLabel = DAY_NAMES[dow]
-  const monthLabel = MONTH_SHORT[m - 1]
+  const badge = formatDayBadge(entry.date)
   const amountStr =
     entry.currency === 'PLN'
-      ? formatCurrency(entry.amountPLN, 'PLN')
-      : `${formatCurrency(entry.amountNative, entry.currency)} · ${formatCurrency(entry.amountPLN, 'PLN')}`
+      ? formatMoney(entry.amountMinorPLN, 'PLN')
+      : `${formatMoney(entry.amountMinorNative, entry.currency)} · ${formatMoney(entry.amountMinorPLN, 'PLN')}`
 
   return (
     <li className="flex items-center gap-3 py-2.5">
       <div className="flex h-9 w-12 shrink-0 flex-col items-center justify-center rounded-md border border-hairline bg-surface-2">
         <span className="text-2xs font-bold uppercase tracking-wider text-zinc-400">
-          {monthLabel} · {dayLabel}
+          {badge.month} · {badge.weekday}
         </span>
-        <span className="text-xs font-bold leading-none text-white">{d}</span>
+        <span className="text-xs font-bold leading-none text-white">{badge.day}</span>
       </div>
 
       <div className="min-w-0 flex-1">
@@ -91,7 +84,7 @@ function RecentRow({ entry }: { entry: RecentEntry }) {
 
       <div className="shrink-0 text-right">
         <div className="text-xs font-semibold tabular-nums text-white">
-          {entry.hours.toFixed(1)}h
+          {formatHours(entry.hours)}
         </div>
         <div className="text-2xs tabular-nums text-zinc-400">{amountStr}</div>
       </div>

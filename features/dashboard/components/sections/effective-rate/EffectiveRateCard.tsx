@@ -1,7 +1,7 @@
 'use client'
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
-import { formatCurrency } from '@/lib/helpers'
+import { formatMoney, toMinor } from '@/lib/format'
 
 export type ClientRate = {
   clientId: string
@@ -42,7 +42,7 @@ export function EffectiveRateCard({
 
       <div className="mt-3 flex items-baseline gap-2">
         <span className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
-          {blendedRate === null ? '—' : formatCurrency(blendedRate, currency)}
+          {blendedRate === null ? '—' : formatMoney(toMinor(blendedRate), currency)}
         </span>
         <span className="text-xs text-zinc-400 sm:text-sm">/ h</span>
       </div>
@@ -65,7 +65,7 @@ export function EffectiveRateCard({
                   <span className="truncate">{r.name}</span>
                 </span>
                 <span className="shrink-0 text-sm font-semibold tabular-nums text-zinc-300">
-                  {formatCurrency(r.ratePerHour, r.currency)}
+                  {formatMoney(toMinor(r.ratePerHour), r.currency)}
                   <span className="text-xs font-normal text-zinc-400"> /h</span>
                 </span>
               </div>

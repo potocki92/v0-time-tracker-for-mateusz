@@ -1,6 +1,13 @@
 'use client'
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
+import {
+  formatDayBadge,
+  formatIsoWeek,
+  formatMonthName,
+  formatWeekday,
+} from '@/lib/format'
+import { getTodayLocalDateString } from '@/lib/helpers'
 import type { TimeRange } from '../../../types/dashboard.types'
 
 type Props = {
@@ -24,32 +31,19 @@ function greetingByHour(): string {
   return 'Dobry wieczór'
 }
 
-function formatDateline(d: Date): string {
-  const weekday = d.toLocaleDateString('pl-PL', { weekday: 'long' }).toUpperCase()
-  const month = d.toLocaleDateString('pl-PL', { month: 'short' }).toUpperCase()
-  const day = String(d.getDate()).padStart(2, '0')
-  const year = d.getFullYear()
-  return `${weekday} · ${day} ${month} ${year}`
+function formatDateline(iso: string): string {
+  const badge = formatDayBadge(iso)
+  const weekday = formatWeekday(iso, 'long').toUpperCase()
+  return `${weekday} · ${badge.day} ${badge.month} ${iso.slice(0, 4)}`
 }
 
-function isoWeekNumber(d: Date): number {
-  const target = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
-  const dayNr = (target.getUTCDay() + 6) % 7
-  target.setUTCDate(target.getUTCDate() - dayNr + 3)
-  const firstThursday = new Date(Date.UTC(target.getUTCFullYear(), 0, 4))
-  const firstDayNr = (firstThursday.getUTCDay() + 6) % 7
-  firstThursday.setUTCDate(firstThursday.getUTCDate() - firstDayNr + 3)
-  return 1 + Math.round((target.getTime() - firstThursday.getTime()) / (7 * 24 * 3600 * 1000))
-}
-
-function shapingCopy(d: Date): string {
-  const monthName = d.toLocaleDateString('pl-PL', { month: 'long' })
-  return `Tak prezentuje się ${monthName}.`
+function shapingCopy(iso: string): string {
+  return `Tak prezentuje się ${formatMonthName(iso, 'long')}.`
 }
 
 export function HeroGreeting({ userName, range, onChangeRange }: Props) {
-  const now = new Date()
-  const dateline = `${formatDateline(now)} · TYDZIEŃ ${isoWeekNumber(now)}`
+  const today = getTodayLocalDateString()
+  const dateline = `${formatDateline(today)} · ${formatIsoWeek(today)}`
   const name = userName?.split(' ')[0] ?? ''
 
   return (
@@ -60,11 +54,11 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
         <h1 className="text-2xl font-semibold leading-[1.25] text-white sm:text-3xl">
           {greetingByHour()}{name ? `, ${name}` : ''}
           <span className="ml-2 hidden font-normal text-zinc-400 sm:inline">
-            — {shapingCopy(now)}
+            — {shapingCopy(today)}
           </span>
         </h1>
         <p className="mt-1 text-xs leading-[1.4] text-zinc-400 sm:hidden">
-          {shapingCopy(now)}
+          {shapingCopy(today)}
         </p>
       </div>
 

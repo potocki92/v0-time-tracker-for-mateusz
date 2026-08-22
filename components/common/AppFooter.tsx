@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toDateKey } from '@/lib/date/format'
+import { formatDate } from '@/lib/format'
 
 type Props = {
   appName?: string
@@ -37,11 +39,7 @@ export function AppFooter({
     return () => clearInterval(t)
   }, [])
 
-  const today = now.toLocaleDateString('pl-PL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+  const today = formatDate(toDateKey(now), 'long')
 
   const synced = syncedAt ? relative(now, syncedAt) : null
 

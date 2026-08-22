@@ -4,6 +4,7 @@ import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { useMemo } from 'react'
 import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import { Card, CardContent } from '@/components/ui/card'
+import { formatHours, NO_DATA } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { WeeklyHoursBar } from '../../domain/calendar.types'
 
@@ -32,7 +33,7 @@ export function HoursPerWeekChart({
     [weekly],
   )
 
-  const peakLabel = peak ? `${peak.hours} h · ${peak.label}` : '—'
+  const peakLabel = peak ? `${formatHours(peak.hours)} · ${peak.label}` : NO_DATA
 
   // Dla a11y dorzucamy tekstowe podsumowanie poza obrazkiem.
   const summary = `Łącznie ${totalHours} godzin w ${monthName}, średnio ${avgHours} godzin tygodniowo.`
@@ -91,8 +92,8 @@ export function HoursPerWeekChart({
         </div>
 
         <div className="mt-3 grid grid-cols-3 gap-2 border-t border-hairline pt-3 text-2xs sm:gap-3">
-          <Stat label="Łącznie" value={`${totalHours.toFixed(1)} h`} />
-          <Stat label="Śr./tydzień" value={`${avgHours} h`} />
+          <Stat label="Łącznie" value={formatHours(totalHours)} />
+          <Stat label="Śr./tydzień" value={formatHours(avgHours)} />
           <Stat label="Szczyt" value={peakLabel} />
         </div>
 

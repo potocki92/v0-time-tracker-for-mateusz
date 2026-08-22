@@ -1,4 +1,5 @@
 import type { Trip, TripCountdownState } from './trips.types'
+import { formatDate, formatWeekday } from '@/lib/format'
 
 const ISO_RE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -79,19 +80,9 @@ export function computeTripCountdown(
   return { mode: 'no_trips', days: 0, targetDate: null, trip: null }
 }
 
-const PL_WEEKDAYS = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'] as const
-const PL_MONTHS = [
-  'stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca',
-  'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia',
-] as const
-
 /** "niedziela, 1 czerwca" — używane jako data celu pod licznikiem. */
 export function formatPlLongDate(iso: string): string {
-  const d = parseIsoDate(iso)
-  const weekday = PL_WEEKDAYS[d.getUTCDay()]
-  const day = d.getUTCDate()
-  const month = PL_MONTHS[d.getUTCMonth()]
-  return `${weekday}, ${day} ${month}`
+  return `${formatWeekday(iso, 'long')}, ${formatDate(iso, 'dayMonthLong')}`
 }
 
 /** Polska forma "dzień / dni" — singular tylko dla |days| === 1. */

@@ -1,6 +1,7 @@
 'use client'
 
 import type { Column, RowData } from '@tanstack/react-table'
+import { formatDate as formatIsoDate, NO_DATA } from '@/lib/format'
 import { FilterX, Plus, Search, Trash2, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -38,13 +39,8 @@ function isSelectFilter(filter: DataTableFilter): filter is DataTableSelectFilte
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return ''
-  const parsed = new Date(iso)
-  if (Number.isNaN(parsed.getTime())) return iso
-  return new Intl.DateTimeFormat('pl-PL', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(parsed)
+  const label = formatIsoDate(iso.slice(0, 10), 'short')
+  return label === NO_DATA ? iso : label
 }
 
 function DebouncedSearchInput({

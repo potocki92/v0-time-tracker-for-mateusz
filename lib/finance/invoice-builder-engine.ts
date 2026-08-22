@@ -11,6 +11,7 @@
  * PDF rendering, JPK exports, and server-side checks.
  */
 
+import { formatMoney as formatMoneyMinor } from '@/lib/format'
 import type {
   InvoiceBuilderCurrency,
   InvoiceBuilderValues,
@@ -244,14 +245,6 @@ export function computeInvoiceTotals(
 // Formatting
 // ---------------------------------------------------------------------------
 
-export function formatMoney(
-  m: MoneyAmount,
-  locale = 'pl-PL',
-): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: m.currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(toMajor(m))
+export function formatMoney(m: MoneyAmount): string {
+  return formatMoneyMinor(Number(m.amountMinor), m.currency)
 }

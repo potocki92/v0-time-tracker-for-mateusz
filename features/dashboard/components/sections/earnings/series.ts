@@ -1,3 +1,5 @@
+import { toDateKey } from '@/lib/date/format'
+import { formatDate } from '@/lib/format'
 import type { SparklinePoint } from '../../../hooks/useEarningsSparkline'
 
 /**
@@ -48,7 +50,7 @@ export function buildSeries(
     return {
       date: p.date,
       day,
-      label: d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+      label: formatDate(p.date, 'dayMonth'),
       cumulative: Math.round(acc * 100) / 100,
       forecast: null,
       prevCumulative: prevByDay.get(day) ?? null,
@@ -68,10 +70,11 @@ export function buildSeries(
       cursor.setDate(lastDate.getDate() + i)
       const projected = Math.round(dailyAvg * (dayOfMonth + i) * 100) / 100
       const day = cursor.getDate()
+      const iso = toDateKey(cursor)
       series.push({
-        date: cursor.toISOString().slice(0, 10),
+        date: iso,
         day,
-        label: cursor.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+        label: formatDate(iso, 'dayMonth'),
         cumulative: Number.NaN as unknown as number,
         forecast: projected,
         prevCumulative: prevByDay.get(day) ?? null,

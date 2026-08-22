@@ -1,27 +1,28 @@
 import { Wallet } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
-import { formatCurrency } from '@/lib/helpers'
+import { formatHours, formatMoney, formatPercent } from '@/lib/format'
 import type { CURRENCY } from '@/lib/types'
 import { KPICard } from './KPICard'
-import { pluralizeDays } from './format'
+import { countDays } from './format'
 
 interface Props {
-  forecastEarnings: number
-  realizedEarnings: number
-  plannedEarnings: number
+  forecastEarningsMinor: number
+  realizedEarningsMinor: number
+  plannedEarningsMinor: number
   plannedHours: number
   plannedDays: number
-  realizedSharePercent: number
+  /** actual/forecast, 0..1 */
+  realizedShare: number
   currency: CURRENCY
 }
 
 export function PredictedEarningsCard({
-  forecastEarnings,
-  realizedEarnings,
-  plannedEarnings,
+  forecastEarningsMinor,
+  realizedEarningsMinor,
+  plannedEarningsMinor,
   plannedHours,
   plannedDays,
-  realizedSharePercent,
+  realizedShare,
   currency,
 }: Props) {
   const hasPlan = plannedDays > 0
@@ -30,31 +31,31 @@ export function PredictedEarningsCard({
     <KPICard
       label="Przewidywany zarobek"
       icon={<Wallet className="h-4 w-4" />}
-      ariaLabel={`Przewidywany zarobek: ${formatCurrency(forecastEarnings, currency)}; zrealizowano ${realizedSharePercent}%`}
+      ariaLabel={`Przewidywany zarobek: ${formatMoney(forecastEarningsMinor, currency)}; zrealizowano ${formatPercent(realizedShare)}`}
     >
       <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
-        {formatCurrency(forecastEarnings, currency)}
+        {formatMoney(forecastEarningsMinor, currency)}
       </p>
 
       <div className="mt-3 space-y-1.5">
         <div className="flex items-center justify-between text-2xs">
           <span className="text-zinc-400">
-            Realnie {formatCurrency(realizedEarnings, currency)}
+            Realnie {formatMoney(realizedEarningsMinor, currency)}
           </span>
           <span className="font-semibold tabular-nums text-emerald-400">
-            {realizedSharePercent}%
+            {formatPercent(realizedShare)}
           </span>
         </div>
         <Progress
           aria-label="Udział zrealizowanych zarobków w prognozie"
-          value={realizedSharePercent}
+          value={realizedShare * 100}
           className="h-1.5 bg-surface-3 [&>div]:bg-emerald-500"
         />
         <p className="text-2xs text-zinc-400">
           {hasPlan
-            ? `Plan: ${formatCurrency(plannedEarnings, currency)} • ${plannedDays} ${pluralizeDays(
+            ? `Plan: ${formatMoney(plannedEarningsMinor, currency)} • ${countDays(
                 plannedDays,
-              )} • ${plannedHours.toFixed(1)} h`
+              )} • ${formatHours(plannedHours)}`
             : 'Brak zaplanowanych dni'}
         </p>
       </div>

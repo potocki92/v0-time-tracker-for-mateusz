@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { calculateEntryMoney, fallbackFromClient } from '@/lib/finance/entry-calculations'
 import { add, convert, toMajor, zero } from '@/lib/finance/money'
-import { Client, WorkEntry, MONTH_NAMES } from '@/lib/types'
+import { formatDate, formatMonthName } from '@/lib/format'
+import { Client, WorkEntry } from '@/lib/types'
 import { ChartDataItem, ChartGrouping } from '../types/dashboard.types'
 import { toDateKey } from '@/lib/date/format'           // ← z @/lib
 import { getWeekStart, getWeekLabel } from '@/lib/date/week' // ← z @/lib
@@ -42,7 +43,7 @@ export function useChartData(
 
       if (grouping === 'daily') {
         key   = toDateKey(cursor)
-        label = cursor.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })
+        label = formatDate(key, 'dayMonth')
         cursor.setDate(cursor.getDate() + 1)
       } else if (grouping === 'weekly') {
         const ws = getWeekStart(cursor)
@@ -53,7 +54,7 @@ export function useChartData(
       } else if (grouping === 'monthly') {
         const ms = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
         key      = `${ms.getFullYear()}-${String(ms.getMonth() + 1).padStart(2, '0')}`
-        label    = MONTH_NAMES[ms.getMonth()].slice(0, 3)
+        label    = formatMonthName(key, 'short')
         sortDate = ms
         cursor.setMonth(cursor.getMonth() + 1, 1)
       } else {
@@ -109,7 +110,7 @@ export function useChartData(
         label,
         earningsPLN: toMajor(earningsPLN),
         earningsEUR: toMajor(earningsEUR),
-        hours:       Number(hours.toFixed(1)),
+        hours:       Math.round(hours * 10) / 10,
         date: sortDate.toISOString(),
       }))
   }, [entries, clients, grouping, eurRate, dateRange])

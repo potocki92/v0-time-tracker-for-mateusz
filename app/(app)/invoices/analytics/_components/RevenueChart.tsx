@@ -4,11 +4,10 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { MonthlyRevenuePoint } from '@/lib/finance/invoice-analytics'
 import { format as formatMoney, fromMajor } from '@/lib/finance/money'
+import { formatMoneyCompact, toMinor } from '@/lib/format'
 
 function formatAxis(value: number) {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
-  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}k`
-  return String(value)
+  return formatMoneyCompact(toMinor(value), 'PLN')
 }
 
 export function RevenueChart({ data }: { data: MonthlyRevenuePoint[] }) {

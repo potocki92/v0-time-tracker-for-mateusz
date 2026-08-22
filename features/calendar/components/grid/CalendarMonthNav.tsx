@@ -1,6 +1,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { DAY_NAMES, MONTH_NAMES } from '@/lib/types'
+import { formatMonthTitle } from '@/lib/format'
+import { getMonthKey } from '@/lib/helpers'
+import { DAY_NAMES } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -35,8 +37,7 @@ export function CalendarMonthNav({
 
         <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
           <h2 className="truncate text-sm font-semibold tracking-tight text-white sm:text-base">
-            {MONTH_NAMES[currentMonth]}{' '}
-            <span className="font-normal text-zinc-400">{currentYear}</span>
+            {formatMonthTitle(getMonthKey(currentYear, currentMonth))}
           </h2>
           {!isCurrentMonth && (
             <Button
