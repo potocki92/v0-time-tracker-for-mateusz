@@ -3,7 +3,8 @@
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { formatCurrency } from '@/lib/helpers'
+import { formatDate, formatMoney, formatRelativeDay, toMinor } from '@/lib/format'
+import { getTodayLocalDateString } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
 import {
   PROJECT_PRIORITY_PILL,
@@ -20,12 +21,10 @@ type ProjectListRowProps = {
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24
 
-function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString('pl-PL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
+
+function formatDeadlineDate(date: string): string {
+  return formatDate(date.slice(0, 10), 'long')
 }
 
 /**
@@ -40,14 +39,19 @@ function formatDeadline(
   if (!date) return null
   const time = new Date(date).getTime()
   if (Number.isNaN(time)) return null
-  if (!isActive) return { text: formatDate(date), urgent: false }
+  if (!isActive) return { text: formatDeadlineDate(date), urgent: false }
 
   const days = Math.ceil((time - Date.now()) / MS_PER_DAY)
   if (days < 0) return { text: 'Po terminie', urgent: true }
-  if (days === 0) return { text: 'Dziś', urgent: true }
-  if (days === 1) return { text: 'Jutro', urgent: true }
-  if (days <= 7) return { text: `Za ${days} dni`, urgent: true }
-  return { text: formatDate(date), urgent: false }
+  if (days <= 7) {
+    return {
+      text: capitalize(
+        formatRelativeDay(date.slice(0, 10), getTodayLocalDateString()),
+      ),
+      urgent: true,
+    }
+  }
+  return { text: formatDeadlineDate(date), urgent: false }
 }
 
 export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
@@ -196,7 +200,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
         </div>
         {budget > 0 && (
           <span className="shrink-0 text-2xs tabular-nums text-zinc-400">
-            {formatCurrency(budget, 'PLN')}
+            {formatMoney(toMinor(budget), 'PLN')}
           </span>
         )}
       </div>

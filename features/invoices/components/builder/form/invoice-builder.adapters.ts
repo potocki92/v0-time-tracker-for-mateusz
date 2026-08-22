@@ -183,7 +183,7 @@ export function builderValuesToFormValues(
     billing_quarter: billingQuarter,
     billing_year:    billingYear,
     invoice_date:    values.issue_date,
-    amount:          Number(grossTotal.toFixed(2)),
+    amount:          Math.round(grossTotal * 100) / 100,
     currency:        clampToLegacyCurrency(values.currency),
     is_paid:         options.isPaid ?? false,
     notes:           values.notes ?? '',

@@ -7,7 +7,8 @@ import {
   getCurrentEarningsForGoal,
 } from '@/lib/finance/goal'
 import { isRealizedEntry } from '@/lib/finance/realization'
-import { formatCurrency, getTodayLocalDateString } from '@/lib/helpers'
+import { formatMoney, toMinor } from '@/lib/format'
+import { getTodayLocalDateString } from '@/lib/helpers'
 import type { WorkEntry } from '@/lib/types'
 import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
 import {
@@ -93,7 +94,7 @@ export function GoalSection() {
         <p className="mt-2 text-sm text-muted-foreground">
           W planie:{' '}
           <span className="font-medium text-foreground">
-            {formatCurrency(predictedCurrent, currency)}
+            {formatMoney(toMinor(predictedCurrent), currency)}
           </span>
         </p>
       )}

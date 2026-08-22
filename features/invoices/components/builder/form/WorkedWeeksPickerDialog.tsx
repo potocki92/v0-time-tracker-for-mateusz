@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { formatHours, formatMoney, toMinor, type Currency } from '@/lib/format'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarRange, Loader2 } from 'lucide-react'
 
@@ -40,17 +41,8 @@ function defaultRange() {
   }
 }
 
-function formatHours(hours: number) {
-  if (!Number.isFinite(hours) || hours === 0) return '0 h'
-  return `${hours.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} h`
-}
-
 function formatAmount(amount: number, currency: string) {
-  return new Intl.NumberFormat('pl-PL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 2,
-  }).format(amount)
+  return formatMoney(toMinor(amount), currency as Currency)
 }
 
 /**

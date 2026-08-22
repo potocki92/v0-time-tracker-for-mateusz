@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Clock, Layers } from 'lucide-react'
+import { formatDayBadge } from '@/lib/format'
 import type { Client, WorkEntry } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { STATUS_CONFIG } from '../../domain/calendar.constants'
@@ -18,7 +19,7 @@ interface Props {
  */
 export function CalendarListRow({ entry, client, onClick }: Props) {
   const cfg = STATUS_CONFIG[entry.status as WorkStatus]
-  const [, m, d] = entry.date.split('-')
+  const badge = formatDayBadge(entry.date)
 
   const quantityLabel =
     entry.status === 'worked' && client
@@ -38,9 +39,9 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
     >
       <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-surface-2">
         <span className="text-2xs font-medium uppercase tracking-widest text-zinc-400">
-          {['', 'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'][Number(m)]}
+          {badge.month}
         </span>
-        <span className="text-sm font-bold leading-none text-white">{Number(d)}</span>
+        <span className="text-sm font-bold leading-none text-white">{badge.day}</span>
       </div>
 
       <div className="min-w-0 flex-1 space-y-1">

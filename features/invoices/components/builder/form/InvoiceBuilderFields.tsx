@@ -91,7 +91,7 @@ export function InvoiceBuilderFields({
 
     if (Number.isFinite(currentRate) && currentRate > 0 && !wasAutoSeeded) return
 
-    const nextRate = Number(eurRate.toFixed(4))
+    const nextRate = Math.round(eurRate * 10_000) / 10_000
     autoSeededEurRateRef.current = nextRate
     setValue('exchange_rate', nextRate, {
       shouldDirty: false,

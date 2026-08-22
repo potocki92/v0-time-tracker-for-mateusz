@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { formatNumber } from '@/lib/format'
 
 interface Props {
   unit: string
@@ -47,7 +48,7 @@ export function QuantityInput({ unit, from, to, onChangeFrom, onChangeTo }: Prop
         <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
           Różnica:{' '}
           <span className="font-semibold text-foreground tabular-nums">
-            {diff.toFixed(2)} {unit}
+            {formatNumber(diff, { decimals: 2 })} {unit}
           </span>
         </div>
       )}

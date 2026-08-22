@@ -1,3 +1,4 @@
+import { formatMonthName } from '@/lib/format'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import type { WorkEntry } from '@/lib/types'
 
@@ -38,11 +39,6 @@ export function levelFromHours(hours: number): HeatmapCell['level'] {
   if (hours < 8) return 3
   return 4
 }
-
-const MONTHS = [
-  'sty', 'lut', 'mar', 'kwi', 'maj', 'cze',
-  'lip', 'sie', 'wrz', 'paź', 'lis', 'gru',
-]
 
 /**
  * Buduje siatkę 52 tygodni × 7 dni w układzie GitHuba: kolumna to tydzień
@@ -126,7 +122,8 @@ export function buildHeatmap(
 
     weeks.push({
       startDate: days[0].date,
-      monthLabel: isNewMonth && w > 0 ? MONTHS[month] : null,
+      monthLabel:
+        isNewMonth && w > 0 ? formatMonthName(days[3].date, 'short') : null,
       days,
       totalHours: weekHours,
     })

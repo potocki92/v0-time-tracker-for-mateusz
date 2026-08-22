@@ -198,11 +198,6 @@ export interface MonthlyTotals {
 // Constants
 export const DAY_NAMES = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'] as const
 
-export const MONTH_NAMES = [
-  'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
-  'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
-] as const
-
 export const PROJECT_STATUS_LABELS = {
   planned: 'Planowany',
   in_progress: 'W trakcie',

@@ -20,6 +20,33 @@ const moduleBoundaries = {
     "Import przez publiczne API modulu: '@/features/<x>', '@/features/<x>/domain' albo '@/features/<x>/server'. Brakuje symbolu? Dodaj go do index.ts tego modulu zamiast siegac do srodka.",
 }
 
+/**
+ * Formatowanie (Etap 2).
+ * Jedna warstwa zamienia liczby i daty na tekst: lib/format. Poza nia Intl
+ * jest zablokowany, bo rozjezdzal sie miedzy komponentami — "240.0h" obok
+ * "18 200,00 zl", "W33" obok "KW 34/2026", grudniowe etykiety przy
+ * sierpniowych wpisach.
+ */
+const FORMATTING_MESSAGE = 'Uzyj lib/format'
+
+const noAdhocFormatting = [
+  {
+    selector:
+      "MemberExpression[property.name=/^toLocale(Date|Time)?String$/]",
+    message: FORMATTING_MESSAGE,
+  },
+  {
+    selector:
+      "NewExpression[callee.object.name='Intl'][callee.property.name=/^(NumberFormat|DateTimeFormat|RelativeTimeFormat|PluralRules|ListFormat)$/]",
+    message: FORMATTING_MESSAGE,
+  },
+  {
+    selector:
+      "CallExpression[callee.object.name='Intl'][callee.property.name=/^(NumberFormat|DateTimeFormat|RelativeTimeFormat|PluralRules|ListFormat)$/]",
+    message: FORMATTING_MESSAGE,
+  },
+]
+
 const serverEnvOnly = {
   name: '@/lib/env',
   importNames: ['serverEnv'],
@@ -52,13 +79,35 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-restricted-imports': ['error', { patterns: [moduleBoundaries], paths: [serverEnvOnly] }],
+      'no-restricted-syntax': ['error', ...noAdhocFormatting],
+      'no-restricted-properties': [
+        'error',
+        { object: 'Intl', property: 'NumberFormat', message: FORMATTING_MESSAGE },
+        { object: 'Intl', property: 'DateTimeFormat', message: FORMATTING_MESSAGE },
+        { object: 'Intl', property: 'RelativeTimeFormat', message: FORMATTING_MESSAGE },
+        { object: 'Intl', property: 'PluralRules', message: FORMATTING_MESSAGE },
+      ],
     },
+  },
+
+  // Warstwa formatowania to jedyne miejsce, ktore ma prawo wolac Intl.
+  // Landing marketingowy nie renderuje danych aplikacji, tylko statyczne
+  // liczby z projektu graficznego (licznik CountUp odtwarza format literalu,
+  // ktory dostal, lacznie z lokalizacja en-US).
+  {
+    files: ['lib/format/**/*.ts', 'app/(marketing)/**/*.{ts,tsx}'],
+    rules: { 'no-restricted-syntax': 'off', 'no-restricted-properties': 'off' },
   },
 
   // Testy jednostkowe sprawdzaja wnetrze modulow — to ich zadanie.
   {
     files: ['__test__/**/*.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
-    rules: { 'no-restricted-imports': 'off' },
+    rules: {
+      'no-restricted-imports': 'off',
+      // Testy formatowania musza siegnac do Intl, zeby sprawdzic cache.
+      'no-restricted-syntax': 'off',
+      'no-restricted-properties': 'off',
+    },
   },
 
   // Konteksty serwerowe: serverEnv dozwolony, granice modulow NADAL obowiazuja.

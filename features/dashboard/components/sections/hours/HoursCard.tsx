@@ -10,6 +10,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { HEATMAP_LEVELS } from '@/components/ui/tokens'
+import {
+  formatCount,
+  formatDate,
+  formatHours,
+  formatWeekday,
+  NO_DATA,
+} from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { WorkEntry } from '@/lib/types'
 import { buildHeatmap, HEATMAP_WEEKS } from './heatmap'
@@ -33,15 +40,8 @@ const DAY_LABELS = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
 /** Widoczne są co drugie — reszta zostaje dla czytnika ekranu. */
 const VISIBLE_DAY_LABELS = new Set([0, 2, 4])
 
-const dayFormatter = new Intl.DateTimeFormat('pl-PL', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-})
-
 function formatDay(iso: string): string {
-  const [y, m, d] = iso.split('-').map(Number)
-  return dayFormatter.format(new Date(y, m - 1, d))
+  return `${formatWeekday(iso, 'short')}, ${formatDate(iso, 'dayMonth')}`
 }
 
 export function HoursCard({
@@ -77,16 +77,16 @@ export function HoursCard({
         <div>
           <SectionEyebrow>Godziny · {periodLabel}</SectionEyebrow>
           <p className="mt-2 text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
-            {totalHours.toFixed(1)}{' '}
+            {formatHours(totalHours)}{' '}
             {targetHours !== null && (
               <span className="text-xs font-medium text-zinc-400 sm:text-sm">
-                / {targetHours} h
+                / {formatHours(targetHours)}
               </span>
             )}
           </p>
           <p className="mt-1 text-2xs leading-[1.4] text-zinc-400 sm:text-xs">
-            Średnio {avgPerDay === null ? '—' : avgPerDay.toFixed(1)} h/dzień
-            {overtime > 0 && <> · {overtime.toFixed(0)} h nadgodzin</>}
+            Średnio {avgPerDay === null ? NO_DATA : formatHours(avgPerDay)}/dzień
+            {overtime > 0 && <> · {formatHours(overtime, { decimals: 0 })} nadgodzin</>}
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export function HoursCard({
               title="Dni robocze z rzędu z wpisem"
             >
               <Flame className="h-3 w-3 text-amber-400" aria-hidden />
-              Seria {streakDays} {streakDays === 1 ? 'dzień' : 'dni'}
+              Seria {formatCount(streakDays, ['dzień', 'dni', 'dni'])}
             </span>
           )}
         </div>
@@ -122,9 +122,9 @@ export function HoursCard({
           </div>
           <div className="mt-1.5 flex justify-between text-2xs tabular-nums text-zinc-400">
             <span>0</span>
-            <span>Cel {targetHours}</span>
+            <span>Cel {formatHours(targetHours)}</span>
             <span className={reached ? 'font-semibold text-[var(--chart-1)]' : ''}>
-              {totalHours.toFixed(0)}
+              {formatHours(totalHours, { decimals: 0 })}
             </span>
           </div>
         </div>
@@ -138,7 +138,10 @@ export function HoursCard({
         <div ref={scrollRef} className="overflow-x-auto pb-1">
           <div
             role="img"
-            aria-label={`Aktywność z ostatnich ${HEATMAP_WEEKS} tygodni: ${heatmap.activeDays} dni z wpisami, łącznie ${heatmap.totalHours.toFixed(1)} godzin`}
+            aria-label={`Aktywność z ostatnich ${HEATMAP_WEEKS} tygodni: ${formatCount(
+              heatmap.activeDays,
+              ['dzień', 'dni', 'dni'],
+            )} z wpisami, łącznie ${formatHours(heatmap.totalHours)}`}
             className="flex w-fit gap-2"
           >
             <div
@@ -193,7 +196,7 @@ export function HoursCard({
                           <TooltipContent side="top" sideOffset={4}>
                             {cell.isFuture
                               ? `${formatDay(cell.date)} · jeszcze przed nami`
-                              : `${formatDay(cell.date)} · ${cell.hours.toFixed(1)} h`}
+                              : `${formatDay(cell.date)} · ${formatHours(cell.hours)}`}
                           </TooltipContent>
                         </Tooltip>
                       ))}
@@ -211,7 +214,7 @@ export function HoursCard({
             {heatmap.weeks.map((week) => (
               <tr key={week.startDate}>
                 <th scope="row">Tydzień od {formatDay(week.startDate)}</th>
-                <td>{week.totalHours.toFixed(1)} h</td>
+                <td>{formatHours(week.totalHours)}</td>
               </tr>
             ))}
           </tbody>
@@ -219,7 +222,8 @@ export function HoursCard({
 
         <div className="mt-2 flex items-center justify-between gap-3 text-2xs text-zinc-400">
           <span className="tabular-nums">
-            {heatmap.activeDays} dni z wpisami przez ostatni rok
+            {formatCount(heatmap.activeDays, ['dzień', 'dni', 'dni'])} z wpisami przez
+            ostatni rok
           </span>
           <span aria-hidden className="flex items-center gap-1">
             Mniej

@@ -1,5 +1,6 @@
 'use client'
 
+import { formatHours } from '@/lib/format'
 import { ChartErrorBoundary } from '../../errors'
 import { HoursCard } from './HoursCard'
 import { useDashboardDerived } from '../shared/DashboardDerivedContext'
@@ -31,7 +32,7 @@ export function HoursSection() {
         <p className="mt-2 text-sm text-muted-foreground">
           Przewidywane godziny:{' '}
           <span className="font-medium text-foreground">
-            {hours.planned.toFixed(1)} h
+            {formatHours(hours.planned)}
           </span>
         </p>
       )}

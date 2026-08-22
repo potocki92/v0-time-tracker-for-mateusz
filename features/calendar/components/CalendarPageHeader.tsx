@@ -2,7 +2,8 @@
 
 import { CalendarDays } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
-import { MONTH_NAMES } from '@/lib/types'
+import { formatMonthTitle } from '@/lib/format'
+import { getMonthKey } from '@/lib/helpers'
 
 interface Props {
   currentMonth: number
@@ -36,7 +37,7 @@ export function CalendarPageHeader({
         <Separator orientation="vertical" className="h-5 bg-hairline" />
 
         <span className="truncate text-xs text-zinc-400">
-          {MONTH_NAMES[currentMonth]} {currentYear}
+          {formatMonthTitle(getMonthKey(currentYear, currentMonth))}
         </span>
 
         <div className="ml-auto flex items-center gap-2 text-2xs text-zinc-400">

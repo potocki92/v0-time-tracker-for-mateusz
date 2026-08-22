@@ -13,7 +13,7 @@ import {
   XCircle,
   type LucideIcon,
 } from 'lucide-react'
-import { formatCurrency } from '@/lib/helpers'
+import { formatDate, formatMoney, NO_DATA, toMinor } from '@/lib/format'
 import type { Invoice } from '@/lib/types'
 import { InvoiceStatus, deriveInvoiceStatus } from '@/lib/finance/invoice-status'
 import { sumInvoicesByCurrency } from '@/lib/finance/invoice-currency-totals'
@@ -69,10 +69,8 @@ const STATUS_PILL: Record<
 }
 
 function shortDue(due: string | null | undefined): string {
-  if (!due) return ''
-  const d = new Date(due)
-  if (Number.isNaN(d.getTime())) return ''
-  return `termin ${d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short' })}`
+  const label = formatDate(due?.slice(0, 10), 'dayMonth')
+  return label === NO_DATA ? '' : `termin ${label}`
 }
 
 export function InvoicesCard({ invoices, periodShort }: Props) {
@@ -140,7 +138,7 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
                     )}
                   </div>
                   <span className="shrink-0 text-xs font-semibold tabular-nums text-white sm:text-sm">
-                    {formatCurrency(inv.amount, inv.currency)}
+                    {formatMoney(toMinor(inv.amount), inv.currency)}
                   </span>
                 </Link>
               </li>
@@ -154,14 +152,14 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
           Łącznie wystawione ·{' '}
           {totals.length === 0 ? (
             <span className="font-semibold tabular-nums text-white">
-              {formatCurrency(0, 'PLN')}
+              {formatMoney(toMinor(0), 'PLN')}
             </span>
           ) : (
             totals.map((t, index) => (
               <span key={t.currency}>
                 {index > 0 && ' · '}
                 <span className="font-semibold tabular-nums text-white">
-                  {formatCurrency(t.total, t.currency)}
+                  {formatMoney(toMinor(t.total), t.currency)}
                 </span>
               </span>
             ))

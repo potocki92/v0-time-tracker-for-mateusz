@@ -1,6 +1,7 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import type { Client, WorkEntry } from '@/lib/types'
-import { formatCurrency, getDateString, isFutureDate } from '@/lib/helpers'
+import { formatMoney, toMinor } from '@/lib/format'
+import { getDateString, isFutureDate } from '@/lib/helpers'
 import { calculateEarnings } from '@/lib/finance/earnings'
 import { cn } from '@/lib/utils'
 import { STATUS_CONFIG } from '../../domain/calendar.constants'
@@ -118,7 +119,7 @@ export function DayCell({
           </div>
           {earnings && earnings.amount > 0 && (
             <div className="truncate text-2xs font-medium leading-none text-zinc-400">
-              {formatCurrency(earnings.amount, earnings.currency)}
+              {formatMoney(toMinor(earnings.amount), earnings.currency)}
             </div>
           )}
           {client && (
@@ -156,14 +157,7 @@ export function DayCell({
           className="w-56 overflow-hidden border-border/80 p-0 shadow-xl"
           sideOffset={6}
         >
-          <DayCellTooltip
-            entry={entry}
-            client={client}
-            earnings={earnings}
-            day={day}
-            month={month}
-            year={year}
-          />
+          <DayCellTooltip entry={entry} client={client} earnings={earnings} />
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

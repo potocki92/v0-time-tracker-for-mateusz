@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Pencil, Trash2 } from 'lucide-react'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { formatCurrency } from '@/lib/helpers'
+import { formatDate, formatMoney, toMinor } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
   PROJECT_BUDGET_LABELS,
@@ -22,11 +22,8 @@ type ProjectDetailsPanelProps = {
   onDelete: () => void
 }
 
-function formatDate(date: string | null): string {
-  if (!date) return '—'
-  const d = new Date(date)
-  if (Number.isNaN(d.getTime())) return '—'
-  return d.toLocaleDateString('pl-PL', { day: '2-digit', month: 'short', year: 'numeric' })
+function formatDeadlineDate(date: string | null): string {
+  return formatDate(date?.slice(0, 10), 'long')
 }
 
 export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPanelProps) {
@@ -109,8 +106,8 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       </div>
 
       <dl className="mt-3 grid grid-cols-2 gap-3">
-        <DetailField label="START" value={formatDate(project.start_date)} />
-        <DetailField label="TERMIN" value={formatDate(dueDate)} danger={isAtRisk} />
+        <DetailField label="START" value={formatDeadlineDate(project.start_date)} />
+        <DetailField label="TERMIN" value={formatDeadlineDate(dueDate)} danger={isAtRisk} />
         <DetailField label="TYP BUDŻETU" value={PROJECT_BUDGET_LABELS[project.budget_type]} />
         <DetailField label="GODZINY" value={`${Math.round(hoursLogged)}h`} />
       </dl>
@@ -120,7 +117,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
         <div className="mt-2 space-y-1.5 text-xs">
           <Row
             label="Kwota"
-            value={budget > 0 ? formatCurrency(budget, 'PLN') : '—'}
+            value={budget > 0 ? formatMoney(toMinor(budget), 'PLN') : '—'}
             mute={budget <= 0}
           />
           <Row

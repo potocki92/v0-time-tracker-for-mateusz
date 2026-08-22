@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
+import { formatDate } from '@/lib/format'
 import { findGoalReachedDate } from '@/lib/finance/goal'
 import type { Goal } from '@/features/dashboard/domain'
 import type { WorkEntry } from '@/lib/types'
 
-const plDate = (iso: string) =>
-  new Date(iso).toLocaleDateString('pl-PL', { day: '2-digit', month: 'short' })
+const plDate = (iso: string) => formatDate(iso, 'dayMonth')
 
 function entry(over: Partial<WorkEntry>): WorkEntry {
   return {

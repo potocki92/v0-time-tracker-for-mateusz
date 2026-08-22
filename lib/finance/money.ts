@@ -1,3 +1,4 @@
+import { formatMoney } from '@/lib/format'
 import type { CURRENCY } from '@/lib/types'
 
 /**
@@ -129,15 +130,9 @@ export function isPositive(m: Money): boolean {
   return m.amountMinor > ZERO
 }
 
-/** Format using Intl.NumberFormat. Works in the browser and on the server. */
-export function format(m: Money, locale = 'pl-PL'): string {
-  const value = toMajor(m)
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: m.currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value)
+/** Prezentacja idzie przez lib/format — tu tylko zamiana bigint → number. */
+export function format(m: Money): string {
+  return formatMoney(Number(m.amountMinor), m.currency)
 }
 
 /** Build Money from a NUMERIC(12,2) value returned by Supabase. Accepts number | string | null. */

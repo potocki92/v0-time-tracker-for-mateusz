@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/format'
 import type { Goal } from '@/features/dashboard/domain'
 import { Client, MonthlyTotals, WorkEntry } from '@/lib/types'
 import { calculateEarnings } from './earnings'
@@ -59,10 +60,7 @@ export function findGoalReachedDate(
     if (earned.currency !== goal.currency) continue
     cumulative += earned.amount
     if (cumulative >= target) {
-      return new Date(entry.date).toLocaleDateString('pl-PL', {
-        day: '2-digit',
-        month: 'short',
-      })
+      return formatDate(entry.date, 'dayMonth')
     }
   }
   return null

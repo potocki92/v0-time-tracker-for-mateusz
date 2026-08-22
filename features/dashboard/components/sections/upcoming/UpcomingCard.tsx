@@ -2,6 +2,8 @@
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { ChevronRight, Plus } from 'lucide-react'
+import { formatDayBadge } from '@/lib/format'
+import { toDateKey } from '@/lib/date/format'
 
 export type UpcomingCategory = 'vacation' | 'billing' | 'project' | 'finance' | 'event'
 
@@ -35,10 +37,7 @@ const CATEGORY_LABEL: Record<UpcomingCategory, string> = {
 }
 
 function dayLabel(d: Date): { day: string; month: string } {
-  return {
-    day: String(d.getDate()).padStart(2, '0'),
-    month: d.toLocaleDateString('pl-PL', { month: 'short' }).toUpperCase(),
-  }
+  return formatDayBadge(toDateKey(d))
 }
 
 export function UpcomingCard({ items, onAdd }: Props) {

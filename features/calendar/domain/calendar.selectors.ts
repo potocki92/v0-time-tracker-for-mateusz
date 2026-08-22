@@ -130,8 +130,8 @@ export function selectRecentEntries(
       clientName: client?.name ?? null,
       notes: entry.notes,
       hours: entry.hours ?? 0,
-      amountPLN: earnings.amountInPLN,
-      amountNative: earnings.amount,
+      amountMinorPLN: Math.round(earnings.amountInPLN * 100),
+      amountMinorNative: Math.round(earnings.amount * 100),
       currency: earnings.currency,
     })
   }

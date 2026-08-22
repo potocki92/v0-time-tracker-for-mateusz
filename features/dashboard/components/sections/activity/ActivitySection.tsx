@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react'
 import type { Client, Invoice, WorkEntry } from '@/lib/types'
+import { toDateKey } from '@/lib/date/format'
+import { formatDate, formatHours, formatMoney, toMinor } from '@/lib/format'
 import { isRealizedEntry } from '@/lib/finance/realization'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
@@ -26,7 +28,7 @@ function relTime(iso: string): string {
   const d = Math.floor(h / 24)
   if (d === 1) return 'wczoraj'
   if (d < 7) return `${d} dni temu`
-  return new Date(t).toLocaleDateString('pl-PL', { day: '2-digit', month: 'short' })
+  return formatDate(toDateKey(new Date(t)), 'dayMonth')
 }
 
 function buildFeed(
@@ -54,7 +56,7 @@ function buildFeed(
       text: (
         <span>
           <span className="font-medium">{c.name}</span> · zarejestrowano{' '}
-          <span className="font-semibold">{e.hours?.toFixed(1)} h</span>
+          <span className="font-semibold">{formatHours(e.hours ?? null)}</span>
           {e.notes ? <> przy <span className="text-zinc-300">{e.notes}</span></> : null}
         </span>
       ),
@@ -80,7 +82,7 @@ function buildFeed(
           {inv.is_paid ? 'Opłacona faktura ' : 'Wystawiona faktura '}
           <span className="font-medium">{inv.invoice_number ?? inv.name}</span>{' '}
           <span className="text-zinc-400">
-            ({Intl.NumberFormat('pl-PL', { style: 'currency', currency: inv.currency }).format(inv.amount)})
+            ({formatMoney(toMinor(inv.amount), inv.currency)})
           </span>
         </span>
       ),

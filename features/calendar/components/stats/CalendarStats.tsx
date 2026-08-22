@@ -4,7 +4,6 @@ import { DaysCard } from './DaysCard'
 import { HoursCard } from './HoursCard'
 import { PredictedEarningsCard } from './PredictedEarningsCard'
 import { RealizedEarningsCard } from './RealizedEarningsCard'
-import { toMajorUnits } from './format'
 
 interface Props {
   metrics: MonthMetrics
@@ -20,31 +19,29 @@ interface Props {
 export function CalendarStats({ metrics }: Props) {
   const { hours, earnings, days } = metrics
   const realizedShare =
-    earnings.forecastMinor > 0
-      ? Math.round((earnings.actualMinor / earnings.forecastMinor) * 100)
-      : 0
+    earnings.forecastMinor > 0 ? earnings.actualMinor / earnings.forecastMinor : 0
 
   return (
     <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-5">
       <HoursCard
         totalHours={hours.actual}
         goalHours={hours.goal}
-        progressPercent={hours.goalProgress * 100}
+        goalProgress={hours.goalProgress}
         isAhead={hours.goalProgress >= 1}
       />
       <RealizedEarningsCard
-        realizedEarnings={toMajorUnits(earnings.actualMinor)}
+        realizedEarningsMinor={earnings.actualMinor}
         realizedHours={hours.actual}
         realizedDays={metrics.realizedWorkedDays}
         currency={earnings.currency}
       />
       <PredictedEarningsCard
-        forecastEarnings={toMajorUnits(earnings.forecastMinor)}
-        realizedEarnings={toMajorUnits(earnings.actualMinor)}
-        plannedEarnings={toMajorUnits(earnings.plannedMinor)}
+        forecastEarningsMinor={earnings.forecastMinor}
+        realizedEarningsMinor={earnings.actualMinor}
+        plannedEarningsMinor={earnings.plannedMinor}
         plannedHours={hours.planned}
         plannedDays={metrics.plannedDays}
-        realizedSharePercent={realizedShare}
+        realizedShare={realizedShare}
         currency={earnings.currency}
       />
       <DaysCard

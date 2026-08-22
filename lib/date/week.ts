@@ -1,3 +1,6 @@
+import { toDateKey } from './format'
+import { formatDateRange } from '@/lib/format'
+
 export function getWeekStart(date: Date): Date {
   const clone = new Date(date)
   const day = clone.getDay()
@@ -11,7 +14,7 @@ export function getWeekLabel(date: Date): string {
   const weekStart = getWeekStart(date)
   const weekEnd = new Date(weekStart)
   weekEnd.setDate(weekStart.getDate() + 6)
-  return `${weekStart.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}–${weekEnd.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' })}`
+  return formatDateRange(toDateKey(weekStart), toDateKey(weekEnd))
 }
 
 /** Poniedziałek–niedziela obejmujący podaną datę. */

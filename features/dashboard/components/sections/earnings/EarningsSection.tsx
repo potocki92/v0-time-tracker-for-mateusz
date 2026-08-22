@@ -19,7 +19,7 @@ import {
   usePrivacyMode,
 } from '../../../hooks/useDashboardUiStore'
 import { useExportData } from '@/hooks/useExportData'
-import { formatCurrency } from '@/lib/helpers'
+import { formatMoney, toMinor } from '@/lib/format'
 import { GoalEditDialog } from '../../card/GoalEditDialog'
 import { EarningsCardBoundary } from '../../errors'
 import { EarningsCard } from './EarningsCard'
@@ -94,7 +94,7 @@ export function EarningsSection() {
   }, [])
 
   const handleCopyAmount = useCallback(() => {
-    const formatted = formatCurrency(totals.totalEarningsAllPLN, 'PLN')
+    const formatted = formatMoney(toMinor(totals.totalEarningsAllPLN), 'PLN')
     if (typeof navigator === 'undefined' || !navigator.clipboard) {
       toast.error('Schowek niedostępny')
       return
@@ -128,7 +128,7 @@ export function EarningsSection() {
         />
       </EarningsCardBoundary>
       <p className="mt-2 text-sm text-zinc-400">
-        Przewidywane zarobki: <span className="font-medium text-zinc-100">{formatCurrency(projectedTotals.totalEarningsAllPLN, 'PLN')}</span>
+        Przewidywane zarobki: <span className="font-medium text-zinc-100">{formatMoney(toMinor(projectedTotals.totalEarningsAllPLN), 'PLN')}</span>
       </p>
 
       <GoalEditDialog

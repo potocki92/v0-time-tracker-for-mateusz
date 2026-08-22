@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { formatCount, formatHours } from '@/lib/format'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import {
   closestCenter,
@@ -45,17 +46,17 @@ interface InvoiceLineItemsFieldProps {
 function weekToLineItem(week: WorkedWeekSummary) {
   const description =
     week.workType === 'piecework'
-      ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${week.quantity.toLocaleString('pl-PL')} szt.`
-      : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${week.hours.toLocaleString('pl-PL')} h`
+      ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${formatCount(week.quantity, ['szt.', 'szt.', 'szt.'])}`
+      : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${formatHours(week.hours)}`
 
   const quantity = week.workType === 'piecework' ? week.quantity || 1 : week.hours || 1
-  const unit_price_net = quantity > 0 ? Number((week.amount / quantity).toFixed(2)) : 0
+  const unit_price_net = quantity > 0 ? Math.round((week.amount / quantity) * 100) / 100 : 0
 
   return {
     id:             makeLineItemId(),
     description,
     unit:           week.workType === 'piecework' ? 'szt.' : 'h',
-    quantity:       Number(quantity.toFixed(3)),
+    quantity:       Math.round(quantity * 1000) / 1000,
     unit_price_net,
     vat_mode:       'standard' as const,
     vat_rate:       23,

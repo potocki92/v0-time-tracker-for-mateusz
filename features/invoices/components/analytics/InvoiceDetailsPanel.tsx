@@ -5,7 +5,7 @@ import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { CheckCircle2, ChevronDown, Clock3, Copy, Download, Mail, Pencil, Printer, Trash2 } from 'lucide-react'
 import type { Client, Invoice, InvoiceLifecycleStatus } from '@/lib/types'
-import { formatCurrency, formatDate } from '@/lib/helpers'
+import { formatDate, formatMoney, toMinor } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { displayInvoiceNumber } from '@/lib/finance/invoice-number'
 import {
@@ -22,7 +22,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { polishMonthShort } from '../../domain/stats'
 
 interface InvoiceDetailsPanelProps {
   invoice: Invoice
@@ -45,10 +44,7 @@ const STATUS_PILL: Record<InvoiceStatus, string> = {
 }
 
 function formatShortDate(iso: string | null | undefined): string {
-  if (!iso) return '—'
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return '—'
-  return `${polishMonthShort(d.getMonth())} ${d.getDate()}`
+  return formatDate(iso?.slice(0, 10), 'dayMonth')
 }
 
 export function InvoiceDetailsPanel({
@@ -73,10 +69,10 @@ export function InvoiceDetailsPanel({
 
   const isPaid = invoice.is_paid || status === InvoiceStatus.PAID
   const sentLabel = invoice.invoice_date
-    ? `Wysłano · ${formatDate(invoice.invoice_date)}`
+    ? `Wysłano · ${formatDate(invoice.invoice_date.slice(0, 10), 'short')}`
     : null
-  const draftedLabel = invoice.created_at ? `Utworzono · ${formatDate(invoice.created_at)}` : null
-  const paidLabel = invoice.paid_date ? `Opłacono · ${formatDate(invoice.paid_date)}` : null
+  const draftedLabel = invoice.created_at ? `Utworzono · ${formatDate(invoice.created_at.slice(0, 10), 'short')}` : null
+  const paidLabel = invoice.paid_date ? `Opłacono · ${formatDate(invoice.paid_date.slice(0, 10), 'short')}` : null
 
   const mailHref = client?.email
     ? `mailto:${client.email}?subject=${encodeURIComponent(`Faktura ${numberLabel}`)}`
@@ -190,20 +186,20 @@ export function InvoiceDetailsPanel({
           <li className="flex items-center justify-between gap-3">
             <span className="truncate text-zinc-200">{projectName}</span>
             <span className="shrink-0 font-medium tabular-nums text-white">
-              {formatCurrency(net || gross, invoice.currency)}
+              {formatMoney(toMinor(net || gross), invoice.currency)}
             </span>
           </li>
         </ul>
         <div className="mt-3 space-y-1.5 border-t border-hairline pt-3 text-xs">
-          <Row label="Suma netto" value={formatCurrency(net || gross, invoice.currency)} />
+          <Row label="Suma netto" value={formatMoney(toMinor(net || gross), invoice.currency)} />
           <Row
             label="VAT"
-            value={vat > 0 ? formatCurrency(vat, invoice.currency) : '—'}
+            value={vat > 0 ? formatMoney(toMinor(vat), invoice.currency) : '—'}
             mute={vat <= 0}
           />
           <Row
             label={`Razem · ${invoice.currency}`}
-            value={formatCurrency(gross, invoice.currency)}
+            value={formatMoney(toMinor(gross), invoice.currency)}
             strong
           />
         </div>

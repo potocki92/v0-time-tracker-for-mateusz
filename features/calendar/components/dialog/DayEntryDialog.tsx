@@ -15,7 +15,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Copy, Trash2 } from 'lucide-react'
 import type { Client, Project, WorkEntry } from '@/lib/types'
-import { MONTH_NAMES } from '@/lib/types'
+import { formatDate } from '@/lib/format'
+import { getDateString } from '@/lib/helpers'
 import type { WorkStatus } from '../../domain/calendar.types'
 import { ClientSelect } from './ClientSelect'
 import { HoursInput } from './HoursInput'
@@ -112,7 +113,11 @@ export function DayEntryDialog({
       <DialogContent className="gap-0 overflow-hidden p-0 max-h-[92vh] sm:max-w-[440px]">
         <DialogHeader className="border-b bg-muted/30 px-4 py-3.5 sm:px-5 sm:py-4">
           <DialogTitle className="text-sm font-semibold sm:text-base">
-            {selectedDay && `${selectedDay} ${MONTH_NAMES[currentMonth]} ${currentYear}`}
+            {selectedDay &&
+              formatDate(
+                getDateString(currentYear, currentMonth, selectedDay),
+                'long',
+              )}
           </DialogTitle>
           {existingEntry && (
             <p className="mt-0.5 text-2xs text-muted-foreground">Edycja istniejącego wpisu</p>

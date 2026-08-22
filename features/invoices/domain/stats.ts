@@ -1,3 +1,4 @@
+import { formatMonthName } from '@/lib/format'
 import type { CURRENCY, Invoice } from '@/lib/types'
 import { InvoiceStatus, deriveInvoiceStatus } from '@/lib/finance/invoice-status'
 
@@ -64,42 +65,10 @@ export interface InvoicesAggregateStats {
   }
 }
 
-const POLISH_MONTHS_FULL = [
-  'Styczeń',
-  'Luty',
-  'Marzec',
-  'Kwiecień',
-  'Maj',
-  'Czerwiec',
-  'Lipiec',
-  'Sierpień',
-  'Wrzesień',
-  'Październik',
-  'Listopad',
-  'Grudzień',
-] as const
-
-const POLISH_MONTHS_SHORT = [
-  'Sty',
-  'Lut',
-  'Mar',
-  'Kwi',
-  'Maj',
-  'Cze',
-  'Lip',
-  'Sie',
-  'Wrz',
-  'Paź',
-  'Lis',
-  'Gru',
-] as const
-
-function polishMonthFull(monthIndex: number): string {
-  return POLISH_MONTHS_FULL[monthIndex] ?? ''
-}
-
-export function polishMonthShort(monthIndex: number): string {
-  return POLISH_MONTHS_SHORT[monthIndex] ?? ''
+/** "YYYY-MM" dla podanego roku i indeksu miesiąca (0..11), z przewinięciem lat. */
+function monthKey(year: number, monthIndex: number): string {
+  const date = new Date(year, monthIndex, 1)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 }
 
 function quarterFromMonth(monthIndex: number): 1 | 2 | 3 | 4 {
@@ -142,7 +111,7 @@ export function computeInvoicesStats(
 ): InvoicesAggregateStats {
   const monthIndex = now.getMonth()
   const year = now.getFullYear()
-  const monthLabel = polishMonthFull(monthIndex).toUpperCase()
+  const monthLabel = formatMonthName(monthKey(year, monthIndex), 'long').toUpperCase()
   const cycleLabel = `Q${quarterFromMonth(monthIndex)}`
 
   const onlyCurrency = invoices.filter((inv) => (inv.currency ?? 'PLN') === currency)
@@ -237,7 +206,7 @@ export function computeInvoicesStats(
     cashflowMonths.push({
       monthIndex: ref.getMonth(),
       year: ref.getFullYear(),
-      label: polishMonthShort(ref.getMonth()),
+      label: formatMonthName(monthKey(ref.getFullYear(), ref.getMonth()), 'short'),
       total,
     })
   }

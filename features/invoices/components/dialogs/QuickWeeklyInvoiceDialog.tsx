@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { formatCount, formatHours, formatMoney, toMinor, type Currency } from '@/lib/format'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarRange, Loader2 } from 'lucide-react'
 
@@ -49,17 +50,8 @@ function defaultRange() {
   }
 }
 
-function formatHours(hours: number) {
-  if (!Number.isFinite(hours) || hours === 0) return '0 h'
-  return `${hours.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} h`
-}
-
 function formatAmount(amount: number, currency: string) {
-  return new Intl.NumberFormat('pl-PL', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 2,
-  }).format(amount)
+  return formatMoney(toMinor(amount), currency as Currency)
 }
 
 function quarterFromIso(iso: string) {
@@ -147,24 +139,27 @@ export function QuickWeeklyInvoiceDialog({
     const lineItems = selectedWeeks.map((week) => {
       const description =
         week.workType === 'piecework'
-          ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${week.quantity.toLocaleString('pl-PL')} szt.`
-          : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${week.hours.toLocaleString('pl-PL')} h`
+          ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${formatCount(week.quantity, ['szt.', 'szt.', 'szt.'])}`
+          : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${formatHours(week.hours)}`
       const quantity = week.workType === 'piecework' ? week.quantity || 1 : week.hours || 1
-      const unit_price_net = quantity > 0 ? Number((week.amount / quantity).toFixed(2)) : 0
+      const unit_price_net = quantity > 0 ? Math.round((week.amount / quantity) * 100) / 100 : 0
       return {
         description,
         unit:           week.workType === 'piecework' ? 'szt.' : 'h',
-        quantity:       Number(quantity.toFixed(3)),
+        quantity:       Math.round(quantity * 1000) / 1000,
         unit_price_net,
         vat_rate:       0,
       }
     })
 
-    const grossTotal = Number(
-      lineItems
-        .reduce((acc, item) => acc + item.quantity * item.unit_price_net * (1 + item.vat_rate / 100), 0)
-        .toFixed(2),
-    )
+    const grossTotal =
+      Math.round(
+        lineItems.reduce(
+          (acc, item) =>
+            acc + item.quantity * item.unit_price_net * (1 + item.vat_rate / 100),
+          0,
+        ) * 100,
+      ) / 100
 
     const values: InvoiceFormValues = {
       name:            `${selectedClient.name} — tygodnie ${periodStart} – ${periodEnd}`,

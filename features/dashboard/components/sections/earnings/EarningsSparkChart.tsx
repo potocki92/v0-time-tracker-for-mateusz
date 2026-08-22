@@ -9,8 +9,9 @@ import {
   XAxis,
   type TooltipProps,
 } from 'recharts'
+import { formatDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { formatCurrency } from '@/lib/helpers'
+import { formatMoney, toMinor } from '@/lib/format'
 import { maskValue } from '../../../hooks/useDashboardUiStore'
 import type { SeriesPoint } from './series'
 
@@ -32,11 +33,11 @@ function makeChartTooltip(privacyMode: boolean, compareMode: boolean) {
       <div className="rounded-lg border border-hairline bg-surface-1 px-2.5 py-1.5 text-xs shadow-2xl">
         <p className="font-medium text-white">{row.label}</p>
         <p className={cn('tabular-nums', isForecast ? 'text-zinc-400' : 'text-[var(--chart-1)]')}>
-          {maskValue(formatCurrency(value, 'PLN'), privacyMode)}
+          {maskValue(formatMoney(toMinor(value), 'PLN'), privacyMode)}
         </p>
         {compareMode && row.prevCumulative !== null && (
           <p className="tabular-nums text-zinc-400">
-            Poprz.: {maskValue(formatCurrency(row.prevCumulative, 'PLN'), privacyMode)}
+            Poprz.: {maskValue(formatMoney(toMinor(row.prevCumulative), 'PLN'), privacyMode)}
           </p>
         )}
         {isForecast && (
@@ -73,10 +74,7 @@ export function EarningsSparkChart({ series, ticks, privacyMode, compareMode }: 
         <XAxis
           dataKey="date"
           ticks={ticks}
-          tickFormatter={(iso: string) => {
-            const d = new Date(iso)
-            return d.toLocaleDateString('pl-PL', { month: 'short', day: '2-digit' })
-          }}
+          tickFormatter={(iso: string) => formatDate(iso, 'dayMonth')}
           stroke="var(--hairline-strong)"
           tickLine={false}
           axisLine={false}

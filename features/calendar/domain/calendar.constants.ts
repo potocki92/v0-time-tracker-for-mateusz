@@ -57,8 +57,3 @@ export const WORK_STATUS_ORDER: WorkStatus[] = [
   'sick_leave',
   'day_off',
 ]
-
-export const MONTH_ABBR = [
-  'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze',
-  'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru',
-] as const

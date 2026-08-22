@@ -1,7 +1,7 @@
 'use client'
 
 import type { CURRENCY } from '@/lib/types'
-import { formatCurrency } from '@/lib/helpers'
+import { formatMoney, formatNumber, toMinor } from '@/lib/format'
 import { StatTile } from '@/components/common/stat/StatTile'
 import type { InvoicesAggregateStats } from '../../domain/stats'
 
@@ -68,7 +68,7 @@ export function InvoiceStatsGrid({ stats, otherCurrencyStats }: InvoiceStatsGrid
     stats.paid.totalCount > 0
       ? `${stats.paid.paidCount} z ${stats.paid.totalCount} rozliczonych${
           stats.paid.avgDaysToPay !== null
-            ? ` · śr. ${stats.paid.avgDaysToPay.toFixed(1)} d`
+            ? ` · śr. ${formatNumber(stats.paid.avgDaysToPay, { decimals: 1 })} d`
             : ''
         }`
       : 'Brak płatności w tym okresie'
@@ -85,10 +85,10 @@ export function InvoiceStatsGrid({ stats, otherCurrencyStats }: InvoiceStatsGrid
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <StatTile
         label={`WYSTAWIONE · ${stats.monthLabel}`}
-        value={formatCurrency(stats.period.total, currency)}
+        value={formatMoney(toMinor(stats.period.total), currency)}
         secondary={
           otherCurrencyStats.period.count > 0
-            ? formatCurrency(otherCurrencyStats.period.total, otherCurrency)
+            ? formatMoney(toMinor(otherCurrencyStats.period.total), otherCurrency)
             : undefined
         }
         badge={formatTrendBadge(stats.period.trendPercent)}
@@ -97,10 +97,10 @@ export function InvoiceStatsGrid({ stats, otherCurrencyStats }: InvoiceStatsGrid
       />
       <StatTile
         label="OPŁACONE"
-        value={formatCurrency(stats.paid.total, currency)}
+        value={formatMoney(toMinor(stats.paid.total), currency)}
         secondary={
           otherCurrencyStats.paid.paidCount > 0
-            ? formatCurrency(otherCurrencyStats.paid.total, otherCurrency)
+            ? formatMoney(toMinor(otherCurrencyStats.paid.total), otherCurrency)
             : undefined
         }
         badge={paidBadge}
@@ -109,10 +109,10 @@ export function InvoiceStatsGrid({ stats, otherCurrencyStats }: InvoiceStatsGrid
       />
       <StatTile
         label="OCZEKUJĄCE"
-        value={formatCurrency(stats.outstanding.total, currency)}
+        value={formatMoney(toMinor(stats.outstanding.total), currency)}
         secondary={
           otherCurrencyStats.outstanding.openCount + otherCurrencyStats.outstanding.overdueCount > 0
-            ? formatCurrency(otherCurrencyStats.outstanding.total, otherCurrency)
+            ? formatMoney(toMinor(otherCurrencyStats.outstanding.total), otherCurrency)
             : undefined
         }
         badge={outstandingBadge}
@@ -121,10 +121,10 @@ export function InvoiceStatsGrid({ stats, otherCurrencyStats }: InvoiceStatsGrid
       />
       <StatTile
         label="SZKICE"
-        value={formatCurrency(stats.drafts.total, currency)}
+        value={formatMoney(toMinor(stats.drafts.total), currency)}
         secondary={
           otherCurrencyStats.drafts.count > 0
-            ? formatCurrency(otherCurrencyStats.drafts.total, otherCurrency)
+            ? formatMoney(toMinor(otherCurrencyStats.drafts.total), otherCurrency)
             : undefined
         }
         badge={stats.drafts.count > 0 ? 'Akcja' : undefined}

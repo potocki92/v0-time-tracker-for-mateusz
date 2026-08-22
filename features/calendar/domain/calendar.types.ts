@@ -46,9 +46,10 @@ export type RecentEntry = {
   clientName: string | null
   notes: string | null
   hours: number
-  amountPLN: number
+  /** grosze — warstwa widoku dostaje liczby gotowe do `formatMoney` */
+  amountMinorPLN: number
   currency: CURRENCY
-  amountNative: number
+  amountMinorNative: number
 }
 
 export type CalendarInsights = {

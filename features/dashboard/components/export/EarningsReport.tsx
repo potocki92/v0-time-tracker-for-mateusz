@@ -16,6 +16,8 @@ import {
   StyleSheet,
   Font,
 } from '@react-pdf/renderer'
+import { formatDate, formatHours, formatMoney, NO_DATA, toMinor } from '@/lib/format'
+import { getTodayLocalDateString } from '@/lib/helpers'
 import type { ExportRow } from '@/hooks/useExportData'
 
 // ── Fonty ─────────────────────────────────────────────────────────────────────
@@ -145,9 +147,7 @@ interface EarningsReportProps {
 // ── Komponent ─────────────────────────────────────────────────────────────────
 
 export function EarningsReport({ rows, totals, periodLabel }: EarningsReportProps) {
-  const now = new Date().toLocaleDateString('pl-PL', {
-    day: '2-digit', month: 'long', year: 'numeric',
-  })
+  const now = formatDate(getTodayLocalDateString(), 'long')
 
   return (
     <Document
@@ -168,18 +168,18 @@ export function EarningsReport({ rows, totals, periodLabel }: EarningsReportProp
           <View style={styles.totalCard}>
             <Text style={styles.totalLabel}>Łącznie PLN</Text>
             <Text style={styles.totalValue}>
-              {totals.totalPLN.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} zł
+              {formatMoney(toMinor(totals.totalPLN), 'PLN')}
             </Text>
           </View>
           <View style={styles.totalCard}>
             <Text style={styles.totalLabel}>Łącznie EUR</Text>
             <Text style={styles.totalValue}>
-              {totals.totalEUR.toLocaleString('pl-PL', { minimumFractionDigits: 2 })} €
+              {formatMoney(toMinor(totals.totalEUR), 'EUR')}
             </Text>
           </View>
           <View style={styles.totalCard}>
             <Text style={styles.totalLabel}>Godziny</Text>
-            <Text style={styles.totalValue}>{totals.totalHours.toFixed(1)} h</Text>
+            <Text style={styles.totalValue}>{formatHours(totals.totalHours)}</Text>
           </View>
         </View>
 
@@ -205,14 +205,14 @@ export function EarningsReport({ rows, totals, periodLabel }: EarningsReportProp
               <Text style={styles.colDate}>{row.date}</Text>
               <Text style={styles.colClient}>{row.client}</Text>
               <Text style={styles.colProject}>{row.project}</Text>
-              <Text style={styles.colHours}>{row.hours.toFixed(1)}</Text>
+              <Text style={styles.colHours}>{formatHours(row.hours)}</Text>
               <Text style={styles.colPLN}>
-                {row.earningsPLN.toLocaleString('pl-PL', { minimumFractionDigits: 2 })}
+                {formatMoney(toMinor(row.earningsPLN), 'PLN')}
               </Text>
               <Text style={styles.colEUR}>
                 {row.earningsEUR > 0
-                  ? row.earningsEUR.toLocaleString('pl-PL', { minimumFractionDigits: 2 })
-                  : '—'}
+                  ? formatMoney(toMinor(row.earningsEUR), 'EUR')
+                  : NO_DATA}
               </Text>
             </View>
           ))}
