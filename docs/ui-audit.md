@@ -235,3 +235,86 @@ Zadanie mówi: „Jeśli tabela faktur albo builder się przez to rozjedzie — 
 W tym środowisku nie da się uruchomić przeglądarki na aplikacji (brak Dockera → brak Supabase),
 więc **nie mogę tego sprawdzić**. Zwężenie zrobię zgodnie z zadaniem i opiszę ryzyko,
 ale weryfikacja zostaje po stronie człowieka.
+
+---
+
+## Po migracji
+
+**Zrzutów ekranu nie ma.** Faza 0 i Faza 5 wymagają uruchomionej aplikacji z zalogowanym
+kontem testowym, a to znaczy lokalny Supabase — w tym kontenerze nie ma demona Dockera,
+więc `npx supabase start` nie wstanie. `docs/screenshots/_before/` nigdy nie powstał
+(nie ma czego usuwać), a `docs/screenshots/desktop|mobile` są puste tak samo jak przed
+zmianą. Poniższy opis jest **czytany z klas, nie oglądany** — każdą pozycję trzeba
+potwierdzić na oku po odpaleniu `npm run e2e -- screenshots.spec.ts` na maszynie z Dockerem.
+
+### Co się zmieniło wizualnie, sekcja po sekcji
+
+| sekcja | zmiana | ujednolicenie czy regresja |
+|---|---|---|
+| Klienci | „Dodaj klienta” z `bg-primary` na `bg-emerald-500`/czarny tekst | ujednolicenie — trzy sekcje miały trzy różne przyciski |
+| Klienci | kafelki KPI: wartość `text-2xl sm:text-3xl` → `text-3xl sm:text-4xl`, promień `rounded-xl` → `rounded-2xl` | ujednolicenie; **do sprawdzenia**: dłuższe kwoty w dwukolumnowej siatce na 390 px |
+| Klienci | „Top przychód” (`compact`): `text-sm sm:text-base` → `text-base sm:text-lg` | ujednolicenie |
+| Klienci | panel filtrów listy mobilnej `rounded-xl` → `rounded-2xl` | ujednolicenie |
+| Klienci | eyebrow `tracking-[0.16em]` → `0.18em` | ujednolicenie |
+| Projekty | „Nowy projekt”: `py-1.5 text-xs` bez stałej wysokości → `h-8 text-sm`, `rounded-lg` → `rounded-md` | ujednolicenie — przycisk był o ~4 px niższy od sąsiadów |
+| Projekty | „Export”: własny `<button>` z `bg-surface-3` → `Button variant="outline"` (tło `bg-background`, `shadow-xs`) | ujednolicenie; **do sprawdzenia**: outline shadcn jest jaśniejszy niż poprzednie `surface-3` |
+| Projekty | kafelki KPI: `rounded-xl` → `rounded-2xl`, etykieta dostała `min-h-[2.4em]` z wariantu Klientów | ujednolicenie — siatka przestaje się rozjeżdżać przy zawiniętej etykiecie |
+| Projekty | „Edytuj / Usuń projekt”: `<button>` → `<Button>`, geometria (`h-12`/`h-10`, `w-full`) zachowana klasą | bez zmiany wizualnej |
+| Projekty | eyebrow `tracking-[0.16em]` → `0.18em` | ujednolicenie |
+| Faktury | **kontener zwężony**: `max-w-3xl`/`lg:max-w-6xl` → `max-w-2xl`/`md:max-w-5xl` | **największe ryzyko** — patrz niżej |
+| Faktury | „Nowa faktura”: `rounded-lg text-xs` → `rounded-md text-sm` (wysokość bez zmian, `h-8`) | ujednolicenie |
+| Faktury | kafelki statystyk: `bg-surface-1` → `bg-surface-2`, `border-hairline` → `border-hairline-strong`, `p-4 sm:p-5` → `p-3.5 sm:p-4`, etykieta z `min-h-[2.4em]` | ujednolicenie — kafelki są o stopień jaśniejsze i ciaśniejsze niż dziś |
+| Faktury | karty analityki (wiekowanie, cashflow, panel szczegółów, paginacja, pozycja listy) `bg-surface-1` → `bg-surface-2` | ujednolicenie |
+| Faktury | panele w środku panelu szczegółów `bg-surface-2` → `bg-surface-3` | ujednolicenie — drabinka głębi 2→3 zamiast 1→2 |
+| Faktury | pigułka waluty: `tracking-[0.1em]` → `tracking-wider` (0.05em) | ujednolicenie; różnica ~0,5 px na dwuznakowej etykiecie |
+| Faktury | nagłówek okresu: `text-muted-foreground` → `text-zinc-400` (kolor eyebrow z tokenu) | ujednolicenie |
+| Raporty | trigger „Eksport”: `<button h-10>` → `<Button size="sm">` (`h-8`) | **do sprawdzenia** — przycisk kurczy się o 8 px w pasku |
+| Raporty | eyebrow nagłówka `tracking-[0.22em]` → `0.18em` | ujednolicenie |
+| Raporty | karty KPI/filtrów/podziału `bg-surface-1` → `bg-surface-2`, `border-hairline` → `border-hairline-strong` | ujednolicenie |
+| Kalendarz | kontener `container … py-4` → `PageContainer` (`px-3 pb-28 pt-2`, `max-w-2xl`/`md:max-w-5xl`) | ujednolicenie; **do sprawdzenia**: `container` był szerszy na dużych ekranach, siatka miesiąca dostaje mniej miejsca |
+| Kalendarz | eyebrow `tracking-[0.14em]` → `0.18em`, `font-medium` → `font-semibold` w `KPICard` | ujednolicenie |
+| Kalendarz | „Zobacz wszystkie”: `<button>` → `<Button variant="ghost" size="sm">` | bez zmiany wizualnej (`h-auto` + te same paddingi) |
+| Pulpit | eyebrow: 16 etykiet na `0.18em` (były 0.14 / 0.18 / 0.22), `HeroGreeting` `font-medium` → `font-semibold` | ujednolicenie |
+| Pulpit | reszta bez zmian — siatka `data-dashboard-grid`, karty i `EarningsKpi` nietknięte | zgodnie z zadaniem |
+| Wyjazdy | karta `bg-surface-1` → `bg-surface-2`, eyebrow `0.16em` → `0.18em` | ujednolicenie; sekcja nie była w kolejności Fazy 3, ale siedzi w `features/**` |
+
+### Jedna zmiana, którą trzeba obejrzeć zanim wejdzie na produkcję
+
+Zwężenie Faktur. Układ `lg:grid-cols-12` (lista 7 kolumn + panel szczegółów 5) miał do
+dyspozycji `lg:max-w-6xl` (72 rem), a dostaje `md:max-w-5xl` (64 rem) — o 11% mniej.
+Przy 1440 px panel szczegółów schodzi z ~26 rem do ~23 rem szerokości. Numery faktur,
+kwoty i nazwy klientów są w tym panelu w `truncate`, więc nie rozwalą layoutu, ale
+mogą się urwać wcześniej niż dziś. Builder faktur siedzi w dialogu (`sm:max-w-3xl`),
+więc kontenera strony w ogóle nie dotyka.
+
+Zadanie mówi: „jeśli tabela faktur albo builder się przez to rozjedzie — zatrzymaj się
+i zapytaj”. Nie da się tego rozstrzygnąć bez przeglądarki, więc zwężenie zostało zrobione
+zgodnie z poleceniem, a weryfikacja zostaje po stronie człowieka.
+
+### Bilans
+
+| faza | plików | +/- |
+|---|---|---|
+| audyt | 1 | +216 |
+| prymitywy | 6 | +247 / −4 |
+| Klienci | 9 | +52 / −104 |
+| Projekty | 17 | +65 / −181 |
+| Faktury | 12 | +109 / −145 |
+| Raporty | 9 | +58 / −38 |
+| Kalendarz | 9 | +23 / −24 |
+| Pulpit + Wyjazdy | 16 | +58 / −71 |
+| testy | 2 | +236 |
+
+Usunięte duplikaty:
+- `features/projects/components/linear/linear.tokens.ts`
+- `features/clients/components/clients.tokens.ts` (kopia bajt w bajt tej samej mapy)
+- `features/projects/components/linear/KpiTile.tsx`
+- `features/invoices/components/analytics/InvoiceStatCard.tsx`
+- lokalny `function KpiTile` w `features/clients/components/ClientsStats.tsx`
+- cztery warianty ciągu kontenera strony → jeden `PageContainer`
+- sześć wartości `tracking` → jedna, w `LINEAR.eyebrow`
+- 12 kombinacji powierzchni karty → trzy stałe w `SURFACE`
+
+Świadomie poza ujednoliceniem (uzasadnienia wyżej): `ReportsKpis.KpiCard`,
+`calendar/stats/KPICard`, `EarningsKpi` w karcie Zarobki, siatka Pulpitu,
+`WorkspaceHeader` / `AppShell` / sidebar / BottomNav.
