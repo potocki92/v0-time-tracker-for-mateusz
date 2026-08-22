@@ -66,6 +66,8 @@ npm run dev
 
 Open: `http://localhost:3000`
 
+Weekly summary e-mails (SMTP + cron secrets): [`docs/weekly-summary-email.md`](docs/weekly-summary-email.md)
+
 ## Development Workflow
 
 1. **Run locally** using `npm run dev`.
