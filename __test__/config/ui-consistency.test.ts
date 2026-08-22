@@ -155,3 +155,43 @@ describe('ui — kanoniczne powierzchnie kart', () => {
     }
   })
 })
+
+describe('ui — karty Pulpitu maja jedna powierzchnie', () => {
+  /**
+   * Pulpit ma wlasna siatke i celowo zostal poza ujednoliceniem z Fazy 2
+   * (`SURFACE.card` = `rounded-2xl`/`bg-surface-2`), ale wewnatrz siebie musi
+   * byc spojny: jego karta to `rounded-lg border border-hairline bg-surface-1`.
+   * Karta „Analiza aktywnosci" byla jedynym wyjatkiem — stala na shadcnowym
+   * <Card>, wiec miala inny promien, inne tlo i inny stopien naglowka niz
+   * sasiadki w tej samej kolumnie.
+   */
+  const DASHBOARD_SURFACE = 'rounded-lg border border-hairline bg-surface-1'
+  const cards = featureFiles.filter(
+    (f) =>
+      f.startsWith('features/dashboard/components/') &&
+      /(Card|EarningsChart)\.tsx$/.test(f),
+  )
+
+  it('znajduje karty Pulpitu', () => {
+    expect(cards.length, 'zmienil sie uklad plikow Pulpitu').toBeGreaterThanOrEqual(9)
+  })
+
+  for (const card of cards) {
+    it(`${card} stoi na powierzchni Pulpitu`, () => {
+      expect(
+        sources.get(card),
+        `${card} maluje sie inaczej niz sasiadki w tej samej kolumnie`,
+      ).toContain(DASHBOARD_SURFACE)
+    })
+  }
+
+  it('Pulpit nie wraca do shadcnowego <Card>', () => {
+    const found = offenders(
+      (src) => /from '@\/components\/ui\/card'/.test(src),
+    ).filter((f) => f.startsWith('features/dashboard/'))
+    expect(
+      found,
+      `sekcja Pulpitu uzywa <Card> zamiast <section> z powierzchnia Pulpitu:\n${found.join('\n')}`,
+    ).toEqual([])
+  })
+})

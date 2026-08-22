@@ -44,3 +44,23 @@ export const SURFACE = {
   /** Pusty stan / miejsce na treść, której jeszcze nie ma. */
   cardDashed: 'rounded-2xl border border-dashed border-hairline bg-surface-2',
 } as const
+
+/**
+ * Skala intensywności heatmapy godzin (karta „Godziny" na Pulpicie).
+ *
+ * Pięć stopni na akcencie motywu zamiast zahardkodowanego emeralda: panel ma
+ * pięć palet (`--chart-1` w `app/globals.css`), a poprzednia wersja karty
+ * malowała się `bg-emerald-*` i `bg-[#101410]`, więc na motywie pomarańczowym
+ * czy fioletowym heatmapa była jedynym zielonym elementem ekranu.
+ *
+ * Wartości idą w `style`, nie w klasę: `color-mix` z zmienną CSS w arbitralnej
+ * klasie Tailwinda jest odporny na literówki dopiero po zbudowaniu, a tu
+ * pomyłka byłaby niewidoczna aż do zmiany motywu.
+ */
+export const HEATMAP_LEVELS = [
+  'color-mix(in oklab, var(--chart-1) 8%, var(--surface-2))',
+  'color-mix(in oklab, var(--chart-1) 30%, var(--surface-2))',
+  'color-mix(in oklab, var(--chart-1) 55%, var(--surface-2))',
+  'color-mix(in oklab, var(--chart-1) 78%, var(--surface-2))',
+  'var(--chart-1)',
+] as const

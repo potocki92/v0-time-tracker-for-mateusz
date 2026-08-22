@@ -2,6 +2,7 @@
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import {
   ArrowUpRight,
   Check,
@@ -166,13 +167,12 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
             ))
           )}
         </p>
-        <Link
-          href="/invoices?action=new"
-          className="inline-flex items-center gap-1 rounded-lg border border-hairline bg-surface-2 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300"
-        >
-          <Plus className="h-3.5 w-3.5" aria-hidden />
-          Nowa
-        </Link>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/invoices?action=new">
+            <Plus className="h-3.5 w-3.5" aria-hidden />
+            Nowa
+          </Link>
+        </Button>
       </footer>
     </section>
   )

@@ -33,12 +33,12 @@ function CircularProgress({ value }: { value: number }) {
         role="img"
         aria-label={`${clamped.toFixed(0)}% celu miesięcznego`}
       >
-        <circle cx={size / 2} cy={size / 2} r={radius} stroke="#1a1a1a" strokeWidth={stroke} fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={radius} stroke="var(--surface-3)" strokeWidth={stroke} fill="none" />
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#22c55e"
+          stroke="var(--chart-1)"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circ}
@@ -46,7 +46,7 @@ function CircularProgress({ value }: { value: number }) {
           fill="none"
           style={{
             transition: 'stroke-dashoffset 600ms ease',
-            filter: 'drop-shadow(0 0 10px rgba(34,197,94,0.6))',
+            filter: 'drop-shadow(0 0 10px color-mix(in oklab, var(--chart-1) 60%, transparent))',
           }}
         />
       </svg>
@@ -108,7 +108,7 @@ export function MonthlyGoalCard({
       <div className="mt-3.5 grid grid-cols-2 gap-2">
         <div className="rounded-lg border border-hairline bg-surface-2 px-3 py-2.5">
           <p className="text-2xs font-semibold uppercase tracking-wider text-zinc-400">Nadwyżka</p>
-          <p className="mt-1 text-base font-semibold tabular-nums text-emerald-400">
+          <p className="mt-1 text-base font-semibold tabular-nums text-[var(--chart-1)]">
             +{formatCurrency(surplus, currency)}
           </p>
         </div>

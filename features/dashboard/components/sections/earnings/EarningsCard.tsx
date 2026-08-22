@@ -265,14 +265,14 @@ export const EarningsCard = memo(function EarningsCard({
           {compareMode && trend.prevTotal > 0 && (
             <div className="pointer-events-none absolute right-2 top-1 flex items-center gap-2 text-2xs uppercase tracking-wide text-zinc-400">
               <span className="inline-flex items-center gap-1">
-                <span className="h-[2px] w-3 rounded-full bg-emerald-400" aria-hidden />
+                <span className="h-[2px] w-3 rounded-full bg-[var(--chart-1)]" aria-hidden />
                 bieżący
               </span>
               <span className="inline-flex items-center gap-1">
                 <span
                   aria-hidden
                   className="h-[2px] w-3 rounded-full bg-zinc-500"
-                  style={{ background: 'repeating-linear-gradient(90deg,#71717a 0 3px,transparent 3px 6px)' }}
+                  style={{ background: 'repeating-linear-gradient(90deg,var(--muted-foreground) 0 3px,transparent 3px 6px)' }}
                 />
                 poprzedni
               </span>

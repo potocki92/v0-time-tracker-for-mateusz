@@ -64,7 +64,7 @@ export const EarningsMenu = memo(function EarningsMenu({
         <button
           type="button"
           aria-label="Opcje karty Zarobki"
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400 transition hover:border-hairline-strong hover:bg-surface-3 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 data-[state=open]:border-emerald-500/40 data-[state=open]:bg-[#0e120e] data-[state=open]:text-emerald-400"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400 transition hover:border-hairline-strong hover:bg-surface-3 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 data-[state=open]:border-emerald-500/40 data-[state=open]:bg-surface-3 data-[state=open]:text-emerald-400"
         >
           <MoreHorizontal className="h-4 w-4" aria-hidden />
         </button>

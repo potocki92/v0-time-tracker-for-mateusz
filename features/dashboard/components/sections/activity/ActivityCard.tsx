@@ -2,6 +2,7 @@
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import {
   Briefcase,
   CalendarOff,
@@ -85,12 +86,11 @@ export function ActivityCard({
     >
       <header className="flex items-center justify-between">
         <SectionEyebrow>Aktywność</SectionEyebrow>
-        <Link
-          href="/calendar"
-          className="inline-flex items-center gap-1 rounded-md border border-hairline bg-surface-2 px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3"
-        >
-          Zobacz wszystkie
-        </Link>
+        {/* Akcja sekcji idzie przez <Button>, a nie przez <a> pomalowany na
+            przycisk — patrz docs/ui-audit.md §1. */}
+        <Button asChild variant="outline" size="sm" className="h-7 text-2xs">
+          <Link href="/calendar">Zobacz wszystkie</Link>
+        </Button>
       </header>
 
       <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">

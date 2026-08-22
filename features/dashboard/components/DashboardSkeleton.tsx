@@ -1,6 +1,8 @@
 import { SkeletonBlock } from '@/components/common/SkeletonBlock'
 import {
+  AnalyticsChartSkeleton,
   ChartSkeleton,
+  HeatmapSkeleton,
   HeaderSkeleton,
   InvoicesSkeleton,
   KpiSkeleton,
@@ -57,7 +59,7 @@ export function DashboardSkeleton() {
 
           {/* Kolumna glowna — osiem pozycji, tyle samo co w tresci */}
           <div className="min-w-0 space-y-4 lg:col-span-12 xl:col-span-8">
-            <ChartSkeleton />
+            <HeatmapSkeleton />
             <ChartSkeleton />
             {/* SectionHeader "Harmonogram i rozliczenia" — text-2xs/1.4 = 15 px */}
             <SkeletonBlock height={15} className="w-48" rounded="sm" />
@@ -65,7 +67,7 @@ export function DashboardSkeleton() {
             <InvoicesSkeleton />
             <InvoicesSkeleton />
             <InvoicesSkeleton />
-            <ChartSkeleton />
+            <AnalyticsChartSkeleton />
           </div>
 
           {/* Szyna */}

@@ -106,6 +106,57 @@ export function ChartSkeleton() {
   )
 }
 
+/**
+ * Karta Godziny — heatmapa 13 tygodni.
+ *
+ * Ma wlasny skeleton, bo `ChartSkeleton` udawal ja bloczkiem 108 px, a realna
+ * karta ma ~290 px: naglowek z duza wartoscia, pasek celu i siatke 7 x 52
+ * komorek po 13 px (rzad miesiecy 12 + odstep 4 + 7 * 13 + 6 * 3 = 129 px).
+ * Po przejsciu na staly rozmiar komorki ta wysokosc wreszcie NIE zalezy od
+ * szerokosci karty, wiec da sie ja odwzorowac — patrz docs/dashboard-cls.md.
+ */
+export function HeatmapSkeleton() {
+  return (
+    <DarkBox>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <SkeletonBlock height={15} className="w-28" />
+          <SkeletonBlock height={35} className="mt-2 w-40" />
+          <SkeletonBlock height={15} className="mt-1 w-36" />
+        </div>
+        <SkeletonBlock height={18} className="w-24" rounded="full" />
+      </div>
+      <SkeletonBlock height={6} className="mt-4" rounded="full" />
+      <SkeletonBlock height={15} className="mt-1.5" />
+      <SkeletonBlock height={129} className="mt-5" rounded="md" />
+      <SkeletonBlock height={15} className="mt-2 w-64" />
+    </DarkBox>
+  )
+}
+
+/**
+ * Karta „Analiza aktywnosci" — naglowek + dwa rzedy kontrolek + wykres 220 px.
+ * `ChartSkeleton` (108 px) byl o polowe za niski, wiec podmiana tresci
+ * spychala stopke strony w dol.
+ */
+export function AnalyticsChartSkeleton() {
+  return (
+    <DarkBox>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <SkeletonBlock height={15} className="w-32" />
+          <SkeletonBlock height={35} className="mt-2 w-28" />
+          <SkeletonBlock height={15} className="mt-1 w-36" />
+        </div>
+        <SkeletonBlock height={18} className="w-16" rounded="full" />
+      </div>
+      <SkeletonBlock height={28} className="mt-1" rounded="lg" />
+      <SkeletonBlock height={24} className="mt-1.5" rounded="lg" />
+      <SkeletonBlock height={220} className="mt-3" rounded="md" />
+    </DarkBox>
+  )
+}
+
 export function InvoicesSkeleton() {
   return (
     <div className="rounded-lg border border-hairline bg-surface-1">
