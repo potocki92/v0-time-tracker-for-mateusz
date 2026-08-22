@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import { fallbackFromClient } from '@/lib/finance/entry-calculations'
 import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
 import { selectClients } from '../../../hooks/dashboardSelectors'
 import { EffectiveRateCard, type ClientRate } from './EffectiveRateCard'
@@ -22,67 +21,43 @@ function periodShort(label: string): string {
 }
 
 /**
- * Effective rate — pokazuje wyłącznie BAZOWĄ stawkę godzinową w EUR
- * (bez przeliczania kursem NBP). Klienci, którzy mają stawkę w PLN,
- * są pomijani: dla nich pojęcie "bazowej stawki w EUR" nie istnieje.
+ * Stawka efektywna = przychód okna / rozliczalne godziny okna.
+ *
+ * Poprzednia wersja liczyła wyłącznie klientów rozliczanych w EUR, więc przy
+ * kliencie w złotówkach pokazywała „0,00 €/h · 0 klientów" obok kilkunastu
+ * tysięcy przychodu. Teraz obie liczby biorą się z `metrics`, czyli z tego
+ * samego rachunku co Kalendarz — waluta wynika z ustawień, nie z klienta.
  */
 export function EffectiveRateSection() {
   const clients = useDashboardSlice(selectClients)
-  const { realized, periodLabel } = useDashboardDerived()
+  const { periodLabel, metrics } = useDashboardDerived()
 
-  const { rates, blendedRate } = useMemo(() => {
+  const rates = useMemo<ClientRate[]>(() => {
     const clientMap = new Map(clients.map((c) => [c.id, c]))
-    type Acc = { hours: number; clientId: string }
-    const map = new Map<string, Acc>()
-
-    let eurHours = 0
-    let eurEarnings = 0
-
-    for (const e of realized) {
-      if (e.status !== 'worked') continue
-      if (!e.client_id) continue
-      const c = clientMap.get(e.client_id)
-      if (!c) continue
-      const fb = fallbackFromClient(c)
-      if (fb.currency !== 'EUR') continue
-
-      const hours = e.hours ?? 0
-      const acc = map.get(e.client_id) ?? { hours: 0, clientId: e.client_id }
-      acc.hours += hours
-      map.set(e.client_id, acc)
-
-      eurHours += hours
-      eurEarnings += hours * fb.rate
-    }
-
-    const list: ClientRate[] = Array.from(map.values())
-      .filter((r) => r.hours > 0)
-      .map((r, i) => {
-        const c = clientMap.get(r.clientId)
-        const fb = c ? fallbackFromClient(c) : { rate: 0, currency: 'EUR' as const, workType: 'hourly' as const }
-        const earnings = r.hours * fb.rate
+    return metrics.byClient
+      .filter((bucket) => bucket.hours > 0 && bucket.amountMinor > 0)
+      .slice(0, 4)
+      .map((bucket, i) => {
+        const client = bucket.clientId ? clientMap.get(bucket.clientId) : undefined
         return {
-          clientId: r.clientId,
-          name: c?.name ?? 'Klient',
-          ratePerHour: fb.rate,
-          currency: 'EUR' as const,
-          share: eurEarnings > 0 ? earnings / eurEarnings : 0,
-          color: c?.color || FALLBACK_COLORS[i % FALLBACK_COLORS.length],
-          earnings,
+          clientId: bucket.clientId ?? '__unassigned',
+          name: client?.name ?? 'Bez klienta',
+          ratePerHour: bucket.amountMinor / bucket.hours / 100,
+          currency: metrics.earnings.currency,
+          share: bucket.shareOfMonth,
+          color: client?.color || FALLBACK_COLORS[i % FALLBACK_COLORS.length],
         }
       })
-      .sort((a, b) => b.earnings - a.earnings)
-      .slice(0, 4)
-      .map(({ earnings: _earnings, ...rest }) => rest)
-
-    const blended = eurHours > 0 ? eurEarnings / eurHours : 0
-    return { rates: list, blendedRate: blended }
-  }, [realized, clients])
+  }, [metrics.byClient, metrics.earnings.currency, clients])
 
   return (
     <EffectiveRateCard
-      blendedRate={blendedRate}
-      currency="EUR"
+      blendedRate={
+        metrics.effectiveRateMinorPerHour === null
+          ? null
+          : metrics.effectiveRateMinorPerHour / 100
+      }
+      currency={metrics.earnings.currency}
       clientsCount={rates.length}
       rates={rates}
       periodShort={periodShort(periodLabel)}

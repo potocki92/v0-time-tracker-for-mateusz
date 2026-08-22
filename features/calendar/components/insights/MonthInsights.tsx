@@ -3,6 +3,7 @@
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { MonthMetrics } from '@/lib/metrics/types'
 import type { CalendarInsights } from '../../domain/calendar.types'
 import { DayComposition } from './DayComposition'
 
@@ -16,6 +17,7 @@ import { TimeByProject } from './TimeByProject'
 
 interface Props {
   monthName: string
+  metrics: MonthMetrics
   insights: CalendarInsights
   onViewAllEntries?: () => void
 }
@@ -25,7 +27,12 @@ interface Props {
  * z wykresem słupkowym i 3 dodatkowymi widgetami w 2 rzędach.
  * Mobile: pojedyncza kolumna z naturalnym porządkiem od góry do dołu.
  */
-export function MonthInsights({ monthName, insights, onViewAllEntries }: Props) {
+export function MonthInsights({
+  monthName,
+  metrics,
+  insights,
+  onViewAllEntries,
+}: Props) {
   return (
     <section
       aria-labelledby="month-insights-heading"
@@ -43,13 +50,16 @@ export function MonthInsights({ monthName, insights, onViewAllEntries }: Props) 
       <div className="grid gap-3 lg:grid-cols-2">
         <HoursPerWeekChart
           weekly={insights.weekly}
-          totalHours={insights.weeklyTotalHours}
+          totalHours={metrics.hours.actual}
           avgHours={insights.weeklyAvgHours}
           peak={insights.weeklyPeak}
           monthName={monthName}
         />
-        <TimeByProject projects={insights.byProject} />
-        <DayComposition composition={insights.composition} />
+        <TimeByProject
+          projects={insights.byProject}
+          currency={metrics.earnings.currency}
+        />
+        <DayComposition days={metrics.days} />
         <RecentEntries entries={insights.recent} onViewAll={onViewAllEntries} />
       </div>
     </section>

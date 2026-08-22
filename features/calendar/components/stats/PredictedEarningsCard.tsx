@@ -1,42 +1,45 @@
 import { Wallet } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import { formatCurrency } from '@/lib/helpers'
+import type { CURRENCY } from '@/lib/types'
 import { KPICard } from './KPICard'
 import { pluralizeDays } from './format'
 
 interface Props {
-  totalEarningsPLN: number
-  realizedEarningsPLN: number
-  predictedEarningsPLN: number
-  predictedHours: number
-  predictedDays: number
+  forecastEarnings: number
+  realizedEarnings: number
+  plannedEarnings: number
+  plannedHours: number
+  plannedDays: number
   realizedSharePercent: number
+  currency: CURRENCY
 }
 
 export function PredictedEarningsCard({
-  totalEarningsPLN,
-  realizedEarningsPLN,
-  predictedEarningsPLN,
-  predictedHours,
-  predictedDays,
+  forecastEarnings,
+  realizedEarnings,
+  plannedEarnings,
+  plannedHours,
+  plannedDays,
   realizedSharePercent,
+  currency,
 }: Props) {
-  const hasPlan = predictedEarningsPLN > 0
+  const hasPlan = plannedDays > 0
 
   return (
     <KPICard
       label="Przewidywany zarobek"
       icon={<Wallet className="h-4 w-4" />}
-      ariaLabel={`Przewidywany zarobek: ${formatCurrency(totalEarningsPLN, 'PLN')}; zrealizowano ${realizedSharePercent}%`}
+      ariaLabel={`Przewidywany zarobek: ${formatCurrency(forecastEarnings, currency)}; zrealizowano ${realizedSharePercent}%`}
     >
       <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
-        {formatCurrency(totalEarningsPLN, 'PLN')}
+        {formatCurrency(forecastEarnings, currency)}
       </p>
 
       <div className="mt-3 space-y-1.5">
         <div className="flex items-center justify-between text-2xs">
           <span className="text-zinc-400">
-            Realnie {formatCurrency(realizedEarningsPLN, 'PLN')}
+            Realnie {formatCurrency(realizedEarnings, currency)}
           </span>
           <span className="font-semibold tabular-nums text-emerald-400">
             {realizedSharePercent}%
@@ -49,9 +52,9 @@ export function PredictedEarningsCard({
         />
         <p className="text-2xs text-zinc-400">
           {hasPlan
-            ? `Plan: ${formatCurrency(predictedEarningsPLN, 'PLN')} • ${predictedDays} ${pluralizeDays(
-                predictedDays,
-              )} • ${predictedHours.toFixed(1)} h`
+            ? `Plan: ${formatCurrency(plannedEarnings, currency)} • ${plannedDays} ${pluralizeDays(
+                plannedDays,
+              )} • ${plannedHours.toFixed(1)} h`
             : 'Brak zaplanowanych dni'}
         </p>
       </div>

@@ -3,7 +3,7 @@ import type { WorkEntry } from '@/lib/types'
 /**
  * Wpis "zrealizowany" = potwierdzony `real` z datą do dziś włącznie.
  * Reszta (wpisy `predicted` oraz przyszłe daty) to plan.
- * Definicja spójna z kalendarzem (selectCalendarStats).
+ * Definicja spójna z `computeMonthMetrics`.
  */
 export function isRealizedEntry(
   entry: Pick<WorkEntry, 'entry_kind' | 'date'>,

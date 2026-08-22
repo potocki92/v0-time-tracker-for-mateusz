@@ -11,11 +11,11 @@ import {
   useCalendarData,
   useCalendarInsights,
   useCalendarNavigation,
-  useCalendarStats,
   useDayDialog,
   useEntryForm,
   useEntryMutations,
   useMonthEntries,
+  useMonthMetrics,
 } from '../hooks'
 import { selectDefaultClient, selectTripDayMarkers } from '../domain/calendar.selectors'
 import { useTrips } from '@/features/trips'
@@ -59,15 +59,19 @@ export function CalendarContent() {
       ),
     [trips, nav.currentYear, nav.currentMonth, nav.daysInMonth, nav.firstDayOfMonth],
   )
-  const stats = useCalendarStats(monthEntries, clients, eurRate)
-  const insights = useCalendarInsights({
-    allEntries: workEntries,
-    monthEntries,
+  const metrics = useMonthMetrics(
+    workEntries,
     clients,
     eurRate,
-    year: nav.currentYear,
-    month: nav.currentMonth,
-    daysInMonth: nav.daysInMonth,
+    nav.currentYear,
+    nav.currentMonth,
+  )
+  const insights = useCalendarInsights({
+    metrics,
+    allEntries: workEntries,
+    clients,
+    projects,
+    eurRate,
   })
 
   const form = useEntryForm(clients, projects, defaultClient)
@@ -174,17 +178,13 @@ export function CalendarContent() {
       <CalendarPageHeader
         currentMonth={nav.currentMonth}
         currentYear={nav.currentYear}
-        workDays={stats.workDays}
+        workDays={metrics.days.worked}
         totalEntries={monthEntries.length}
       />
 
       <PageContainer>
         <CalendarStatsErrorBoundary>
-          <CalendarStats
-            {...stats}
-            streakCurrent={insights.activeStreak.current}
-            streakLongest={insights.activeStreak.longestThisYear}
-          />
+          <CalendarStats metrics={metrics} />
         </CalendarStatsErrorBoundary>
 
         <Tabs
@@ -259,6 +259,7 @@ export function CalendarContent() {
 
         <MonthInsights
           monthName={MONTH_NAMES[nav.currentMonth]}
+          metrics={metrics}
           insights={insights}
           onViewAllEntries={() => setView('list')}
         />

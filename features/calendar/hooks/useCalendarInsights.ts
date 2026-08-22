@@ -1,92 +1,84 @@
 'use client'
 
 import { useMemo } from 'react'
-import type { Client, WorkEntry } from '@/lib/types'
-import {
-  selectActiveStreak,
-  selectDayComposition,
-  selectHoursPerWeek,
-  selectRecentEntries,
-  selectTimeByProject,
-} from '../domain/calendar.selectors'
+import { UNASSIGNED_PROJECT_ID } from '@/lib/metrics/adapter'
+import { isoWeekKey } from '@/lib/metrics/period'
+import type { MonthMetrics } from '@/lib/metrics/types'
+import type { Client, Project, WorkEntry } from '@/lib/types'
+import { selectRecentEntries } from '../domain/calendar.selectors'
 import type {
-  ActiveStreak,
   CalendarInsights,
+  ProjectAggregate,
+  WeeklyHoursBar,
 } from '../domain/calendar.types'
 
 interface Args {
+  metrics: MonthMetrics
   allEntries: WorkEntry[]
-  monthEntries: WorkEntry[]
   clients: Client[]
+  projects: Project[]
   eurRate: number
-  year: number
-  month: number
-  daysInMonth: number
 }
 
 /**
- * Wszystkie agregaty potrzebne sekcji "Month Insights" + active streak.
- * Każdy fragment liczony jest niezależnie i memoizowany — żeby dodanie nowego
- * widgetu nie ponownie liczyło reszty.
+ * Widgety sekcji "Podsumowanie miesiąca".
+ *
+ * Nic tu już nie liczy godzin ani kwot — wszystkie liczby przychodzą gotowe
+ * z `metrics`, hook dokłada im tylko nazwy, kolory i etykiety. Jedynym
+ * wyjątkiem jest lista ostatnich wpisów, która nie jest metryką miesiąca.
  */
 export function useCalendarInsights({
+  metrics,
   allEntries,
-  monthEntries,
   clients,
+  projects,
   eurRate,
-  year,
-  month,
-  daysInMonth,
-}: Args): CalendarInsights & { activeStreak: ActiveStreak } {
-  const weekly = useMemo(
-    () => selectHoursPerWeek(monthEntries, year, month, daysInMonth),
-    [monthEntries, year, month, daysInMonth],
-  )
+}: Args): CalendarInsights {
+  const weekly = useMemo<WeeklyHoursBar[]>(() => {
+    const currentWeek = isoWeekKey(metrics.today)
+    return metrics.byWeek.map((week) => ({
+      key: week.isoWeek,
+      label: `W${week.isoWeek.split('-W')[1]}`,
+      hours: week.hours,
+      isCurrent: week.isoWeek === currentWeek,
+    }))
+  }, [metrics.byWeek, metrics.today])
 
   const weeklyAggregates = useMemo(() => {
-    const total = weekly.reduce((sum, w) => sum + w.hours, 0)
-    const nonEmpty = weekly.filter((w) => w.hours > 0).length || 1
-    let peak: { hours: number; date: string } | null = null
-    for (const entry of monthEntries) {
-      if (entry.status !== 'worked') continue
-      const hours = entry.hours ?? 0
-      if (!peak || hours > peak.hours) {
-        peak = { hours, date: entry.date }
-      }
-    }
+    const active = weekly.filter((w) => w.hours > 0)
+    const peak = active.reduce<WeeklyHoursBar | null>(
+      (best, week) => (!best || week.hours > best.hours ? week : best),
+      null,
+    )
     return {
-      weeklyTotalHours: Math.round(total * 10) / 10,
-      weeklyAvgHours: Math.round((total / nonEmpty) * 10) / 10,
+      weeklyAvgHours: active.length
+        ? Math.round((metrics.hours.actual / active.length) * 10) / 10
+        : 0,
       weeklyPeak: peak,
     }
-  }, [weekly, monthEntries])
+  }, [weekly, metrics.hours.actual])
 
-  const byProject = useMemo(
-    () => selectTimeByProject(monthEntries, clients, eurRate),
-    [monthEntries, clients, eurRate],
-  )
-
-  const composition = useMemo(
-    () => selectDayComposition(monthEntries, year, month, daysInMonth),
-    [monthEntries, year, month, daysInMonth],
-  )
+  const byProject = useMemo<ProjectAggregate[]>(() => {
+    const projectMap = new Map(projects.map((p) => [p.id, p]))
+    return metrics.byProject.map((bucket) => {
+      const project = projectMap.get(bucket.projectId)
+      return {
+        projectId: bucket.projectId,
+        name:
+          project?.name ??
+          (bucket.projectId === UNASSIGNED_PROJECT_ID ? 'Bez projektu' : 'Projekt'),
+        color: project?.color ?? '',
+        hours: bucket.hours,
+        amountMinor: bucket.amountMinor,
+        share: bucket.shareOfMonth,
+      }
+    })
+  }, [metrics.byProject, projects])
 
   const recent = useMemo(
     () => selectRecentEntries(allEntries, clients, eurRate),
     [allEntries, clients, eurRate],
   )
 
-  const activeStreak = useMemo(
-    () => selectActiveStreak(allEntries),
-    [allEntries],
-  )
-
-  return {
-    weekly,
-    ...weeklyAggregates,
-    byProject,
-    composition,
-    recent,
-    activeStreak,
-  }
+  return { weekly, ...weeklyAggregates, byProject, recent }
 }

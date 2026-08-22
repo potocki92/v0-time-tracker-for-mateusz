@@ -15,43 +15,8 @@ export type CalendarData = {
   workEntries: WorkEntry[]
 }
 
-export type CalendarStats = {
-  totalHours: number
-  /** Godziny już zrealizowane (wpisy `real` do dziś włącznie). */
-  realizedHours: number
-  /** Godziny zaplanowane (wpisy `predicted` lub przyszłe). */
-  predictedHours: number
-  /** Suma zarobków: zrealizowane + zaplanowane. */
-  totalEarningsPLN: number
-  /** Zaplanowany zarobek (przyszłe / `predicted`). */
-  predictedEarningsPLN: number
-  /** Zrealizowany zarobek (wpisy `real` do dziś). */
-  realizedEarningsPLN: number
-  /** Udział zrealizowanego zarobku w sumie, 0..100. */
-  realizedSharePercent: number
-  workDays: number
-  /** Dni już zrealizowane. */
-  realizedDays: number
-  /** Dni zaplanowane (przyszłe / `predicted`). */
-  predictedDays: number
-  freeDays: number
-  absences: number
-  progressPercent: number
-  baselineHours: number
-  isAhead: boolean
-}
-
 /**
- * Aktywny "streak" — ile dni z rzędu user pracował (pomijając weekendy).
- * `longestThisYear` służy karcie "Active Streak" w nowym dashboardzie.
- */
-export type ActiveStreak = {
-  current: number
-  longestThisYear: number
-}
-
-/**
- * Pojedynczy słupek wykresu "Hours per Week".
+ * Pojedynczy słupek wykresu "Godziny tygodniowo".
  */
 export type WeeklyHoursBar = {
   /** Numer ISO-tygodnia, np. "W17" */
@@ -63,29 +28,16 @@ export type WeeklyHoursBar = {
 }
 
 /**
- * Agregat czasu/zarobków dla pojedynczego klienta w miesiącu.
+ * Agregat czasu/zarobków dla pojedynczego projektu w miesiącu.
  */
 export type ProjectAggregate = {
-  clientId: string
-  clientName: string
+  projectId: string
+  name: string
   color: string
   hours: number
-  amountPLN: number
-  amountNative: number
-  currency: CURRENCY
-  shareOfHours: number // 0..1
-}
-
-/**
- * Rozbicie kompozycji miesiąca na typy dni — używane w pasku "Day composition".
- */
-export type DayCompositionBreakdown = {
-  totalDays: number
-  worked: number
-  pto: number // vacation
-  sick: number
-  off: number // day_off + not_worked
-  weekend: number
+  amountMinor: number
+  /** udział w godzinach miesiąca, 0..1 */
+  share: number
 }
 
 export type RecentEntry = {
@@ -101,11 +53,9 @@ export type RecentEntry = {
 
 export type CalendarInsights = {
   weekly: WeeklyHoursBar[]
-  weeklyTotalHours: number
   weeklyAvgHours: number
-  weeklyPeak: { hours: number; date: string } | null
+  weeklyPeak: WeeklyHoursBar | null
   byProject: ProjectAggregate[]
-  composition: DayCompositionBreakdown
   recent: RecentEntry[]
 }
 

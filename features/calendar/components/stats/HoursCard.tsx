@@ -5,17 +5,17 @@ import { KPICard } from './KPICard'
 
 interface Props {
   totalHours: number
-  baselineHours: number
+  goalHours: number
   progressPercent: number
   isAhead: boolean
 }
 
-export function HoursCard({ totalHours, baselineHours, progressPercent, isAhead }: Props) {
+export function HoursCard({ totalHours, goalHours, progressPercent, isAhead }: Props) {
   return (
     <KPICard
       label="Suma godzin"
       icon={<Clock className="h-4 w-4" />}
-      ariaLabel={`Przepracowane godziny: ${totalHours.toFixed(1)} z ${baselineHours} (${Math.round(
+      ariaLabel={`Przepracowane godziny: ${totalHours.toFixed(1)} z ${goalHours} (${Math.round(
         progressPercent,
       )}%)`}
     >
@@ -26,7 +26,7 @@ export function HoursCard({ totalHours, baselineHours, progressPercent, isAhead 
 
       <div className="mt-3 space-y-1.5">
         <div className="flex items-center justify-between text-2xs">
-          <span className="text-zinc-400">Cel: {baselineHours}h</span>
+          <span className="text-zinc-400">Cel: {goalHours}h</span>
           <span
             className={cn(
               'font-semibold tabular-nums',
@@ -38,7 +38,7 @@ export function HoursCard({ totalHours, baselineHours, progressPercent, isAhead 
         </div>
         <Progress
           aria-label="Realizacja celu godzinowego"
-          value={progressPercent}
+          value={Math.min(100, progressPercent)}
           className="h-1.5 bg-surface-3 transition-colors [&>div]:bg-emerald-500"
         />
       </div>
