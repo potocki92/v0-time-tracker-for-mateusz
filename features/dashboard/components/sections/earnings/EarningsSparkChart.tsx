@@ -31,7 +31,7 @@ function makeChartTooltip(privacyMode: boolean, compareMode: boolean) {
     return (
       <div className="rounded-lg border border-hairline bg-surface-1 px-2.5 py-1.5 text-xs shadow-2xl">
         <p className="font-medium text-white">{row.label}</p>
-        <p className={cn('tabular-nums', isForecast ? 'text-zinc-400' : 'text-emerald-400')}>
+        <p className={cn('tabular-nums', isForecast ? 'text-zinc-400' : 'text-[var(--chart-1)]')}>
           {maskValue(formatCurrency(value, 'PLN'), privacyMode)}
         </p>
         {compareMode && row.prevCumulative !== null && (
@@ -60,16 +60,16 @@ export function EarningsSparkChart({ series, ticks, privacyMode, compareMode }: 
       <AreaChart data={series} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
         <defs>
           <linearGradient id="earningsFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#22c55e" stopOpacity={0.55} />
-            <stop offset="55%" stopColor="#22c55e" stopOpacity={0.18} />
-            <stop offset="100%" stopColor="#22c55e" stopOpacity={0} />
+            <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.55} />
+            <stop offset="55%" stopColor="var(--chart-1)" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="earningsPrev" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#71717a" stopOpacity={0.18} />
-            <stop offset="100%" stopColor="#71717a" stopOpacity={0} />
+            <stop offset="0%" stopColor="var(--muted-foreground)" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="var(--muted-foreground)" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid stroke="#161616" strokeDasharray="2 4" vertical={false} />
+        <CartesianGrid stroke="var(--hairline)" strokeDasharray="2 4" vertical={false} />
         <XAxis
           dataKey="date"
           ticks={ticks}
@@ -77,14 +77,14 @@ export function EarningsSparkChart({ series, ticks, privacyMode, compareMode }: 
             const d = new Date(iso)
             return d.toLocaleDateString('pl-PL', { month: 'short', day: '2-digit' })
           }}
-          stroke="#3f3f46"
+          stroke="var(--hairline-strong)"
           tickLine={false}
           axisLine={false}
-          tick={{ fill: '#71717a', fontSize: 10 }}
+          tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
         />
         <Tooltip
           content={makeChartTooltip(privacyMode, compareMode)}
-          cursor={{ stroke: '#22c55e', strokeOpacity: 0.3 }}
+          cursor={{ stroke: 'var(--chart-1)', strokeOpacity: 0.3 }}
         />
 
         {/* Poprzedni okres jako tło — tylko gdy włączony tryb compare */}
@@ -92,7 +92,7 @@ export function EarningsSparkChart({ series, ticks, privacyMode, compareMode }: 
           <Area
             type="monotone"
             dataKey="prevCumulative"
-            stroke="#71717a"
+            stroke="var(--muted-foreground)"
             strokeOpacity={0.55}
             strokeWidth={1.25}
             strokeDasharray="2 3"
@@ -108,7 +108,7 @@ export function EarningsSparkChart({ series, ticks, privacyMode, compareMode }: 
         <Area
           type="monotone"
           dataKey="forecast"
-          stroke="#22c55e"
+          stroke="var(--chart-1)"
           strokeOpacity={0.45}
           strokeWidth={1.5}
           strokeDasharray="3 4"
@@ -123,12 +123,12 @@ export function EarningsSparkChart({ series, ticks, privacyMode, compareMode }: 
         <Area
           type="monotone"
           dataKey="cumulative"
-          stroke="#22c55e"
+          stroke="var(--chart-1)"
           strokeWidth={2.5}
           fill="url(#earningsFill)"
           dot={false}
-          activeDot={{ r: 5, strokeWidth: 2, stroke: '#22c55e', fill: '#0a0a0a' }}
-          style={{ filter: 'drop-shadow(0 0 8px rgba(34,197,94,0.45))' }}
+          activeDot={{ r: 5, strokeWidth: 2, stroke: 'var(--chart-1)', fill: 'var(--surface-1)' }}
+          style={{ filter: 'drop-shadow(0 0 8px color-mix(in oklab, var(--chart-1) 45%, transparent))' }}
           isAnimationActive={false}
         />
       </AreaChart>
