@@ -1,5 +1,8 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
+import { SURFACE } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 import { FolderOpen } from 'lucide-react'
 import type { ProjectUsage } from '../lib/types'
 
@@ -13,12 +16,10 @@ export function ReportsBreakdown({ items }: Props) {
   return (
     <section
       aria-label="Podział na projekty"
-      className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5"
+      className={cn(SURFACE.card, 'p-4 sm:p-5')}
     >
       <header className="flex items-center justify-between gap-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          Projekty
-        </p>
+        <SectionEyebrow>Projekty</SectionEyebrow>
         {items.length > 0 && (
           <span className="text-2xs text-zinc-400">
             {items.length === 1 ? '1 projekt' : `${items.length} projektów`}
@@ -71,7 +72,7 @@ function BreakdownRow({ item }: { item: ProjectUsage }) {
 
 function EmptyState() {
   return (
-    <div className="mt-4 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-hairline bg-surface-2 px-4 py-10 text-center">
+    <div className={cn(SURFACE.cardDashed, 'mt-4 flex flex-col items-center justify-center gap-2 px-4 py-10 text-center')}>
       <FolderOpen aria-hidden className="size-6 text-zinc-400" />
       <p className="text-sm text-zinc-400">Brak danych w wybranym zakresie</p>
       <p className="text-xs text-zinc-400">Zmień filtry, aby zobaczyć podział pracy</p>

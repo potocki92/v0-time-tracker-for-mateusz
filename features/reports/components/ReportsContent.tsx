@@ -1,5 +1,6 @@
 'use client'
 
+import { PageContainer } from '@/components/common/section/PageContainer'
 import { useMemo } from 'react'
 import { useDashboardData } from '@/features/dashboard'
 import {
@@ -54,7 +55,7 @@ export function ReportsContent() {
 
   return (
     <div className="min-h-screen bg-surface-0 text-white">
-      <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
+      <PageContainer>
         <ReportsHeader
           rangeLabel={summary.range.label}
           onExportCsv={exportCsv}
@@ -80,7 +81,7 @@ export function ReportsContent() {
         <ReportsKpis summary={summary} compareOn={filtersState.filters.compare} />
 
         <ReportsBreakdown items={summary.projectUsage} />
-      </div>
+      </PageContainer>
     </div>
   )
 }

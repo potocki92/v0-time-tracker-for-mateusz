@@ -1,4 +1,5 @@
 import type { ElementType, ReactNode } from 'react'
+import { LINEAR } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 
 /**
@@ -8,6 +9,10 @@ import { cn } from '@/lib/utils'
  *
  * `as` istnieje, bo eyebrow bywa nagłówkiem sekcji (`h2`/`h3`), a nie zawsze
  * akapitem — bez tego migracja gubiłaby poziomy nagłówków.
+ *
+ * Tam, gdzie element nie jest nasz (Radix `DropdownMenuLabel`) albo potrzebuje
+ * atrybutu spoza tego API (`<label htmlFor>`), tę samą klasę bierze się wprost
+ * z `LINEAR.eyebrow` — token jest źródłem, komponent tylko go opakowuje.
  */
 export function SectionEyebrow({
   children,
@@ -21,10 +26,7 @@ export function SectionEyebrow({
   return (
     <Tag
       data-slot="eyebrow"
-      className={cn(
-        'text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400',
-        className,
-      )}
+      className={cn(LINEAR.eyebrow, className)}
     >
       {children}
     </Tag>

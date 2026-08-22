@@ -1,5 +1,8 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+import { LINEAR } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 import { Download, FileJson, FileSpreadsheet } from 'lucide-react'
 import {
   DropdownMenu,
@@ -19,24 +22,23 @@ export function ReportsExportMenu({ onExportCsv, onExportJson }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="sm"
           aria-label="Eksportuj raport"
-          className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-hairline bg-surface-2 px-3 text-sm font-medium text-zinc-200 transition-colors hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+          className={cn('rounded-xl text-zinc-200', LINEAR.border, LINEAR.surface, LINEAR.surfaceHover)}
         >
           <Download aria-hidden className="size-4" />
           <span className="hidden sm:inline">Eksport</span>
-        </button>
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="w-44 rounded-xl border-hairline bg-surface-1 text-zinc-200"
+        className={cn('w-44 rounded-xl text-zinc-200', LINEAR.border, LINEAR.surface)}
       >
-        <DropdownMenuLabel className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          Pobierz dane
-        </DropdownMenuLabel>
+        <DropdownMenuLabel className={LINEAR.eyebrow}>Pobierz dane</DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-hairline" />
         <DropdownMenuItem onSelect={onExportCsv} className="gap-2">
           <FileSpreadsheet aria-hidden className="size-4 text-emerald-400" />

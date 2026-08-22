@@ -1,5 +1,7 @@
 'use client'
 
+import { LINEAR } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 import type { Client, Project } from '@/lib/types'
 import type { PeriodPreset, ReportsFilters } from '../lib/types'
 
@@ -24,16 +26,13 @@ const PRESETS: Array<{ value: PeriodPreset; label: string }> = [
 ]
 
 const FIELD_CLASSES =
-  'h-11 w-full rounded-xl border border-hairline bg-surface-2 px-3 text-sm text-zinc-200 ' +
+  `h-11 w-full rounded-xl border px-3 text-sm text-zinc-200 ${LINEAR.border} ${LINEAR.surface} ` +
   'placeholder:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 ' +
   'focus-visible:ring-zinc-500/60 disabled:opacity-50'
 
 function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
   return (
-    <label
-      htmlFor={htmlFor}
-      className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400"
-    >
+    <label htmlFor={htmlFor} className={LINEAR.eyebrow}>
       {children}
     </label>
   )
@@ -59,7 +58,7 @@ export function ReportsFilterForm({
           role="tablist"
           aria-label="Zakres czasu"
           id="reports-preset"
-          className="grid grid-cols-4 gap-1 rounded-xl border border-hairline bg-surface-1 p-1"
+          className={cn('grid grid-cols-4 gap-1 rounded-xl border p-1', LINEAR.border, LINEAR.surface)}
         >
           {PRESETS.map((p) => {
             const active = filters.preset === p.value

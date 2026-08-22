@@ -1,5 +1,8 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
+import { SURFACE } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 import { ArrowDownRight, ArrowUpRight, Clock4, type LucideIcon, Minus, Percent, Sigma } from 'lucide-react'
 import type { ReportSummary } from '../lib/types'
 
@@ -50,11 +53,9 @@ type CardProps = {
 
 function KpiCard({ label, value, hint, trend, icon: Icon }: CardProps) {
   return (
-    <div className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5">
+    <div className={cn(SURFACE.card, 'p-4 sm:p-5')}>
       <div className="flex items-center justify-between">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          {label}
-        </p>
+        <SectionEyebrow>{label}</SectionEyebrow>
         <Icon aria-hidden className="size-4 text-zinc-400" />
       </div>
       <p className="mt-3 text-3xl font-semibold leading-none tabular-nums text-white sm:text-4xl">
