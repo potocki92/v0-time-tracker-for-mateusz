@@ -1,6 +1,7 @@
 'use client'
 
 import { Plus, Search } from 'lucide-react'
+import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
 import { cn } from '@/lib/utils'
 import type { InvoiceFilterTab } from '../../domain/stats'
 
@@ -37,6 +38,17 @@ export function InvoiceFilterToolbar({
 }: InvoiceFilterToolbarProps) {
   return (
     <div className="space-y-3">
+      <WorkspaceHeaderActions>
+        <button
+          type="button"
+          onClick={onCreate}
+          className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-black transition hover:bg-emerald-400"
+        >
+          <Plus className="h-3.5 w-3.5" aria-hidden />
+          Nowa faktura
+        </button>
+      </WorkspaceHeaderActions>
+
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Wszystkie faktury
@@ -96,14 +108,6 @@ export function InvoiceFilterToolbar({
             className="h-11 w-full rounded-xl border border-hairline bg-surface-1 pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-400 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
-        <button
-          type="button"
-          onClick={onCreate}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 text-xs font-semibold text-black shadow-[0_0_22px_-6px_color-mix(in_oklab,var(--primary)_65%,transparent)] transition hover:bg-emerald-400 active:scale-[0.99]"
-        >
-          <Plus className="h-4 w-4" aria-hidden />
-          Nowa faktura
-        </button>
       </div>
     </div>
   )

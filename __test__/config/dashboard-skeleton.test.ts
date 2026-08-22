@@ -86,51 +86,44 @@ describe('dashboard — skeleton odwzorowuje tresc', () => {
     ).toBe(inContent)
   })
 
-  it('HeaderSkeleton ukrywa pasek na mobile tak jak LinearTopBar', () => {
-    const topBar = read('features/dashboard/components/sections/header/LinearTopBar.tsx')
-    expect(topBar, 'zalozenie testu: realny pasek jest ukryty ponizej md').toMatch(
-      /hidden[^"]*md:flex/,
+  it('HeaderSkeleton nie rysuje wlasnego paska naglowka', () => {
+    // Naglowek obszaru roboczego siedzi w AppShell, czyli PONAD granica
+    // <Suspense> dashboardu — jest widoczny przez cale ladowanie. Pasek
+    // w skeletonie bylby wiec drugim paskiem, ktorego tresc nie ma, i strona
+    // skakalaby o jego wysokosc na podmianie.
+    const header = codeOf(bodyOf(sections, 'HeaderSkeleton'))
+    expect(
+      header,
+      'skeleton rysuje pasek, ktorego tresc juz nie ma — naglowek jest w AppShell',
+    ).not.toMatch(/sticky top-0/)
+  })
+
+  it('naglowek panelu stoi nad granica Suspense, nie w skeletonie', () => {
+    // Bez komentarzy: docblock powloki sam pisze o `<main>`.
+    const shell = codeOf(read('app/(app)/_layout/AppShell.tsx'))
+    expect(shell, 'WorkspaceHeader musi byc renderowany raz, w powloce').toContain(
+      '<WorkspaceHeader',
     )
-
-    // Asercja idzie na KLASACH pierwszego elementu HeaderSkeleton, nie na
-    // odleglosci znakow miedzy "hidden" a "md:flex" w zrodle. Kanoniczna
-    // kolejnosc klas Tailwinda wstawia miedzy nie osiem innych (84 znaki),
-    // wiec proba dopasowania ich blisko siebie wymuszalaby rozjechana
-    // kolejnosc klas tylko po to, zeby regex trafil.
-    const bar = classesContaining(bodyOf(sections, 'HeaderSkeleton'), 'sticky top-0')
-    for (const token of ['hidden', 'md:flex']) {
-      expect(
-        bar,
-        `skeleton pokazuje na telefonie pasek, ktorego tresc nie ma — strona skacze o jego wysokosc (brak "${token}")`,
-      ).toContain(token)
-    }
+    expect(
+      shell.indexOf('<WorkspaceHeader'),
+      'naglowek ma stac PRZED <main>, inaczej wpada w granice ladowania strony',
+    ).toBeLessThan(shell.indexOf('<main'))
   })
 
-  it('pasek skeletonu ma te same ujemne marginesy co realny', () => {
-    // Kontener dashboardu ma px-3 sm:px-4 xl:px-8. Bez xl:-mx-8 pasek skeletonu
-    // od 1280 px konczy sie 32 px przed krawedzia, a pasek tresci do niej siega.
-    const bar = classesContaining(bodyOf(sections, 'HeaderSkeleton'), 'sticky top-0')
-    for (const token of ['-mx-3', 'md:-mx-4', 'xl:-mx-8']) {
-      expect(bar, `brak "${token}" — pasek nie siega krawedzi tak jak realny`).toContain(token)
-    }
-  })
-
-  it('HeaderSkeleton odwzorowuje takze HeroGreeting', () => {
+  it('HeaderSkeleton odwzorowuje caly HeroGreeting', () => {
+    // dateline + naglowek + akapit `sm:hidden` + zakladki zakresu = 4 bloczki.
     const blocks = bodyOf(sections, 'HeaderSkeleton').match(/<SkeletonBlock/g) ?? []
     expect(
       blocks.length,
-      'sam pasek to za malo — HeroGreeting (dateline, naglowek, zakladki zakresu) tez musi byc odwzorowany',
-    ).toBeGreaterThanOrEqual(6)
+      'kazdy nieodwzorowany element HeroGreeting wskakuje znikad przy podmianie',
+    ).toBeGreaterThanOrEqual(4)
   })
 
-  it('bloczki naglowka maja wysokosc realnych przyciskow, nie zaokraglona w gore', () => {
-    // LinearTopBar: py-2 (16) + h-8 (32) + border-b (1) = 49 px. Poprzednia
-    // wersja skeletonu miala bloczki 40 px i wychodzila 57 px — 8 px skoku.
-    const bar = bodyOf(sections, 'HeaderSkeleton')
-    expect(bar, 'przyciski paska to h-8, czyli 32 px').toMatch(/height=\{32\}/)
-    expect(bar, 'bloczek 40 px nie odpowiada zadnemu elementowi paska').not.toMatch(
-      /height=\{40\}/,
-    )
+  it('bloczki naglowka nie uzywaja wysokosci zaokraglonej w gore', () => {
+    // Bloczek 40 px nie odpowiada zadnemu elementowi HeroGreeting — poprzednia
+    // wersja skeletonu wychodzila przez to 8 px za wysoka.
+    const header = bodyOf(sections, 'HeaderSkeleton')
+    expect(header).not.toMatch(/height=\{40\}/)
   })
 })
 

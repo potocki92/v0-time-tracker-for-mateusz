@@ -79,10 +79,9 @@ export function DashboardContent() {
               __test__/config/dashboard-skeleton.test.ts. */}
           <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3 xl:max-w-[1440px] xl:px-8">
             {/*
-              HeaderSection zostaje POZA gridem i BEZ wrappera <div>.
-              LinearTopBar w srodku ma `sticky top-0`, a sticky przykleja sie
-              wylacznie w granicach swojego rodzica — owiniecie go w komorke
-              o wysokosci naglowka zabiloby przyklejanie.
+              HeaderSection (powitanie + zakladki zakresu) zostaje POZA gridem:
+              nie jest karta, a w komorce siatki wpadloby w pas KPI i przesunelo
+              caly wiersz. Breadcrumb i akcje sa wyzej, w WorkspaceHeader.
             */}
             <HeaderSection />
 
@@ -135,9 +134,9 @@ export function DashboardContent() {
                 data-dashboard-rail
                 className="min-w-0 lg:col-span-12 xl:col-span-4"
               >
-                {/* top-16 = 64 px, a nie 16 px: LinearTopBar ma zmierzone 49 px
-                    wysokosci i `z-40`, wiec szyna przyklejona nizej wjezdzalaby
-                    pod niego i chowala naglowek "Wkrotce". 64 - 49 = 15 px luzu. */}
+                {/* top-16 = 64 px, a nie 16 px: WorkspaceHeader ma h-14 + krawedz,
+                    czyli 57 px, wiec szyna przyklejona nizej wjezdzalaby pod niego
+                    i chowala naglowek "Wkrotce". 64 - 57 = 7 px luzu. */}
                 <div className="space-y-4 xl:sticky xl:top-16">
                   <SectionHeader label="Wkrótce" />
 

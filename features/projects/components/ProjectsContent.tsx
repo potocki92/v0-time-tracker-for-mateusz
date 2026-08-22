@@ -22,7 +22,7 @@ import {
  * Linear-style dark composition for the Projects module.
  *
  * Stack (mobile-first, single column up to md):
- *   - HeaderSection ─ slim action bar (Export · Nowy projekt)
+ *   - HeaderSection ─ akcje (Export · Nowy projekt) portalowane do WorkspaceHeader
  *   - KpiSection ─ KPI grid (All / Active / Done / Total budget)
  *   - FeaturedSection ─ top priority active project, opens edit dialog
  *   - StatusBreakdownSection

@@ -23,7 +23,8 @@ export function CalendarPageHeader({
   totalEntries,
 }: Props) {
   return (
-    <div className="sticky top-0 z-30 border-b border-hairline bg-surface-0/80 backdrop-blur-sm">
+    // `top-14 z-20`: nad tym paskiem stoi przyklejony WorkspaceHeader (h-14, z-30).
+    <div className="sticky top-14 z-20 border-b border-hairline bg-surface-0/80 backdrop-blur-sm">
       <div className="container flex h-12 items-center gap-2.5 px-4 sm:h-14 sm:gap-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500/10">

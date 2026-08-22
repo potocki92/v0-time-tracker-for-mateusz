@@ -8,6 +8,9 @@ import { QUERY_KEYS } from '@/lib/query/queryKeys'
 import { QUERY_CONFIG } from '@/lib/query/queryConfig'
 import { CalendarContent, CalendarContentBoundary, CalendarSkeleton } from '@/features/calendar'
 import { getCalendarDataServer } from '@/features/calendar/server'
+import { workspaceMetadata } from '@/lib/workspace/sections'
+
+export const metadata = workspaceMetadata('calendar')
 
 /**
  * Default export jest SYNCHRONICZNY celowo — `await prefetchQuery` w default

@@ -1,6 +1,7 @@
 'use client'
 
 import { BarChart3 } from 'lucide-react'
+import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
 import { ReportsExportMenu } from './ReportsExportMenu'
 
 type Props = {
@@ -11,7 +12,11 @@ type Props = {
 
 export function ReportsHeader({ rangeLabel, onExportCsv, onExportJson }: Props) {
   return (
-    <header className="flex items-start justify-between gap-3">
+    <header className="min-w-0">
+      <WorkspaceHeaderActions>
+        <ReportsExportMenu onExportCsv={onExportCsv} onExportJson={onExportJson} />
+      </WorkspaceHeaderActions>
+
       <div className="min-w-0">
         <p className="text-2xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
           Insights
@@ -22,8 +27,6 @@ export function ReportsHeader({ rangeLabel, onExportCsv, onExportJson }: Props) 
         </h1>
         <p className="mt-1 truncate text-xs text-zinc-400 sm:text-sm">{rangeLabel}</p>
       </div>
-
-      <ReportsExportMenu onExportCsv={onExportCsv} onExportJson={onExportJson} />
     </header>
   )
 }

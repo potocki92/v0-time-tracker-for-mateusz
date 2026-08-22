@@ -25,30 +25,12 @@ export function HeaderSkeleton() {
   return (
     <>
       {/*
-        Klasy paska sa KOPIA <header> z LinearTopBar — lacznie z `hidden … md:flex`
-        i z ujemnymi marginesami az do `xl:-mx-8`.
+        Paska breadcrumbow tu NIE MA i miec nie moze. Naglowek obszaru roboczego
+        przeniosl sie do `AppShell`, czyli PONAD granice <Suspense> dashboardu —
+        jest na ekranie przez caly czas ladowania. Bloczek udajacy go w tym
+        miejscu dorysowywalby drugi pasek, ktorego tresc nie ma, i strona
+        skakalaby o jego wysokosc na samej podmianie.
 
-        Widocznosc: poprzednia wersja pokazywala pasek na KAZDEJ szerokosci, a tresc
-        ma go dopiero od `md:`. Na telefonie skeleton rysowal wiec pasek, ktorego
-        tresc nie ma, i po podmianie strona skakala w gore o cala jego wysokosc.
-
-        Marginesy: kontener dashboardu ma `px-3 sm:px-4 xl:px-8`. Bez `xl:-mx-8`
-        pasek skeletonu od 1280 px konczylby sie 32 px przed krawedzia, a pasek
-        tresci do niej siega — przesuniecie w poziomie na samej podmianie.
-
-        Wysokosc: `h-8` przyciskow (32) + `py-2` (16) + `border-b` (1) = 49 px,
-        dokladnie tyle co realny pasek. Poprzednia wersja miala bloczki 40 px
-        i wychodzila 57 px.
-      */}
-      <div className="sticky top-0 z-40 -mx-3 hidden border-b border-hairline bg-surface-0/85 px-3 py-2 backdrop-blur-md md:-mx-4 md:flex md:items-center md:justify-between md:px-4 xl:-mx-8 xl:px-8">
-        <SkeletonBlock height={14} className="w-40" />
-        <div className="flex items-center gap-2">
-          <SkeletonBlock height={32} className="w-8" rounded="md" />
-          <SkeletonBlock height={32} className="w-8" rounded="md" />
-        </div>
-      </div>
-
-      {/*
         HeroGreeting — w poprzedniej wersji skeletonu NIE BYLO go wcale, wiec caly
         blok (dateline + naglowek + zakladki zakresu) wskakiwal znikad na kazdej
         szerokosci.

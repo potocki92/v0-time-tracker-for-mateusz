@@ -4,13 +4,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 export function ClientsSkeleton() {
   return (
     <div className="container space-y-6 px-4 py-6" data-testid="section-skeleton">
-      <div className="sticky top-0 z-20 -mx-4 border-b bg-background/95 px-4 pb-4 pt-2">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <Skeleton className="h-7 w-32" />
-            <Skeleton className="h-3 w-24" />
-          </div>
-          <Skeleton className="h-10 w-40" />
+      {/* `top-14` i brak bloczka przycisku — jak w ClientsHeader po przeniesieniu
+          akcji do WorkspaceHeader. */}
+      <div className="sticky top-14 z-20 -mx-4 border-b bg-background/95 px-4 pb-4 pt-2">
+        <div className="space-y-1">
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-3 w-24" />
         </div>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto]">
           <Skeleton className="h-10 w-full" />

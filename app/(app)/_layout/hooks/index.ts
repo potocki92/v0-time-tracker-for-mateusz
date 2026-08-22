@@ -1,1 +1,0 @@
-export { usePageLabel } from './usePageLabel'
