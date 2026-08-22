@@ -1,5 +1,8 @@
 'use client'
 
+import { SURFACE } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { TrendingUp } from 'lucide-react'
 import type { CURRENCY } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
@@ -27,11 +30,9 @@ export function InvoiceCashflowCard({
       : `${trendPercent > 0 ? '+' : ''}${trendPercent}%`
 
   return (
-    <section className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5">
+    <section className={cn(SURFACE.card, 'p-4 sm:p-5')}>
       <header className="flex items-center justify-between gap-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          PRZEPŁYW · 6 MIESIĘCY
-        </p>
+        <SectionEyebrow>PRZEPŁYW · 6 MIESIĘCY</SectionEyebrow>
         {trendBadge && (
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-2xs font-semibold text-emerald-300 ring-1 ring-emerald-500/30 tabular-nums">
             <TrendingUp className="h-3 w-3" aria-hidden />

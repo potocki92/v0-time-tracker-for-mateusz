@@ -1,5 +1,8 @@
 'use client'
 
+import { PageContainer } from '@/components/common/section/PageContainer'
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import type { Invoice } from '@/lib/types'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
@@ -321,7 +324,7 @@ export function InvoicesContent() {
   const testBusy = saveMutation.isPending && !editingInvoice
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-5 px-4 py-6 pb-28 lg:max-w-6xl lg:pb-10">
+    <PageContainer>
       <input
         ref={importInputRef}
         type="file"
@@ -344,7 +347,12 @@ export function InvoicesContent() {
               variant="outline"
               size="icon"
               aria-label="Więcej akcji"
-              className="h-10 w-10 shrink-0 rounded-xl border-hairline bg-surface-1 text-zinc-300 hover:border-hairline-strong hover:bg-surface-2 hover:text-white"
+              className={cn(
+                'h-10 w-10 shrink-0 rounded-xl text-zinc-300 hover:text-white',
+                LINEAR.border,
+                LINEAR.surface,
+                LINEAR.surfaceHover,
+              )}
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
@@ -410,7 +418,7 @@ export function InvoicesContent() {
 
           {filteredInvoices.length === 0 ? (
             data.invoices.length === 0 ? (
-              <Empty className="rounded-2xl border border-dashed border-hairline bg-surface-1">
+              <Empty className={SURFACE.cardDashed}>
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
                     <FileText className="size-5" />
@@ -423,7 +431,7 @@ export function InvoicesContent() {
                 <Button onClick={openCreate}>Dodaj pierwszą fakturę</Button>
               </Empty>
             ) : (
-              <div className="rounded-2xl border border-dashed border-hairline bg-surface-1 px-4 py-10 text-center text-sm text-zinc-400">
+              <div className={cn(SURFACE.cardDashed, 'px-4 py-10 text-center text-sm text-zinc-400')}>
                 Brak faktur dopasowanych do filtrów.
               </div>
             )
@@ -477,7 +485,7 @@ export function InvoicesContent() {
               />
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-hairline bg-surface-1 px-4 py-10 text-center text-sm text-zinc-400">
+            <div className={cn(SURFACE.cardDashed, 'px-4 py-10 text-center text-sm text-zinc-400')}>
               Wybierz fakturę z listy, aby zobaczyć szczegóły.
             </div>
           )}
@@ -557,6 +565,6 @@ export function InvoicesContent() {
         onClose={() => setQuickQuarterOpen(false)}
         onSubmit={handleQuickQuarterSubmit}
       />
-    </div>
+    </PageContainer>
   )
 }

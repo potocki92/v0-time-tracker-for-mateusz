@@ -1,5 +1,8 @@
 'use client'
 
+import { SURFACE } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import type { CURRENCY } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
 import type { InvoiceAgingBuckets } from '../../domain/stats'
@@ -36,11 +39,9 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
   }
 
   return (
-    <section className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5">
+    <section className={cn(SURFACE.card, 'p-4 sm:p-5')}>
       <header className="flex items-center justify-between gap-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          NALEŻNOŚCI · WIEKOWANIE
-        </p>
+        <SectionEyebrow>NALEŻNOŚCI · WIEKOWANIE</SectionEyebrow>
         <button
           type="button"
           aria-label="Więcej opcji wiekowania"
@@ -82,10 +83,10 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
       <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
         {SEGMENTS.map((seg) => (
           <div key={seg.key} className="space-y-1">
-            <dt className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
+            <SectionEyebrow as="dt" className="flex items-center gap-2">
               <span className={`h-2 w-2 rounded-full ${seg.dot}`} aria-hidden />
               {seg.label}
-            </dt>
+            </SectionEyebrow>
             <dd className="text-sm font-semibold tabular-nums text-white">
               {formatCurrency(segmentValues[seg.key], currency)}
             </dd>

@@ -1,5 +1,8 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { CheckCircle2, ChevronDown, Clock3, Copy, Download, Mail, Pencil, Printer, Trash2 } from 'lucide-react'
 import type { Client, Invoice, InvoiceLifecycleStatus } from '@/lib/types'
 import { formatCurrency, formatDate } from '@/lib/helpers'
@@ -80,11 +83,9 @@ export function InvoiceDetailsPanel({
     : `mailto:?subject=${encodeURIComponent(`Faktura ${numberLabel}`)}`
 
   return (
-    <section className="rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5">
+    <section className={cn(SURFACE.card, 'p-4 sm:p-5')}>
       <header className="flex items-center justify-between gap-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          FAKTURA
-        </p>
+        <SectionEyebrow>FAKTURA</SectionEyebrow>
         {onChangeStatus ? (
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -183,10 +184,8 @@ export function InvoiceDetailsPanel({
         <DetailField label="TERMIN" value={due} />
       </dl>
 
-      <div className="mt-4 rounded-xl border border-hairline bg-surface-2 p-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          POZYCJE
-        </p>
+      <div className={cn('mt-4 p-3', SURFACE.cardNested)}>
+        <SectionEyebrow>POZYCJE</SectionEyebrow>
         <ul className="mt-2 space-y-2 text-xs">
           <li className="flex items-center justify-between gap-3">
             <span className="truncate text-zinc-200">{projectName}</span>
@@ -210,10 +209,8 @@ export function InvoiceDetailsPanel({
         </div>
       </div>
 
-      <div className="mt-4 rounded-xl border border-hairline bg-surface-2 p-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          AKTYWNOŚĆ
-        </p>
+      <div className={cn('mt-4 p-3', SURFACE.cardNested)}>
+        <SectionEyebrow>AKTYWNOŚĆ</SectionEyebrow>
         <ul className="mt-2 space-y-1.5 text-xs text-zinc-400">
           {paidLabel && <ActivityRow dot="bg-emerald-400" text={paidLabel} />}
           {sentLabel && <ActivityRow dot="bg-emerald-400" text={sentLabel} />}
@@ -224,14 +221,16 @@ export function InvoiceDetailsPanel({
         </ul>
       </div>
 
-      <button
-        type="button"
+      <Button
+        variant="accent"
         onClick={onTogglePaid}
         disabled={isTogglingPaid}
         className={cn(
-          'mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl text-xs font-semibold transition',
+          'mt-4 h-12 w-full rounded-xl text-xs font-semibold',
           isPaid
-            ? 'border border-hairline bg-surface-2 text-zinc-200 hover:border-amber-500/40 hover:text-amber-300'
+            // `hover:bg-surface-2` zeruje emeraldowy hover wariantu `accent` —
+            // stan „oplacona" nie ma podswietlenia tla, tylko obramowania.
+            ? 'border border-hairline bg-surface-2 text-zinc-200 hover:bg-surface-2 hover:border-amber-500/40 hover:text-amber-300'
             : 'bg-emerald-500 text-black shadow-[0_0_22px_-6px_color-mix(in_oklab,var(--primary)_60%,transparent)] hover:bg-emerald-400',
           isTogglingPaid && 'opacity-60',
         )}
@@ -247,44 +246,50 @@ export function InvoiceDetailsPanel({
             Oznacz jako opłaconą
           </>
         )}
-      </button>
+      </Button>
 
       <div className="mt-2 grid grid-cols-2 gap-2">
         <a
           href={mailHref}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-hairline bg-surface-2 text-xs font-medium text-zinc-200 transition hover:border-hairline-strong hover:text-white"
+          className={cn(
+            'inline-flex h-11 items-center justify-center gap-2 rounded-xl border text-xs font-medium text-zinc-200 transition hover:text-white',
+            LINEAR.border,
+            LINEAR.surface,
+          )}
         >
           <Mail className="h-4 w-4" aria-hidden />
           E-mail
         </a>
-        <button
-          type="button"
+        <Button
+          variant="outline"
           onClick={() => window.print()}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-hairline bg-surface-2 text-xs font-medium text-zinc-200 transition hover:border-hairline-strong hover:text-white"
+          className={cn(
+            'h-11 rounded-xl text-xs font-medium text-zinc-200 hover:text-white',
+            LINEAR.border,
+            LINEAR.surface,
+          )}
         >
           <Printer className="h-4 w-4" aria-hidden />
           Drukuj
-        </button>
+        </Button>
       </div>
 
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={onDelete}
-        className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-transparent text-xs font-medium text-zinc-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+        className="mt-2 h-10 w-full rounded-xl border border-transparent text-xs font-medium text-zinc-400 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden />
         Usuń fakturę
-      </button>
+      </Button>
     </section>
   )
 }
 
 function DetailField({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-hairline bg-surface-2 p-3">
-      <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-        {label}
-      </p>
+    <div className={cn('p-3', SURFACE.cardNested)}>
+      <SectionEyebrow>{label}</SectionEyebrow>
       <p className="mt-1.5 truncate text-xs font-medium text-zinc-100">{value}</p>
     </div>
   )
