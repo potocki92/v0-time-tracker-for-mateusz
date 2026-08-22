@@ -16,9 +16,13 @@ import { buildHeatmap, HEATMAP_WEEKS } from './heatmap'
 
 type Props = {
   totalHours: number
-  totalDays: number
+  /** `null`, gdy nie ma jeszcze zrealizowanego dnia pracy. */
+  avgPerDay: number | null
   /** `null` dla zakresu bez sensownej normy („wszystko") — pasek celu znika. */
   targetHours: number | null
+  /** 0..n, nieprzycięty — pasek przycinamy dopiero przy rysowaniu. */
+  goalProgress: number
+  overtime: number
   periodLabel: string
   /** Wpisy z CAŁEJ historii, nie z zakresu — heatmapa ma własne okno 13 tygodni. */
   entries: WorkEntry[]
@@ -42,17 +46,16 @@ function formatDay(iso: string): string {
 
 export function HoursCard({
   totalHours,
-  totalDays,
+  avgPerDay,
   targetHours,
+  goalProgress,
+  overtime,
   periodLabel,
   entries,
   streakDays,
 }: Props) {
-  const ratio = targetHours && targetHours > 0 ? totalHours / targetHours : 0
-  const filled = Math.min(100, ratio * 100)
-  const reached = targetHours !== null && ratio >= 1
-  const overtime = targetHours ? Math.max(0, totalHours - targetHours) : 0
-  const avgPerDay = totalDays > 0 ? totalHours / totalDays : 0
+  const filled = Math.min(100, goalProgress * 100)
+  const reached = targetHours !== null && goalProgress >= 1
 
   const heatmap = useMemo(() => buildHeatmap(entries), [entries])
 
@@ -82,7 +85,7 @@ export function HoursCard({
             )}
           </p>
           <p className="mt-1 text-2xs leading-[1.4] text-zinc-400 sm:text-xs">
-            Średnio {avgPerDay.toFixed(1)} h/dzień
+            Średnio {avgPerDay === null ? '—' : avgPerDay.toFixed(1)} h/dzień
             {overtime > 0 && <> · {overtime.toFixed(0)} h nadgodzin</>}
           </p>
         </div>

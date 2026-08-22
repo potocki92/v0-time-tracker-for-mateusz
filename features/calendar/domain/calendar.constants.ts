@@ -1,6 +1,5 @@
 import type { StatusVisualConfig, WorkStatus } from './calendar.types'
 
-export const MONTHLY_BASELINE_HOURS = 160
 export const DEFAULT_ENTRY_HOURS = 8
 
 /**

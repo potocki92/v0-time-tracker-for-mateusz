@@ -2,31 +2,36 @@
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Card, CardContent } from '@/components/ui/card'
-import type { DayCompositionBreakdown } from '../../domain/calendar.types'
+import type { DayBreakdown } from '@/lib/metrics/types'
 
 interface Props {
-  composition: DayCompositionBreakdown
+  days: DayBreakdown
 }
 
 const SEGMENTS: Array<{
-  key: keyof Omit<DayCompositionBreakdown, 'totalDays'>
+  key: keyof Omit<DayBreakdown, 'totalDays'>
   label: string
   color: string
-  ringColor: string
 }> = [
-  { key: 'worked', label: 'Pracowane', color: 'bg-emerald-500', ringColor: 'bg-emerald-500' },
-  { key: 'pto', label: 'Urlop', color: 'bg-violet-500', ringColor: 'bg-violet-500' },
-  { key: 'sick', label: 'L4', color: 'bg-amber-500', ringColor: 'bg-amber-500' },
-  { key: 'off', label: 'Wolne', color: 'bg-slate-400', ringColor: 'bg-slate-400' },
-  { key: 'weekend', label: 'Weekend', color: 'bg-muted-foreground/40', ringColor: 'bg-muted-foreground/40' },
+  { key: 'worked', label: 'Pracowane', color: 'bg-emerald-500' },
+  { key: 'vacation', label: 'Urlop', color: 'bg-violet-500' },
+  { key: 'sick', label: 'L4', color: 'bg-amber-500' },
+  { key: 'dayOff', label: 'Wolne', color: 'bg-slate-400' },
+  { key: 'weekendIdle', label: 'Weekend', color: 'bg-muted-foreground/40' },
+  { key: 'weekdayIdle', label: 'Bez wpisu', color: 'bg-surface-3' },
 ]
 
-export function DayComposition({ composition }: Props) {
-  const { totalDays } = composition
+/**
+ * Kubełki są rozłączne, więc pasek zawsze wypełnia się dokładnie w 100%.
+ * Wcześniej weekend z wpisem liczył się dwa razy i „35 dni" wychodziło
+ * w 31-dniowym sierpniu.
+ */
+export function DayComposition({ days }: Props) {
+  const { totalDays } = days
   const segments = SEGMENTS.map((seg) => ({
     ...seg,
-    value: composition[seg.key],
-    percent: totalDays > 0 ? (composition[seg.key] / totalDays) * 100 : 0,
+    value: days[seg.key],
+    percent: totalDays > 0 ? (days[seg.key] / totalDays) * 100 : 0,
   }))
 
   const summary = `${totalDays} dni: ${segments
@@ -69,7 +74,7 @@ export function DayComposition({ composition }: Props) {
             >
               <span className="flex items-center gap-1.5 text-zinc-400">
                 <span
-                  className={`h-1.5 w-1.5 shrink-0 rounded-full ${seg.ringColor}`}
+                  className={`h-1.5 w-1.5 shrink-0 rounded-full ${seg.color}`}
                   aria-hidden
                 />
                 {seg.label}

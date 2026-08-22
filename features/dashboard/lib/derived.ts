@@ -1,5 +1,9 @@
 import { calculateTotals } from '@/lib/finance/totals'
 import { partitionByRealization } from '@/lib/finance/realization'
+import { getTodayLocalDateString } from '@/lib/helpers'
+import { defaultMetricsSettings, toMetricsInput } from '@/lib/metrics/adapter'
+import { computeMonthMetrics } from '@/lib/metrics/computeMonthMetrics'
+import type { IsoDate, MetricsPeriod, MonthMetrics } from '@/lib/metrics/types'
 import { TIME_RANGE_OPTIONS } from '../types/dashboard.constants'
 import type { TimeRange } from '../domain'
 import type { Client, MonthlyTotals, WorkEntry } from '@/lib/types'
@@ -28,6 +32,12 @@ export interface DashboardDerived {
   totals: MonthlyTotals
   predictedTotals: MonthlyTotals
   periodLabel: string
+  /**
+   * Metryki okna z tego samego silnika, z ktorego liczy Kalendarz.
+   * Godziny, cel, seria i stawka efektywna maja tu jedno zrodlo — sekcje
+   * nie licza ich juz samodzielnie.
+   */
+  metrics: MonthMetrics
 }
 
 export interface DashboardDerivedInput {
@@ -85,6 +95,8 @@ export function computeDashboardDerived({
   const { realized: prevRealized } = partitionByRealization(prevFiltered, todayIso)
   const { realized: realizedAll } = partitionByRealization(workEntries, todayIso)
 
+  const periodLabel = TIME_RANGE_OPTIONS.find((o) => o.value === range)?.label ?? ''
+
   return {
     filtered,
     prevFiltered,
@@ -94,6 +106,39 @@ export function computeDashboardDerived({
     realizedAll,
     totals: calculateTotals(realized, clients, eurRate),
     predictedTotals: calculateTotals(predicted, clients, eurRate),
-    periodLabel: TIME_RANGE_OPTIONS.find((o) => o.value === range)?.label ?? '',
+    periodLabel,
+    metrics: computeMonthMetrics(
+      toMetricsInput({
+        period: toMetricsPeriod(dateRange, periodLabel, workEntries, todayIso),
+        today: todayIso,
+        // Caly zbior, nie `filtered`: okno tnie sam silnik, a seria musi
+        // widziec dni sprzed zakresu.
+        workEntries,
+        clients,
+        settings: defaultMetricsSettings(eurRate),
+      }),
+    ),
+  }
+}
+
+/**
+ * Zakres dashboardu -> okno metryk. Zakres "wszystko" nie ma granic, wiec
+ * bierzemy je z danych: od najstarszego wpisu do dzis (albo do ostatniego
+ * zaplanowanego dnia, gdy plan siega dalej).
+ */
+function toMetricsPeriod(
+  { from, to }: DerivedDateRange,
+  label: string,
+  entries: WorkEntry[],
+  todayIso: IsoDate,
+): MetricsPeriod {
+  if (from && to) {
+    return { from: getTodayLocalDateString(from), to: getTodayLocalDateString(to), label }
+  }
+  const dates = entries.map((e) => e.date)
+  return {
+    from: dates.length ? dates.reduce((min, d) => (d < min ? d : min)) : todayIso,
+    to: dates.reduce((max, d) => (d > max ? d : max), todayIso),
+    label,
   }
 }

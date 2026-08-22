@@ -13,7 +13,8 @@ export type ClientRate = {
 }
 
 type Props = {
-  blendedRate: number
+  /** `null` gdy brak godzin rozliczalnych — karta pokazuje „—", nigdy 0,00. */
+  blendedRate: number | null
   currency: 'PLN' | 'EUR'
   clientsCount: number
   rates: ClientRate[]
@@ -41,7 +42,7 @@ export function EffectiveRateCard({
 
       <div className="mt-3 flex items-baseline gap-2">
         <span className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
-          {formatCurrency(blendedRate, currency)}
+          {blendedRate === null ? '—' : formatCurrency(blendedRate, currency)}
         </span>
         <span className="text-xs text-zinc-400 sm:text-sm">/ h</span>
       </div>

@@ -4,16 +4,19 @@ import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Card, CardContent } from '@/components/ui/card'
 import { Briefcase } from 'lucide-react'
 import { formatCurrency } from '@/lib/helpers'
+import type { CURRENCY } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { toMajorUnits } from '../stats/format'
 import type { ProjectAggregate } from '../../domain/calendar.types'
 import { stringToColor } from '../grid/clientColor'
 
 interface Props {
   projects: ProjectAggregate[]
+  currency: CURRENCY
 }
 
-export function TimeByProject({ projects }: Props) {
-  const total = projects.reduce((sum, p) => sum + p.amountPLN, 0)
+export function TimeByProject({ projects, currency }: Props) {
+  const total = toMajorUnits(projects.reduce((sum, p) => sum + p.amountMinor, 0))
 
   return (
     <Card className="rounded-lg border-hairline bg-surface-1 py-0 shadow-none">
@@ -21,7 +24,7 @@ export function TimeByProject({ projects }: Props) {
         <header className="flex items-center justify-between">
           <SectionEyebrow as="h3">Czas wg projektu</SectionEyebrow>
           <span className="text-2xs font-semibold tabular-nums text-zinc-300">
-            {formatCurrency(total, 'PLN')}
+            {formatCurrency(total, currency)}
           </span>
         </header>
 
@@ -33,7 +36,7 @@ export function TimeByProject({ projects }: Props) {
         ) : (
           <ul className="mt-4 space-y-3">
             {projects.map((project) => (
-              <ProjectRow key={project.clientId} project={project} />
+              <ProjectRow key={project.projectId} project={project} currency={currency} />
             ))}
           </ul>
         )}
@@ -42,9 +45,15 @@ export function TimeByProject({ projects }: Props) {
   )
 }
 
-function ProjectRow({ project }: { project: ProjectAggregate }) {
-  const color = project.color || stringToColor(project.clientName)
-  const percent = Math.round(project.shareOfHours * 100)
+function ProjectRow({
+  project,
+  currency,
+}: {
+  project: ProjectAggregate
+  currency: CURRENCY
+}) {
+  const color = project.color || stringToColor(project.name)
+  const percent = Math.round(project.share * 100)
 
   return (
     <li>
@@ -56,13 +65,13 @@ function ProjectRow({ project }: { project: ProjectAggregate }) {
             aria-hidden
           />
           <span className="truncate text-xs font-medium text-white">
-            {project.clientName}
+            {project.name}
           </span>
         </div>
         <div className="flex shrink-0 items-baseline gap-2 text-2xs tabular-nums">
           <span className="font-semibold text-white">{project.hours.toFixed(1)}h</span>
           <span className="text-zinc-400">
-            {formatCurrency(project.amountPLN, 'PLN')}
+            {formatCurrency(toMajorUnits(project.amountMinor), currency)}
           </span>
         </div>
       </div>
@@ -73,7 +82,7 @@ function ProjectRow({ project }: { project: ProjectAggregate }) {
         aria-valuenow={percent}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={`${project.clientName}: ${percent}% przepracowanych godzin`}
+        aria-label={`${project.name}: ${percent}% przepracowanych godzin`}
       >
         <div
           className={cn('h-full rounded-full transition-[width] duration-700 ease-out')}
