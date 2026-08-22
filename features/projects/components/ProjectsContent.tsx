@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AppFooter } from '@/components/common/AppFooter'
+import { PageContainer } from '@/components/common/section/PageContainer'
 import type { Project } from '@/lib/types'
 import { useProjectForm } from '../hooks/useProjectForm'
 import { useProjectMutations } from '../hooks/useProjectMutations'
@@ -77,7 +78,7 @@ export function ProjectsContent() {
 
   return (
     <div className="min-h-screen bg-surface-0 text-white">
-      <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
+      <PageContainer>
         <HeaderSection onCreate={form.openCreate} />
 
         <ProjectsStatsBoundary>
@@ -114,7 +115,7 @@ export function ProjectsContent() {
         />
 
         <AppFooter />
-      </div>
+      </PageContainer>
     </div>
   )
 }

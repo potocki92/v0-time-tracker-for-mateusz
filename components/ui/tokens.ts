@@ -38,9 +38,9 @@ export const LINEAR = {
  */
 export const SURFACE = {
   /** Karta pierwszego poziomu — bezpośrednio na tle sekcji. */
-  card: 'rounded-xl border border-hairline-strong bg-surface-2',
-  /** Karta lub wiersz wewnątrz karty — o stopień jaśniejszy. */
-  cardNested: 'rounded-lg border border-hairline-strong bg-surface-3',
+  card: 'rounded-2xl border border-hairline-strong bg-surface-2',
+  /** Karta lub panel wewnątrz karty — o stopień jaśniejszy i o stopień mniej zaokrąglony. */
+  cardNested: 'rounded-xl border border-hairline-strong bg-surface-3',
   /** Pusty stan / miejsce na treść, której jeszcze nie ma. */
-  cardDashed: 'rounded-xl border border-dashed border-hairline bg-surface-2',
+  cardDashed: 'rounded-2xl border border-dashed border-hairline bg-surface-2',
 } as const

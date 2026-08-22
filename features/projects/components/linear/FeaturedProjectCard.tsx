@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import type { ReactNode } from 'react'
 import { Pencil, Pin } from 'lucide-react'
 import { clientInitials } from '@/components/common/ClientDisplay'
@@ -13,7 +14,7 @@ import {
   progressAccentOf,
 } from '../../types/projects.constants'
 import type { FeaturedProject } from '../../types/projects.types'
-import { LINEAR } from './linear.tokens'
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
 
 type FeaturedProjectCardProps = {
   featured: FeaturedProject
@@ -35,11 +36,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
 
   return (
     <section
-      className={cn(
-        'relative overflow-hidden rounded-2xl border',
-        LINEAR.border,
-        LINEAR.surface,
-      )}
+      className={cn('relative overflow-hidden', SURFACE.card)}
     >
       <div
         aria-hidden
@@ -185,9 +182,7 @@ function Metric({
 }) {
   return (
     <div className={cn('rounded-lg border px-3 py-2.5', LINEAR.borderInset, LINEAR.rowSurface)}>
-      <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
-        {label}
-      </p>
+      <SectionEyebrow>{label}</SectionEyebrow>
       <p
         className={cn(
           'mt-0.5 text-base font-semibold tabular-nums tracking-tight text-white sm:text-lg',

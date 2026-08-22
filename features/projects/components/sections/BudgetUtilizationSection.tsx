@@ -10,7 +10,7 @@ import { useBudgetUtilization } from '../../hooks/useBudgetUtilization'
 import { useProjectsData } from '../../hooks/useProjectsData'
 import { BudgetRow } from '../linear/BudgetRow'
 import { LinearCard } from '../linear/LinearCard'
-import { LINEAR } from '../linear/linear.tokens'
+import { LINEAR } from '@/components/ui/tokens'
 
 export function BudgetUtilizationSection() {
   const { data } = useProjectsData()

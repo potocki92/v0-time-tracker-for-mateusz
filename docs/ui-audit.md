@@ -117,9 +117,16 @@ wykazał potrzeby slotów):
 
 | stała | klasy | rola |
 |---|---|---|
-| `SURFACE.card` | `rounded-xl border border-hairline-strong bg-surface-2` | karta 1. poziomu |
-| `SURFACE.cardNested` | `rounded-lg border border-hairline-strong bg-surface-3` | karta / wiersz zagnieżdżony |
-| `SURFACE.cardDashed` | `rounded-xl border border-dashed border-hairline bg-surface-2` | pusty stan |
+| `SURFACE.card` | `rounded-2xl border border-hairline-strong bg-surface-2` | karta 1. poziomu |
+| `SURFACE.cardNested` | `rounded-xl border border-hairline-strong bg-surface-3` | karta / panel zagnieżdżony |
+| `SURFACE.cardDashed` | `rounded-2xl border border-dashed border-hairline bg-surface-2` | pusty stan |
+
+Promień bierze się z policzenia, na jakim poziomie hierarchii stoi dziś każdy z nich:
+`rounded-2xl` niosą karty stojące bezpośrednio na tle sekcji (`ClientCard`,
+`CurrentClientCard`, `LinearCard`, `FeaturedProjectCard`, `ProjectDetailsPanel`,
+karty analityki Faktur, karty Raportów), a `rounded-xl` — panele i wiersze wewnątrz nich
+(`ProjectListRow`, boksy w `ProjectDetailsPanel`, `InvoiceTotalsSummary`). Kafelek KPI
+stoi na tle sekcji, więc dostaje `SURFACE.card`.
 
 Drabinka kontrastu `surface-2 → surface-3` jest ta sama, którą opisuje komentarz
 w `linear.tokens.ts` i której pilnuje `__test__/config/design-tokens.test.ts`

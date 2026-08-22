@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { useProjectsData } from '../../hooks/useProjectsData'
 import { useStatusBreakdown } from '../../hooks/useStatusBreakdown'
 import { LinearCard } from '../linear/LinearCard'
-import { LINEAR } from '../linear/linear.tokens'
+import { LINEAR } from '@/components/ui/tokens'
 
 /**
  * Jeden pasek segmentowy + legenda. Poprzednia wersja renderowała cztery

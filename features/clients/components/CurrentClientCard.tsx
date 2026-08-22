@@ -21,7 +21,7 @@ import {
   formatRelativeDate,
 } from '../domain/clients.selectors'
 import type { ClientPeriodStats, ClientWithStats } from '../domain/clients.types'
-import { LINEAR } from '@/components/ui/tokens'
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
 
 type Props = {
   client: ClientWithStats
@@ -46,11 +46,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
 
   return (
     <section
-      className={cn(
-        'relative overflow-hidden rounded-2xl border',
-        LINEAR.border,
-        LINEAR.surface,
-      )}
+      className={cn('relative overflow-hidden', SURFACE.card)}
       aria-labelledby="current-client-name"
     >
       <div

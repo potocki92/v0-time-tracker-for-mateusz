@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { LINEAR } from './linear.tokens'
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 
 type LinearCardProps = {
@@ -23,12 +23,7 @@ export function LinearCard({
 }: LinearCardProps) {
   return (
     <section
-      className={cn(
-        'rounded-2xl border',
-        LINEAR.border,
-        LINEAR.surface,
-        className,
-      )}
+      className={cn(SURFACE.card, className)}
     >
       {(eyebrow || badge || trailing) && (
         <header
