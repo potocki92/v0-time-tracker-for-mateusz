@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { memo, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import {
@@ -160,9 +161,7 @@ export const EarningsCard = memo(function EarningsCard({
       <header className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-              Zarobki · {periodLabel}
-            </p>
+            <SectionEyebrow>Zarobki · {periodLabel}</SectionEyebrow>
             {trend.percent !== null && (
               <span
                 className={cn(
@@ -234,17 +233,17 @@ export const EarningsCard = memo(function EarningsCard({
 
       {/* ─────────────── KPI strip ─────────────── */}
       <div className="relative mt-3.5 grid grid-cols-3 gap-2">
-        <KpiTile
+        <EarningsKpi
           icon={TrendingUp}
           label="Średnia / dzień pracy"
           value={avgStr}
         />
-        <KpiTile
+        <EarningsKpi
           icon={CalendarDays}
           label="Aktywne dni"
           value={String(dailyStats.activeDays)}
         />
-        <KpiTile
+        <EarningsKpi
           icon={Sparkles}
           label="Najlepszy dzień"
           value={bestStr}
@@ -285,9 +284,14 @@ export const EarningsCard = memo(function EarningsCard({
   )
 })
 
-/* ─────────────────────────── KPI tile ─────────────────────────── */
+/* ────────────────────── KPI tile (zagniezdzony) ────────────────────── */
 
-function KpiTile({
+/**
+ * Mikro-kafelek WEWNATRZ karty Zarobki — nie ten sam element co `StatTile`
+ * sekcji (ikona po lewej, wartosc nad etykieta, `text-sm`). Nazwa mowi, ze to
+ * kafelek tej karty, a nie czwarta implementacja kafelka KPI panelu.
+ */
+function EarningsKpi({
   icon: Icon,
   label,
   value,

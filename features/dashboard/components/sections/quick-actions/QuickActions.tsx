@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
 import {
   Play,
@@ -36,9 +37,7 @@ export function QuickActions() {
       className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
       <header className="flex items-center justify-between">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          Szybkie akcje
-        </p>
+        <SectionEyebrow>Szybkie akcje</SectionEyebrow>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-400">
           <Command className="h-3.5 w-3.5" aria-hidden />
         </span>

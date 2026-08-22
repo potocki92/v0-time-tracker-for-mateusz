@@ -1,5 +1,7 @@
 'use client'
 
+import { SURFACE } from '@/components/ui/tokens'
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Home, Plane, Plus, Settings2 } from 'lucide-react'
 import {
   formatPlLongDate,
@@ -23,12 +25,10 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
     return (
       <section
         aria-label="Wyjazdy"
-        className="rounded-2xl border border-hairline bg-surface-1"
+        className={SURFACE.card}
       >
         <header className="flex items-center justify-between border-b border-hairline px-4 py-3 sm:px-5">
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-            Wyjazdy
-          </p>
+          <SectionEyebrow>Wyjazdy</SectionEyebrow>
           <button
             type="button"
             onClick={onManage}
@@ -68,12 +68,10 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
   return (
     <section
       aria-label="Licznik wyjazdu"
-      className="rounded-2xl border border-hairline bg-surface-1"
+      className={SURFACE.card}
     >
       <header className="flex items-center justify-between border-b border-hairline px-4 py-3 sm:px-5">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          Wyjazdy
-        </p>
+        <SectionEyebrow>Wyjazdy</SectionEyebrow>
         <button
           type="button"
           onClick={onManage}
@@ -93,9 +91,7 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
             <Icon className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
-              {heading}
-            </p>
+            <SectionEyebrow>{heading}</SectionEyebrow>
             {isToday ? (
               <p className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
                 {isAway ? 'Dzisiaj wracasz do domu' : 'Dzisiaj wyjeżdżasz'}
