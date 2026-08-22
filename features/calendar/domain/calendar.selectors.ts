@@ -1,5 +1,6 @@
 import { calculateEarnings } from '@/lib/finance/earnings'
 import { isRealizedEntry } from '@/lib/finance/realization'
+import { computeActiveStreak } from '@/lib/date/streak'
 import { getMonthKey, getTodayLocalDateString } from '@/lib/helpers'
 import type { Client, WorkEntry } from '@/lib/types'
 import { addDaysIso, type Trip } from '@/features/trips/domain'
@@ -176,64 +177,7 @@ export function selectActiveStreak(
   entries: WorkEntry[],
   today: Date = new Date(),
 ): ActiveStreak {
-  const workedSet = new Set(
-    entries.filter((e) => e.status === 'worked').map((e) => e.date),
-  )
-  const offSet = new Set(
-    entries
-      .filter(
-        (e) =>
-          e.status === 'vacation' ||
-          e.status === 'sick_leave' ||
-          e.status === 'day_off',
-      )
-      .map((e) => e.date),
-  )
-
-  const fmt = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-      d.getDate(),
-    ).padStart(2, '0')}`
-
-  // Bieżący streak — idziemy wstecz od dziś, omijając weekendy i dni urlopowe.
-  let current = 0
-  const cursor = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  while (true) {
-    const dow = cursor.getDay()
-    const key = fmt(cursor)
-    if (dow === 0 || dow === 6 || offSet.has(key)) {
-      cursor.setDate(cursor.getDate() - 1)
-      continue
-    }
-    if (workedSet.has(key)) {
-      current += 1
-      cursor.setDate(cursor.getDate() - 1)
-      continue
-    }
-    break
-  }
-
-  // Najdłuższy streak — iterujemy po dniach roboczych roku w przód.
-  const year = today.getFullYear()
-  let longest = 0
-  let running = 0
-  const day = new Date(year, 0, 1)
-  const end = new Date(year, 11, 31)
-  while (day <= end) {
-    const dow = day.getDay()
-    const key = fmt(day)
-    if (dow !== 0 && dow !== 6 && !offSet.has(key)) {
-      if (workedSet.has(key)) {
-        running += 1
-        longest = Math.max(longest, running)
-      } else if (day <= today) {
-        running = 0
-      }
-    }
-    day.setDate(day.getDate() + 1)
-  }
-
-  return { current, longestThisYear: Math.max(longest, current) }
+  return computeActiveStreak(entries, today)
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
