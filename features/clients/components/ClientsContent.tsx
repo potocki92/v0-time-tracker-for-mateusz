@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Plus } from 'lucide-react'
+import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useClientsData } from '../hooks/useClientsData'
 import { useClientsFilters } from '../hooks/useClientsFilters'
@@ -12,7 +15,6 @@ import {
   useUpdateClient,
 } from '../hooks/useClientMutations'
 import { useIsMobile } from '@/hooks/use-mobile'
-import { ClientsHeader } from './ClientsHeader'
 import { ClientsStats } from './ClientsStats'
 import { CurrentClientCard } from './CurrentClientCard'
 import {
@@ -140,19 +142,16 @@ export function ClientsContent() {
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
-      <ClientsHeader
-        totalCount={allClients.length}
-        visibleCount={visible.length}
-        search={search}
-        onSearchChange={setSearch}
-        workTypeFilter={workTypeFilter}
-        onWorkTypeFilterChange={setWorkTypeFilter}
-        currencyFilter={currencyFilter}
-        onCurrencyFilterChange={setCurrencyFilter}
-        activityFilter={activityFilter}
-        onActivityFilterChange={setActivityFilter}
-        onAddClient={openCreate}
-      />
+      {/* Tytul sekcji zyje w breadcrumbie górnego paska — tu zostaje sam
+          naglowek dla czytnikow ekranu, zeby strona miala h1. */}
+      <h1 className="sr-only">Klienci</h1>
+
+      <WorkspaceHeaderActions>
+        <Button size="sm" onClick={openCreate}>
+          <Plus className="mr-2 h-4 w-4" />
+          Dodaj klienta
+        </Button>
+      </WorkspaceHeaderActions>
 
       {currentClient && currentClientMonth && (
         <ClientsStatsBoundary>

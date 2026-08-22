@@ -4,20 +4,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 export function ClientsSkeleton() {
   return (
     <div className="container space-y-6 px-4 py-6" data-testid="section-skeleton">
-      {/* `top-14` i brak bloczka przycisku — jak w ClientsHeader po przeniesieniu
-          akcji do WorkspaceHeader. */}
-      <div className="sticky top-14 z-20 -mx-4 border-b bg-background/95 px-4 pb-4 pt-2">
-        <div className="space-y-1">
-          <Skeleton className="h-7 w-32" />
-          <Skeleton className="h-3 w-24" />
-        </div>
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto]">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full sm:w-40" />
-          <Skeleton className="h-10 w-full sm:w-36" />
-        </div>
-      </div>
-
       {/* Karta „Aktualny zleceniodawca" — bez niej lista podskakiwała
           o własną wysokość w momencie dojścia danych. */}
       <div className="space-y-3 rounded-2xl border border-hairline-strong bg-surface-2 p-4">
