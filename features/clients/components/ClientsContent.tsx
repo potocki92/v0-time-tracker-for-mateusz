@@ -28,6 +28,7 @@ import { ClientFormDialog } from './ClientFormDialog'
 import { DeleteClientDialog } from './DeleteClientDialog'
 import { RateHistoryDialog } from './RateHistoryDialog'
 import { AppFooter } from '@/components/common/AppFooter'
+import { PageContainer } from '@/components/common/section/PageContainer'
 import { ClientsStatsBoundary, ClientsTableBoundary } from './errors'
 import type { Client, ClientFormData } from '@/lib/types'
 import type { ClientWithStats } from '../domain/clients.types'
@@ -141,13 +142,13 @@ export function ClientsContent() {
   }, [searchParams, openCreate, router])
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
+    <PageContainer>
       {/* Tytul sekcji zyje w breadcrumbie górnego paska — tu zostaje sam
           naglowek dla czytnikow ekranu, zeby strona miala h1. */}
       <h1 className="sr-only">Klienci</h1>
 
       <WorkspaceHeaderActions>
-        <Button size="sm" onClick={openCreate}>
+        <Button variant="accent" size="sm" onClick={openCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Dodaj klienta
         </Button>
@@ -233,7 +234,7 @@ export function ClientsContent() {
         onClose={() => setHistoryClient(null)}
       />
       <AppFooter />
-    </div>
+    </PageContainer>
   )
 }
 

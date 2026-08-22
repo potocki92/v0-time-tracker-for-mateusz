@@ -12,13 +12,17 @@ import { cn } from '@/lib/utils'
 export function PageContainer({
   children,
   className,
+  'data-testid': testId,
 }: {
   children: ReactNode
   className?: string
+  /** Skeletony sekcji identyfikuje `section-skeleton` — patrz e2e/navigation.spec.ts. */
+  'data-testid'?: string
 }) {
   return (
     <div
       data-slot="page-container"
+      data-testid={testId}
       className={cn(
         'mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8',
         className,

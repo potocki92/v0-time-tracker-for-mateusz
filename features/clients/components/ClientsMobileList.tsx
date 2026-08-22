@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowDownUp, ChevronDown, SlidersHorizontal } from 'lucide-react'
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 import {
   ACTIVITY_GROUP_LABELS,
@@ -108,7 +110,12 @@ export function ClientsMobileList({
           <CollapsibleTrigger asChild>
             <Button
               variant="outline"
-              className="h-11 flex-1 justify-between gap-2 rounded-xl border-hairline-strong bg-surface-2 text-sm font-medium text-zinc-300 hover:bg-surface-3 hover:text-white"
+              className={cn(
+                'h-11 flex-1 justify-between gap-2 rounded-xl text-sm font-medium text-zinc-300 hover:text-white',
+                LINEAR.border,
+                LINEAR.surface,
+                LINEAR.surfaceHover,
+              )}
             >
               <span className="flex items-center gap-2">
                 <SlidersHorizontal className="size-4" />
@@ -125,7 +132,11 @@ export function ClientsMobileList({
 
           <Select value={sortKey} onValueChange={(v) => onSortChange(v as ClientsSortKey)}>
             <SelectTrigger
-              className="h-11 w-[11.5rem] shrink-0 gap-1.5 rounded-xl border-hairline-strong bg-surface-2 text-sm text-zinc-300 [&>span]:truncate"
+              className={cn(
+                'h-11 w-[11.5rem] shrink-0 gap-1.5 rounded-xl text-sm text-zinc-300 [&>span]:truncate',
+                LINEAR.border,
+                LINEAR.surface,
+              )}
               aria-label="Sortowanie listy klientów"
             >
               <ArrowDownUp className="size-4 shrink-0 text-zinc-400" aria-hidden />
@@ -142,7 +153,7 @@ export function ClientsMobileList({
         </div>
 
         <CollapsibleContent className="data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
-          <div className="mt-2 space-y-3 rounded-xl border border-hairline-strong bg-surface-2 p-3">
+          <div className={cn('mt-2 space-y-3 p-3', SURFACE.card)}>
             <FilterChipsRow
               label="Status"
               options={STATUS_FILTER_OPTIONS}
@@ -181,9 +192,9 @@ export function ClientsMobileList({
         <div className="space-y-4">
           {grouped.map(({ activity, items }) => (
             <section key={activity} className="space-y-2.5">
-              <h2 className="px-1 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+              <SectionEyebrow as="h2" className="px-1">
                 {ACTIVITY_GROUP_LABELS[activity]} {items.length}
-              </h2>
+              </SectionEyebrow>
               <ul className="space-y-2.5">
                 {items.map((client) => (
                   <li key={client.id}>
@@ -217,7 +228,12 @@ export function ClientsMobileList({
       {hasMore && (
         <Button
           variant="outline"
-          className="h-11 w-full rounded-xl border-hairline-strong bg-surface-2 text-zinc-300 hover:bg-surface-3 hover:text-white"
+          className={cn(
+            'h-11 w-full rounded-xl text-zinc-300 hover:text-white',
+            LINEAR.border,
+            LINEAR.surface,
+            LINEAR.surfaceHover,
+          )}
           onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
         >
           Pokaż więcej ({clients.length - visibleCount})

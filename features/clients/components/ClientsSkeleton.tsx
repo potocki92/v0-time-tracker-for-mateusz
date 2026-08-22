@@ -1,12 +1,15 @@
+import { PageContainer } from '@/components/common/section/PageContainer'
 import { Card, CardContent } from '@/components/ui/card'
+import { SURFACE } from '@/components/ui/tokens'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 export function ClientsSkeleton() {
   return (
-    <div className="container space-y-6 px-4 py-6" data-testid="section-skeleton">
+    <PageContainer data-testid="section-skeleton">
       {/* Karta „Aktualny zleceniodawca" — bez niej lista podskakiwała
           o własną wysokość w momencie dojścia danych. */}
-      <div className="space-y-3 rounded-2xl border border-hairline-strong bg-surface-2 p-4">
+      <div className={cn('space-y-3 p-4', SURFACE.card)}>
         <Skeleton className="h-4 w-44" />
         <div className="flex items-center gap-3">
           <Skeleton className="size-11 rounded-full" />
@@ -58,6 +61,6 @@ export function ClientsSkeleton() {
           ))}
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }
