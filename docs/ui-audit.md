@@ -60,7 +60,7 @@ geometrii (`className` dopina `h-12 w-full` itd.).
 | lokalny `KpiTile` — jak wyżej, ale wartość `text-2xl sm:text-3xl`, etykieta z `min-h-[2.4em]`, prop `compact` (nazwa klienta zamiast liczby), bez `progress`/`accent` | 4 | deklaracja i użycia: `features/clients/components/ClientsStats.tsx` | `StatTile` |
 | `InvoiceStatCard` — `rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5`, badge z `tone`, `secondaryAmount`, `description` | 4 | deklaracja: `features/invoices/components/analytics/InvoiceStatCard.tsx`; użycia: `features/invoices/components/analytics/InvoiceStatsGrid.tsx` | `StatTile` |
 | `KpiCard` (raporty) — `rounded-2xl border border-hairline bg-surface-1 p-4 sm:p-5`, `hint` + `TrendBadge` | 3 | deklaracja i użycia: `features/reports/components/ReportsKpis.tsx` | **poza ujednoliceniem** (patrz niżej) |
-| lokalny `KpiTile` (Pulpit, pasek w karcie Zarobki) — `rounded-lg border p-2.5`, wartość `text-sm`, ikona po lewej, `hint` po prawej | 3 | deklaracja i użycia: `features/dashboard/components/sections/earnings/EarningsCard.tsx` | **do rozstrzygnięcia** (patrz „Pytania otwarte”) |
+| lokalny `KpiTile` (Pulpit, pasek w karcie Zarobki) — `rounded-lg border p-2.5`, wartość `text-sm`, ikona po lewej, `hint` po prawej | 3 | deklaracja i użycia: `features/dashboard/components/sections/earnings/EarningsCard.tsx` | **poza ujednoliceniem** — zmiana nazwy na `EarningsKpi` (P2) |
 | `KPICard` (Kalendarz) — `Card` + `CardContent`, ikona w kółku `bg-emerald-500/10`, `Progress` | 4 | `features/calendar/components/stats/KPICard.tsx` + 4 karty w `features/calendar/components/stats/` | **poza ujednoliceniem** (patrz niżej) |
 
 **Poza ujednoliceniem świadomie:**
@@ -172,9 +172,11 @@ Poza samą duplikacją: `__test__/config/design-tokens.test.ts` trzyma obie ści
 w `SURFACE_TOKEN_MODULES` i czyta je przez `readFileSync` — po usunięciu plików ten test
 wywali się na braku pliku, więc lista musi wskazać `components/ui/tokens.ts`.
 
-## Pytania otwarte — Faza 2 wstrzymana do odpowiedzi
+## Pytania otwarte — rozstrzygnięte przed Fazą 2
 
 ### P1. Zasięg asercji „najwyżej 3 warianty powierzchni” (Faza 4a)
+
+**Decyzja: (a) — test liczy wyłącznie powierzchnie kart.**
 
 Test z Fazy 4a ma policzyć warianty `rounded-* border-* bg-surface-*` w `features/**`
 i asertować ≤ 3. Dziś jest ich **28 (100 wystąpień)** — i tylko część to karty.
@@ -185,13 +187,21 @@ zestawów oznacza przeskinowanie m.in. `features/trips`, `features/settings`,
 znacznie więcej niż „przyciski, kafelki, eyebrow, kontener, tokeny” z opisu zadania,
 i realną zmianę wyglądu elementów, które kartami nie są.
 
-Do wyboru:
+Rozważane warianty:
 - **(a)** liczyć tylko powierzchnie **kart** (literały z `rounded-xl`/`rounded-2xl` + border + `bg-surface-*`)
   i do trzech sprowadzić wyłącznie je — dziś takich kombinacji jest 12; pigułki i wiersze zostają;
 - **(b)** liczyć wszystko, jak w literalnym brzmieniu — pełne przeskinowanie `features/**`;
 - **(c)** inny podział.
 
+Wybrano **(a)**. `rounded-md`, `rounded-lg`, `rounded-full` i `rounded-t-*` są poza licznikiem —
+to pigułki, wiersze list, pozycje dropdownów i nagłówki tabel, nie karty. Objęte pliki:
+`features/invoices/**` (10), `features/reports/**` (5), `features/clients/**` (2),
+`features/trips/**` (1). Wyjazdy nie są sekcją z kolejności Fazy 3, ale siedzą
+w `features/**`, więc wchodzą do zakresu razem z ostatnią sekcją.
+
 ### P2. Czwarta implementacja kafelka KPI (Pulpit)
+
+**Decyzja: (a) — zmiana nazwy deklaracji na `EarningsKpi`, bez migracji do `StatTile`.**
 
 `features/dashboard/components/sections/earnings/EarningsCard.tsx` deklaruje własny
 `function KpiTile` — mikro-kafelek **wewnątrz** karty Zarobki: `rounded-lg p-2.5`,
@@ -201,12 +211,16 @@ jej ruszenie, ale wciśnięcie jej w `StatTile` albo wywróci pasek trzech kafel
 Zarobki (`StatTile` ma `p-3.5 sm:p-4` i wartość `text-3xl`), albo wymusi w `StatTile`
 czwarty tryb rozmiarowy — czyli prop „na zapas” względem trzech migrowanych komponentów.
 
-Do wyboru:
+Rozważane warianty:
 - **(a)** zostawić go w miejscu i zmienić nazwę deklaracji na `EarningsKpi` — test 4a przechodzi,
   Pulpit wygląda tak samo, ale czwarty wariant kafelka zostaje w kodzie;
 - **(b)** dodać do `StatTile` prop `dense` i zmigrować — jeden kafelek w repo, ale pasek
   w karcie Zarobki zmienia geometrię;
 - **(c)** zostawić deklarację i osłabić asercję 4a do `features/{clients,projects,invoices}`.
+
+Wybrano **(a)**. To kafelek **zagnieżdżony w karcie**, nie kafelek sekcji — inna anatomia
+(ikona po lewej, wartość nad etykietą, `text-sm`), a `StatTile` musiałby dostać czwarty tryb
+rozmiarowy, którego trzy migrowane komponenty nie potrzebują (CLAUDE.md §2).
 
 ### P3. Zwężenie Faktur bez możliwości weryfikacji wizualnej
 
