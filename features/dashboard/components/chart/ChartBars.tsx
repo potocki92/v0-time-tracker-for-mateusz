@@ -13,10 +13,17 @@ import { useMemo } from 'react'
 import { ChartContainer, ChartTooltip as ShadTooltip, type ChartConfig } from '@/components/ui/chart'
 import { ChartTooltip } from './ChartTooltip'
 
+// Kolory z tokenow motywu, nie z literalow oklch: panel ma piec palet
+// (`--chart-1..5` w `app/globals.css`), a wykres malowal sie na sztywno
+// niebieskim, wiec na kazdym motywie poza domyslnym byl obcym cialem.
 const chartConfig = {
-  hours: { label: 'Godziny', color: 'oklch(0.74 0.17 253)' },
-  rolling: { label: 'Trend (7)', color: 'oklch(0.78 0.14 159)' },
+  hours: { label: 'Godziny', color: 'var(--chart-1)' },
+  rolling: { label: 'Trend (7)', color: 'var(--chart-2)' },
 } satisfies ChartConfig
+
+/** Siatka i osie — neutralne, liczone z `--foreground`, a nie bialy rgba. */
+const AXIS = 'color-mix(in oklab, var(--foreground) 55%, transparent)'
+const GRID = 'color-mix(in oklab, var(--foreground) 12%, transparent)'
 
 type DataItem = {
   label: string
@@ -49,37 +56,51 @@ export function ChartBars({ data, avgHours, isYearDaily }: Props) {
   const showBrush = data.length > 14
 
   return (
-    <div className="rounded-lg border border-white/10 bg-linear-to-b from-white/10 via-white/[0.03] to-transparent p-2 shadow-lg backdrop-blur-sm">
+    <>
       <ChartContainer config={chartConfig} className="h-[220px] w-full">
         <ComposedChart data={enriched} margin={{ top: 14, right: 8, left: -2, bottom: 0 }} barCategoryGap={isYearDaily ? '15%' : '30%'}>
           <defs>
             <linearGradient id="hoursFill" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="oklch(0.74 0.17 253)" stopOpacity={0.92} />
-              <stop offset="100%" stopColor="oklch(0.74 0.17 253)" stopOpacity={0.35} />
+              <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.95} />
+              <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0.30} />
             </linearGradient>
           </defs>
-          <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.08)" strokeDasharray="4 6" />
-          <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={isYearDaily ? 40 : 18} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.62)' }} />
-          <YAxis tickLine={false} axisLine={false} width={36} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.62)' }} tickFormatter={(v) => `${v}h`} />
+          <CartesianGrid vertical={false} stroke={GRID} strokeDasharray="4 6" />
+          <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={isYearDaily ? 40 : 18} tick={{ fontSize: 11, fill: AXIS }} />
+          <YAxis tickLine={false} axisLine={false} width={36} tick={{ fontSize: 11, fill: AXIS }} tickFormatter={(v) => `${v}h`} />
           {avgHours > 0 && (
             <ReferenceLine
               y={avgHours}
-              stroke="rgba(109,255,212,0.8)"
+              stroke="var(--chart-2)"
               strokeDasharray="4 3"
               strokeWidth={1.5}
-              label={{ value: `śr. ${avgHours.toFixed(1)}h`, position: 'insideTopRight', fontSize: 10, fill: 'rgba(109,255,212,0.8)', dy: -4 }}
             />
           )}
-          <ShadTooltip cursor={{ fill: 'rgba(255,255,255,0.08)', opacity: 1 }} content={<ChartTooltip />} />
+          <ShadTooltip cursor={{ fill: GRID, opacity: 1 }} content={<ChartTooltip />} />
           <Bar dataKey="hours" radius={isYearDaily ? [3, 3, 0, 0] : [6, 6, 2, 2]}>
             {enriched.map((entry, i) => (
-              <Cell key={i} fill={entry.hours > 0 ? 'url(#hoursFill)' : 'rgba(255,255,255,0.12)'} />
+              <Cell key={i} fill={entry.hours > 0 ? 'url(#hoursFill)' : GRID} />
             ))}
           </Bar>
-          {showRolling && <Line type="monotone" dataKey="rolling" stroke="oklch(0.78 0.14 159)" strokeWidth={2} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} isAnimationActive={false} />}
-          {showBrush && <Brush dataKey="label" height={20} travellerWidth={8} stroke="rgba(255,255,255,0.2)" fill="rgba(255,255,255,0.06)" className="text-2xs" />}
+          {showRolling && <Line type="monotone" dataKey="rolling" stroke="var(--chart-2)" strokeWidth={2} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} isAnimationActive={false} />}
+          {showBrush && <Brush dataKey="label" height={20} travellerWidth={8} stroke="var(--hairline-strong)" fill="var(--surface-2)" className="text-2xs" />}
         </ComposedChart>
       </ChartContainer>
-    </div>
+
+      {/* Wykres jest `role="img"` bez tresci dla czytnika ekranu — te same
+          liczby w formie tabeli, wzorem
+          `features/calendar/components/insights/HoursPerWeekChart.tsx`. */}
+      <table className="sr-only">
+        <caption>Godziny w kolejnych okresach</caption>
+        <tbody>
+          {data.map((d) => (
+            <tr key={d.date || d.label}>
+              <th scope="row">{d.label}</th>
+              <td>{d.hours.toFixed(1)} h</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   )
 }
