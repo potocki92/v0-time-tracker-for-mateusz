@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { COLLAPSED_SECTION_ROWS } from '@/features/dashboard/components/DashboardSkeleton'
+import { DASHBOARD_SECTIONS } from '@/features/dashboard/sections/registry'
 
 const ROOT = process.cwd()
 const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8')
@@ -71,19 +73,32 @@ describe('dashboard — skeleton odwzorowuje tresc', () => {
     ).not.toMatch(/max-w-2xl/)
   })
 
-  it('skeleton odwzorowuje siatke tresci', () => {
-    expect(skeleton).toMatch(/grid-cols-1[^"]*lg:grid-cols-12/)
-    expect(skeleton, 'brak pasa KPI').toMatch(/lg:col-span-4/)
-    expect(skeleton, 'brak podzialu na kolumne i szyne').toMatch(/xl:col-span-8/)
+  it('skeleton odwzorowuje uklad warstwowy tresci', () => {
+    // Uklad nie jest juz siatka 12-kolumnowa: hero, pas trzech kart,
+    // wiersz „Dostosuj pulpit" i lista zwinietych sekcji.
+    expect(skeleton, 'brak pasa nad zagieciem').toMatch(/grid-cols-1[^"]*lg:grid-cols-3/)
+    expect(skeleton, 'brak karty hero').toContain('<HeroSkeleton')
   })
 
-  it('pas KPI ma w skeletonie tyle samo komorek co w tresci', () => {
-    const inContent = (content.match(/lg:col-span-4/g) ?? []).length
-    const inSkeleton = (skeleton.match(/lg:col-span-4/g) ?? []).length
+  it('pas nad zagieciem ma w skeletonie tyle kart, ile rejestr ma primary', () => {
+    const primary = DASHBOARD_SECTIONS.filter((s) => s.tier === 'primary').length
+    const inSkeleton = (skeleton.match(/<KpiSkeleton/g) ?? []).length
     expect(
       inSkeleton,
       'brakujaca albo nadmiarowa karta KPI to caly jej wiersz przesuniecia',
-    ).toBe(inContent)
+    ).toBe(primary)
+  })
+
+  it('liczba zwinietych wierszy zgadza sie z rejestrem', () => {
+    // Skeleton trzyma te liczbe jako stala, zeby nie wciagac rejestru
+    // do chunka `loading.tsx` — zgodnosc pilnuje wiec test, nie typ.
+    const collapsible = DASHBOARD_SECTIONS.filter(
+      (s) => s.tier !== 'hero' && s.tier !== 'primary',
+    ).length
+    expect(
+      COLLAPSED_SECTION_ROWS,
+      'kazdy brakujacy wiersz to 44 px przeskoku przy podmianie skeletonu',
+    ).toBe(collapsible)
   })
 
   it('HeaderSkeleton nie rysuje wlasnego paska naglowka', () => {

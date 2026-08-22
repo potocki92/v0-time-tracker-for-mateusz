@@ -27,8 +27,8 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
         aria-label="Wyjazdy"
         className={SURFACE.card}
       >
-        <header className="flex items-center justify-between border-b border-hairline px-4 py-3 sm:px-5">
-          <SectionEyebrow>Wyjazdy</SectionEyebrow>
+        {/* Tytul sekcji niesie skorupa Pulpitu — karta go nie powtarza. */}
+        <header className="flex items-center justify-end border-b border-hairline px-4 py-3 sm:px-5">
           <button
             type="button"
             onClick={onManage}
@@ -70,8 +70,7 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
       aria-label="Licznik wyjazdu"
       className={SURFACE.card}
     >
-      <header className="flex items-center justify-between border-b border-hairline px-4 py-3 sm:px-5">
-        <SectionEyebrow>Wyjazdy</SectionEyebrow>
+      <header className="flex items-center justify-end border-b border-hairline px-4 py-3 sm:px-5">
         <button
           type="button"
           onClick={onManage}

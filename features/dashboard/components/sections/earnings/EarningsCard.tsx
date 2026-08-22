@@ -35,7 +35,6 @@ type Props = {
   trend: EarningsTrendData
   sparklineData: SparklinePoint[]
   prevSparklineData?: SparklinePoint[]
-  periodLabel: string
   privacyMode: boolean
   compareMode: boolean
   isExporting?: boolean
@@ -90,7 +89,6 @@ export const EarningsCard = memo(function EarningsCard({
   trend,
   sparklineData,
   prevSparklineData,
-  periodLabel,
   privacyMode,
   compareMode,
   isExporting = false,
@@ -158,7 +156,7 @@ export const EarningsCard = memo(function EarningsCard({
       <header className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <SectionEyebrow>Zarobki · {periodLabel}</SectionEyebrow>
+            <SectionEyebrow>Zarobki</SectionEyebrow>
             {trend.percent !== null && (
               <span
                 className={cn(

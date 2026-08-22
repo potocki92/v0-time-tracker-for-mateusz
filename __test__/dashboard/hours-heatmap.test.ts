@@ -3,7 +3,7 @@ import {
   buildHeatmap,
   levelFromHours,
   HEATMAP_WEEKS,
-} from '@/features/dashboard/components/sections/hours/heatmap'
+} from '@/features/dashboard/components/sections/year-heatmap/heatmap'
 import type { WorkEntry } from '@/lib/types'
 
 function entry(date: string, hours: number, status: WorkEntry['status'] = 'worked'): WorkEntry {

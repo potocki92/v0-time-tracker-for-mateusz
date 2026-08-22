@@ -1,25 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
 import { Check, Flame } from 'lucide-react'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { HEATMAP_LEVELS } from '@/components/ui/tokens'
-import {
-  formatCount,
-  formatDate,
-  formatHours,
-  formatWeekday,
-  NO_DATA,
-} from '@/lib/format'
-import { cn } from '@/lib/utils'
-import type { WorkEntry } from '@/lib/types'
-import { buildHeatmap, HEATMAP_WEEKS } from './heatmap'
+import { formatCount, formatHours, NO_DATA } from '@/lib/format'
 
 type Props = {
   totalHours: number
@@ -30,18 +13,7 @@ type Props = {
   /** 0..n, nieprzycięty — pasek przycinamy dopiero przy rysowaniu. */
   goalProgress: number
   overtime: number
-  periodLabel: string
-  /** Wpisy z CAŁEJ historii, nie z zakresu — heatmapa ma własne okno 13 tygodni. */
-  entries: WorkEntry[]
   streakDays: number
-}
-
-const DAY_LABELS = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
-/** Widoczne są co drugie — reszta zostaje dla czytnika ekranu. */
-const VISIBLE_DAY_LABELS = new Set([0, 2, 4])
-
-function formatDay(iso: string): string {
-  return `${formatWeekday(iso, 'short')}, ${formatDate(iso, 'dayMonth')}`
 }
 
 export function HoursCard({
@@ -50,23 +22,10 @@ export function HoursCard({
   targetHours,
   goalProgress,
   overtime,
-  periodLabel,
-  entries,
   streakDays,
 }: Props) {
   const filled = Math.min(100, goalProgress * 100)
   const reached = targetHours !== null && goalProgress >= 1
-
-  const heatmap = useMemo(() => buildHeatmap(entries), [entries])
-
-  // Siatka roczna jest szersza niz karta na waskich ekranach, a interesujacy
-  // jest jej PRAWY koniec — biezacy tydzien. Bez tego telefon pokazywalby
-  // sprzed roku.
-  const scrollRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const el = scrollRef.current
-    if (el) el.scrollLeft = el.scrollWidth
-  }, [])
 
   return (
     <section
@@ -75,7 +34,9 @@ export function HoursCard({
     >
       <header className="flex items-start justify-between gap-3">
         <div>
-          <SectionEyebrow>Godziny · {periodLabel}</SectionEyebrow>
+          {/* Bez „· Miesiac": zakres nazywaja zakladki nad pasem KPI,
+              a powtorzenie go w kazdym naglowku karty bylo drugim zrodlem prawdy. */}
+          <SectionEyebrow>Godziny</SectionEyebrow>
           <p className="mt-2 text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
             {formatHours(totalHours)}{' '}
             {targetHours !== null && (
@@ -129,115 +90,6 @@ export function HoursCard({
           </div>
         </div>
       )}
-
-      <div className="mt-5 min-w-0">
-        {/* Jeden `role="img"` na całą siatkę, nie 364 osobne: czytnik ekranu
-            czytał wcześniej każdą komórkę z osobna. Treść dla SR niesie
-            tabela `sr-only` niżej — ten sam wzorzec, co w
-            `features/calendar/components/insights/HoursPerWeekChart.tsx`. */}
-        <div ref={scrollRef} className="overflow-x-auto pb-1">
-          <div
-            role="img"
-            aria-label={`Aktywność z ostatnich ${HEATMAP_WEEKS} tygodni: ${formatCount(
-              heatmap.activeDays,
-              ['dzień', 'dni', 'dni'],
-            )} z wpisami, łącznie ${formatHours(heatmap.totalHours)}`}
-            className="flex w-fit gap-2"
-          >
-            <div
-              aria-hidden
-              className="flex shrink-0 flex-col gap-[3px] pt-4 text-2xs text-zinc-500"
-            >
-              {DAY_LABELS.map((label, i) => (
-                <span key={label} className="flex h-[13px] items-center leading-none">
-                  {VISIBLE_DAY_LABELS.has(i) ? label : ''}
-                </span>
-              ))}
-            </div>
-
-            <TooltipProvider delayDuration={80}>
-              <div className="flex flex-col gap-1">
-                {/* Rząd etykiet miesięcy MUSI mieć własną wysokość: etykiety są
-                    pozycjonowane absolutnie (są szersze niż kolumna tygodnia),
-                    więc bez `h-3` rząd zwijał się do zera i napisy lądowały na
-                    pierwszym rzędzie komórek. */}
-                <div aria-hidden className="flex h-3 gap-[3px] text-2xs leading-3 text-zinc-500">
-                  {heatmap.weeks.map((week) => (
-                    <span key={week.startDate} className="relative block w-[13px]">
-                      {week.monthLabel && (
-                        <span className="absolute left-0 top-0 whitespace-nowrap">
-                          {week.monthLabel}
-                        </span>
-                      )}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex gap-[3px]">
-                  {heatmap.weeks.map((week) => (
-                    <div key={week.startDate} className="flex flex-col gap-[3px]">
-                      {week.days.map((cell) => (
-                        <Tooltip key={cell.date}>
-                          <TooltipTrigger asChild>
-                            <div
-                              aria-hidden
-                              className={cn(
-                                'h-[13px] w-[13px] rounded-[3px] transition-transform hover:scale-125',
-                                cell.isFuture && 'border border-dashed border-hairline',
-                                cell.isToday && 'ring-1 ring-[var(--chart-1)]/60',
-                              )}
-                              style={
-                                cell.isFuture
-                                  ? undefined
-                                  : { background: HEATMAP_LEVELS[cell.level] }
-                              }
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent side="top" sideOffset={4}>
-                            {cell.isFuture
-                              ? `${formatDay(cell.date)} · jeszcze przed nami`
-                              : `${formatDay(cell.date)} · ${formatHours(cell.hours)}`}
-                          </TooltipContent>
-                        </Tooltip>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </TooltipProvider>
-          </div>
-        </div>
-
-        <table className="sr-only">
-          <caption>Godziny w tygodniach — ostatnie {HEATMAP_WEEKS} tygodni</caption>
-          <tbody>
-            {heatmap.weeks.map((week) => (
-              <tr key={week.startDate}>
-                <th scope="row">Tydzień od {formatDay(week.startDate)}</th>
-                <td>{formatHours(week.totalHours)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="mt-2 flex items-center justify-between gap-3 text-2xs text-zinc-400">
-          <span className="tabular-nums">
-            {formatCount(heatmap.activeDays, ['dzień', 'dni', 'dni'])} z wpisami przez
-            ostatni rok
-          </span>
-          <span aria-hidden className="flex items-center gap-1">
-            Mniej
-            {HEATMAP_LEVELS.map((color, i) => (
-              <span
-                key={i}
-                className="h-2.5 w-2.5 rounded-[2px]"
-                style={{ background: color }}
-              />
-            ))}
-            Więcej
-          </span>
-        </div>
-      </div>
 
     </section>
   )

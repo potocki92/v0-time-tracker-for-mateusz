@@ -1,6 +1,5 @@
 'use client'
 
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { formatMoney, toMinor } from '@/lib/format'
 
 export type ClientRate = {
@@ -18,7 +17,6 @@ type Props = {
   currency: 'PLN' | 'EUR'
   clientsCount: number
   rates: ClientRate[]
-  periodShort: string
 }
 
 export function EffectiveRateCard({
@@ -26,21 +24,14 @@ export function EffectiveRateCard({
   currency,
   clientsCount,
   rates,
-  periodShort,
 }: Props) {
   return (
     <section
       aria-label="Stawka efektywna"
       className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
-      <header className="flex items-center justify-between">
-        <SectionEyebrow>Stawka efektywna</SectionEyebrow>
-        <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-400">
-          {periodShort}
-        </span>
-      </header>
-
-      <div className="mt-3 flex items-baseline gap-2">
+      {/* Tytul niesie <SectionShell>, zakres — zakladki nad pasem KPI. */}
+      <div className="flex items-baseline gap-2">
         <span className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
           {blendedRate === null ? '—' : formatMoney(toMinor(blendedRate), currency)}
         </span>
