@@ -3,8 +3,8 @@ import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 
-export type StatTileTone = 'neutral' | 'success' | 'warning' | 'action'
-export type StatTileAccent = 'emerald' | 'amber' | 'blue' | 'violet'
+type StatTileTone = 'neutral' | 'success' | 'warning' | 'action'
+type StatTileAccent = 'emerald' | 'amber' | 'blue' | 'violet'
 
 type StatTileProps = {
   label: string
