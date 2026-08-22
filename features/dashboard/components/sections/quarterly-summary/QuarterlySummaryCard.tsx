@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowUpRight, CheckCircle2, Clock, FileWarning, Loader2 } from 'lucide-react'
@@ -34,9 +35,7 @@ export function QuarterlySummaryCard() {
     >
       <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
         <div className="flex items-center gap-2">
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-            Kwartały
-          </p>
+          <SectionEyebrow>Kwartały</SectionEyebrow>
           <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
             ostatnie 4
           </span>
@@ -119,17 +118,11 @@ function QuarterRow({ quarter: q }: { quarter: OverallQuarterSummary }) {
             : ''}
         </p>
         {q.invoiced ? (
-          <p className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold uppercase tracking-[0.14em] text-emerald-400">
-            Wystawiona
-          </p>
+          <SectionEyebrow className="mt-1 inline-flex items-center gap-1 text-emerald-400">Wystawiona</SectionEyebrow>
         ) : q.workedDays > 0 ? (
-          <p className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold uppercase tracking-[0.14em] text-amber-300">
-            Do wystawienia
-          </p>
+          <SectionEyebrow className="mt-1 inline-flex items-center gap-1 text-amber-300">Do wystawienia</SectionEyebrow>
         ) : (
-          <p className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
-            Brak pracy
-          </p>
+          <SectionEyebrow className="mt-1 inline-flex items-center gap-1">Brak pracy</SectionEyebrow>
         )}
       </div>
     </li>

@@ -10,6 +10,9 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        /** Akcja glowna sekcji panelu — jeden wyglad dla „Dodaj klienta",
+            „Nowy projekt" i „Nowa faktura". */
+        accent: 'bg-emerald-500 text-black hover:bg-emerald-400',
         destructive:
           'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
         outline:

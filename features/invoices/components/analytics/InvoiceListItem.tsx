@@ -1,5 +1,6 @@
 'use client'
 
+import { SURFACE } from '@/components/ui/tokens'
 import { FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Client, Invoice } from '@/lib/types'
@@ -51,10 +52,11 @@ export function InvoiceListItem({
   return (
     <article
       className={cn(
-        'rounded-2xl border bg-surface-1 p-4 transition',
+        SURFACE.card,
+        'p-4 transition',
         selected
           ? 'border-emerald-500/40 ring-1 ring-emerald-500/20'
-          : 'border-hairline hover:border-hairline-strong',
+          : 'hover:border-zinc-700/60',
       )}
     >
       <button

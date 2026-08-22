@@ -1,3 +1,4 @@
+import { PageContainer } from '@/components/common/section/PageContainer'
 import { Skeleton } from '@/components/ui/skeleton'
 
 /**
@@ -7,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 export function ProjectsSkeleton() {
   return (
     <div className="min-h-screen bg-surface-0 text-white" data-testid="section-skeleton">
-      <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
+      <PageContainer>
         {/* Bez bloczka akcji — „Nowy projekt" siedzi w WorkspaceHeader,
             czyli poza granicą <Suspense> tej sekcji. */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -19,7 +20,7 @@ export function ProjectsSkeleton() {
         <Skeleton className="h-[300px] rounded-2xl bg-surface-3" />
         <Skeleton className="h-[128px] rounded-2xl bg-surface-3" />
         <Skeleton className="h-[520px] rounded-2xl bg-surface-3" />
-      </div>
+      </PageContainer>
     </div>
   )
 }

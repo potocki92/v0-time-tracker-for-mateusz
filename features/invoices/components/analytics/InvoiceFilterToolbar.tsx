@@ -1,7 +1,10 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Plus, Search } from 'lucide-react'
 import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
+import { Button } from '@/components/ui/button'
+import { LINEAR } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 import type { InvoiceFilterTab } from '../../domain/stats'
 
@@ -39,20 +42,14 @@ export function InvoiceFilterToolbar({
   return (
     <div className="space-y-3">
       <WorkspaceHeaderActions>
-        <button
-          type="button"
-          onClick={onCreate}
-          className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-black transition hover:bg-emerald-400"
-        >
+        <Button variant="accent" size="sm" onClick={onCreate}>
           <Plus className="h-3.5 w-3.5" aria-hidden />
           Nowa faktura
-        </button>
+        </Button>
       </WorkspaceHeaderActions>
 
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-2xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Wszystkie faktury
-        </h2>
+        <SectionEyebrow as="h2">Wszystkie faktury</SectionEyebrow>
       </div>
 
       <div
@@ -105,7 +102,11 @@ export function InvoiceFilterToolbar({
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Szukaj faktury, klienta, projektu..."
             aria-label="Szukaj faktury"
-            className="h-11 w-full rounded-xl border border-hairline bg-surface-1 pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-400 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className={cn(
+              'h-11 w-full rounded-xl border pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-400 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20',
+              LINEAR.border,
+              LINEAR.surface,
+            )}
           />
         </div>
       </div>

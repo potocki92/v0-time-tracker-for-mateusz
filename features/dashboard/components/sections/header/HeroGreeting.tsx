@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import type { TimeRange } from '../../../types/dashboard.types'
 
 type Props = {
@@ -53,9 +54,7 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
 
   return (
     <section className="space-y-2.5">
-      <p className="text-2xs font-medium uppercase tracking-[0.18em] text-zinc-400">
-        {dateline}
-      </p>
+      <SectionEyebrow>{dateline}</SectionEyebrow>
       <div>
         {/* Mobile: stacked.  Desktop (sm+): inline „— here's how April is shaping up." */}
         <h1 className="text-2xl font-semibold leading-[1.25] text-white sm:text-3xl">

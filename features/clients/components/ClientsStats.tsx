@@ -1,15 +1,14 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Banknote, Clock, Trophy, Users, type LucideIcon } from 'lucide-react'
+import { Banknote, Clock, Trophy, Users } from 'lucide-react'
+import { StatTile } from '@/components/common/stat/StatTile'
 import { useEffectiveEurRate } from '@/features/dashboard'
 import { calculateEarnings } from '@/lib/finance/earnings'
 import { formatCurrency } from '@/lib/helpers'
-import { cn } from '@/lib/utils'
 import type { WorkEntry } from '@/lib/types'
 import { deriveActivity } from '../domain/clients.selectors'
 import type { ClientWithStats } from '../domain/clients.types'
-import { LINEAR } from './clients.tokens'
 
 type Props = {
   clients: ClientWithStats[]
@@ -80,25 +79,25 @@ export function ClientsStats({ clients, workEntries }: Props) {
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <KpiTile
+      <StatTile
         label="Zarobek (mies.)"
         value={formatCurrency(stats.monthTotalPLN, 'PLN')}
         icon={Banknote}
         meta={stats.monthEUR > 0 ? `w tym ${formatCurrency(stats.monthEUR, 'EUR')}` : undefined}
       />
-      <KpiTile
+      <StatTile
         label="Godziny (mies.)"
         value={stats.monthHours > 0 ? `${formatHours(stats.monthHours)} h` : '0 h'}
         icon={Clock}
         meta={stats.monthDays > 0 ? `${stats.monthDays} ${pluralizeDays(stats.monthDays)} roboczych` : 'Brak wpisów'}
       />
-      <KpiTile
+      <StatTile
         label="Aktywni"
         value={`${stats.active} / ${clients.length}`}
         icon={Users}
         meta={stats.dormant > 0 ? `${stats.dormant} uśpionych` : 'Wszyscy w grze'}
       />
-      <KpiTile
+      <StatTile
         label="Top przychód"
         value={stats.top?.name ?? '—'}
         icon={Trophy}
@@ -109,49 +108,6 @@ export function ClientsStats({ clients, workEntries }: Props) {
         }
         compact
       />
-    </div>
-  )
-}
-
-function KpiTile({
-  label,
-  value,
-  icon: Icon,
-  meta,
-  compact,
-}: {
-  label: string
-  value: string
-  icon: LucideIcon
-  meta?: string
-  /** Nazwa klienta zamiast liczby — mniejszy stopień, żeby się mieściła. */
-  compact?: boolean
-}) {
-  return (
-    <div className={cn('rounded-xl border p-3.5 sm:p-4', LINEAR.border, LINEAR.surface)}>
-      <div className="flex items-start justify-between gap-2">
-        {/* min-h na dwie linie — inaczej kafelek z zawiniętą etykietą jest
-            wyższy od sąsiadów i siatka się rozjeżdża. */}
-        <p className={cn(LINEAR.eyebrow, 'min-h-[2.4em] leading-[1.2]')}>{label}</p>
-        <span
-          className={cn('shrink-0 rounded-md border p-1 text-zinc-300', LINEAR.border, LINEAR.surfaceElevated)}
-        >
-          <Icon className="h-3.5 w-3.5" aria-hidden />
-        </span>
-      </div>
-      {/* Stały rozmiar zamiast płynnego `text-2xl` (clamp w globals.css),
-          przez który kwoty ucinały się w dwukolumnowej siatce na telefonie. */}
-      <p
-        className={cn(
-          'mt-2 truncate font-semibold leading-none tracking-tight text-white',
-          compact
-            ? 'text-sm leading-snug sm:text-base'
-            : 'text-2xl tabular-nums sm:text-3xl',
-        )}
-      >
-        {value}
-      </p>
-      {meta && <p className="mt-2 truncate text-2xs text-zinc-400 sm:text-xs">{meta}</p>}
     </div>
   )
 }

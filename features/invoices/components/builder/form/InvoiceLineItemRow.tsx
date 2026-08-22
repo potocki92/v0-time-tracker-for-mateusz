@@ -1,5 +1,6 @@
 'use client'
 
+import { SURFACE } from '@/components/ui/tokens'
 import * as React from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { useSortable } from '@dnd-kit/sortable'
@@ -89,7 +90,8 @@ export const InvoiceLineItemRow = React.memo(function InvoiceLineItemRow({
       style={style}
       data-dragging={isDragging || undefined}
       className={cn(
-        'group relative rounded-2xl border border-hairline bg-surface-2 p-3 sm:p-4 shadow-sm',
+        SURFACE.card,
+        'group relative p-3 sm:p-4 shadow-sm',
         'transition data-[dragging=true]:shadow-lg data-[dragging=true]:ring-2 data-[dragging=true]:ring-emerald-500/40',
       )}
     >
@@ -198,7 +200,10 @@ export const InvoiceLineItemRow = React.memo(function InvoiceLineItemRow({
             in a traditional invoice grid. */}
         <div className="col-span-12 md:col-start-2 md:col-span-11">
           <div
-            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline bg-surface-1 px-3 py-2 text-xs"
+            className={cn(
+              SURFACE.cardNested,
+              'flex flex-wrap items-center justify-between gap-3 px-3 py-2 text-xs',
+            )}
             aria-live="polite"
           >
             <dl className="flex flex-wrap items-baseline gap-x-4 gap-y-1">

@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { cn } from '@/lib/utils'
 import type { CURRENCY } from '@/lib/types'
 
@@ -23,9 +24,7 @@ export function InvoicesPageHeader({
   return (
     <header className="space-y-2">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <p className="text-2xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          {monthLabel} {year} · CYKL {cycleLabel}
-        </p>
+        <SectionEyebrow>{monthLabel} {year} · CYKL {cycleLabel}</SectionEyebrow>
         <div
           className="inline-flex gap-0.5 rounded-full border border-hairline bg-surface-1 p-0.5"
           role="tablist"
@@ -41,7 +40,7 @@ export function InvoicesPageHeader({
                 aria-selected={active}
                 onClick={() => onCurrencyChange(value)}
                 className={cn(
-                  'rounded-full px-2 py-0.5 text-2xs font-semibold uppercase tracking-[0.1em] transition',
+                  'rounded-full px-2 py-0.5 text-2xs font-semibold uppercase tracking-wider transition',
                   active
                     ? 'bg-emerald-500/10 text-emerald-200'
                     : 'text-zinc-400 hover:text-white',

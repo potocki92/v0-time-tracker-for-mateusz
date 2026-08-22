@@ -1,5 +1,6 @@
 'use client'
 
+import { SURFACE } from '@/components/ui/tokens'
 import * as React from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { AlertTriangle } from 'lucide-react'
@@ -100,7 +101,7 @@ export function InvoiceTotalsSummary() {
             value={formatMoney(totals.gross_in_pln)}
           />
         ) : currency !== 'PLN' ? (
-          <div className="rounded-xl border border-dashed border-hairline bg-surface-1 px-3 py-2 text-xs text-muted-foreground">
+          <div className={cn(SURFACE.cardDashed, 'px-3 py-2 text-xs text-muted-foreground')}>
             Podaj kurs wymiany, aby zobaczyć równowartość w PLN.
           </div>
         ) : null}
@@ -129,7 +130,8 @@ function TotalsCell({
   return (
     <div
       className={cn(
-        'rounded-xl border border-hairline bg-surface-2 px-3 py-2',
+        SURFACE.cardNested,
+        'px-3 py-2',
         emphasis && 'border-emerald-500/40 bg-emerald-500/10',
       )}
     >

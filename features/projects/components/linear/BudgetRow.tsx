@@ -3,7 +3,7 @@
 import { formatCurrency } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
 import { BUDGET_OVERSPEND_THRESHOLD, BUDGET_WARNING_THRESHOLD } from '../../types/projects.constants'
-import { LINEAR } from './linear.tokens'
+import { LINEAR } from '@/components/ui/tokens'
 
 type BudgetRowProps = {
   projectName: string

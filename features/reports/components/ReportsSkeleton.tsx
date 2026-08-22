@@ -1,9 +1,10 @@
+import { PageContainer } from '@/components/common/section/PageContainer'
 import { SkeletonBlock } from '@/components/common/SkeletonBlock'
 
 export function ReportsSkeleton() {
   return (
     <div className="min-h-screen bg-surface-0" data-testid="section-skeleton">
-      <div className="mx-auto w-full max-w-2xl space-y-5 px-3 pb-28 pt-2 sm:px-4 md:max-w-5xl md:px-6 md:pb-10 md:pt-3 lg:px-8">
+      <PageContainer>
         {/* Bez bloczka menu eksportu — „Eksportuj raport" siedzi w
             WorkspaceHeader, poza granicą <Suspense> tej sekcji. */}
         <div className="min-w-0 space-y-2">
@@ -21,7 +22,7 @@ export function ReportsSkeleton() {
         </div>
 
         <SkeletonBlock height={280} rounded="lg" />
-      </div>
+      </PageContainer>
     </div>
   )
 }

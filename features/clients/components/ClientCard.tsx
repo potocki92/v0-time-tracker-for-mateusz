@@ -13,6 +13,7 @@ import {
   Star,
   Trash2,
 } from 'lucide-react'
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -42,7 +43,7 @@ import {
   toExternalUrl,
 } from '../domain/clients.selectors'
 import type { ClientWithStats } from '../domain/clients.types'
-import { LINEAR } from './clients.tokens'
+import { LINEAR } from '@/components/ui/tokens'
 
 interface ClientCardProps {
   client: ClientWithStats
@@ -293,9 +294,7 @@ function Metric({
 }) {
   return (
     <div className="min-w-0">
-      <dt className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
-        {label}
-      </dt>
+      <SectionEyebrow as="dt">{label}</SectionEyebrow>
       <dd
         className={cn(
           'mt-0.5 truncate text-xs font-semibold tabular-nums text-white',

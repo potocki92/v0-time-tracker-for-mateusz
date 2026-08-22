@@ -1,5 +1,7 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { ArrowUpRight, ClipboardList } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/helpers'
@@ -20,23 +22,22 @@ export function RecentEntries({ entries, onViewAll }: Props) {
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
           <div>
-            <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
-              Ostatnie wpisy
-            </h3>
+            <SectionEyebrow as="h3">Ostatnie wpisy</SectionEyebrow>
             <p className="text-2xs text-zinc-400">Ostatnie 7 wpisów</p>
           </div>
           {onViewAll && (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onViewAll}
               className={cn(
-                'group inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-emerald-400',
-                'transition-colors hover:bg-emerald-500/10 focus-visible:bg-emerald-500/10',
+                'group h-auto gap-1 rounded-md px-2 py-1 text-2xs font-medium text-emerald-400',
+                'hover:bg-emerald-500/10 hover:text-emerald-400 focus-visible:bg-emerald-500/10',
               )}
             >
               Zobacz wszystkie
               <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </button>
+            </Button>
           )}
         </header>
 

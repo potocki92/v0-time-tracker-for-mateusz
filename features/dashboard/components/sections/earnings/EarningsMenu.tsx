@@ -1,6 +1,8 @@
 'use client'
 
 import { memo } from 'react'
+import { LINEAR } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 import {
   BarChart3,
   Copy,
@@ -73,7 +75,7 @@ export const EarningsMenu = memo(function EarningsMenu({
         sideOffset={6}
         className="min-w-[260px] rounded-lg border border-hairline bg-surface-1 p-1.5 text-zinc-200 shadow-2xl"
       >
-        <DropdownMenuLabel className="px-2 pb-1 pt-1.5 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+        <DropdownMenuLabel className={cn('px-2 pb-1 pt-1.5', LINEAR.eyebrow)}>
           Karta Zarobki
         </DropdownMenuLabel>
 
@@ -119,7 +121,7 @@ export const EarningsMenu = memo(function EarningsMenu({
 
         <DropdownMenuSeparator className="my-1 bg-hairline" />
 
-        <DropdownMenuLabel className="px-2 pb-1 pt-1 text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
+        <DropdownMenuLabel className={cn('px-2 pb-1 pt-1', LINEAR.eyebrow)}>
           Analiza
         </DropdownMenuLabel>
 

@@ -146,11 +146,8 @@ describe('design tokens — the scale is actually used', () => {
 
   const components = ['app', 'features', 'components'].flatMap((d) => walk(resolve(ROOT, d)))
 
-  /** Moduly palet trzymane w .ts — `walk` zbiera wylacznie .tsx. */
-  const SURFACE_TOKEN_MODULES = [
-    'features/projects/components/linear/linear.tokens.ts',
-    'features/clients/components/clients.tokens.ts',
-  ]
+  /** Modul palety trzymany w .ts — `walk` zbiera wylacznie .tsx. */
+  const SURFACE_TOKEN_MODULES = ['components/ui/tokens.ts']
 
   it('has no arbitrary font sizes outside the type scale', () => {
     const offenders: string[] = []
@@ -184,8 +181,8 @@ describe('design tokens — the scale is actually used', () => {
     const SURFACE_HEX =
       /\b(?:bg|border|divide|ring)-\[#(?:0a0a0a|0c0c0c|0e0e0e|101012|111|141414|151519|161616|17171a|1a1a1a|1f1f1f|212126|262626|2a2a30)\]/g
     const offenders: string[] = []
-    // Palety modulow Projects i Clients mieszkaja w .ts, wiec `components`
-    // (samo .tsx) by ich nie objal — a to wlasnie tam literaly siedzialy najglebiej.
+    // Paleta panelu mieszka w .ts, wiec `components` (samo .tsx) by jej nie
+    // objal — a to wlasnie tam literaly siedzialy najglebiej.
     for (const file of [...components, ...SURFACE_TOKEN_MODULES]) {
       const hits = readFileSync(resolve(ROOT, file), 'utf8').match(SURFACE_HEX)
       if (hits) offenders.push(`${file}  (${[...new Set(hits)].join(', ')})`)

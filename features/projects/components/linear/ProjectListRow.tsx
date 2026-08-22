@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatCurrency } from '@/lib/helpers'
@@ -10,7 +11,7 @@ import {
   progressAccentOf,
 } from '../../types/projects.constants'
 import type { ProjectListRow as ProjectListRowType } from '../../types/projects.types'
-import { LINEAR } from './linear.tokens'
+import { LINEAR } from '@/components/ui/tokens'
 
 type ProjectListRowProps = {
   row: ProjectListRowType
@@ -206,9 +207,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
 function Stat({ label, value, danger }: { label: string; value: string; danger?: boolean }) {
   return (
     <div>
-      <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
-        {label}
-      </p>
+      <SectionEyebrow>{label}</SectionEyebrow>
       <p
         className={cn(
           'mt-0.5 text-xs font-semibold tabular-nums text-white',

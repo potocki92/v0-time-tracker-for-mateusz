@@ -1,5 +1,6 @@
 'use client'
 
+import { SURFACE } from '@/components/ui/tokens'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -35,7 +36,7 @@ export function InvoicesPagination({
   const canNext   = pageIndex < pageCount - 1
 
   return (
-    <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-1 px-4 py-3 sm:flex-row">
+    <div className={cn('mt-4 flex flex-col items-center justify-between gap-3 px-4 py-3 sm:flex-row', SURFACE.card)}>
       <div className="flex items-center gap-3 text-xs text-zinc-400">
         <span className="tabular-nums">
           {fromIndex + 1}–{toIndex} z {totalCount}

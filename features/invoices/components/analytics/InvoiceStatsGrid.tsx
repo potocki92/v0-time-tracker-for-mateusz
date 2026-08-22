@@ -2,8 +2,8 @@
 
 import type { CURRENCY } from '@/lib/types'
 import { formatCurrency } from '@/lib/helpers'
+import { StatTile } from '@/components/common/stat/StatTile'
 import type { InvoicesAggregateStats } from '../../domain/stats'
-import { InvoiceStatCard } from './InvoiceStatCard'
 
 interface InvoiceStatsGridProps {
   stats: InvoicesAggregateStats
@@ -83,53 +83,53 @@ export function InvoiceStatsGrid({ stats, otherCurrencyStats }: InvoiceStatsGrid
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <InvoiceStatCard
+      <StatTile
         label={`WYSTAWIONE · ${stats.monthLabel}`}
-        amount={formatCurrency(stats.period.total, currency)}
-        secondaryAmount={
+        value={formatCurrency(stats.period.total, currency)}
+        secondary={
           otherCurrencyStats.period.count > 0
             ? formatCurrency(otherCurrencyStats.period.total, otherCurrency)
             : undefined
         }
         badge={formatTrendBadge(stats.period.trendPercent)}
         tone="success"
-        description={billedDescription}
+        meta={billedDescription}
       />
-      <InvoiceStatCard
+      <StatTile
         label="OPŁACONE"
-        amount={formatCurrency(stats.paid.total, currency)}
-        secondaryAmount={
+        value={formatCurrency(stats.paid.total, currency)}
+        secondary={
           otherCurrencyStats.paid.paidCount > 0
             ? formatCurrency(otherCurrencyStats.paid.total, otherCurrency)
             : undefined
         }
         badge={paidBadge}
         tone="success"
-        description={paidDescription}
+        meta={paidDescription}
       />
-      <InvoiceStatCard
+      <StatTile
         label="OCZEKUJĄCE"
-        amount={formatCurrency(stats.outstanding.total, currency)}
-        secondaryAmount={
+        value={formatCurrency(stats.outstanding.total, currency)}
+        secondary={
           otherCurrencyStats.outstanding.openCount + otherCurrencyStats.outstanding.overdueCount > 0
             ? formatCurrency(otherCurrencyStats.outstanding.total, otherCurrency)
             : undefined
         }
         badge={outstandingBadge}
         tone={stats.outstanding.overdueCount > 0 ? 'warning' : 'neutral'}
-        description={outstandingDescription}
+        meta={outstandingDescription}
       />
-      <InvoiceStatCard
+      <StatTile
         label="SZKICE"
-        amount={formatCurrency(stats.drafts.total, currency)}
-        secondaryAmount={
+        value={formatCurrency(stats.drafts.total, currency)}
+        secondary={
           otherCurrencyStats.drafts.count > 0
             ? formatCurrency(otherCurrencyStats.drafts.total, otherCurrency)
             : undefined
         }
         badge={stats.drafts.count > 0 ? 'Akcja' : undefined}
         tone="action"
-        description={draftsDescription}
+        meta={draftsDescription}
       />
     </div>
   )

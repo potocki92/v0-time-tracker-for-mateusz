@@ -1,5 +1,7 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
+import { Button } from '@/components/ui/button'
 import { Pencil, Trash2 } from 'lucide-react'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -12,7 +14,7 @@ import {
   progressAccentOf,
 } from '../../types/projects.constants'
 import type { ProjectListRow as ProjectListRowType } from '../../types/projects.types'
-import { LINEAR } from './linear.tokens'
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
 
 type ProjectDetailsPanelProps = {
   row: ProjectListRowType
@@ -44,7 +46,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
   const accent = progressAccentOf(project.status, isAtRisk, budgetUtilization)
 
   return (
-    <section className={cn('rounded-2xl border p-4 sm:p-5', LINEAR.border, LINEAR.surface)}>
+    <section className={cn(SURFACE.card, 'p-4 sm:p-5')}>
       <header className="flex items-center justify-between gap-3">
         <p className={LINEAR.eyebrow}>PROJEKT</p>
         <div className="flex shrink-0 items-center gap-1.5">
@@ -91,7 +93,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
         </div>
       </div>
 
-      <div className={cn('mt-4 flex items-center gap-2 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
+      <div className={cn('mt-4 flex items-center gap-2 p-3', SURFACE.cardNested)}>
         <Avatar className={cn('h-7 w-7 border', LINEAR.border)}>
           <AvatarFallback
             className="text-2xs font-semibold text-white"
@@ -101,9 +103,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-            KLIENT
-          </p>
+          <SectionEyebrow>KLIENT</SectionEyebrow>
           <p className="truncate text-xs font-medium text-zinc-100">{clientName}</p>
         </div>
       </div>
@@ -115,10 +115,8 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
         <DetailField label="GODZINY" value={`${Math.round(hoursLogged)}h`} />
       </dl>
 
-      <div className={cn('mt-4 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          BUDŻET
-        </p>
+      <div className={cn('mt-4 p-3', SURFACE.cardNested)}>
+        <SectionEyebrow>BUDŻET</SectionEyebrow>
         <div className="mt-2 space-y-1.5 text-xs">
           <Row
             label="Kwota"
@@ -135,19 +133,17 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       </div>
 
       {project.address && (
-        <div className={cn('mt-3 rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-            ADRES
-          </p>
+        <div className={cn('mt-3 p-3', SURFACE.cardNested)}>
+          <SectionEyebrow>ADRES</SectionEyebrow>
           <p className="mt-1.5 text-xs font-medium text-zinc-100">{project.address}</p>
         </div>
       )}
 
-      <button
-        type="button"
+      <Button
+        variant="outline"
         onClick={onEdit}
         className={cn(
-          'mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border text-xs font-semibold text-white transition',
+          'mt-4 h-12 w-full rounded-xl text-xs font-semibold text-white',
           LINEAR.border,
           LINEAR.surfaceElevated,
           'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300',
@@ -155,16 +151,16 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       >
         <Pencil className="h-4 w-4" aria-hidden />
         Edytuj projekt
-      </button>
+      </Button>
 
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={onDelete}
-        className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-transparent text-xs font-medium text-zinc-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+        className="mt-2 h-10 w-full rounded-xl border border-transparent text-xs font-medium text-zinc-400 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden />
         Usuń projekt
-      </button>
+      </Button>
     </section>
   )
 }
@@ -179,10 +175,8 @@ function DetailField({
   danger?: boolean
 }) {
   return (
-    <div className={cn('rounded-xl border p-3', LINEAR.border, LINEAR.surfaceElevated)}>
-      <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-        {label}
-      </p>
+    <div className={cn('p-3', SURFACE.cardNested)}>
+      <SectionEyebrow>{label}</SectionEyebrow>
       <p
         className={cn(
           'mt-1.5 truncate text-xs font-medium text-zinc-100',

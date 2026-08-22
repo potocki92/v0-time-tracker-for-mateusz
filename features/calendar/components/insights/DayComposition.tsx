@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Card, CardContent } from '@/components/ui/card'
 import type { DayCompositionBreakdown } from '../../domain/calendar.types'
 
@@ -36,9 +37,7 @@ export function DayComposition({ composition }: Props) {
     <Card className="rounded-lg border-hairline bg-surface-1 py-0 shadow-none">
       <CardContent className="p-4 sm:p-5">
         <header className="flex items-center justify-between">
-          <h3 className="text-2xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
-            Struktura dni
-          </h3>
+          <SectionEyebrow as="h3">Struktura dni</SectionEyebrow>
           <span className="text-2xs font-medium text-zinc-400 tabular-nums">
             {totalDays} dni
           </span>

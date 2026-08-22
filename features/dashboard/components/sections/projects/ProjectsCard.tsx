@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
 import { ArrowUpRight, ChevronRight, CheckCircle2, Clock } from 'lucide-react'
 
@@ -47,9 +48,7 @@ export function ProjectsCard({ projects, totalActive }: Props) {
     >
       <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
         <div className="flex items-center gap-2">
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-            Projekty
-          </p>
+          <SectionEyebrow>Projekty</SectionEyebrow>
           <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
             {totalActive} aktywne
           </span>

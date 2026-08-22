@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { useMemo } from 'react'
 import { Check } from 'lucide-react'
 import type { WorkEntry } from '@/lib/types'
@@ -99,9 +100,7 @@ export function HoursCard({
     >
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-            Godziny · {periodLabel}
-          </p>
+          <SectionEyebrow>Godziny · {periodLabel}</SectionEyebrow>
           <p className="mt-2 text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
             {totalHours.toFixed(1)}{' '}
             <span className="text-xs font-medium text-zinc-400 sm:text-sm">

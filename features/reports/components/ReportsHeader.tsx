@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { BarChart3 } from 'lucide-react'
 import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
 import { ReportsExportMenu } from './ReportsExportMenu'
@@ -18,9 +19,7 @@ export function ReportsHeader({ rangeLabel, onExportCsv, onExportJson }: Props) 
       </WorkspaceHeaderActions>
 
       <div className="min-w-0">
-        <p className="text-2xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
-          Insights
-        </p>
+        <SectionEyebrow>Insights</SectionEyebrow>
         <h1 className="mt-1 flex items-center gap-2 text-xl font-semibold text-white sm:text-2xl">
           <BarChart3 aria-hidden className="size-5 text-zinc-400 sm:size-6" />
           Raporty

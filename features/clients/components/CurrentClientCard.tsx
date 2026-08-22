@@ -1,6 +1,7 @@
 'use client'
 
 import { Mail, MapPin, Phone, Star, Zap } from 'lucide-react'
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   clientInitials,
@@ -20,7 +21,7 @@ import {
   formatRelativeDate,
 } from '../domain/clients.selectors'
 import type { ClientPeriodStats, ClientWithStats } from '../domain/clients.types'
-import { LINEAR } from './clients.tokens'
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
 
 type Props = {
   client: ClientWithStats
@@ -45,11 +46,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
 
   return (
     <section
-      className={cn(
-        'relative overflow-hidden rounded-2xl border',
-        LINEAR.border,
-        LINEAR.surface,
-      )}
+      className={cn('relative overflow-hidden', SURFACE.card)}
       aria-labelledby="current-client-name"
     >
       <div
@@ -181,9 +178,7 @@ function Metric({
     <div className={cn('rounded-lg border px-3 py-2.5', LINEAR.borderInset, LINEAR.rowSurface)}>
       {/* min-h na dwie linie: gdy jedna etykieta się zawinie, a inne nie,
           wartości w siatce przestają stać w jednej linii. */}
-      <p className="min-h-[2.4em] text-2xs font-semibold uppercase leading-[1.2] tracking-[0.16em] text-zinc-400">
-        {label}
-      </p>
+      <SectionEyebrow className="min-h-[2.4em] leading-[1.2]">{label}</SectionEyebrow>
       <p
         className={cn(
           'mt-0.5 truncate text-base font-semibold tabular-nums tracking-tight text-white sm:text-lg',

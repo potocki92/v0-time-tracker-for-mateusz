@@ -1,10 +1,10 @@
 'use client'
 
 import { CheckCircle2, FolderKanban, ListChecks, Wallet } from 'lucide-react'
+import { StatTile } from '@/components/common/stat/StatTile'
 import { formatCurrency } from '@/lib/helpers'
 import { useProjectsData } from '../../hooks/useProjectsData'
 import { useProjectsKpis } from '../../hooks/useProjectsKpis'
-import { KpiTile } from '../linear/KpiTile'
 
 export function KpiSection() {
   const { data } = useProjectsData()
@@ -12,14 +12,14 @@ export function KpiSection() {
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <KpiTile
+      <StatTile
         label="Wszystkie"
         value={String(kpis.total)}
         icon={FolderKanban}
         meta={`${kpis.planned} zaplanowanych`}
         accent="blue"
       />
-      <KpiTile
+      <StatTile
         label="W trakcie"
         value={String(kpis.active)}
         icon={ListChecks}
@@ -27,7 +27,7 @@ export function KpiSection() {
         progress={kpis.activeShare}
         accent="emerald"
       />
-      <KpiTile
+      <StatTile
         label="Zakończone"
         value={String(kpis.completed)}
         icon={CheckCircle2}
@@ -35,7 +35,7 @@ export function KpiSection() {
         progress={kpis.completedShare}
         accent="violet"
       />
-      <KpiTile
+      <StatTile
         label="Budżet"
         value={formatCurrency(kpis.totalBudget, kpis.totalBudgetCurrency)}
         icon={Wallet}

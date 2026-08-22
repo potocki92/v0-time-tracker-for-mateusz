@@ -1,5 +1,7 @@
 'use client'
 
+import { LINEAR, SURFACE } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { SlidersHorizontal, TrendingUp, X } from 'lucide-react'
 import {
@@ -55,7 +57,7 @@ export function ReportsFilters(props: Props) {
   return (
     <section
       aria-label="Filtry raportu"
-      className="rounded-2xl border border-hairline bg-surface-1 p-3 sm:p-4"
+      className={cn(SURFACE.card, 'p-3 sm:p-4')}
     >
       {/* Mobile control bar — desktop ukrywa */}
       <div className="flex items-center gap-2 md:hidden">
@@ -63,7 +65,11 @@ export function ReportsFilters(props: Props) {
           <SheetTrigger asChild>
             <button
               type="button"
-              className="relative inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-hairline bg-surface-2 px-3 text-sm font-medium text-zinc-200 transition-colors active:bg-surface-3"
+              className={cn(
+                'relative inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium text-zinc-200 transition-colors active:bg-surface-3',
+                LINEAR.border,
+                LINEAR.surface,
+              )}
             >
               <SlidersHorizontal aria-hidden className="size-4" />
               Filtry
@@ -94,7 +100,11 @@ export function ReportsFilters(props: Props) {
               <button
                 type="button"
                 onClick={props.onReset}
-                className="h-11 flex-1 rounded-xl border border-hairline bg-surface-2 text-sm text-zinc-300 active:bg-surface-3"
+                className={cn(
+                  'h-11 flex-1 rounded-xl border text-sm text-zinc-300 active:bg-surface-3',
+                  LINEAR.border,
+                  LINEAR.surface,
+                )}
               >
                 Reset
               </button>
@@ -129,7 +139,11 @@ export function ReportsFilters(props: Props) {
             type="button"
             onClick={props.onReset}
             aria-label="Wyczyść filtry"
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-hairline bg-surface-2 text-zinc-400 active:bg-surface-3"
+            className={cn(
+              'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-zinc-400 active:bg-surface-3',
+              LINEAR.border,
+              LINEAR.surface,
+            )}
           >
             <X aria-hidden className="size-4" />
           </button>

@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { ChevronRight, Plus } from 'lucide-react'
 
 export type UpcomingCategory = 'vacation' | 'billing' | 'project' | 'finance' | 'event'
@@ -47,9 +48,7 @@ export function UpcomingCard({ items, onAdd }: Props) {
       className="rounded-lg border border-hairline bg-surface-1"
     >
       <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          Nadchodzące
-        </p>
+        <SectionEyebrow>Nadchodzące</SectionEyebrow>
         <button
           type="button"
           onClick={onAdd}

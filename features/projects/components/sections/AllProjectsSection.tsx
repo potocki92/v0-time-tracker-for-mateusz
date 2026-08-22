@@ -12,7 +12,7 @@ import {
 import { useProjectsData } from '../../hooks/useProjectsData'
 import { useProjectsFilters } from '../../hooks/useProjectsFilters'
 import { LinearCard } from '../linear/LinearCard'
-import { LINEAR } from '../linear/linear.tokens'
+import { LINEAR } from '@/components/ui/tokens'
 import { ProjectDetailsPanel } from '../linear/ProjectDetailsPanel'
 import { ProjectListRow } from '../linear/ProjectListRow'
 

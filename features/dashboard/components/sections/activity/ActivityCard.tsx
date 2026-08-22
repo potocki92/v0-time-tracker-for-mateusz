@@ -1,5 +1,6 @@
 'use client'
 
+import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
 import {
   Briefcase,
@@ -83,9 +84,7 @@ export function ActivityCard({
       className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
       <header className="flex items-center justify-between">
-        <p className="text-2xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
-          Aktywność
-        </p>
+        <SectionEyebrow>Aktywność</SectionEyebrow>
         <Link
           href="/calendar"
           className="inline-flex items-center gap-1 rounded-md border border-hairline bg-surface-2 px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3"
