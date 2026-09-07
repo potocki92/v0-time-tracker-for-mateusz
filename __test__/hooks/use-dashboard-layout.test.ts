@@ -72,14 +72,32 @@ describe('use-dashboard-layout — scalanie z rejestrem', () => {
     expect(merged.map((s) => s.order)).toEqual([0, 1, 2])
   })
 
-  it('trzyma hero widoczne i rozwiniete mimo zapisanego stanu przeciwnego', () => {
+  it('respektuje zapisane ukrycie karty wiodacej', () => {
+    // Zadna sekcja nie jest przypieta — o tym, co stoi na gorze, decyduje
+    // wylacznie kolejnosc uzytkownika.
     const merged = mergeLayout(
-      [{ id: 'hero', visible: false, collapsed: true, order: 0 }],
+      [
+        { id: 'hero', visible: false, collapsed: true, order: 0 },
+        { id: 'alfa', visible: true, collapsed: false, order: 1 },
+      ],
       REGISTRY,
     )
-    const hero = merged.find((s) => s.id === 'hero')!
-    expect(hero.visible).toBe(true)
-    expect(hero.collapsed).toBe(false)
+    expect(merged.find((s) => s.id === 'hero')!.visible).toBe(false)
+  })
+
+  it('zapis, w ktorym wszystko jest wylaczone, wraca z jedna widoczna sekcja', () => {
+    const merged = mergeLayout(
+      [
+        { id: 'hero', visible: false, collapsed: false, order: 0 },
+        { id: 'alfa', visible: false, collapsed: false, order: 1 },
+        { id: 'beta', visible: false, collapsed: false, order: 2 },
+      ],
+      REGISTRY,
+    )
+    expect(
+      merged.filter((s) => s.visible).map((s) => s.id),
+      'pusty Pulpit nie ma zadnej drogi powrotu poza „Przywroc domyslne"',
+    ).toEqual(['hero'])
   })
 })
 
@@ -108,16 +126,27 @@ describe('use-dashboard-layout — akcje', () => {
     expect(() => useDashboardLayout.getState().toggleVisible('nie-ma-takiej')).not.toThrow()
   })
 
-  it('toggleVisible na hero nie ma efektu', () => {
+  it('karte wiodaca da sie wylaczyc i przesunac jak kazda inna', () => {
     useDashboardLayout.getState().toggleVisible(heroId)
-    const hero = useDashboardLayout.getState().sections.find((s) => s.id === heroId)!
-    expect(hero.visible, 'bez hero Pulpit nie odpowiada na pytanie „co z dzisiaj"').toBe(true)
+    expect(
+      useDashboardLayout.getState().sections.find((s) => s.id === heroId)!.visible,
+      'skoro o gorze decyduje kolejnosc, to hero tez musi dac sie ustapic',
+    ).toBe(false)
+
+    useDashboardLayout.getState().toggleVisible(heroId)
+    useDashboardLayout.getState().moveDown(heroId)
+    expect(useDashboardLayout.getState().sections[0].id).not.toBe(heroId)
   })
 
-  it('hero nigdy nie jest zwiniete', () => {
-    useDashboardLayout.getState().toggleCollapsed(heroId)
-    const hero = useDashboardLayout.getState().sections.find((s) => s.id === heroId)!
-    expect(hero.collapsed).toBe(false)
+  it('sekcja z dolu listy da sie doprowadzic nad zagiecie', () => {
+    const last = useDashboardLayout.getState().sections.at(-1)!.id
+    for (let i = 0; i < DASHBOARD_SECTIONS.length; i += 1) {
+      useDashboardLayout.getState().moveUp(last)
+    }
+    expect(
+      useDashboardLayout.getState().sections[0].id,
+      'bez tego strzalki w „Dostosuj pulpit" nie zmieniaja tego, co widac bez przewijania',
+    ).toBe(last)
   })
 
   it('toggleCollapsed przelacza zwykla sekcje w obie strony', () => {
@@ -131,12 +160,12 @@ describe('use-dashboard-layout — akcje', () => {
     ).toBe(!before)
   })
 
-  it('ukrycie wszystkiego zostawia widoczne hero', () => {
+  it('ostatniej widocznej sekcji nie da sie wylaczyc', () => {
     for (const section of useDashboardLayout.getState().sections) {
       useDashboardLayout.getState().toggleVisible(section.id)
     }
     const visible = useDashboardLayout.getState().sections.filter((s) => s.visible)
-    expect(visible.map((s) => s.id), 'Pulpit nie moze byc pusty').toEqual([heroId])
+    expect(visible.length, 'Pulpit nie moze zostac pusty').toBe(1)
   })
 
   it('resetToDefaults odtwarza stan z rejestru', () => {
@@ -152,7 +181,7 @@ describe('use-dashboard-layout — akcje', () => {
     for (const section of DASHBOARD_SECTIONS) {
       const state = defaultLayout().find((s) => s.id === section.id)!
       expect(state.visible).toBe(section.defaultVisible)
-      expect(state.collapsed).toBe(section.tier === 'hero' ? false : section.defaultCollapsed)
+      expect(state.collapsed).toBe(section.defaultCollapsed)
     }
   })
 })

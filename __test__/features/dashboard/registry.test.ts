@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { DASHBOARD_SECTIONS } from '@/features/dashboard/sections/registry'
 
 /**
- * Rejestr jest JEDYNYM zrodlem prawdy o tym, co stoi na Pulpicie.
+ * Rejestr jest JEDYNYM zrodlem prawdy o tym, CO moze stac na Pulpicie —
+ * i o tym, jak wyglada uklad STARTOWY. Gdzie sekcja stoi naprawde, decyduje
+ * kolejnosc w `use-dashboard-layout`, wiec `tier` jest tu zasiewem, a nie
+ * przypisaniem na stale.
  * Ten plik pilnuje kontraktu, ktorego nie widac w typach: budzetu nad
  * zagieciem, kompletnosci po refaktorze i tego, ze uzytkownik zawsze wie,
  * jaki okres oglada.
@@ -39,12 +42,12 @@ describe('rejestr sekcji Pulpitu', () => {
     expect(new Set(ids).size, `duplikaty id: ${ids.join(', ')}`).toBe(ids.length)
   })
 
-  it('ma dokladnie jedna sekcje hero', () => {
+  it('ma dokladnie jedna sekcje hero w ukladzie startowym', () => {
     const hero = DASHBOARD_SECTIONS.filter((s) => s.tier === 'hero')
     expect(hero.map((s) => s.id)).toHaveLength(1)
   })
 
-  it('miesci sie w budzecie nad zagieciem: najwyzej 3 sekcje primary', () => {
+  it('startowy pas nad zagieciem to dokladnie 3 sekcje', () => {
     const primary = DASHBOARD_SECTIONS.filter((s) => s.tier === 'primary')
     expect(
       primary.map((s) => s.id),
@@ -103,7 +106,7 @@ describe('rejestr sekcji Pulpitu', () => {
     }
   })
 
-  it('hero jest widoczne i rozwiniete domyslnie', () => {
+  it('karta wiodaca jest widoczna i rozwinieta w ukladzie startowym', () => {
     const hero = DASHBOARD_SECTIONS.find((s) => s.tier === 'hero')!
     expect(hero.defaultVisible).toBe(true)
     expect(hero.defaultCollapsed).toBe(false)

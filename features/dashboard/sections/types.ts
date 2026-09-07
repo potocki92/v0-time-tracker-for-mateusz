@@ -10,12 +10,22 @@ export interface DashboardSectionDef {
   id: string
   /** tytul sekcji w skorupie; przy zwinieciu jest jedynym, co widac */
   title: string
+  /**
+   * POCZATKOWE miejsce sekcji w ukladzie — zasiew kolejnosci, nie stala
+   * wlasciwosc. O tym, co jest nad zagieciem, decyduje pozycja w ukladzie
+   * uzytkownika (patrz `dashboard-sections.tsx`), wiec kazda sekcja moze
+   * skonczyc jako karta wiodaca albo jako zwinieta pozycja listy.
+   */
   tier: SectionTier
   /** czy sekcja reaguje na globalny wybor okresu (zakladki Tydzien/Miesiac/Kwartal/Rok) */
   respondsToPeriod: boolean
   /** wlasny zakres pokazywany w naglowku, gdy respondsToPeriod === false */
   ownRangeLabel?: string
-  /** hero i primary montuja sie od razu, reszta leniwie przy zblizeniu do viewportu */
+  /**
+   * Domyslny moment montowania. Sekcja, ktora uzytkownik postawil nad
+   * zagieciem, montuje sie od razu niezaleznie od tej wartosci — kod i tak
+   * przychodzi osobnym chunkiem.
+   */
   loading: 'eager' | 'lazy'
   defaultVisible: boolean
   defaultCollapsed: boolean

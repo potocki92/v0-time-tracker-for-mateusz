@@ -1,6 +1,5 @@
 'use client'
 
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Pencil } from 'lucide-react'
 import { formatCount, formatMoney, formatMoneyDelta, formatPercent, toMinor } from '@/lib/format'
 import type { Currency } from '../../../types/dashboard.types'
@@ -78,7 +77,6 @@ export function MonthlyGoalCard({
       className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
       <header className="flex items-center justify-between">
-        <SectionEyebrow>Cel miesięczny</SectionEyebrow>
         <button
           type="button"
           aria-label="Edytuj cel miesięczny"

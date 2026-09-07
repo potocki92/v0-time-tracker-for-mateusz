@@ -3,8 +3,7 @@
 import Link from 'next/link'
 import { Play, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
-import { formatDate, formatHours, formatWeekday } from '@/lib/format'
+import { formatHours } from '@/lib/format'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import { useTimerStore } from '@/hooks/stores/useTimerStore'
 import { useTrips } from '@/features/trips'
@@ -43,11 +42,9 @@ export function HeroToday() {
       aria-label="Dzisiaj"
       className="rounded-lg border border-hairline bg-surface-1 p-4 sm:p-5"
     >
-      <SectionEyebrow>
-        {formatWeekday(today, 'long')} · {formatDate(today, 'dayMonth')}
-      </SectionEyebrow>
-
-      <p className="mt-2 text-3xl font-semibold leading-[1.15] tabular-nums text-white sm:text-4xl">
+      {/* Bez datownika: powitanie nad Pulpitem pokazuje juz „PONIEDZIALEK ·
+          07 WRZ 2026 · KW 37/2026", a tytul sekcji niesie naglowek nad karta. */}
+      <p className="text-3xl font-semibold leading-[1.15] tabular-nums text-white sm:text-4xl">
         {glance.hours > 0 ? formatHours(glance.hours) : 'Brak wpisu na dziś'}
       </p>
 

@@ -12,6 +12,7 @@ const sections = read('features/dashboard/components/dashboard-sections.tsx')
 const codeOf = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
 const shell = codeOf(read('features/dashboard/components/section-shell.tsx'))
 
+
 /**
  * Poprzednia wersja tego pliku pilnowala siatki 12-kolumnowej z pasem trzech
  * kart KPI i przyklejona szyna — czyli ukladu, w ktorym pietnascie sekcji
@@ -31,9 +32,18 @@ describe('dashboard — uklad warstwowy', () => {
     ).toContain('useDashboardLayout')
   })
 
-  it('trzyma pas primary w jednym rzedzie od lg', () => {
+  it('trzyma pas nad zagieciem w jednym rzedzie od lg', () => {
     expect(sections).toMatch(/data-dashboard-primary/)
     expect(sections).toMatch(/grid-cols-1[^"]*lg:grid-cols-3/)
+  })
+
+  it('o pasie nad zagieciem decyduje kolejnosc uzytkownika, nie tier z rejestru', () => {
+    // Regresja ze zgloszenia: przy podziale po `tier` strzalki w „Dostosuj
+    // pulpit" przestawialy sekcje wylacznie w obrebie zwinietej listy —
+    // zadna nie mogla wjechac nad zagiecie ani zastapic karty wiodacej.
+    const code = codeOf(sections)
+    expect(code, 'podzial po tier wraca do przypietego ukladu').not.toMatch(/tier ===/)
+    expect(code, 'brak ciecia listy na sloty').toMatch(/\.slice\(/)
   })
 
   it('komorka pasa KPI wymusza min-w-0', () => {
