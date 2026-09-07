@@ -3,11 +3,13 @@ import { STATUS_CONFIG, WORK_STATUS_ORDER } from '../../domain/calendar.constant
 
 /**
  * Legenda pod gridem kalendarza — pomaga szybko odczytać znaczenie kolorów.
- * Renderowana horyzontalnie ze scrollem na wąskich ekranach.
+ * Zawija się zamiast scrollować: pięć statusów mieściło się na 390 px dokładnie
+ * co do piksela, więc ostatni ("Dzień wolny") przycinała krawędź karty, a
+ * scrollbara na mobile nie widać.
  */
 export function StatusLegend() {
   return (
-    <div className="-mx-1 flex items-center gap-3 overflow-x-auto px-1 pb-1 scrollbar-none">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
       {WORK_STATUS_ORDER.map((status) => {
         const cfg = STATUS_CONFIG[status]
         return (

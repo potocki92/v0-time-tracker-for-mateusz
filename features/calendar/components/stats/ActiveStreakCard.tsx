@@ -4,6 +4,7 @@ import { KPICard } from './KPICard'
 interface Props {
   current: number
   longest: number
+  className?: string
 }
 
 /**
@@ -11,11 +12,12 @@ interface Props {
  * Obie liczby przychodzą z `computeMonthMetrics` — tego samego rachunku, który
  * pokazuje pigułka serii na Pulpicie.
  */
-export function ActiveStreakCard({ current, longest }: Props) {
+export function ActiveStreakCard({ current, longest, className }: Props) {
   return (
     <KPICard
       label="Aktywna seria"
       icon={<Flame className="h-4 w-4" />}
+      className={className}
       ariaLabel={`Aktualna seria: ${current} dni, najdłuższa: ${longest} dni`}
     >
       <p className="mt-2 text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
@@ -24,7 +26,7 @@ export function ActiveStreakCard({ current, longest }: Props) {
           {pluralizeDay(current)}
         </span>
       </p>
-      <p className="mt-3 text-2xs text-zinc-400">
+      <p className="mt-auto pt-3 text-2xs text-zinc-400">
         Najdłuższa ·{' '}
         <span className="font-semibold text-zinc-300 tabular-nums">{longest} d</span>
       </p>

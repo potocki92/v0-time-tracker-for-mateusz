@@ -57,7 +57,10 @@ export function HoursPerWeekChart({
             <BarChart
               data={data}
               margin={{ top: 6, right: 4, left: -28, bottom: 0 }}
-              barCategoryGap={8}
+              // Procent, nie 8 px: przy pięciu tygodniach recharts rozdmuchiwał
+              // słupek do ~60 px i pojedynczy tydzień z godzinami wyglądał jak
+              // płyta, a nie jak słupek.
+              barCategoryGap="30%"
             >
               <XAxis
                 dataKey="label"
@@ -75,6 +78,7 @@ export function HoursPerWeekChart({
               />
               <Bar
                 dataKey="value"
+                maxBarSize={28}
                 radius={[6, 6, 2, 2]}
                 isAnimationActive
                 animationDuration={650}

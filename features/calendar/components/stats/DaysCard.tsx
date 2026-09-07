@@ -18,7 +18,7 @@ export function DaysCard({ workDays, freeDays }: Props) {
         <span className="text-xs text-zinc-400 sm:text-sm">/ {freeDays}</span>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-2xs">
+      <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 text-2xs">
         <span className="flex items-center gap-1 text-zinc-400">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           {workDays} pracy

@@ -16,13 +16,17 @@ interface Props {
 /**
  * Bazowy KPI card — płaska, ciemna karta spójna z dashboardem (Pulpit):
  * tło #0a0a0a, obwódka #1a1a1a, emeraldowa ikona w pigułce.
+ *
+ * Kolumna flex, bo karty w jednym rzędzie siatki mają wspólną wysokość: bez
+ * `mt-auto` na stopce karta z krótszą treścią (np. „Dni w miesiącu" obok
+ * „Przewidywanego zarobku") zostawiała pod spodem pustą połowę.
  */
 export function KPICard({ label, icon, className, children, ariaLabel }: Props) {
   return (
     <div
       aria-label={ariaLabel}
       className={cn(
-        'relative overflow-hidden rounded-lg border border-hairline bg-surface-1 p-3 sm:p-4',
+        'relative flex h-full flex-col overflow-hidden rounded-lg border border-hairline bg-surface-1 p-3 sm:p-4',
         className,
       )}
     >
