@@ -37,7 +37,7 @@ export function PredictedEarningsCard({
         {formatMoney(forecastEarningsMinor, currency)}
       </p>
 
-      <div className="mt-3 space-y-1.5">
+      <div className="mt-auto space-y-1.5 pt-3">
         <div className="flex items-center justify-between text-2xs">
           <span className="text-zinc-400">
             Realnie {formatMoney(realizedEarningsMinor, currency)}

@@ -48,7 +48,10 @@ export function CalendarStats({ metrics }: Props) {
         workDays={days.worked}
         freeDays={days.vacation + days.sick + days.dayOff}
       />
+      {/* Piąta karta w siatce 2-kolumnowej zostawała sama w rzędzie, z pustą
+          połową obok — na mobile bierze całą szerokość. */}
       <ActiveStreakCard
+        className="col-span-2 lg:col-span-1"
         current={metrics.currentStreakDays}
         longest={metrics.longestStreakDays}
       />

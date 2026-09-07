@@ -64,8 +64,10 @@ function RecentRow({ entry }: { entry: RecentEntry }) {
 
   return (
     <li className="flex items-center gap-3 py-2.5">
-      <div className="flex h-9 w-12 shrink-0 flex-col items-center justify-center rounded-md border border-hairline bg-surface-2">
-        <span className="text-2xs font-bold uppercase tracking-wider text-zinc-400">
+      {/* w-12 + tracking-wider nie mieściło "GRU · SO" w jednej linii, więc
+          kafelek łamał się na trzy wiersze i wylewał poza swoje 36 px. */}
+      <div className="flex h-10 w-14 shrink-0 flex-col items-center justify-center gap-0.5 rounded-md border border-hairline bg-surface-2">
+        <span className="whitespace-nowrap text-2xs font-bold uppercase leading-none text-zinc-400">
           {badge.month} · {badge.weekday}
         </span>
         <span className="text-xs font-bold leading-none text-white">{badge.day}</span>

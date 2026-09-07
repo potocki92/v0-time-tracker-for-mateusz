@@ -26,7 +26,7 @@ export function RealizedEarningsCard({
       <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
         {formatMoney(realizedEarningsMinor, currency)}
       </p>
-      <p className="mt-3 text-2xs text-zinc-400">
+      <p className="mt-auto pt-3 text-2xs text-zinc-400">
         {countDays(realizedDays)} • {formatHours(realizedHours)}
       </p>
     </KPICard>

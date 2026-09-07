@@ -1,6 +1,6 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import type { Client, WorkEntry } from '@/lib/types'
-import { formatMoney, toMinor } from '@/lib/format'
+import { formatHours, formatMoney, formatNumber, toMinor } from '@/lib/format'
 import { getDateString, isFutureDate } from '@/lib/helpers'
 import { calculateEarnings } from '@/lib/finance/earnings'
 import { cn } from '@/lib/utils'
@@ -32,8 +32,14 @@ const SHORT_LABEL: Record<WorkStatus, string> = {
 
 /**
  * Pojedyncza komórka kalendarza. Adaptuje się do mobile (h-16) i desktop (h-24).
- * "Glow" na dzisiejszym dniu, krótki tag (OFF/PTO/L4) zamiast pełnej etykiety,
- * delikatne podkreślenie kolorem klienta na dole. Hover-tooltip tylko na desktopie.
+ * Wyróżnienie dzisiejszego dnia idzie WYŁĄCZNIE do wnętrza komórki (ring-inset
+ * + pigułka z numerem): pierścień z `ring-offset` rósł na zewnątrz i przy
+ * `gap-1` nachodził na sąsiadów, przez co dzisiejsza kolumna wyglądała na
+ * przesuniętą.
+ *
+ * Na wąskim ekranie komórka ma ~32 px treści — kwota nie ma tam szans i lądowała
+ * jako "1 00…". Do `md` pokazujemy więc same godziny, a kwota wraca wtedy, gdy
+ * jest dla niej miejsce; pełne dane i tak są w dialogu dnia i w widoku listy.
  */
 export function DayCell({
   day,
@@ -74,14 +80,14 @@ export function DayCell({
         tripMarker ? `, wyjazd${tripMarker.destination ? ` ${tripMarker.destination}` : ''}` : ''
       }`}
       className={cn(
-        'group relative isolate flex h-16 w-full flex-col overflow-hidden border bg-surface-1 p-1.5 text-left sm:h-24 sm:p-2',
+        'group relative isolate flex h-16 w-full flex-col overflow-hidden border bg-surface-1 p-1 text-left sm:h-24 sm:p-2',
         tripRounding,
         'transition-all duration-200 motion-reduce:transition-none',
         entry
           ? `border-l-[3px] ${cfg?.border} border-y border-r border-hairline ${cfg?.bg}`
           : 'border-hairline hover:border-hairline-strong hover:bg-surface-2',
         isToday &&
-          'border-emerald-500/60 ring-2 ring-emerald-500/40 ring-offset-1 ring-offset-black shadow-[0_0_0_1px_#22c55e] before:absolute before:inset-0 before:rounded-[inherit] before:bg-emerald-500/5 before:pointer-events-none',
+          'ring-1 ring-inset ring-emerald-500/60 before:absolute before:inset-0 before:-z-10 before:bg-emerald-500/[0.07] before:pointer-events-none',
         isWeekend && !entry && 'bg-surface-2',
         'cursor-pointer hover:shadow-sm hover:-translate-y-px active:scale-[0.97]',
         isFuture && 'opacity-80',
@@ -111,25 +117,29 @@ export function DayCell({
       </div>
 
       {entry?.status === 'worked' && (
-        <div className="relative mt-auto space-y-0.5">
-          <div className="text-2xs font-bold leading-none text-white">
+        <div className="mt-auto min-w-0 space-y-0.5">
+          <div className="truncate text-2xs font-bold leading-none text-white">
             {client?.work_type === 'hourly'
-              ? `${entry.hours}h`
-              : `${entry.quantity} ${client?.unit ?? ''}`}
+              ? formatHours(entry.hours)
+              : `${formatNumber(entry.quantity)} ${client?.unit ?? ''}`.trim()}
           </div>
           {earnings && earnings.amount > 0 && (
-            <div className="truncate text-2xs font-medium leading-none text-zinc-400">
+            <div className="hidden truncate text-2xs font-medium leading-none text-zinc-400 md:block">
               {formatMoney(toMinor(earnings.amount), earnings.currency)}
             </div>
           )}
-          {client && (
-            <div
-              className="absolute -bottom-1.5 left-0 right-0 h-[2px] opacity-70 sm:-bottom-2"
-              style={{ background: stringToColor(client.name) }}
-              aria-hidden
-            />
-          )}
         </div>
+      )}
+
+      {/* Pasek klienta idzie przez całą szerokość komórki — wersja wpisana
+          w padding kończyła się 6 px przed jej krawędziami i czytała się
+          jak artefakt renderowania, a nie jak akcent. */}
+      {entry?.status === 'worked' && client && (
+        <span
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] opacity-80"
+          style={{ background: stringToColor(client.name) }}
+          aria-hidden
+        />
       )}
 
       {entry && entry.status !== 'worked' && (
