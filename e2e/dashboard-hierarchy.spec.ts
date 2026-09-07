@@ -19,6 +19,7 @@ test.use({ viewport: { width: 390, height: 844 } })
  * `__test__/features/dashboard/registry.test.ts`.
  */
 const SECTION_IDS = [
+  'today-overview',
   'trips',
   'activity',
   'projects-schedule',
@@ -155,4 +156,34 @@ test('@mobile ukryta sekcja znika z Pulpitu i wraca po ponownym wlaczeniu', asyn
   await page.getByRole('dialog').locator('[data-section-id="upcoming"]').getByRole('switch').click()
   await page.keyboard.press('Escape')
   await expect(page.locator('[data-section-id="upcoming"]')).toHaveCount(1)
+})
+
+test('@mobile sekcja z dolu da sie przeniesc nad zagiecie', async ({ page }) => {
+  await openDashboard(page)
+
+  // „Kwartaly" startuja na dole, zwiniete. Po przeniesieniu na sama gore maja
+  // stac jako karta wiodaca — bez przycisku zwijania i bez przewijania.
+  await page.getByRole('button', { name: 'Dostosuj pulpit' }).click()
+  const sheet = page.getByRole('dialog')
+  const up = sheet
+    .locator('[data-section-id="quarters"]')
+    .getByRole('button', { name: /wyżej/ })
+
+  for (let i = 0; i < SECTION_IDS.length + 1; i += 1) {
+    if (await up.isDisabled()) break
+    await up.click()
+  }
+  await page.keyboard.press('Escape')
+  await expect(sheet).toBeHidden()
+
+  const quarters = page.locator('[data-section-id="quarters"]')
+  await expect(quarters.getByRole('region', { name: 'Kwartały' })).toBeVisible()
+  await expect(
+    quarters.getByRole('button', { name: /Kwartały/ }),
+    'sekcja nad zagieciem nie ma przycisku zwijania',
+  ).toHaveCount(0)
+
+  const box = await quarters.boundingBox()
+  expect(box, 'brak sekcji').not.toBeNull()
+  expect(box!.y, 'karta wiodaca ma byc na pierwszym ekranie').toBeLessThan(844)
 })

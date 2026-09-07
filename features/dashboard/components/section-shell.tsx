@@ -85,11 +85,7 @@ export function SectionShell({
           </CollapsibleTrigger>
         </h2>
 
-        {rangeLabel && (
-          <span className="shrink-0 rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-400">
-            {rangeLabel}
-          </span>
-        )}
+        <RangeBadge label={rangeLabel} />
 
         {actions}
       </div>
@@ -127,4 +123,18 @@ function usePrefersReducedMotion(): boolean {
   }, [])
 
   return reduced
+}
+
+/**
+ * Etykieta wlasnego zakresu sekcji. Wspoldzielona ze skorupa sekcji nad
+ * zagieciem — obie musza wygladac tak samo, bo sekcja przechodzi miedzy nimi
+ * jednym klikiem w „Dostosuj pulpit".
+ */
+export function RangeBadge({ label }: { label?: string }) {
+  if (!label) return null
+  return (
+    <span className="shrink-0 rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-400">
+      {label}
+    </span>
+  )
 }

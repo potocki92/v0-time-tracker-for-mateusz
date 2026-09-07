@@ -1,6 +1,5 @@
 'use client'
 
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { memo, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import {
@@ -155,8 +154,9 @@ export const EarningsCard = memo(function EarningsCard({
       {/* ─────────────── HEADER ─────────────── */}
       <header className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
+          {/* Tytul niesie naglowek sekcji nad karta — karta moze stac
+              zarowno nad zagieciem, jak i w zwijanej skorupie. */}
           <div className="flex flex-wrap items-center gap-2">
-            <SectionEyebrow>Zarobki</SectionEyebrow>
             {trend.percent !== null && (
               <span
                 className={cn(

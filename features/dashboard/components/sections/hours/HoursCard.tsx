@@ -1,7 +1,6 @@
 'use client'
 
 import { Check, Flame } from 'lucide-react'
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { formatCount, formatHours, NO_DATA } from '@/lib/format'
 
 type Props = {
@@ -34,10 +33,7 @@ export function HoursCard({
     >
       <header className="flex items-start justify-between gap-3">
         <div>
-          {/* Bez „· Miesiac": zakres nazywaja zakladki nad pasem KPI,
-              a powtorzenie go w kazdym naglowku karty bylo drugim zrodlem prawdy. */}
-          <SectionEyebrow>Godziny</SectionEyebrow>
-          <p className="mt-2 text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
+          <p className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
             {formatHours(totalHours)}{' '}
             {targetHours !== null && (
               <span className="text-xs font-medium text-zinc-400 sm:text-sm">

@@ -9,6 +9,11 @@ import type { DashboardSectionDef, SectionLayoutState } from '../sections/types'
 /**
  * Uklad Pulpitu: co jest widoczne, co zwiniete i w jakiej kolejnosci.
  *
+ * Kolejnosc jest tu jedynym zrodlem hierarchii: `dashboard-sections.tsx`
+ * tnie te liste na karte wiodaca (1), pas nad zagieciem (2-4) i reszte.
+ * Zadna sekcja nie jest przypieta — takze karta „Dzisiaj" da sie przesunac
+ * nizej albo wylaczyc, jesli ktos woli miec na gorze co innego.
+ *
  * Caly ciezar tego pliku siedzi w `mergeLayout`. Zapisany stan i rejestr
  * rozjezdzaja sie przy KAZDYM wydaniu, ktore dodaje albo usuwa sekcje —
  * a uzytkownik ma w localStorage uklad sprzed tego wydania. Bez scalania
@@ -18,9 +23,6 @@ import type { DashboardSectionDef, SectionLayoutState } from '../sections/types'
 const STORAGE_KEY = 'dashboard-layout'
 const VERSION = 1
 
-const heroIds = (registry: DashboardSectionDef[]) =>
-  new Set(registry.filter((s) => s.tier === 'hero').map((s) => s.id))
-
 /** Uklad wprost z rejestru — stan po pierwszym wejsciu i po „Przywroc domyslne". */
 export function defaultLayout(
   registry: DashboardSectionDef[] = DASHBOARD_SECTIONS,
@@ -28,9 +30,7 @@ export function defaultLayout(
   return registry.map((section, order) => ({
     id: section.id,
     visible: section.defaultVisible,
-    // Hero nie da sie zwinac — inaczej Pulpit przestaje odpowiadac na
-    // pytanie „co z dzisiaj", czyli na jedyne, po ktore sie go otwiera.
-    collapsed: section.tier === 'hero' ? false : section.defaultCollapsed,
+    collapsed: section.defaultCollapsed,
     order,
   }))
 }
@@ -41,14 +41,13 @@ export function defaultLayout(
  *      na koniec listy (nie rozpycha kolejnosci ustawionej przez uzytkownika),
  *   2. sekcja w zapisie, brak w rejestrze  -> wypada,
  *   3. kolejnosc uzytkownika bije kolejnosc rejestru,
- *   4. hero zawsze widoczne i rozwiniete.
+ *   4. cos musi zostac widoczne — pusty Pulpit to nie jest ustawienie.
  */
 export function mergeLayout(
   saved: SectionLayoutState[] | undefined,
   registry: DashboardSectionDef[] = DASHBOARD_SECTIONS,
 ): SectionLayoutState[] {
   const defaults = new Map(defaultLayout(registry).map((s) => [s.id, s]))
-  const heroes = heroIds(registry)
 
   const savedInRegistry = (Array.isArray(saved) ? saved : [])
     .filter((s) => s && defaults.has(s.id))
@@ -57,12 +56,20 @@ export function mergeLayout(
   const seen = new Set(savedInRegistry.map((s) => s.id))
   const added = defaultLayout(registry).filter((s) => !seen.has(s.id))
 
-  return [...savedInRegistry, ...added].map((state, order) => ({
+  const merged = [...savedInRegistry, ...added].map((state, order) => ({
     id: state.id,
-    visible: heroes.has(state.id) ? true : Boolean(state.visible),
-    collapsed: heroes.has(state.id) ? false : Boolean(state.collapsed),
+    visible: Boolean(state.visible),
+    collapsed: Boolean(state.collapsed),
     order,
   }))
+
+  // Zapis, w ktorym wszystko jest wylaczone, daje pusta strone bez zadnej
+  // drogi powrotu poza „Przywroc domyslne" — pierwsza sekcja zostaje wtedy
+  // wlaczona z powrotem.
+  if (merged.length > 0 && !merged.some((state) => state.visible)) {
+    merged[0].visible = true
+  }
+  return merged
 }
 
 /**
@@ -101,9 +108,6 @@ const move = (sections: SectionLayoutState[], id: string, delta: number) => {
   const from = sections.findIndex((s) => s.id === id)
   const to = from + delta
   if (from === -1 || to < 0 || to >= sections.length) return
-  // Hero stoi nad zagieciem z definicji — strona rysuje je poza lista
-  // zwijanych sekcji, wiec przestawianie go nie mialoby odbicia w UI.
-  if (heroIds(DASHBOARD_SECTIONS).has(id)) return
   const [moved] = sections.splice(from, 1)
   sections.splice(to, 0, moved)
   renumber(sections)
@@ -116,16 +120,18 @@ export const useDashboardLayout = create<DashboardLayoutStore>()(
 
       toggleCollapsed: (id) =>
         set((state) => {
-          if (heroIds(DASHBOARD_SECTIONS).has(id)) return
           const section = state.sections.find((s) => s.id === id)
           if (section) section.collapsed = !section.collapsed
         }),
 
       toggleVisible: (id) =>
         set((state) => {
-          if (heroIds(DASHBOARD_SECTIONS).has(id)) return
           const section = state.sections.find((s) => s.id === id)
-          if (section) section.visible = !section.visible
+          if (!section) return
+          // Ostatniej widocznej sekcji nie da sie wylaczyc: pusty Pulpit
+          // nie jest ustawieniem, tylko slepa uliczka.
+          if (section.visible && state.sections.filter((s) => s.visible).length === 1) return
+          section.visible = !section.visible
         }),
 
       moveUp: (id) => set((state) => move(state.sections, id, -1)),
