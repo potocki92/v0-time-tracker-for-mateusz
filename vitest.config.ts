@@ -24,12 +24,24 @@ export default defineConfig({
     projects: [
       {
         resolve: { alias },
+        // Testy jednostkowe siegaja tez po moduly, ktore importuja komponenty
+        // (rejestr sekcji Pulpitu trzyma referencje do `.tsx`), wiec
+        // transformer musi umiec sparsowac JSX takze w projekcie `unit`.
+        oxc: { jsx: { runtime: 'automatic' } },
         test: {
           name: 'unit',
           environment: 'node',
           globals: true,
           include: ['__test__/**/*.test.ts', 'lib/**/__tests__/**/*.test.ts'],
-          exclude: ['**/rls.test.ts', '**/*.rls.test.ts', '**/rls/**', 'node_modules/**'],
+          exclude: [
+            '**/rls.test.ts',
+            '**/*.rls.test.ts',
+            '**/rls/**',
+            'node_modules/**',
+            // Hooki klienckie (store ukladu Pulpitu z persist) potrzebuja
+            // localStorage — ida do projektu `components`, nie do node.
+            '__test__/hooks/**',
+          ],
         },
       },
       {
@@ -41,7 +53,11 @@ export default defineConfig({
           name: 'components',
           environment: 'jsdom',
           globals: true,
-          include: ['components/**/__tests__/**/*.test.tsx'],
+          include: [
+            'components/**/__tests__/**/*.test.tsx',
+            '__test__/**/*.test.tsx',
+            '__test__/hooks/**/*.test.ts',
+          ],
           exclude: ['node_modules/**'],
         },
       },

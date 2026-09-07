@@ -5,12 +5,8 @@ import { ChartErrorBoundary } from '../../errors'
 import { HoursCard } from './HoursCard'
 import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
-function periodShort(label: string): string {
-  return label.split(' ').slice(-1)[0] ?? label
-}
-
 export function HoursSection() {
-  const { realizedAll, periodLabel, metrics } = useDashboardDerived()
+  const { metrics } = useDashboardDerived()
   const { hours } = metrics
 
   return (
@@ -21,11 +17,6 @@ export function HoursSection() {
         targetHours={hours.goal > 0 ? hours.goal : null}
         goalProgress={hours.goalProgress}
         overtime={hours.overtime}
-        periodLabel={periodShort(periodLabel) || 'okres'}
-        // Heatmapa patrzy na CALA historie, nie na zakres: przy zakresie
-        // „biezacy tydzien" siatka 13 tygodni pokazywalaby jeden zapelniony
-        // tydzien i dwanascie pustych, choc dane sa.
-        entries={realizedAll}
         streakDays={metrics.currentStreakDays}
       />
       {hours.planned > 0 && (

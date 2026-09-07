@@ -25,10 +25,6 @@ import { EarningsCardBoundary } from '../../errors'
 import { EarningsCard } from './EarningsCard'
 import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
-function periodShort(label: string): string {
-  return label.split(' ').slice(-1)[0] ?? label
-}
-
 export function EarningsSection() {
   const clients = useDashboardSlice(selectClients)
   const router = useRouter()
@@ -114,7 +110,6 @@ export function EarningsSection() {
           trend={trend}
           sparklineData={sparklineData}
           prevSparklineData={prevSparklineData}
-          periodLabel={periodShort(periodLabel) || 'okres'}
           privacyMode={privacyMode}
           compareMode={compareMode}
           isExporting={isExporting}

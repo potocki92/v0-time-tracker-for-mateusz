@@ -1,6 +1,5 @@
 'use client'
 
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { useMemo, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
@@ -45,12 +44,10 @@ export function WeeklySummarySection() {
     >
       <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <SectionEyebrow>Podsumowanie tygodnia</SectionEyebrow>
-            <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
-              KW {summary.weekNumber}/{summary.weekYear}
-            </span>
-          </div>
+          {/* Tytul sekcji niesie <SectionShell>. */}
+          <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
+            KW {summary.weekNumber}/{summary.weekYear}
+          </span>
           <p className="mt-0.5 truncate text-2xs text-zinc-400">
             dla księgowej · {summary.rangeLabel}
           </p>

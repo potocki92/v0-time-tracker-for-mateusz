@@ -754,6 +754,33 @@
  */
 
 @layer utilities {
+  /*
+   * Rozwijanie sekcji Pulpitu.
+   *
+   * CSS, nie framer-motion: LazyMotion kosztowal na tej trasie 17 kB gzip
+   * (zmierzone: 239 kB -> 222 kB First Load JS) za animacje wysokosci, ktora
+   * Radix i tak opisuje zmienna `--radix-collapsible-content-height`.
+   * Zwiniete sekcje sa ODMONTOWANE, wiec animacja dotyczy tylko rozwijania.
+   *
+   * Wariant „mniej ruchu" nie polega tu na globalnym bezpieczniku wyzej —
+   * <SectionShell> w ogole nie doklada tej klasy, gdy uzytkownik prosil
+   * o mniej ruchu (data-animated="false").
+   */
+  @keyframes collapsible-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+  }
+
+  .collapsible-reveal[data-state='open'] {
+    animation: collapsible-down 180ms ease-out;
+  }
+
   /* Bazowa animacja skeleton — jedna dla całej strony */
   @keyframes skeleton-shimmer {
     0%, 100% {

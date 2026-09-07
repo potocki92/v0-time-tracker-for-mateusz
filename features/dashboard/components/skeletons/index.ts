@@ -1,9 +1,6 @@
 export {
+  CollapsedSectionSkeleton,
   HeaderSkeleton,
+  HeroSkeleton,
   KpiSkeleton,
-  StatsSkeleton,
-  AnalyticsChartSkeleton,
-  ChartSkeleton,
-  HeatmapSkeleton,
-  InvoicesSkeleton,
 } from './SectionSkeletons'

@@ -1,6 +1,5 @@
 'use client'
 
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { ChevronRight, Plus } from 'lucide-react'
 import { formatDayBadge } from '@/lib/format'
 import { toDateKey } from '@/lib/date/format'
@@ -46,8 +45,8 @@ export function UpcomingCard({ items, onAdd }: Props) {
       aria-label="Nadchodzące"
       className="rounded-lg border border-hairline bg-surface-1"
     >
-      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        <SectionEyebrow>Nadchodzące</SectionEyebrow>
+      {/* Tytul sekcji niesie <SectionShell> — karta go nie powtarza. */}
+      <header className="flex items-center justify-end border-b border-hairline px-4 py-3">
         <button
           type="button"
           onClick={onAdd}

@@ -23,7 +23,7 @@ import type {
  */
 
 /** Norma dobowa w godzinach — 1/5 etatu 40 h. Podstawa celu, planu i prognozy. */
-const DAILY_NORM_HOURS = 8
+export const DAILY_NORM_HOURS = 8
 
 const ABSENCE_KIND: Record<string, AbsenceInput['kind']> = {
   vacation: 'vacation',

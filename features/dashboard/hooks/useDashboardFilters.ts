@@ -31,7 +31,9 @@ export function useDashboardFilters() {
     {
       range: parseAsStringLiteral(TIME_RANGES).withDefault('current_month'),
     },
-    { history: 'replace', clearOnDefault: true },
+    // `push`, nie `replace`: zmiana okresu ma byc krokiem w historii, wiec
+    // przycisk wstecz wraca do poprzedniego zakresu zamiast wyrzucac z Pulpitu.
+    { history: 'push', clearOnDefault: true },
   )
 
   const dateRange = useMemo(() => getDateRange(query.range), [query.range])

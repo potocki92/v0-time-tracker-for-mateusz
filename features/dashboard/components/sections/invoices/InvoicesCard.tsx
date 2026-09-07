@@ -1,6 +1,5 @@
 'use client'
 
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
@@ -73,7 +72,7 @@ function shortDue(due: string | null | undefined): string {
   return label === NO_DATA ? '' : `termin ${label}`
 }
 
-export function InvoicesCard({ invoices, periodShort }: Props) {
+export function InvoicesCard({ invoices }: Props) {
   const visible = invoices.slice(0, 5)
   const totals = sumInvoicesByCurrency(invoices)
 
@@ -83,12 +82,10 @@ export function InvoicesCard({ invoices, periodShort }: Props) {
       className="rounded-lg border border-hairline bg-surface-1"
     >
       <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        <div className="flex items-center gap-2">
-          <SectionEyebrow>Faktury</SectionEyebrow>
-          <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
-            {invoices.length} · {periodShort}
-          </span>
-        </div>
+        {/* Tytul niesie <SectionShell>, zakres — zakladki. Zostaje licznik. */}
+        <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
+          {invoices.length}
+        </span>
         <Link
           href="/invoices"
           className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"

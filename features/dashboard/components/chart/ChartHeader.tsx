@@ -1,5 +1,4 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { formatHours, formatMoney, formatNumber, toMinor } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -21,8 +20,8 @@ export function ChartHeader({ trend, totalHours, totalEarnings, avgHours }: Prop
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <SectionEyebrow>Analiza aktywności</SectionEyebrow>
-        <p className="mt-2 text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
+        {/* Tytul niesie <SectionShell>. */}
+        <p className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
           {formatHours(totalHours)}
         </p>
         <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 text-2xs leading-[1.4] tabular-nums text-zinc-400 sm:text-xs">

@@ -29,12 +29,10 @@ export function QuarterlySummaryCard() {
       className="rounded-lg border border-hairline bg-surface-1"
     >
       <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        <div className="flex items-center gap-2">
-          <SectionEyebrow>Kwartały</SectionEyebrow>
-          <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
-            ostatnie 4
-          </span>
-        </div>
+        {/* Tytul niesie <SectionShell>. */}
+        <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
+          ostatnie 4
+        </span>
         <Link
           href="/invoices"
           className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"

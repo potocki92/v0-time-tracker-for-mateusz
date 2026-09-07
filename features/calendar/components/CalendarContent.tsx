@@ -1,7 +1,8 @@
 'use client'
 
 import { PageContainer } from '@/components/common/section/PageContainer'
-import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutGrid, List } from 'lucide-react'
@@ -107,6 +108,8 @@ export function CalendarContent() {
     () => selectedDateEntries.find((entry) => entry.id === selectedEntryId),
     [selectedDateEntries, selectedEntryId],
   )
+
+  useOpenDayFromUrl(dialog.openDay, nav.currentYear, nav.currentMonth)
 
   const mutations = useEntryMutations({ onSuccess: dialog.close })
 
@@ -302,4 +305,29 @@ export function CalendarContent() {
       />
     </div>
   )
+}
+
+/**
+ * Otwiera formularz dnia wskazanego w `?day=YYYY-MM-DD`.
+ *
+ * Wejscie z Pulpitu: akcja glowna sekcji „Dzisiaj" ma wladowac uzytkownika
+ * wprost w formularz, a nie w siatke miesiaca, w ktorej musi jeszcze trafic
+ * kciukiem w dzisiejsza komorke. Otwieramy RAZ na parametr — bez straznika
+ * dialog wracalby po kazdym zamknieciu.
+ */
+function useOpenDayFromUrl(
+  openDay: (day: number) => void,
+  currentYear: number,
+  currentMonth: number,
+) {
+  const requested = useSearchParams().get('day')
+  const handled = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!requested || handled.current === requested) return
+    const [year, month, day] = requested.split('-').map(Number)
+    if (year !== currentYear || month - 1 !== currentMonth || !day) return
+    handled.current = requested
+    openDay(day)
+  }, [requested, currentYear, currentMonth, openDay])
 }

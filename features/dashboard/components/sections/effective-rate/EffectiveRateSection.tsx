@@ -15,11 +15,6 @@ const FALLBACK_COLORS = [
   '#ec4899',
 ]
 
-function periodShort(label: string): string {
-  const words = label.split(' ')
-  return (words[words.length - 1] ?? label).slice(0, 8)
-}
-
 /**
  * Stawka efektywna = przychód okna / rozliczalne godziny okna.
  *
@@ -30,7 +25,7 @@ function periodShort(label: string): string {
  */
 export function EffectiveRateSection() {
   const clients = useDashboardSlice(selectClients)
-  const { periodLabel, metrics } = useDashboardDerived()
+  const { metrics } = useDashboardDerived()
 
   const rates = useMemo<ClientRate[]>(() => {
     const clientMap = new Map(clients.map((c) => [c.id, c]))
@@ -60,7 +55,6 @@ export function EffectiveRateSection() {
       currency={metrics.earnings.currency}
       clientsCount={rates.length}
       rates={rates}
-      periodShort={periodShort(periodLabel)}
     />
   )
 }

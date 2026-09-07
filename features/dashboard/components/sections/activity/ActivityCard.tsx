@@ -1,6 +1,5 @@
 'use client'
 
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
@@ -84,8 +83,8 @@ export function ActivityCard({
       aria-label="Aktywność"
       className="rounded-lg border border-hairline bg-surface-1 p-4"
     >
-      <header className="flex items-center justify-between">
-        <SectionEyebrow>Aktywność</SectionEyebrow>
+      {/* Tytul sekcji niesie <SectionShell> — karta go nie powtarza. */}
+      <header className="flex items-center justify-end">
         {/* Akcja sekcji idzie przez <Button>, a nie przez <a> pomalowany na
             przycisk — patrz docs/ui-audit.md §1. */}
         <Button asChild variant="outline" size="sm" className="h-7 text-2xs">
