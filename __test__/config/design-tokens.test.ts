@@ -134,12 +134,141 @@ describe('design tokens — skala powierzchni panelu', () => {
   })
 })
 
+/**
+ * Akcenty panelu — drabinka `--brand-*` (idzie za motywem) i piec rodzin
+ * semantycznych (stale we wszystkich motywach). Ksztalt drabinki `brand` jest
+ * wspolny dla wszystkich palet, wiec kontrast liczymy raz na motyw,
+ * podstawiajac jego `--brand-h` / `--brand-c` do formuly z CSS.
+ */
+describe('design tokens — akcenty panelu', () => {
+  const accentBlock =
+    css.match(/\n:root,\s*\[data-theme\]\s*\{([^}]*--brand-100:[^}]*)\}/)?.[1] ?? ''
+
+  /** `oklch(0.845 calc(var(--brand-c) * 0.84) var(--brand-h))` -> gotowy kolor. */
+  const resolve = (expr: string, vars: Record<string, string>) =>
+    expr
+      .replace(/var\(--([a-z0-9-]+)\)/g, (_, name) => vars[name] ?? '0')
+      .replace(/calc\(([\d.]+)\s*\*\s*([\d.]+)\)/g, (_, a, b) => String(Number(a) * Number(b)))
+
+  const rampOf = (prefix: string) =>
+    [...accentBlock.matchAll(new RegExp(`--${prefix}-(\\d{3}):\\s*([^;]+);`, 'g'))].map(
+      (m) => [`${prefix}-${m[1]}`, m[2].trim()] as const,
+    )
+
+  it('drabinka stoi na [data-theme], nie tylko na :root', () => {
+    // Podstawienie var() wewnatrz wartosci zmiennej dzieje sie na elemencie
+    // deklaracji. Na samym :root kazdy zagniezdzony podglad motywu (kafelek
+    // w ustawieniach) dziedziczylby akcent z <html> zamiast wlasnego.
+    expect(accentBlock, 'blok akcentow nie jest zakotwiczony w [data-theme]').not.toEqual('')
+  })
+
+  it('drabinka brand ma komplet stopni', () => {
+    expect(rampOf('brand').map(([step]) => step)).toEqual([
+      'brand-100',
+      'brand-200',
+      'brand-300',
+      'brand-400',
+      'brand-500',
+      'brand-600',
+      'brand-700',
+    ])
+  })
+
+  it('kazdy motyw podaje hue i chrome akcentu', () => {
+    for (const [name, vars] of Object.entries(themes)) {
+      if (name.endsWith('-dark')) continue // dziedziczy po bloku light
+      expect(vars['brand-h'], `${name} nie definiuje --brand-h`).toBeDefined()
+      expect(vars['brand-c'], `${name} nie definiuje --brand-c`).toBeDefined()
+    }
+  })
+
+  for (const [name, vars] of Object.entries(themes).sort()) {
+    if (name.endsWith('-dark')) continue
+    const brand = Object.fromEntries(
+      rampOf('brand').map(([step, expr]) => [step, resolve(expr, vars)]),
+    )
+
+    // Panel jest ciemny w obu schematach, wiec akcent tekstowy musi udzwignac
+    // najjasniejszy stopien skali powierzchni — `--surface-3`.
+    it(`${name}: akcent tekstowy na powierzchni panelu`, () => {
+      for (const step of ['brand-300', 'brand-400'] as const) {
+        expect(
+          Number(contrast(brand[step], vars['surface-3']).toFixed(2)),
+          `--${step} na --surface-3`,
+        ).toBeGreaterThanOrEqual(4.5)
+      }
+    })
+
+    it(`${name}: etykieta na pelnym wypelnieniu akcentu`, () => {
+      const foreground = accentBlock.match(/--brand-foreground:\s*([^;]+);/)![1].trim()
+      expect(
+        Number(contrast(foreground, brand['brand-500']).toFixed(2)),
+        '--brand-foreground na --brand-500',
+      ).toBeGreaterThanOrEqual(4.5)
+    })
+  }
+
+  const SEMANTIC = ['positive', 'warning', 'danger', 'info', 'special'] as const
+
+  it('rodziny semantyczne maja stopnie 300..700', () => {
+    for (const family of SEMANTIC) {
+      expect(rampOf(family).map(([step]) => step), `niepelna drabinka ${family}`).toEqual([
+        `${family}-300`,
+        `${family}-400`,
+        `${family}-500`,
+        `${family}-600`,
+        `${family}-700`,
+      ])
+    }
+  })
+
+  it('stopien 300 rodzin semantycznych jest czytelny na powierzchni panelu', () => {
+    // Wszystkie motywy dziela ten sam `--surface-3`? Nie — sprawdzamy kazdy.
+    for (const [name, vars] of Object.entries(themes)) {
+      for (const family of SEMANTIC) {
+        const value = rampOf(family).find(([step]) => step === `${family}-300`)![1]
+        expect(
+          Number(contrast(value, vars['surface-3']).toFixed(2)),
+          `${name}: --${family}-300 na --surface-3`,
+        ).toBeGreaterThanOrEqual(4.5)
+      }
+    }
+  })
+
+  it('rodziny semantyczne sa rozroznialne miedzy soba', () => {
+    // Bez tego „oplacona" i „zalegla" moglyby zjechac do tego samego odcienia.
+    const hue = (family: string) =>
+      Number(
+        rampOf(family)
+          .find(([step]) => step === `${family}-500`)![1]
+          .match(/oklch\([\d.]+\s+[\d.]+\s+([\d.]+)\)/)![1],
+      )
+    const hues = SEMANTIC.map((f) => [f, hue(f)] as const).sort((a, b) => a[1] - b[1])
+    for (let i = 1; i < hues.length; i++) {
+      expect(
+        hues[i][1] - hues[i - 1][1],
+        `${hues[i - 1][0]} i ${hues[i][0]} maja zbyt bliskie hue`,
+      ).toBeGreaterThan(25)
+    }
+  })
+})
+
 describe('design tokens — the scale is actually used', () => {
   function walk(dir: string, acc: string[] = []): string[] {
     for (const entry of readdirSync(dir)) {
       const full = join(dir, entry)
       if (statSync(full).isDirectory()) walk(full, acc)
       else if (/\.tsx$/.test(entry)) acc.push(relative(ROOT, full))
+    }
+    return acc
+  }
+
+  /** Jak `walk`, ale bierze rowniez `.ts` — slowniki klas mieszkaja w `*.constants.ts`. */
+  function walkAll(dir: string, acc: string[] = []): string[] {
+    for (const entry of readdirSync(dir)) {
+      const full = join(dir, entry)
+      if (statSync(full).isDirectory()) walkAll(full, acc)
+      else if (/\.tsx?$/.test(entry)) acc.push(relative(ROOT, full))
     }
     return acc
   }
@@ -190,6 +319,29 @@ describe('design tokens — the scale is actually used', () => {
     expect(
       offenders,
       `literal hex omija motyw — uzyj bg-surface-0..3 / border-hairline / border-hairline-strong:\n${offenders.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('nie siega po chromatyczna palete Tailwinda', () => {
+    // Sedno motywow: `bg-emerald-500` wyglada tak samo w kazdej z pieciu palet,
+    // wiec ikona, przycisk i pasek postepu zostawaly zielone po przelaczeniu
+    // motywu na Sunset czy Violet. Akcenty ida przez `brand-*` (za motywem)
+    // albo przez `positive|warning|danger|info|special-*` (znaczenie).
+    // Neutralne (zinc / white / black / gray) sa poza zakresem — panel jest
+    // ciemny w obu schematach, wiec nie zaleza od palety.
+    const PALETTE =
+      /\b(?:text|bg|border|border-[lrtbxy]|ring|from|to|via|fill|stroke|shadow|divide|outline|decoration|accent|caret|placeholder)-(?:emerald|green|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|red|orange|amber|yellow|lime)-\d{2,3}\b/g
+    const modules = ['app', 'features', 'components', 'lib'].flatMap((d) =>
+      walkAll(resolve(ROOT, d)),
+    )
+    const offenders: string[] = []
+    for (const file of modules) {
+      const hits = readFileSync(resolve(ROOT, file), 'utf8').match(PALETTE)
+      if (hits) offenders.push(`${file}  (${[...new Set(hits)].join(', ')})`)
+    }
+    expect(
+      offenders,
+      `paleta Tailwinda nie zna motywu — uzyj brand-* / positive-* / warning-* / danger-* / info-* / special-*:\n${offenders.join('\n')}`,
     ).toEqual([])
   })
 

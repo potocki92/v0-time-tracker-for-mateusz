@@ -4,7 +4,7 @@ import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 
 type StatTileTone = 'neutral' | 'success' | 'warning' | 'action'
-type StatTileAccent = 'emerald' | 'amber' | 'blue' | 'violet'
+type StatTileAccent = 'brand' | 'warning' | 'info' | 'special'
 
 type StatTileProps = {
   label: string
@@ -25,18 +25,18 @@ type StatTileProps = {
 
 const TONE_BADGE: Record<StatTileTone, string> = {
   neutral: 'bg-zinc-500/10 text-zinc-300 ring-1 ring-zinc-500/30',
-  success: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
-  warning: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
-  action: 'bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/30',
+  success: 'bg-positive-500/15 text-positive-300 ring-1 ring-positive-500/30',
+  warning: 'bg-warning-500/15 text-warning-300 ring-1 ring-warning-500/30',
+  action: 'bg-brand-500/10 text-brand-300 ring-1 ring-brand-500/30',
 }
 
 // Sam pasek niesie akcent. Wewnętrzne poświaty na obramowaniu (po jednej na
 // każdy kafelek, w czterech różnych kolorach) dokładały się do wizualnego szumu.
 const ACCENT_BAR: Record<StatTileAccent, string> = {
-  emerald: 'bg-emerald-500',
-  amber: 'bg-amber-500',
-  blue: 'bg-blue-500',
-  violet: 'bg-violet-500',
+  brand: 'bg-brand-500',
+  warning: 'bg-warning-500',
+  info: 'bg-info-500',
+  special: 'bg-special-500',
 }
 
 /**
@@ -53,7 +53,7 @@ export function StatTile({
   badge,
   tone = 'neutral',
   progress,
-  accent = 'emerald',
+  accent = 'brand',
   compact,
 }: StatTileProps) {
   return (

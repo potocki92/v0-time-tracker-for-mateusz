@@ -22,9 +22,9 @@ export function BudgetRow({
 }: BudgetRowProps) {
   const tone =
     utilization >= BUDGET_OVERSPEND_THRESHOLD
-      ? 'text-rose-300'
+      ? 'text-danger-300'
       : utilization >= BUDGET_WARNING_THRESHOLD
-        ? 'text-amber-300'
+        ? 'text-warning-300'
         : 'text-zinc-300'
 
   return (

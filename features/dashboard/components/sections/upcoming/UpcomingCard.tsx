@@ -20,11 +20,11 @@ type Props = {
 }
 
 const CATEGORY_PILL: Record<UpcomingCategory, string> = {
-  vacation: 'bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30',
-  billing: 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30',
+  vacation: 'bg-special-500/15 text-special-300 ring-1 ring-special-500/30',
+  billing: 'bg-positive-500/15 text-positive-400 ring-1 ring-positive-500/30',
   project: 'bg-zinc-500/15 text-zinc-300 ring-1 ring-zinc-500/30',
-  finance: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
-  event: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30',
+  finance: 'bg-warning-500/15 text-warning-300 ring-1 ring-warning-500/30',
+  event: 'bg-info-500/15 text-info-300 ring-1 ring-info-500/30',
 }
 
 const CATEGORY_LABEL: Record<UpcomingCategory, string> = {

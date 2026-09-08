@@ -41,11 +41,11 @@ export function ReportsExportMenu({ onExportCsv, onExportJson }: Props) {
         <DropdownMenuLabel className={LINEAR.eyebrow}>Pobierz dane</DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-hairline" />
         <DropdownMenuItem onSelect={onExportCsv} className="gap-2">
-          <FileSpreadsheet aria-hidden className="size-4 text-emerald-400" />
+          <FileSpreadsheet aria-hidden className="size-4 text-brand-400" />
           CSV
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onExportJson} className="gap-2">
-          <FileJson aria-hidden className="size-4 text-sky-400" />
+          <FileJson aria-hidden className="size-4 text-info-400" />
           JSON
         </DropdownMenuItem>
       </DropdownMenuContent>

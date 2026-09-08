@@ -87,7 +87,7 @@ export function DayCell({
           ? `border-l-[3px] ${cfg?.border} border-y border-r border-hairline ${cfg?.bg}`
           : 'border-hairline hover:border-hairline-strong hover:bg-surface-2',
         isToday &&
-          'ring-1 ring-inset ring-emerald-500/60 before:absolute before:inset-0 before:-z-10 before:bg-emerald-500/[0.07] before:pointer-events-none',
+          'ring-1 ring-inset ring-brand-500/60 before:absolute before:inset-0 before:-z-10 before:bg-brand-500/[0.07] before:pointer-events-none',
         isWeekend && !entry && 'bg-surface-2',
         'cursor-pointer hover:shadow-sm hover:-translate-y-px active:scale-[0.97]',
         isFuture && 'opacity-80',
@@ -96,7 +96,7 @@ export function DayCell({
       {tripMarker && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 bg-emerald-500/15 dark:bg-emerald-500/[0.10]"
+          className="pointer-events-none absolute inset-0 -z-10 bg-brand-500/15 dark:bg-brand-500/[0.10]"
         />
       )}
       <div className="flex items-center justify-between">
@@ -104,7 +104,7 @@ export function DayCell({
           className={cn(
             'text-2xs font-semibold leading-none transition-colors sm:text-xs',
             isToday
-              ? 'flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-2xs text-black shadow-sm shadow-emerald-500/40'
+              ? 'flex h-5 w-5 items-center justify-center rounded-full bg-brand-500 text-2xs text-brand-foreground shadow-sm shadow-brand-500/40'
               : 'text-zinc-400 group-hover:text-white',
           )}
         >

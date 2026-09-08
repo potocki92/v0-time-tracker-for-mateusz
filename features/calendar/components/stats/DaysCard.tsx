@@ -20,11 +20,11 @@ export function DaysCard({ workDays, freeDays }: Props) {
 
       <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-3 text-2xs">
         <span className="flex items-center gap-1 text-zinc-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
           {workDays} pracy
         </span>
         <span className="flex items-center gap-1 text-zinc-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+          <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
           {freeDays} wolnych
         </span>
       </div>

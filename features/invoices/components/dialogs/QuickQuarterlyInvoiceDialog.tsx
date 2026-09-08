@@ -252,7 +252,7 @@ export function QuickQuarterlyInvoiceDialog({
                             {q.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(q.hours)}
                           </p>
                           {q.invoiced ? (
-                            <p className="mt-0.5 text-xs font-medium text-emerald-400">
+                            <p className="mt-0.5 text-xs font-medium text-brand-400">
                               Faktura już wystawiona za ten kwartał.
                             </p>
                           ) : null}

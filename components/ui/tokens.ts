@@ -16,9 +16,9 @@ export const LINEAR = {
   surfaceElevated: 'bg-surface-3',
   surfaceHover: 'hover:bg-surface-3',
   rowSurface: 'bg-surface-3',
-  track: 'bg-[#26262c]',
+  track: 'bg-track',
   /** Szyna przy krawędzi karty — neutralna, akcent zarezerwowany dla aktywnych. */
-  rail: 'bg-[#44444f]',
+  rail: 'bg-rail',
   border: 'border-hairline-strong',
   borderInset: 'border-hairline-strong',
   divider: 'divide-hairline-strong',
@@ -48,10 +48,10 @@ export const SURFACE = {
 /**
  * Skala intensywności heatmapy godzin (karta „Godziny" na Pulpicie).
  *
- * Pięć stopni na akcencie motywu zamiast zahardkodowanego emeralda: panel ma
+ * Pięć stopni na akcencie motywu zamiast zahardkodowanej zieleni: panel ma
  * pięć palet (`--chart-1` w `app/globals.css`), a poprzednia wersja karty
- * malowała się `bg-emerald-*` i `bg-[#101410]`, więc na motywie pomarańczowym
- * czy fioletowym heatmapa była jedynym zielonym elementem ekranu.
+ * malowała się stałym odcieniem, więc na motywie pomarańczowym czy fioletowym
+ * heatmapa była jedynym zielonym elementem ekranu.
  *
  * Wartości idą w `style`, nie w klasę: `color-mix` z zmienną CSS w arbitralnej
  * klasie Tailwinda jest odporny na literówki dopiero po zbudowaniu, a tu

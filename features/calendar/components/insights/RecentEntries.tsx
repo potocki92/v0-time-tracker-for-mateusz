@@ -28,8 +28,8 @@ export function RecentEntries({ entries, onViewAll }: Props) {
               size="sm"
               onClick={onViewAll}
               className={cn(
-                'group h-auto gap-1 rounded-md px-2 py-1 text-2xs font-medium text-emerald-400',
-                'hover:bg-emerald-500/10 hover:text-emerald-400 focus-visible:bg-emerald-500/10',
+                'group h-auto gap-1 rounded-md px-2 py-1 text-2xs font-medium text-brand-400',
+                'hover:bg-brand-500/10 hover:text-brand-400 focus-visible:bg-brand-500/10',
               )}
             >
               Zobacz wszystkie

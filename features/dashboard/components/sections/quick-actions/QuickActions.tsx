@@ -49,20 +49,20 @@ export function QuickActions() {
             href={href}
             className={`group relative flex items-start gap-3 overflow-hidden rounded-lg border p-3 transition ${
               highlight
-                ? 'border-hairline bg-[#0e120e] hover:border-emerald-500/40 hover:bg-emerald-500/[0.08]'
+                ? 'border-hairline bg-surface-accent hover:border-brand-500/40 hover:bg-brand-500/[0.08]'
                 : 'border-hairline bg-surface-2 hover:border-hairline-strong hover:bg-surface-3'
             }`}
           >
             {highlight && (
               <span
                 aria-hidden
-                className="pointer-events-none absolute left-0 top-0 h-full w-[2px] bg-emerald-500 shadow-[0_0_10px_color-mix(in_oklab,var(--primary)_60%,transparent)]"
+                className="pointer-events-none absolute left-0 top-0 h-full w-[2px] bg-brand-500 shadow-[0_0_10px_color-mix(in_oklab,var(--brand-500)_60%,transparent)]"
               />
             )}
             <span
               className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${
                 highlight
-                  ? 'text-emerald-400'
+                  ? 'text-brand-400'
                   : 'text-zinc-300'
               }`}
             >

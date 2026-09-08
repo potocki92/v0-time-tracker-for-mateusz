@@ -39,7 +39,11 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${accent}99, transparent)` }}
+        style={{
+          // color-mix, nie sufiks `99`: `accent` jest teraz zmienną CSS motywu,
+          // a do var() nie da się dokleić kanału alfa jak do heksa.
+          background: `linear-gradient(90deg, transparent, color-mix(in oklab, ${accent} 60%, transparent), transparent)`,
+        }}
       />
 
       <header className={cn('flex items-start justify-between gap-3 border-b px-4 py-3 sm:px-5', LINEAR.borderInset)}>
@@ -81,7 +85,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
               'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold text-white transition',
               LINEAR.border,
               LINEAR.surfaceElevated,
-              'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300',
+              'hover:border-brand-500/40 hover:bg-brand-500/10 hover:text-brand-300',
             )}
           >
             <Pencil className="h-3.5 w-3.5" aria-hidden />
@@ -185,14 +189,14 @@ function Metric({
         className={cn(
           'mt-0.5 text-base font-semibold tabular-nums tracking-tight text-white sm:text-lg',
           empty && 'text-zinc-400',
-          warning && 'text-amber-300',
-          danger && 'text-rose-300',
+          warning && 'text-warning-300',
+          danger && 'text-danger-300',
         )}
       >
         {value}
       </p>
       {meta && (
-        <p className={cn('mt-0.5 text-2xs text-zinc-400', warning && 'text-amber-300/80')}>
+        <p className={cn('mt-0.5 text-2xs text-zinc-400', warning && 'text-warning-300/80')}>
           {meta}
         </p>
       )}

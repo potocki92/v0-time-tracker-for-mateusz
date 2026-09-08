@@ -60,15 +60,15 @@ export const PROJECT_STATUS_PILL: Record<
   },
   in_progress: {
     label: PROJECT_STATUS_LABELS.in_progress,
-    className: 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40',
+    className: 'bg-positive-500/20 text-positive-300 ring-1 ring-positive-500/40',
   },
   completed: {
     label: PROJECT_STATUS_LABELS.completed,
-    className: 'bg-blue-500/10 text-blue-300/80 ring-1 ring-blue-500/20',
+    className: 'bg-info-500/10 text-info-300/80 ring-1 ring-info-500/20',
   },
   on_hold: {
     label: PROJECT_STATUS_LABELS.on_hold,
-    className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
+    className: 'bg-warning-500/15 text-warning-300 ring-1 ring-warning-500/30',
   },
 }
 
@@ -82,11 +82,11 @@ export const PROJECT_PRIORITY_PILL: Record<
   },
   medium: {
     label: PRIORITY_LABELS.medium,
-    className: 'bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-500/30',
+    className: 'bg-special-500/15 text-special-300 ring-1 ring-special-500/30',
   },
   high: {
     label: PRIORITY_LABELS.high,
-    className: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30',
+    className: 'bg-danger-500/15 text-danger-300 ring-1 ring-danger-500/30',
   },
 }
 
@@ -101,11 +101,16 @@ export const PROJECT_STATUS_GROUP_LABELS: Record<ProjectStatus, string> = {
   on_hold: 'Wstrzymane',
 }
 
+/**
+ * Wartości CSS, nie klasy — trafiają do `style.backgroundColor` pasków postępu.
+ * Zmienne, nie heksy: heks nie zna motywu ani schematu, więc pasek był jedynym
+ * elementem karty, który nie reagował na zmianę wyglądu aplikacji.
+ */
 export const PROJECT_STATUS_ACCENT: Record<ProjectStatus, string> = {
-  planned: '#71717a',
-  in_progress: '#10b981',
-  completed: '#3b82f6',
-  on_hold: '#f59e0b',
+  planned: 'var(--rail)',
+  in_progress: 'var(--positive-500)',
+  completed: 'var(--info-500)',
+  on_hold: 'var(--warning-500)',
 }
 
 export const FEATURED_DEFAULT_TARGET_HOURS = 580
@@ -129,8 +134,8 @@ export function progressAccentOf(
   budgetUtilization: number,
 ): string {
   if (status === 'in_progress') {
-    if (budgetUtilization >= BUDGET_OVERSPEND_THRESHOLD) return '#f43f5e'
-    if (isAtRisk) return '#f59e0b'
+    if (budgetUtilization >= BUDGET_OVERSPEND_THRESHOLD) return 'var(--danger-500)'
+    if (isAtRisk) return 'var(--warning-500)'
   }
   return PROJECT_STATUS_ACCENT[status]
 }

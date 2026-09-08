@@ -35,16 +35,15 @@ type Props = {
 }
 
 /**
- * Tony feedu zachowują semantykę (success/info/warning/neutral), ale paleta
- * jest spójna z resztą "linear" dashboardu — sukces = neonowa zieleń (emerald),
- * informacja = sky, ostrzeżenie = amber, neutralny = zinc. Bez zmian względem
- * wcześniejszego pomysłu, jednak zamiast pełnej kropki dajemy cienki
- * pulsujący ring 2 px — bardziej elegancko i lepiej widać tone.
+ * Tony feedu niosą znaczenie (success/info/warning/neutral), więc idą przez
+ * semantyczne akcenty panelu, a nie przez akcent motywu — inaczej w motywie
+ * Sunset „sukces" i „ostrzeżenie" byłyby tym samym pomarańczem. Zamiast pełnej
+ * kropki dajemy cienki ring 2 px — lepiej widać tone.
  */
 const TONE: Record<ActivityItem['tone'], string> = {
-  success: 'bg-emerald-400 shadow-[0_0_0_2px_rgba(16,185,129,0.18)]',
-  info: 'bg-sky-400 shadow-[0_0_0_2px_rgba(56,189,248,0.18)]',
-  warning: 'bg-amber-400 shadow-[0_0_0_2px_rgba(251,191,36,0.18)]',
+  success: 'bg-positive-400 shadow-[0_0_0_2px_color-mix(in_oklab,var(--positive-400)_18%,transparent)]',
+  info: 'bg-info-400 shadow-[0_0_0_2px_color-mix(in_oklab,var(--info-400)_18%,transparent)]',
+  warning: 'bg-warning-400 shadow-[0_0_0_2px_color-mix(in_oklab,var(--warning-400)_18%,transparent)]',
   neutral: 'bg-zinc-500',
 }
 
@@ -103,7 +102,7 @@ export function ActivityCard({
                 className={cn(
                   'flex h-6 w-6 items-center justify-center rounded-md',
                   accent
-                    ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20'
+                    ? 'bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/20'
                     : 'bg-surface-3 text-zinc-400 ring-1 ring-hairline',
                 )}
               >

@@ -14,10 +14,10 @@ interface InvoiceARAgingCardProps {
 }
 
 const SEGMENTS = [
-  { key: 'current' as const, color: 'bg-emerald-500', dot: 'bg-emerald-400', label: 'BIEŻĄCE' },
-  { key: 'd1to15' as const, color: 'bg-lime-400', dot: 'bg-lime-300', label: '1–15 D' },
-  { key: 'd16to30' as const, color: 'bg-amber-400', dot: 'bg-amber-300', label: '16–30 D' },
-  { key: 'd30plus' as const, color: 'bg-red-500', dot: 'bg-red-400', label: '30+ D' },
+  { key: 'current' as const, color: 'bg-positive-500', dot: 'bg-positive-400', label: 'BIEŻĄCE' },
+  { key: 'd1to15' as const, color: 'bg-warning-300', dot: 'bg-warning-300', label: '1–15 D' },
+  { key: 'd16to30' as const, color: 'bg-warning-500', dot: 'bg-warning-400', label: '16–30 D' },
+  { key: 'd30plus' as const, color: 'bg-danger-500', dot: 'bg-danger-400', label: '30+ D' },
 ] as const
 
 function pluralFaktur(n: number): string {

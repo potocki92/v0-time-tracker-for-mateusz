@@ -22,7 +22,7 @@ export function RevenueChart({ data }: { data: MonthlyRevenuePoint[] }) {
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="month" fontSize={12} />
               <YAxis tickFormatter={formatAxis} fontSize={12} width={50} />
               <Tooltip
@@ -30,9 +30,12 @@ export function RevenueChart({ data }: { data: MonthlyRevenuePoint[] }) {
                 labelClassName="font-medium"
               />
               <Legend />
-              <Bar dataKey="issued_pln" name="Wystawione" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="paid_pln" name="Opłacone" fill="#10b981" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="overdue_pln" name="Zaległe" fill="#ef4444" radius={[4, 4, 0, 0]} />
+              {/* Serie idą tymi samymi tokenami co pigułki statusów faktur —
+                  wystawiona / opłacona / zaległa czytają się tak samo na liście
+                  i na wykresie. */}
+              <Bar dataKey="issued_pln" name="Wystawione" fill="var(--info-500)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="paid_pln" name="Opłacone" fill="var(--positive-500)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="overdue_pln" name="Zaległe" fill="var(--danger-500)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

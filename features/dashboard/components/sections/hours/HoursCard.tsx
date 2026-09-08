@@ -59,7 +59,7 @@ export function HoursCard({
               className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-2 py-0.5 text-2xs font-medium text-zinc-300 ring-1 ring-hairline"
               title="Dni robocze z rzędu z wpisem"
             >
-              <Flame className="h-3 w-3 text-amber-400" aria-hidden />
+              <Flame className="h-3 w-3 text-warning-400" aria-hidden />
               Seria {formatCount(streakDays, ['dzień', 'dni', 'dni'])}
             </span>
           )}

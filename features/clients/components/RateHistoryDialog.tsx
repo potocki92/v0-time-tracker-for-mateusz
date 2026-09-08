@@ -91,9 +91,9 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
             {isLoading ? (
               <p className="text-sm text-muted-foreground">Ładowanie historii...</p>
             ) : isError ? (
-              <p className="rounded-md border border-dashed border-amber-300 bg-amber-50 p-3 text-xs text-amber-800 dark:bg-amber-950/30">
+              <p className="rounded-md border border-dashed border-warning-500/40 bg-warning-500/10 p-3 text-xs text-warning-700 dark:text-warning-300">
                 Historia niedostępna. Uruchom migrację
-                <code className="mx-1 rounded bg-amber-100 px-1 dark:bg-amber-900">
+                <code className="mx-1 rounded bg-warning-500/15 px-1">
                   supabase/migrations (client_rates)
                 </code>
                 żeby włączyć śledzenie zmian stawek.

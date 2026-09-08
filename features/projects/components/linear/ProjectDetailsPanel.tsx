@@ -143,7 +143,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
           'mt-4 h-12 w-full rounded-xl text-xs font-semibold text-white',
           LINEAR.border,
           LINEAR.surfaceElevated,
-          'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300',
+          'hover:border-brand-500/40 hover:bg-brand-500/10 hover:text-brand-300',
         )}
       >
         <Pencil className="h-4 w-4" aria-hidden />
@@ -153,7 +153,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       <Button
         variant="ghost"
         onClick={onDelete}
-        className="mt-2 h-10 w-full rounded-xl border border-transparent text-xs font-medium text-zinc-400 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+        className="mt-2 h-10 w-full rounded-xl border border-transparent text-xs font-medium text-zinc-400 hover:border-danger-500/30 hover:bg-danger-500/10 hover:text-danger-300"
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden />
         Usuń projekt
@@ -177,7 +177,7 @@ function DetailField({
       <p
         className={cn(
           'mt-1.5 truncate text-xs font-medium text-zinc-100',
-          danger && 'text-rose-300',
+          danger && 'text-danger-300',
         )}
       >
         {value}
@@ -204,7 +204,7 @@ function Row({
         className={cn(
           'tabular-nums text-zinc-200',
           mute && 'text-zinc-400',
-          danger && !mute && 'text-rose-300',
+          danger && !mute && 'text-danger-300',
         )}
       >
         {value}

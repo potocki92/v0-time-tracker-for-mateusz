@@ -278,7 +278,7 @@ function FilterChipsRow<T extends string>({
               className={cn(
                 'min-h-9 shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
                 active
-                  ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
+                  ? 'border-brand-500/40 bg-brand-500/15 text-brand-300'
                   : 'border-hairline-strong bg-surface-3 text-zinc-400 hover:bg-surface-3 hover:text-zinc-200',
               )}
             >

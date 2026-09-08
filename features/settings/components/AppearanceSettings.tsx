@@ -22,46 +22,45 @@ const MODE_OPTIONS: readonly ModeOption[] = [
   { id: 'system', label: 'Systemowy', icon: Monitor },
 ] as const
 
+/**
+ * Trzy kropki podglądu: tło, akcent motywu i akcent wypełnienia — dokładnie te
+ * tokeny, które maluje panel.
+ */
+function SwatchDots() {
+  return (
+    <>
+      <span className="h-3 w-3 rounded-full bg-primary shadow-sm" />
+      <span className="h-3 w-3 rounded-full bg-brand-500 shadow-sm" />
+      <span className="h-3 w-3 rounded-full bg-chart-3 shadow-sm" />
+    </>
+  )
+}
+
 function ThemeSwatch({ theme }: { theme: ColorTheme }) {
-  // Podgląd: mini-karta z 3 akcentami nad tłem. Light i dark tło widoczne bok w bok.
+  /**
+   * Podgląd renderuje się ŻYWYMI tokenami: `data-theme` zawęża paletę do
+   * danego motywu, a `dark` na prawej połówce dobiera jego wariant ciemny —
+   * selektory z `app/globals.css` są zwykłymi selektorami atrybutu i klasy,
+   * więc działają na dowolnym elemencie, nie tylko na <html>. Oba atrybuty
+   * muszą stać na TYM SAMYM węźle, bo blok ciemny to `.dark[data-theme='…']`.
+   *
+   * Wcześniej kolory podglądu były drugą kopią palety (`preview` w
+   * `color-themes.ts`) i rozjeżdżały się z tym, co widać po kliknięciu.
+   */
   return (
     <div className="relative overflow-hidden rounded-lg border bg-card">
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-2" aria-hidden="true">
         <div
-          className="flex items-center justify-center gap-1.5 p-3"
-          style={{ background: theme.preview.background }}
-          aria-hidden="true"
+          data-theme={theme.id}
+          className="flex items-center justify-center gap-1.5 bg-background p-3"
         >
-          <span
-            className="h-3 w-3 rounded-full shadow-sm"
-            style={{ background: theme.preview.primary }}
-          />
-          <span
-            className="h-3 w-3 rounded-full shadow-sm"
-            style={{ background: theme.preview.accent }}
-          />
-          <span
-            className="h-3 w-3 rounded-full shadow-sm"
-            style={{ background: theme.preview.tertiary }}
-          />
+          <SwatchDots />
         </div>
         <div
-          className="flex items-center justify-center gap-1.5 p-3"
-          style={{ background: theme.preview.backgroundDark }}
-          aria-hidden="true"
+          data-theme={theme.id}
+          className="dark flex items-center justify-center gap-1.5 bg-background p-3"
         >
-          <span
-            className="h-3 w-3 rounded-full"
-            style={{ background: theme.preview.primary }}
-          />
-          <span
-            className="h-3 w-3 rounded-full"
-            style={{ background: theme.preview.accent }}
-          />
-          <span
-            className="h-3 w-3 rounded-full"
-            style={{ background: theme.preview.tertiary }}
-          />
+          <SwatchDots />
         </div>
       </div>
     </div>

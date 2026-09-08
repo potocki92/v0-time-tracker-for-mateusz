@@ -12,11 +12,11 @@ interface KpiCardProps {
 function KpiCard({ title, value, footnote, tone = 'default' }: KpiCardProps) {
   const toneClass =
     tone === 'success'
-      ? 'text-emerald-600'
+      ? 'text-positive-600'
       : tone === 'warning'
-        ? 'text-amber-600'
+        ? 'text-warning-600'
         : tone === 'danger'
-          ? 'text-red-600'
+          ? 'text-danger-600'
           : ''
 
   return (

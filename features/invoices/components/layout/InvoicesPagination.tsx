@@ -47,7 +47,7 @@ export function InvoicesPagination({
           <select
             value={pageSize}
             onChange={(event) => onPageSizeChange(Number(event.target.value))}
-            className="h-8 rounded-md border border-hairline bg-surface-2 px-2 text-xs text-zinc-200 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="h-8 rounded-md border border-hairline bg-surface-2 px-2 text-xs text-zinc-200 focus:border-brand-500/40 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           >
             {PAGE_SIZE_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -66,7 +66,7 @@ export function InvoicesPagination({
           aria-label="Poprzednia strona"
           className={cn(
             'inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition',
-            'hover:border-emerald-500/40 hover:text-emerald-300',
+            'hover:border-brand-500/40 hover:text-brand-300',
             'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-hairline disabled:hover:text-zinc-300',
           )}
         >
@@ -84,7 +84,7 @@ export function InvoicesPagination({
           aria-label="Następna strona"
           className={cn(
             'inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition',
-            'hover:border-emerald-500/40 hover:text-emerald-300',
+            'hover:border-brand-500/40 hover:text-brand-300',
             'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-hairline disabled:hover:text-zinc-300',
           )}
         >
