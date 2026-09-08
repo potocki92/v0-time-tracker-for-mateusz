@@ -42,14 +42,14 @@ export function PredictedEarningsCard({
           <span className="text-zinc-400">
             Realnie {formatMoney(realizedEarningsMinor, currency)}
           </span>
-          <span className="font-semibold tabular-nums text-emerald-400">
+          <span className="font-semibold tabular-nums text-brand-400">
             {formatPercent(realizedShare)}
           </span>
         </div>
         <Progress
           aria-label="Udział zrealizowanych zarobków w prognozie"
           value={realizedShare * 100}
-          className="h-1.5 bg-surface-3 [&>div]:bg-emerald-500"
+          className="h-1.5 bg-surface-3 [&>div]:bg-brand-500"
         />
         <p className="text-2xs text-zinc-400">
           {hasPlan

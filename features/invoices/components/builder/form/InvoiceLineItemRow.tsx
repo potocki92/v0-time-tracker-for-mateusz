@@ -92,7 +92,7 @@ export const InvoiceLineItemRow = React.memo(function InvoiceLineItemRow({
       className={cn(
         SURFACE.card,
         'group relative p-3 sm:p-4 shadow-sm',
-        'transition data-[dragging=true]:shadow-lg data-[dragging=true]:ring-2 data-[dragging=true]:ring-emerald-500/40',
+        'transition data-[dragging=true]:shadow-lg data-[dragging=true]:ring-2 data-[dragging=true]:ring-brand-500/40',
       )}
     >
       <div className="grid grid-cols-12 gap-3">

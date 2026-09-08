@@ -36,9 +36,9 @@ interface InvoiceDetailsPanelProps {
 }
 
 const STATUS_PILL: Record<InvoiceStatus, string> = {
-  [InvoiceStatus.PAID]: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
-  [InvoiceStatus.SENT]: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
-  [InvoiceStatus.OVERDUE]: 'bg-red-500/15 text-red-300 ring-1 ring-red-500/30',
+  [InvoiceStatus.PAID]: 'bg-positive-500/15 text-positive-300 ring-1 ring-positive-500/30',
+  [InvoiceStatus.SENT]: 'bg-warning-500/15 text-warning-300 ring-1 ring-warning-500/30',
+  [InvoiceStatus.OVERDUE]: 'bg-danger-500/15 text-danger-300 ring-1 ring-danger-500/30',
   [InvoiceStatus.DRAFT]: 'bg-zinc-500/15 text-zinc-300 ring-1 ring-zinc-500/30',
   [InvoiceStatus.CANCELLED]: 'bg-zinc-500/10 text-zinc-400 ring-1 ring-zinc-500/20',
 }
@@ -108,9 +108,9 @@ export function InvoiceDetailsPanel({
                   <span
                     className={cn(
                       'mr-2 inline-block h-2 w-2 rounded-full',
-                      option === InvoiceStatus.PAID && 'bg-emerald-400',
-                      option === InvoiceStatus.SENT && 'bg-amber-400',
-                      option === InvoiceStatus.OVERDUE && 'bg-red-400',
+                      option === InvoiceStatus.PAID && 'bg-positive-400',
+                      option === InvoiceStatus.SENT && 'bg-warning-400',
+                      option === InvoiceStatus.OVERDUE && 'bg-danger-400',
                       option === InvoiceStatus.DRAFT && 'bg-zinc-400',
                       option === InvoiceStatus.CANCELLED && 'bg-zinc-600',
                     )}
@@ -149,7 +149,7 @@ export function InvoiceDetailsPanel({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Pobierz PDF"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-brand-500/40 hover:text-brand-300"
             >
               <Download className="h-3.5 w-3.5" aria-hidden />
             </a>
@@ -158,7 +158,7 @@ export function InvoiceDetailsPanel({
             type="button"
             onClick={onEdit}
             aria-label="Edytuj fakturę"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-brand-500/40 hover:text-brand-300"
           >
             <Pencil className="h-3.5 w-3.5" aria-hidden />
           </button>
@@ -166,7 +166,7 @@ export function InvoiceDetailsPanel({
             type="button"
             onClick={() => navigator.clipboard?.writeText(numberLabel)}
             aria-label="Skopiuj numer"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-emerald-500/40 hover:text-emerald-300"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-300 transition hover:border-brand-500/40 hover:text-brand-300"
           >
             <Copy className="h-3.5 w-3.5" aria-hidden />
           </button>
@@ -208,8 +208,8 @@ export function InvoiceDetailsPanel({
       <div className={cn('mt-4 p-3', SURFACE.cardNested)}>
         <SectionEyebrow>AKTYWNOŚĆ</SectionEyebrow>
         <ul className="mt-2 space-y-1.5 text-xs text-zinc-400">
-          {paidLabel && <ActivityRow dot="bg-emerald-400" text={paidLabel} />}
-          {sentLabel && <ActivityRow dot="bg-emerald-400" text={sentLabel} />}
+          {paidLabel && <ActivityRow dot="bg-positive-400" text={paidLabel} />}
+          {sentLabel && <ActivityRow dot="bg-positive-400" text={sentLabel} />}
           {draftedLabel && <ActivityRow dot="bg-zinc-500" text={draftedLabel} />}
           {!paidLabel && !sentLabel && !draftedLabel && (
             <li className="text-zinc-400">Brak zarejestrowanych zdarzeń.</li>
@@ -226,8 +226,8 @@ export function InvoiceDetailsPanel({
           isPaid
             // `hover:bg-surface-2` zeruje emeraldowy hover wariantu `accent` —
             // stan „oplacona" nie ma podswietlenia tla, tylko obramowania.
-            ? 'border border-hairline bg-surface-2 text-zinc-200 hover:bg-surface-2 hover:border-amber-500/40 hover:text-amber-300'
-            : 'bg-emerald-500 text-black shadow-[0_0_22px_-6px_color-mix(in_oklab,var(--primary)_60%,transparent)] hover:bg-emerald-400',
+            ? 'border border-hairline bg-surface-2 text-zinc-200 hover:bg-surface-2 hover:border-warning-500/40 hover:text-warning-300'
+            : 'bg-brand-500 text-brand-foreground shadow-[0_0_22px_-6px_color-mix(in_oklab,var(--brand-500)_60%,transparent)] hover:bg-brand-400',
           isTogglingPaid && 'opacity-60',
         )}
       >
@@ -273,7 +273,7 @@ export function InvoiceDetailsPanel({
       <Button
         variant="ghost"
         onClick={onDelete}
-        className="mt-2 h-10 w-full rounded-xl border border-transparent text-xs font-medium text-zinc-400 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+        className="mt-2 h-10 w-full rounded-xl border border-transparent text-xs font-medium text-zinc-400 hover:border-danger-500/30 hover:bg-danger-500/10 hover:text-danger-300"
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden />
         Usuń fakturę

@@ -64,7 +64,7 @@ export function InvoiceTotalsSummary() {
                     <span className={cn('inline-flex items-center gap-1.5')}>
                       {row.label}
                       {row.mode !== 'standard' ? (
-                        <span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                        <span className="rounded-md bg-warning-500/10 px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wider text-warning-600 dark:text-warning-400">
                           spec.
                         </span>
                       ) : null}
@@ -108,7 +108,7 @@ export function InvoiceTotalsSummary() {
       </dl>
 
       {totals.has_special_vat ? (
-        <p className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
+        <p className="flex items-start gap-2 rounded-xl border border-warning-500/30 bg-warning-500/5 px-3 py-2 text-xs text-warning-700 dark:text-warning-300">
           <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           Faktura zawiera pozycje ze specjalnym trybem VAT (zw. / np. /
           reverse charge). Pamiętaj o adnotacji na dokumencie.
@@ -132,7 +132,7 @@ function TotalsCell({
       className={cn(
         SURFACE.cardNested,
         'px-3 py-2',
-        emphasis && 'border-emerald-500/40 bg-emerald-500/10',
+        emphasis && 'border-brand-500/40 bg-brand-500/10',
       )}
     >
       <dt className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">

@@ -31,11 +31,11 @@ const offenders = (predicate: (source: string) => boolean) =>
   [...sources].filter(([, src]) => predicate(src)).map(([file]) => file)
 
 describe('ui — akcja glowna idzie przez <Button>', () => {
-  it('zaden surowy <button> nie maluje sie na emerald', () => {
+  it('zaden surowy <button> nie maluje sie na akcent', () => {
     // Trzy sekcje mialy trzy rozne przyciski „dodaj": shadcnowy <Button>,
     // recznie sklejony <button> bez wysokosci i <button> z h-8. Akcent nalezy
     // do wariantu `accent`, nie do klasy wklejonej w JSX.
-    const found = offenders((src) => /<button[^>]*bg-emerald-500/s.test(src))
+    const found = offenders((src) => /<button[^>]*bg-brand-500/s.test(src))
     expect(
       found,
       `akcje maluja sie recznie zamiast <Button variant="accent">:\n${found.join('\n')}`,
@@ -45,8 +45,8 @@ describe('ui — akcja glowna idzie przez <Button>', () => {
   it('buttonVariants zna wariant accent', () => {
     expect(
       read('components/ui/button.tsx'),
-      'bez wariantu `accent` sekcje wroca do recznego bg-emerald-500',
-    ).toMatch(/accent:\s*'bg-emerald-500 text-black hover:bg-emerald-400'/)
+      'bez wariantu `accent` sekcje wroca do recznego bg-brand-500',
+    ).toMatch(/accent:\s*'bg-brand-500 text-brand-foreground hover:bg-brand-400'/)
   })
 })
 

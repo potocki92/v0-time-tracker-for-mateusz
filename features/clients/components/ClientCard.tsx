@@ -86,7 +86,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
         'group relative overflow-hidden rounded-2xl border py-4 pl-5 pr-4 transition-colors',
         LINEAR.rowSurface,
         isActive
-          ? 'border-emerald-500/25 ring-1 ring-emerald-500/15'
+          ? 'border-brand-500/25 ring-1 ring-brand-500/15'
           : cn(LINEAR.borderInset, 'hover:border-zinc-700/60'),
       )}
     >
@@ -96,7 +96,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
         aria-hidden
         className={cn(
           'absolute inset-y-0 left-0 w-1',
-          isActive ? 'bg-emerald-500 shadow-[0_0_10px_color-mix(in_oklab,var(--primary)_45%,transparent)]' : LINEAR.rail,
+          isActive ? 'bg-brand-500 shadow-[0_0_10px_color-mix(in_oklab,var(--brand-500)_45%,transparent)]' : LINEAR.rail,
         )}
       />
 
@@ -130,7 +130,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
               </h3>
               {client.is_default && (
                 <Star
-                  className="size-3.5 shrink-0 fill-amber-500 text-amber-500"
+                  className="size-3.5 shrink-0 fill-warning-500 text-warning-500"
                   aria-label="Domyślny klient"
                 />
               )}
@@ -333,7 +333,7 @@ function QuickAction({ icon, label, href, external }: QuickActionProps) {
         'flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border text-xs font-medium text-white transition-colors',
         LINEAR.border,
         LINEAR.surface,
-        'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300',
+        'hover:border-brand-500/40 hover:bg-brand-500/10 hover:text-brand-300',
       )}
     >
       <span className="text-zinc-400">{icon}</span>

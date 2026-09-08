@@ -13,10 +13,10 @@ const SEGMENTS: Array<{
   label: string
   color: string
 }> = [
-  { key: 'worked', label: 'Pracowane', color: 'bg-emerald-500' },
-  { key: 'vacation', label: 'Urlop', color: 'bg-violet-500' },
-  { key: 'sick', label: 'L4', color: 'bg-amber-500' },
-  { key: 'dayOff', label: 'Wolne', color: 'bg-slate-400' },
+  { key: 'worked', label: 'Pracowane', color: 'bg-positive-500' },
+  { key: 'vacation', label: 'Urlop', color: 'bg-special-500' },
+  { key: 'sick', label: 'L4', color: 'bg-warning-500' },
+  { key: 'dayOff', label: 'Wolne', color: 'bg-zinc-400' },
   { key: 'weekendIdle', label: 'Weekend', color: 'bg-muted-foreground/40' },
   { key: 'weekdayIdle', label: 'Bez wpisu', color: 'bg-surface-3' },
 ]

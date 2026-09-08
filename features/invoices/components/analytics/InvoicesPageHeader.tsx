@@ -42,7 +42,7 @@ export function InvoicesPageHeader({
                 className={cn(
                   'rounded-full px-2 py-0.5 text-2xs font-semibold uppercase tracking-wider transition',
                   active
-                    ? 'bg-emerald-500/10 text-emerald-200'
+                    ? 'bg-brand-500/10 text-brand-200'
                     : 'text-zinc-400 hover:text-white',
                 )}
               >

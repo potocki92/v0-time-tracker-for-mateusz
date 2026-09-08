@@ -61,7 +61,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
           LINEAR.borderInset,
         )}
       >
-        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-2xs font-semibold text-emerald-300 ring-1 ring-emerald-500/30">
+        <span className="inline-flex items-center gap-1 rounded-full bg-positive-500/15 px-2 py-0.5 text-2xs font-semibold text-positive-300 ring-1 ring-positive-500/30">
           <Zap className="h-3 w-3" aria-hidden />
           Aktualny zleceniodawca
         </span>
@@ -78,7 +78,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
             className="inline-flex items-center gap-1 rounded-full bg-surface-3 px-2 py-0.5 text-2xs font-semibold text-zinc-300 ring-1 ring-hairline-strong"
             title="Klient domyślny dla nowych wpisów"
           >
-            <Star className="h-3 w-3 fill-amber-500 text-amber-500" aria-hidden />
+            <Star className="h-3 w-3 fill-warning-500 text-warning-500" aria-hidden />
             Domyślny
           </span>
         )}
@@ -91,7 +91,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
           type="button"
           onClick={() => onOpen(client)}
           aria-label={`Szczegóły klienta ${client.name}`}
-          className="absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500/60"
+          className="absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-500/60"
         />
 
         <div className="pointer-events-none relative z-[1] space-y-4 px-4 py-4 sm:px-5">
@@ -212,7 +212,7 @@ function ContactLink({
         'flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border text-xs font-medium text-white transition-colors',
         LINEAR.border,
         LINEAR.surfaceElevated,
-        'hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-300',
+        'hover:border-brand-500/40 hover:bg-brand-500/10 hover:text-brand-300',
       )}
     >
       <span className="text-zinc-400">{icon}</span>

@@ -156,8 +156,8 @@ function TimerButton() {
         aria-pressed={running}
         aria-label={running ? 'Zatrzymaj śledzenie' : 'Uruchom śledzenie'}
         className={cn(
-          'inline-flex size-8 items-center justify-center rounded-full bg-emerald-500 text-black',
-          'transition-colors hover:bg-emerald-400',
+          'inline-flex size-8 items-center justify-center rounded-full bg-brand-500 text-brand-foreground',
+          'transition-colors hover:bg-brand-400',
           FOCUS_RING,
         )}
       >

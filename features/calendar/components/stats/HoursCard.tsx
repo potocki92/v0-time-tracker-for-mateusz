@@ -31,7 +31,7 @@ export function HoursCard({ totalHours, goalHours, goalProgress, isAhead }: Prop
           <span
             className={cn(
               'font-semibold tabular-nums',
-              isAhead ? 'text-emerald-400' : 'text-zinc-400',
+              isAhead ? 'text-brand-400' : 'text-zinc-400',
             )}
           >
             {formatPercent(goalProgress)}
@@ -40,7 +40,7 @@ export function HoursCard({ totalHours, goalHours, goalProgress, isAhead }: Prop
         <Progress
           aria-label="Realizacja celu godzinowego"
           value={Math.min(100, goalProgress * 100)}
-          className="h-1.5 bg-surface-3 transition-colors [&>div]:bg-emerald-500"
+          className="h-1.5 bg-surface-3 transition-colors [&>div]:bg-brand-500"
         />
       </div>
     </KPICard>

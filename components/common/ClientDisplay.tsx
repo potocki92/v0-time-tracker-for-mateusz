@@ -166,7 +166,7 @@ export const ClientDisplay = memo(function ClientDisplay({
         </Avatar>
         <span className="truncate">{name}</span>
         {showDefaultStar && client?.is_default && (
-          <Star className="size-3 fill-amber-500 text-amber-500" aria-label="Domyślny" />
+          <Star className="size-3 fill-warning-500 text-warning-500" aria-label="Domyślny" />
         )}
       </Badge>
     )
@@ -186,7 +186,7 @@ export const ClientDisplay = memo(function ClientDisplay({
         </Avatar>
         <span className="truncate">{name}</span>
         {showDefaultStar && client?.is_default && (
-          <Star className="size-3 shrink-0 fill-amber-500 text-amber-500" aria-label="Domyślny" />
+          <Star className="size-3 shrink-0 fill-warning-500 text-warning-500" aria-label="Domyślny" />
         )}
       </span>
     )
@@ -208,7 +208,7 @@ export const ClientDisplay = memo(function ClientDisplay({
           <div className="flex items-center gap-1.5">
             <span className="truncate font-medium">{name}</span>
             {showDefaultStar && client?.is_default && (
-              <Star className="size-3.5 fill-amber-500 text-amber-500" aria-label="Domyślny" />
+              <Star className="size-3.5 fill-warning-500 text-warning-500" aria-label="Domyślny" />
             )}
           </div>
           {showMeta && meta && (
@@ -233,7 +233,7 @@ export const ClientDisplay = memo(function ClientDisplay({
       </Avatar>
       <span className="truncate">{name}</span>
       {showDefaultStar && client?.is_default && (
-        <Star className="size-3 shrink-0 fill-amber-500 text-amber-500" aria-label="Domyślny" />
+        <Star className="size-3 shrink-0 fill-warning-500 text-warning-500" aria-label="Domyślny" />
       )}
     </div>
   )

@@ -28,8 +28,8 @@ export function CalendarPageHeader({
     <div className="sticky top-14 z-20 border-b border-hairline bg-surface-0/80 backdrop-blur-sm">
       <div className="container flex h-12 items-center gap-2.5 px-4 sm:h-14 sm:gap-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500/10">
-            <CalendarDays className="h-4 w-4 text-emerald-400" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-brand-500/10">
+            <CalendarDays className="h-4 w-4 text-brand-400" />
           </div>
           <h1 className="text-sm font-semibold tracking-tight text-white">Kalendarz</h1>
         </div>

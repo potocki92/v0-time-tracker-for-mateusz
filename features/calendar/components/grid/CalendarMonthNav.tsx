@@ -44,13 +44,13 @@ export function CalendarMonthNav({
               variant="ghost"
               size="sm"
               onClick={onToday}
-              className="h-6 px-2 text-2xs font-semibold uppercase tracking-wide text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
+              className="h-6 px-2 text-2xs font-semibold uppercase tracking-wide text-brand-400 hover:bg-brand-500/10 hover:text-brand-300"
             >
               Dziś
             </Button>
           )}
           {isCurrentMonth && (
-            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-2xs font-semibold text-emerald-400">
+            <span className="rounded-full bg-brand-500/10 px-2 py-0.5 text-2xs font-semibold text-brand-400">
               Teraz
             </span>
           )}

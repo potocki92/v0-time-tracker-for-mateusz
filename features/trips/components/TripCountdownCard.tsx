@@ -50,8 +50,8 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
   const Icon = isAway ? Home : Plane
   const heading = isAway ? 'Powrót do domu' : 'Wyjazd do pracy'
   const accent = isAway
-    ? 'text-emerald-300 ring-emerald-500/30 bg-emerald-500/10'
-    : 'text-sky-300 ring-sky-500/30 bg-sky-500/10'
+    ? 'text-brand-300 ring-brand-500/30 bg-brand-500/10'
+    : 'text-info-300 ring-info-500/30 bg-info-500/10'
   const destination = state.trip?.destination?.trim()
   const subline = isAway
     ? destination

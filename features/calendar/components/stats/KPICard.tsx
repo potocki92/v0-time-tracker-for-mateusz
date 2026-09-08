@@ -33,7 +33,7 @@ export function KPICard({ label, icon, className, children, ariaLabel }: Props) 
       <div className="flex items-start justify-between gap-2">
         <SectionEyebrow>{label}</SectionEyebrow>
         <div
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20 sm:h-9 sm:w-9"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/20 sm:h-9 sm:w-9"
           aria-hidden
         >
           {icon}

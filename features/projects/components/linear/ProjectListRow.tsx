@@ -92,7 +92,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
         'group relative overflow-hidden rounded-xl border py-3.5 pl-5 pr-3.5 transition',
         LINEAR.rowSurface,
         isActive
-          ? 'border-emerald-500/25 ring-1 ring-emerald-500/15'
+          ? 'border-brand-500/25 ring-1 ring-brand-500/15'
           : cn(LINEAR.borderInset, 'hover:border-zinc-700/60'),
         // Kliknięcie w kartę obsługuje nakładka poniżej — treść musi być
         // przezroczysta dla kursora, żeby nie przechwytywała kliknięć.
@@ -105,7 +105,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
         aria-hidden
         className={cn(
           'absolute inset-y-0 left-0 w-1',
-          isActive ? 'bg-emerald-500 shadow-[0_0_10px_color-mix(in_oklab,var(--primary)_45%,transparent)]' : LINEAR.rail,
+          isActive ? 'bg-brand-500 shadow-[0_0_10px_color-mix(in_oklab,var(--brand-500)_45%,transparent)]' : LINEAR.rail,
         )}
       />
 
@@ -215,7 +215,7 @@ function Stat({ label, value, danger }: { label: string; value: string; danger?:
       <p
         className={cn(
           'mt-0.5 text-xs font-semibold tabular-nums text-white',
-          danger && 'text-rose-300',
+          danger && 'text-danger-300',
         )}
       >
         {value}

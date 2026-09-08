@@ -11,7 +11,7 @@ import { usePrefetchRoute } from '@/hooks/prefetch'
  * mobilnych (`md:hidden`).
  *
  * Aktywny element rozróżniamy WYŁĄCZNIE kolorem ikony i etykiety
- * (`text-emerald-400`). Bez tła, bez pillów, bez wskaźników nad
+ * (`text-brand-400`). Bez tła, bez pillów, bez wskaźników nad
  * zakładką — celowo minimalistycznie, zgodnie z linearowym stylem
  * dashboardu.
  *
@@ -41,9 +41,9 @@ export function BottomNav() {
                 onBlur={cancelIntent}
                 className={cn(
                   'flex h-full flex-col items-center justify-center gap-1 px-1 text-2xs font-medium leading-[1.1] transition-colors',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40',
                   isActive
-                    ? 'text-emerald-400'
+                    ? 'text-brand-400'
                     : 'text-zinc-400 hover:text-zinc-200',
                 )}
               >

@@ -34,7 +34,7 @@ export function InvoiceCashflowCard({
       <header className="flex items-center justify-between gap-3">
         <SectionEyebrow>PRZEPŁYW · 6 MIESIĘCY</SectionEyebrow>
         {trendBadge && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-2xs font-semibold text-emerald-300 ring-1 ring-emerald-500/30 tabular-nums">
+          <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/15 px-2 py-0.5 text-2xs font-semibold text-brand-300 ring-1 ring-brand-500/30 tabular-nums">
             <TrendingUp className="h-3 w-3" aria-hidden />
             {trendBadge}
           </span>
@@ -61,8 +61,8 @@ export function InvoiceCashflowCard({
               <span
                 className={
                   highlightLast && isLast
-                    ? 'block rounded-md bg-emerald-500 shadow-[0_0_22px_-6px_color-mix(in_oklab,var(--primary)_70%,transparent)]'
-                    : 'block rounded-md bg-emerald-500/30'
+                    ? 'block rounded-md bg-brand-500 shadow-[0_0_22px_-6px_color-mix(in_oklab,var(--brand-500)_70%,transparent)]'
+                    : 'block rounded-md bg-brand-500/30'
                 }
                 style={{ height: `${Math.round(ratio * 100)}%` }}
                 role="img"

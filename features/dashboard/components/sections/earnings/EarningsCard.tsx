@@ -112,14 +112,14 @@ export const EarningsCard = memo(function EarningsCard({
     trend.percent === null
       ? 'text-zinc-400'
       : isUp
-        ? 'text-emerald-400'
-        : 'text-red-400'
+        ? 'text-positive-400'
+        : 'text-danger-400'
   const trendBg =
     trend.percent === null
       ? 'bg-zinc-500/10 ring-zinc-500/20'
       : isUp
-        ? 'bg-emerald-500/10 ring-emerald-500/30'
-        : 'bg-red-500/10 ring-red-500/30'
+        ? 'bg-positive-500/10 ring-positive-500/30'
+        : 'bg-danger-500/10 ring-danger-500/30'
 
   const hasSeries = series.length >= 2
   const lastForecastPoint = series.findLast?.((s) => s.forecast !== null) ?? null
@@ -193,7 +193,7 @@ export const EarningsCard = memo(function EarningsCard({
           <p className="mt-1 text-2xs leading-[1.4] text-zinc-400 sm:text-xs">
             {showCompareLine && (
               <>
-                <span className={isUp ? 'text-emerald-400' : 'text-red-400'}>
+                <span className={isUp ? 'text-positive-400' : 'text-danger-400'}>
                   {diffSign}
                   {maskValue(formatMoney(toMinor(diffAbs), 'PLN'), privacyMode)}
                 </span>{' '}

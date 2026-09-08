@@ -42,17 +42,17 @@ const STATUS_PILL: Record<
 > = {
   paid: {
     label: 'Opłacone',
-    className: 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30',
+    className: 'bg-positive-500/15 text-positive-400 ring-1 ring-positive-500/30',
     icon: Check,
   },
   open: {
     label: 'Wystawiona',
-    className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
+    className: 'bg-warning-500/15 text-warning-300 ring-1 ring-warning-500/30',
     icon: Clock,
   },
   overdue: {
     label: 'Zaległe',
-    className: 'bg-red-500/15 text-red-400 ring-1 ring-red-500/30',
+    className: 'bg-danger-500/15 text-danger-400 ring-1 ring-danger-500/30',
     icon: Clock,
   },
   draft: {

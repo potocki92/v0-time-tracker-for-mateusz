@@ -28,13 +28,22 @@ export const INVOICE_STATUS_LABELS_PL: Record<InvoiceStatus, string> = {
   [InvoiceStatus.CANCELLED]: 'Anulowana',
 }
 
-/** Tailwind color tokens per status — consumed by badges and cards. */
+/**
+ * Skóra statusu — tokeny akcentów panelu (`app/globals.css`), nie paleta
+ * Tailwinda. Badge stoi na shadcnowej karcie, więc jest świadomy schematu:
+ * wypełnienie i kontur biorą krycie z jednego stopnia, a tekst przeskakuje
+ * z 700 (na jasnym) na 300 (na ciemnym).
+ */
 export const INVOICE_STATUS_BADGE_CLASS: Record<InvoiceStatus, string> = {
-  [InvoiceStatus.DRAFT]: 'bg-slate-100 text-slate-700 border-slate-200',
-  [InvoiceStatus.SENT]: 'bg-blue-100 text-blue-700 border-blue-200',
-  [InvoiceStatus.PAID]: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  [InvoiceStatus.OVERDUE]: 'bg-red-100 text-red-700 border-red-200',
-  [InvoiceStatus.CANCELLED]: 'bg-gray-100 text-gray-500 border-gray-200 line-through',
+  [InvoiceStatus.DRAFT]: 'bg-muted text-muted-foreground border-border',
+  [InvoiceStatus.SENT]:
+    'bg-info-500/10 text-info-700 border-info-500/30 dark:text-info-300',
+  [InvoiceStatus.PAID]:
+    'bg-positive-500/10 text-positive-700 border-positive-500/30 dark:text-positive-300',
+  [InvoiceStatus.OVERDUE]:
+    'bg-danger-500/10 text-danger-700 border-danger-500/30 dark:text-danger-300',
+  [InvoiceStatus.CANCELLED]:
+    'bg-muted text-muted-foreground border-border line-through',
 }
 
 export interface StatusDerivationInput {

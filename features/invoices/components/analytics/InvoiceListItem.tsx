@@ -21,9 +21,9 @@ interface InvoiceListItemProps {
 }
 
 const STATUS_PILL: Record<InvoiceStatus, string> = {
-  [InvoiceStatus.PAID]: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
-  [InvoiceStatus.SENT]: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
-  [InvoiceStatus.OVERDUE]: 'bg-red-500/15 text-red-300 ring-1 ring-red-500/30',
+  [InvoiceStatus.PAID]: 'bg-positive-500/15 text-positive-300 ring-1 ring-positive-500/30',
+  [InvoiceStatus.SENT]: 'bg-warning-500/15 text-warning-300 ring-1 ring-warning-500/30',
+  [InvoiceStatus.OVERDUE]: 'bg-danger-500/15 text-danger-300 ring-1 ring-danger-500/30',
   [InvoiceStatus.DRAFT]: 'bg-zinc-500/15 text-zinc-300 ring-1 ring-zinc-500/30',
   [InvoiceStatus.CANCELLED]: 'bg-zinc-500/10 text-zinc-400 ring-1 ring-zinc-500/20',
 }
@@ -52,7 +52,7 @@ export function InvoiceListItem({
         SURFACE.card,
         'p-4 transition',
         selected
-          ? 'border-emerald-500/40 ring-1 ring-emerald-500/20'
+          ? 'border-brand-500/40 ring-1 ring-brand-500/20'
           : 'hover:border-zinc-700/60',
       )}
     >

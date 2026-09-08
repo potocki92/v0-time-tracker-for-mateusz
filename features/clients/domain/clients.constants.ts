@@ -35,16 +35,16 @@ export const ACTIVITY_LABELS: Record<ClientActivity, string> = {
 
 /** Kropka statusu — używana na awatarze kafelka. */
 export const ACTIVITY_DOT: Record<ClientActivity, string> = {
-  active:  'bg-emerald-500',
-  dormant: 'bg-amber-500',
-  new:     'bg-sky-500',
+  active:  'bg-positive-500',
+  dormant: 'bg-warning-500',
+  new:     'bg-info-500',
 }
 
 /** Pigułka statusu — konwencja jak PROJECT_STATUS_PILL w module Projekty. */
 export const ACTIVITY_PILL: Record<ClientActivity, string> = {
-  active:  'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40',
-  dormant: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
-  new:     'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30',
+  active:  'bg-positive-500/20 text-positive-300 ring-1 ring-positive-500/40',
+  dormant: 'bg-warning-500/15 text-warning-300 ring-1 ring-warning-500/30',
+  new:     'bg-info-500/15 text-info-300 ring-1 ring-info-500/30',
 }
 
 /** Nagłówki grup na liście — liczba mnoga, jak „W TRAKCIE 1" w Projektach. */

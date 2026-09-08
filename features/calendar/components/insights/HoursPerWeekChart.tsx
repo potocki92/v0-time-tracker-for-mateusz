@@ -66,13 +66,13 @@ export function HoursPerWeekChart({
                 dataKey="label"
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 10, fill: '#71717a' }}
+                tick={{ fontSize: 10, fill: 'var(--color-zinc-500)' }}
                 interval={0}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 10, fill: '#71717a' }}
+                tick={{ fontSize: 10, fill: 'var(--color-zinc-500)' }}
                 width={28}
                 hide
               />
@@ -87,7 +87,11 @@ export function HoursPerWeekChart({
                 {data.map((entry) => (
                   <Cell
                     key={entry.key}
-                    fill={entry.isCurrent ? '#22c55e' : 'rgba(34,197,94,0.35)'}
+                    fill={
+                      entry.isCurrent
+                        ? 'var(--brand-500)'
+                        : 'color-mix(in oklab, var(--brand-500) 35%, transparent)'
+                    }
                   />
                 ))}
               </Bar>
@@ -118,7 +122,7 @@ function Stat({ label, value, highlight }: { label: string; value: string; highl
       <div
         className={cn(
           'truncate text-xs font-semibold tabular-nums',
-          highlight ? 'text-emerald-400' : 'text-white',
+          highlight ? 'text-brand-400' : 'text-white',
         )}
       >
         {value}

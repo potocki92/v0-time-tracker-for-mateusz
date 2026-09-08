@@ -17,7 +17,7 @@ export function KpiSection() {
         value={String(kpis.total)}
         icon={FolderKanban}
         meta={`${kpis.planned} zaplanowanych`}
-        accent="blue"
+        accent="info"
       />
       <StatTile
         label="W trakcie"
@@ -25,7 +25,7 @@ export function KpiSection() {
         icon={ListChecks}
         meta={`${kpis.activeShare}% całości · ${kpis.onHold} wstrzymanych`}
         progress={kpis.activeShare}
-        accent="emerald"
+        accent="brand"
       />
       <StatTile
         label="Zakończone"
@@ -33,14 +33,14 @@ export function KpiSection() {
         icon={CheckCircle2}
         meta={`${kpis.completedShare}% całości`}
         progress={kpis.completedShare}
-        accent="violet"
+        accent="special"
       />
       <StatTile
         label="Budżet"
         value={formatMoney(toMinor(kpis.totalBudget), kpis.totalBudgetCurrency)}
         icon={Wallet}
         meta={kpis.total > 0 ? `${kpis.total} umów` : 'Brak umów'}
-        accent="amber"
+        accent="warning"
       />
     </div>
   )

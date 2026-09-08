@@ -64,7 +64,7 @@ export const EarningsMenu = memo(function EarningsMenu({
         <button
           type="button"
           aria-label="Opcje karty Zarobki"
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400 transition hover:border-hairline-strong hover:bg-surface-3 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 data-[state=open]:border-emerald-500/40 data-[state=open]:bg-surface-3 data-[state=open]:text-emerald-400"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400 transition hover:border-hairline-strong hover:bg-surface-3 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 data-[state=open]:border-brand-500/40 data-[state=open]:bg-surface-3 data-[state=open]:text-brand-400"
         >
           <MoreHorizontal className="h-4 w-4" aria-hidden />
         </button>
@@ -85,7 +85,7 @@ export const EarningsMenu = memo(function EarningsMenu({
               disabled={isExporting}
               className="cursor-pointer gap-2.5 rounded-md px-2 py-2 text-xs text-zinc-200 focus:bg-surface-3 focus:text-white data-[state=open]:bg-surface-3 data-[state=open]:text-white"
             >
-              <Download className="size-4 text-emerald-400" aria-hidden />
+              <Download className="size-4 text-brand-400" aria-hidden />
               <span className="flex-1">
                 {isExporting ? 'Generuję raport…' : 'Eksportuj raport'}
               </span>
@@ -95,12 +95,12 @@ export const EarningsMenu = memo(function EarningsMenu({
               className="min-w-[180px] rounded-lg border border-hairline bg-surface-1 p-1.5 text-zinc-200 shadow-2xl"
             >
               <DropdownMenuItem onClick={onExportPdf} disabled={isExporting} className={ITEM_BASE}>
-                <FileText className="size-4 text-rose-400" aria-hidden />
+                <FileText className="size-4 text-danger-400" aria-hidden />
                 <span>PDF</span>
                 <DropdownMenuShortcut className="text-zinc-400">⌘P</DropdownMenuShortcut>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onExportCsv} disabled={isExporting} className={ITEM_BASE}>
-                <FileSpreadsheet className="size-4 text-emerald-400" aria-hidden />
+                <FileSpreadsheet className="size-4 text-brand-400" aria-hidden />
                 <span>CSV</span>
                 <DropdownMenuShortcut className="text-zinc-400">⌘E</DropdownMenuShortcut>
               </DropdownMenuItem>
@@ -108,7 +108,7 @@ export const EarningsMenu = memo(function EarningsMenu({
           </DropdownMenuSub>
 
           <DropdownMenuItem onClick={onOpenAnalytics} className={ITEM_BASE}>
-            <BarChart3 className="size-4 text-emerald-400" aria-hidden />
+            <BarChart3 className="size-4 text-brand-400" aria-hidden />
             <span>Szczegółowa analityka</span>
           </DropdownMenuItem>
 
@@ -131,13 +131,13 @@ export const EarningsMenu = memo(function EarningsMenu({
           className="cursor-pointer gap-2.5 rounded-md py-2 text-xs text-zinc-200 focus:bg-surface-3 focus:text-white"
         >
           <span className="flex flex-1 items-center gap-2.5 pl-1">
-            <GitCompareArrows className="size-4 text-emerald-400" aria-hidden />
+            <GitCompareArrows className="size-4 text-brand-400" aria-hidden />
             <span>Porównaj z poprzednim okresem</span>
           </span>
         </DropdownMenuCheckboxItem>
 
         <DropdownMenuItem onClick={onSetGoal} className={ITEM_BASE}>
-          <Target className="size-4 text-emerald-400" aria-hidden />
+          <Target className="size-4 text-brand-400" aria-hidden />
           <span>Ustaw cel finansowy</span>
         </DropdownMenuItem>
 
@@ -150,7 +150,7 @@ export const EarningsMenu = memo(function EarningsMenu({
         >
           <span className="flex flex-1 items-center gap-2.5 pl-1">
             {privacyMode ? (
-              <Eye className="size-4 text-emerald-400" aria-hidden />
+              <Eye className="size-4 text-brand-400" aria-hidden />
             ) : (
               <EyeOff className="size-4 text-zinc-400" aria-hidden />
             )}

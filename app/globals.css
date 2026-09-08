@@ -30,6 +30,9 @@
   --primary: oklch(0.52 0.18 160);
   --primary-foreground: oklch(1 0 0);
   --primary-accessible: oklch(0.42 0.15 160);
+  /* Hue i chroma akcentu motywu — drabinka `--brand-*` niżej. */
+  --brand-h: 162;
+  --brand-c: 0.17;
   --success: oklch(0.55 0.15 150);
   --success-foreground: oklch(0.38 0.14 150);
   --warning: oklch(0.70 0.17 80);
@@ -99,6 +102,8 @@
   --primary: oklch(0.52 0.18 230);
   --primary-foreground: oklch(1 0 0);
   --primary-accessible: oklch(0.42 0.17 230);
+  --brand-h: 232;
+  --brand-c: 0.155;
   --success: oklch(0.60 0.14 190);
   --success-foreground: oklch(0.38 0.14 190);
   --warning: oklch(0.72 0.16 70);
@@ -150,6 +155,9 @@
   --primary: oklch(0.52 0.20 35);
   --primary-foreground: oklch(1 0 0);
   --primary-accessible: oklch(0.48 0.18 35);
+  /* 38, nie 35: akcent musi zostać rozróżnialny od `--warning-*` (hue 70). */
+  --brand-h: 38;
+  --brand-c: 0.185;
   --success: oklch(0.62 0.14 150);
   --success-foreground: oklch(0.38 0.14 150);
   --warning: oklch(0.72 0.16 80);
@@ -201,6 +209,8 @@
   --primary: oklch(0.55 0.22 295);
   --primary-foreground: oklch(1 0 0);
   --primary-accessible: oklch(0.42 0.20 295);
+  --brand-h: 295;
+  --brand-c: 0.20;
   --success: oklch(0.58 0.14 155);
   --success-foreground: oklch(0.38 0.14 155);
   --warning: oklch(0.72 0.17 80);
@@ -252,6 +262,9 @@
   --primary: oklch(0.25 0 0);
   --primary-foreground: oklch(1 0 0);
   --primary-accessible: oklch(0.22 0 0);
+  /* Monochromatyczny motyw: chroma bliska zeru zostawia drabinkę w szarościach. */
+  --brand-h: 250;
+  --brand-c: 0.012;
   --success: oklch(0.55 0.14 150);
   --success-foreground: oklch(0.36 0.14 150);
   --warning: oklch(0.70 0.16 80);
@@ -556,6 +569,89 @@
   --sidebar-ring: oklch(0.72 0 0);
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+ * Akcenty panelu — drabinka 100..700
+ *
+ * Panel jest ciemny niezależnie od schematu (patrz `--surface-*`), więc jego
+ * akcenty nie mogą iść przez `--primary` / `--destructive`: te są strojone pod
+ * jasne tło i w wariancie light stoją na L ≈ 0.52, czyli ~3:1 na `--surface-2`.
+ * Stąd osobna drabinka o stałych stopniach jasności — czytelna na każdym
+ * stopniu skali powierzchni, w obu schematach.
+ *
+ * `brand` IDZIE ZA MOTYWEM. Każda paleta podaje tylko `--brand-h` i
+ * `--brand-c`; kształt drabinki (jasności i proporcje chromy) jest wspólny,
+ * więc wszystkie motywy dostają ten sam kontrast. To jest ta jedna zmienna,
+ * która przestawia ikony, przyciski, focus, hovery, zaznaczenia i paski
+ * postępu razem ze zmianą motywu.
+ *
+ * `positive` / `warning` / `danger` / `info` / `special` NIE idą za motywem —
+ * niosą znaczenie (zysk vs strata, opłacona vs zaległa, urlop vs L4), więc ich
+ * hue jest stałe we wszystkich paletach. Gdyby szły, w motywie Sunset trend
+ * w górę i trend w dół byłyby dwoma odcieniami pomarańczu.
+ *
+ * Proporcje chromy odwzorowują kształt ramp Tailwinda (100 ≈ 0.31× chromy
+ * stopnia 500, 400 ≈ 1.04× itd.), żeby motyw Emerald wyglądał po migracji
+ * tak samo jak przed nią.
+ *
+ * Selektor to `:root, [data-theme]`, nie samo `:root`. Podstawienie `var()`
+ * WEWNĄTRZ wartości zmiennej dzieje się na elemencie, na którym ta zmienna
+ * jest zadeklarowana — potomkowie dziedziczą już rozwiniętą wartość. Gdyby
+ * drabinka stała tylko na `:root`, każdy zagnieżdżony `data-theme` (np. kafelek
+ * podglądu w ustawieniach) dostałby akcent motywu z <html>, a nie swój własny.
+ * ═════════════════════════════════════════════════════════════════════════ */
+:root,
+[data-theme] {
+  --brand-100: oklch(0.950 calc(var(--brand-c) * 0.31) var(--brand-h));
+  --brand-200: oklch(0.905 calc(var(--brand-c) * 0.55) var(--brand-h));
+  --brand-300: oklch(0.845 calc(var(--brand-c) * 0.84) var(--brand-h));
+  --brand-400: oklch(0.765 calc(var(--brand-c) * 1.04) var(--brand-h));
+  --brand-500: oklch(0.696 var(--brand-c) var(--brand-h));
+  --brand-600: oklch(0.596 calc(var(--brand-c) * 0.85) var(--brand-h));
+  --brand-700: oklch(0.508 calc(var(--brand-c) * 0.69) var(--brand-h));
+  /* Etykieta na pełnym wypełnieniu `--brand-500` (L 0.696 → ≥ 7:1). */
+  --brand-foreground: oklch(0.16 0 0);
+
+  --positive-300: oklch(0.845 0.143 165);
+  --positive-400: oklch(0.765 0.177 163);
+  --positive-500: oklch(0.696 0.170 162);
+  --positive-600: oklch(0.596 0.145 163);
+  --positive-700: oklch(0.508 0.118 166);
+
+  --warning-300: oklch(0.879 0.169 92);
+  --warning-400: oklch(0.828 0.189 84);
+  --warning-500: oklch(0.769 0.188 70);
+  --warning-600: oklch(0.666 0.179 58);
+  --warning-700: oklch(0.555 0.163 49);
+
+  /* Hue 18 — środek między Tailwindowym `red` (25) a `rose` (14). Panel używał
+   * obu wymiennie na tym samym znaczeniu; jedna rodzina kończy tę dwoistość. */
+  --danger-300: oklch(0.810 0.117 16);
+  --danger-400: oklch(0.708 0.193 18);
+  --danger-500: oklch(0.641 0.242 20);
+  --danger-600: oklch(0.577 0.245 24);
+  --danger-700: oklch(0.505 0.213 25);
+
+  --info-300: oklch(0.828 0.111 230);
+  --info-400: oklch(0.746 0.160 233);
+  --info-500: oklch(0.685 0.169 237);
+  --info-600: oklch(0.588 0.158 242);
+  --info-700: oklch(0.500 0.134 243);
+
+  /* Kategorie bez wartościowania: urlop, priorytet „średni". */
+  --special-300: oklch(0.811 0.111 293);
+  --special-400: oklch(0.702 0.183 294);
+  --special-500: oklch(0.606 0.250 292);
+  --special-600: oklch(0.541 0.281 293);
+  --special-700: oklch(0.491 0.270 293);
+
+  /* Powierzchnia kafelka „z akcentem" (aktywna akcja szybka) i dwa neutralne
+   * stopnie ponad `--hairline-strong`: tor paska postępu i szyna przy krawędzi
+   * karty. Chroma wiązana z `--brand-c`, żeby w Graphite zostały czyste szarości. */
+  --surface-accent: color-mix(in oklab, var(--brand-500) 7%, var(--surface-2));
+  --track: oklch(0.28 calc(var(--brand-c) * 0.05) var(--brand-h));
+  --rail: oklch(0.40 calc(var(--brand-c) * 0.06) var(--brand-h));
+}
+
 @theme inline {
   --font-sans: 'Inter', 'Inter Fallback';
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
@@ -632,8 +728,47 @@
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-surface-accent: var(--surface-accent);
   --color-hairline: var(--hairline);
   --color-hairline-strong: var(--hairline-strong);
+  --color-track: var(--track);
+  --color-rail: var(--rail);
+  /* Akcenty panelu — `bg-brand-500`, `text-brand-300`, `ring-warning-500/30`,
+   * `hover:text-danger-300`. Bez tego zmienne żyją w :root, ale Tailwind nie
+   * generuje z nich żadnej klasy. */
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-positive-300: var(--positive-300);
+  --color-positive-400: var(--positive-400);
+  --color-positive-500: var(--positive-500);
+  --color-positive-600: var(--positive-600);
+  --color-positive-700: var(--positive-700);
+  --color-warning-300: var(--warning-300);
+  --color-warning-400: var(--warning-400);
+  --color-warning-500: var(--warning-500);
+  --color-warning-600: var(--warning-600);
+  --color-warning-700: var(--warning-700);
+  --color-danger-300: var(--danger-300);
+  --color-danger-400: var(--danger-400);
+  --color-danger-500: var(--danger-500);
+  --color-danger-600: var(--danger-600);
+  --color-danger-700: var(--danger-700);
+  --color-info-300: var(--info-300);
+  --color-info-400: var(--info-400);
+  --color-info-500: var(--info-500);
+  --color-info-600: var(--info-600);
+  --color-info-700: var(--info-700);
+  --color-special-300: var(--special-300);
+  --color-special-400: var(--special-400);
+  --color-special-500: var(--special-500);
+  --color-special-600: var(--special-600);
+  --color-special-700: var(--special-700);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

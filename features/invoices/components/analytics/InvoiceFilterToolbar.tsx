@@ -70,7 +70,7 @@ export function InvoiceFilterToolbar({
               className={cn(
                 'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition',
                 active
-                  ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200'
+                  ? 'border-brand-500/40 bg-brand-500/10 text-brand-700 dark:text-brand-200'
                   : 'border-hairline bg-surface-1 text-zinc-300 hover:border-hairline-strong hover:text-white',
               )}
             >
@@ -79,7 +79,7 @@ export function InvoiceFilterToolbar({
                 className={cn(
                   'inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-2xs font-semibold tabular-nums',
                   active
-                    ? 'bg-emerald-400/20 text-emerald-100'
+                    ? 'bg-brand-400/20 text-brand-100'
                     : 'bg-surface-3 text-zinc-400',
                 )}
               >
@@ -103,7 +103,7 @@ export function InvoiceFilterToolbar({
             placeholder="Szukaj faktury, klienta, projektu..."
             aria-label="Szukaj faktury"
             className={cn(
-              'h-11 w-full rounded-xl border pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-400 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20',
+              'h-11 w-full rounded-xl border pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-400 focus:border-brand-500/40 focus:outline-none focus:ring-2 focus:ring-brand-500/20',
               LINEAR.border,
               LINEAR.surface,
             )}

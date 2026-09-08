@@ -21,10 +21,10 @@ export function BudgetUtilizationSection() {
   const utilizationPct = Math.round(utilisation.utilization * 100)
   const tone =
     utilisation.utilization >= BUDGET_OVERSPEND_THRESHOLD
-      ? 'text-rose-300'
+      ? 'text-danger-300'
       : utilisation.utilization >= BUDGET_WARNING_THRESHOLD
-        ? 'text-amber-300'
-        : 'text-emerald-300'
+        ? 'text-warning-300'
+        : 'text-positive-300'
 
   return (
     <LinearCard
@@ -56,10 +56,10 @@ export function BudgetUtilizationSection() {
             className={cn(
               'h-full rounded-full',
               utilisation.utilization >= BUDGET_OVERSPEND_THRESHOLD
-                ? 'bg-rose-500'
+                ? 'bg-danger-500'
                 : utilisation.utilization >= BUDGET_WARNING_THRESHOLD
-                  ? 'bg-amber-500'
-                  : 'bg-emerald-500',
+                  ? 'bg-warning-500'
+                  : 'bg-positive-500',
             )}
             style={{ width: `${Math.min(100, utilizationPct)}%` }}
             aria-hidden

@@ -32,8 +32,8 @@ function TrendBadge({ trend }: { trend: Trend }) {
       : Minus
 
   const tone =
-    trend.direction === 'up'   ? 'text-emerald-400'
-    : trend.direction === 'down' ? 'text-rose-400'
+    trend.direction === 'up'   ? 'text-positive-400'
+    : trend.direction === 'down' ? 'text-danger-400'
     : 'text-zinc-400'
 
   return (

@@ -191,7 +191,7 @@ export function WorkedWeeksPickerDialog({
                             {week.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(week.hours)}
                           </p>
                           {!week.hasRate ? (
-                            <p className="mt-1 text-xs text-amber-400">
+                            <p className="mt-1 text-xs text-warning-400">
                               Brak stawki — kwota wyniesie 0. Ustaw stawkę klienta lub wpisz ręcznie.
                             </p>
                           ) : null}

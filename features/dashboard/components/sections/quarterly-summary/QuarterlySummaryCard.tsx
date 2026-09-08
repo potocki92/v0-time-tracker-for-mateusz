@@ -43,7 +43,7 @@ export function QuarterlySummaryCard() {
       </header>
 
       {error ? (
-        <div className="px-4 py-6 text-center text-sm text-red-400">
+        <div className="px-4 py-6 text-center text-sm text-danger-400">
           Nie udało się załadować kwartałów.
         </div>
       ) : isLoading ? (
@@ -80,9 +80,9 @@ function QuarterRow({ quarter: q }: { quarter: OverallQuarterSummary }) {
         className={
           'mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ' +
           (q.invoiced
-            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
+            ? 'border-positive-500/40 bg-positive-500/10 text-positive-300'
             : q.workedDays > 0
-              ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
+              ? 'border-warning-500/40 bg-warning-500/10 text-warning-300'
               : 'border-hairline bg-surface-2 text-zinc-400')
         }
       >
@@ -111,9 +111,9 @@ function QuarterRow({ quarter: q }: { quarter: OverallQuarterSummary }) {
             : ''}
         </p>
         {q.invoiced ? (
-          <SectionEyebrow className="mt-1 inline-flex items-center gap-1 text-emerald-400">Wystawiona</SectionEyebrow>
+          <SectionEyebrow className="mt-1 inline-flex items-center gap-1 text-positive-400">Wystawiona</SectionEyebrow>
         ) : q.workedDays > 0 ? (
-          <SectionEyebrow className="mt-1 inline-flex items-center gap-1 text-amber-300">Do wystawienia</SectionEyebrow>
+          <SectionEyebrow className="mt-1 inline-flex items-center gap-1 text-warning-300">Do wystawienia</SectionEyebrow>
         ) : (
           <SectionEyebrow className="mt-1 inline-flex items-center gap-1">Brak pracy</SectionEyebrow>
         )}
