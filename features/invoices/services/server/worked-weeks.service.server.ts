@@ -115,6 +115,9 @@ export async function getWorkedWeeksForClient({
       .eq('user_id', user.id)
       .eq('client_id', clientId)
       .eq('status', 'worked')
+      // Do rozliczenia licza sie wylacznie wpisy rzeczywiste; plan
+      // (`predicted`) opisuje ten sam dzien i podwoilby godziny.
+      .eq('entry_kind', 'real')
       .gte('date', range.from)
       .lte('date', range.to)
       .order('date', { ascending: true }),

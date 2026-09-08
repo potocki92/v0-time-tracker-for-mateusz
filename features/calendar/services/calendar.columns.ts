@@ -9,14 +9,15 @@
 /**
  * Wpisy pracy. `billing_*` są potrzebne, bo `calculateEarnings`
  * (lib/finance/earnings.ts) liczy z nich kwotę wpisu; `notes` wyświetla
- * tooltip dnia, lista i sekcja ostatnich wpisów.
+ * tooltip dnia, lista i sekcja ostatnich wpisów; `source` daje dyskretne
+ * oznaczenie „Automatycznie".
  *
  * Świadomie pominięte: `user_id` (scoping robi RLS), `category`, `tags`
  * i `billing_unit` (kalendarz ich nie pokazuje), `note` (legacy),
  * `created_at` / `updated_at` (kalendarz sortuje po `date`).
  */
 export const CALENDAR_WORK_ENTRY_COLUMNS =
-  'id, client_id, project_id, date, status, entry_kind, hours, quantity, quantity_from, quantity_to, notes, billing_rate, billing_currency, billing_work_type'
+  'id, client_id, project_id, date, status, entry_kind, source, hours, quantity, quantity_from, quantity_to, notes, billing_rate, billing_currency, billing_work_type'
 
 /**
  * Klienci — wybór w dialogu dnia plus fallback stawki dla wpisów bez snapshotu.

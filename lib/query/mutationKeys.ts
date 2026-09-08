@@ -34,6 +34,8 @@ export const MUTATION_KEYS = {
     updateInvoiceSettings: ['account', 'update-invoice-settings'] as const,
     updateWeeklySummaryEmail: ['account', 'update-weekly-summary-email'] as const,
     sendWeeklySummaryEmail:   ['account', 'send-weekly-summary-email']   as const,
+    updateWorkAutomation:     ['account', 'update-work-automation']       as const,
+    resumeWorkAutomation:     ['account', 'resume-work-automation']       as const,
   },
   trip: {
     create: ['trip', 'create'] as const,

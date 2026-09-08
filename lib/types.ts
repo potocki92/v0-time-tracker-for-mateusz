@@ -76,6 +76,8 @@ export interface WorkEntry {
   date: string
   status: 'worked' | 'not_worked' | 'vacation' | 'sick_leave' | 'day_off'
   entry_kind?: 'real' | 'predicted'
+  /** Kto wpis UTWORZYL. Reczna edycja wpisu automatycznego tego nie zmienia. */
+  source?: 'manual' | 'automation'
   hours: number | null
   quantity: number | null
   quantity_from: number | null

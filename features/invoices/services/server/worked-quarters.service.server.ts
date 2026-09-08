@@ -101,6 +101,9 @@ export async function getWorkedQuartersForClient({
       .eq('user_id', user.id)
       .eq('client_id', clientId)
       .eq('status', 'worked')
+      // Do rozliczenia licza sie wylacznie wpisy rzeczywiste; plan
+      // (`predicted`) opisuje ten sam dzien i podwoilby godziny.
+      .eq('entry_kind', 'real')
       .gte('date', oldestRange.start)
       .lte('date', newestRange.end)
       .order('date', { ascending: true }),
@@ -284,6 +287,7 @@ export async function getOverallQuarterSummaries(count = 4): Promise<OverallQuar
       .select('date, status, hours, quantity, quantity_from, quantity_to, billing_rate, billing_currency, billing_work_type, client_id')
       .eq('user_id', user.id)
       .eq('status', 'worked')
+      .eq('entry_kind', 'real')
       .gte('date', oldestRange.start)
       .lte('date', newestRange.end),
     supabase

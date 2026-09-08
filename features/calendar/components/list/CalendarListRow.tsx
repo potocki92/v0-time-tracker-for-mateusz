@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { Clock, Layers } from 'lucide-react'
+import { Bot, Clock, Layers } from 'lucide-react'
 import { formatDayBadge } from '@/lib/format'
 import type { Client, WorkEntry } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -57,6 +57,12 @@ export function CalendarListRow({ entry, client, onClick }: Props) {
                 <Layers className="h-3 w-3 text-zinc-400" />
               )}
               {quantityLabel}
+            </span>
+          )}
+          {entry.source === 'automation' && (
+            <span className="inline-flex items-center gap-1 text-2xs text-zinc-400">
+              <Bot className="h-3 w-3" />
+              Automatycznie
             </span>
           )}
         </div>

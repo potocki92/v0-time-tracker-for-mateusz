@@ -12,6 +12,17 @@ export function isRealizedEntry(
   return (entry.entry_kind ?? 'real') === 'real' && entry.date <= todayIso
 }
 
+/**
+ * Wpis rzeczywisty — bez warunku na date.
+ *
+ * Rozliczenie i raporty musza brac wylacznie `real`: automat zapisu pracy
+ * tworzy `real` takze dla dni, dla ktorych istnieje juz reczny plan
+ * (`predicted`), wiec liczenie obu naliczyloby te sama date dwa razy.
+ */
+export function isRealEntry(entry: Pick<WorkEntry, 'entry_kind'>): boolean {
+  return (entry.entry_kind ?? 'real') === 'real'
+}
+
 export function partitionByRealization(
   entries: WorkEntry[],
   todayIso: string,
