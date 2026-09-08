@@ -31,6 +31,7 @@ export const QUERY_KEYS = {
   projectsData:() => [...QUERY_KEYS.all(), 'projects-data']  as const,
   accountProfile: () => [...QUERY_KEYS.all(), 'account-profile'] as const,
   weeklySummaryEmail: () => [...QUERY_KEYS.all(), 'weekly-summary-email'] as const,
+  workAutomation: () => [...QUERY_KEYS.all(), 'work-automation'] as const,
   trips:       () => [...QUERY_KEYS.all(), 'trips']          as const,
 } as const
 

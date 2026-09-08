@@ -1,6 +1,7 @@
 import type { Client, Project, WorkEntry } from '@/lib/types'
 import { daysBetween, getDateKey, isWithin, offsetDateKey, type DateKey } from './date-keys'
 import type { DateRange, PeriodPreset, ProjectUsage, ReportSummary, ReportsFilters } from './types'
+import { isRealEntry } from '@/lib/finance/realization'
 
 const PRESET_LABELS: Record<Exclude<PeriodPreset, 'custom'>, string> = {
   '7d':  'Ostatnie 7 dni',
@@ -77,8 +78,10 @@ export function computeReportSummary(
   const inRange  = filtered.filter((e) => isWithin(e.date, range.start, range.end))
   const inPrev   = filtered.filter((e) => isWithin(e.date, prev.start,  prev.end))
 
-  const worked     = inRange.filter((e) => e.status === 'worked')
-  const prevWorked = inPrev .filter((e) => e.status === 'worked')
+  // Plan (`predicted`) nie jest wykonaniem — bez tego filtru dzien z planem
+  // i z wpisem rzeczywistym wchodzilby do raportu dwa razy.
+  const worked     = inRange.filter((e) => e.status === 'worked' && isRealEntry(e))
+  const prevWorked = inPrev .filter((e) => e.status === 'worked' && isRealEntry(e))
 
   const totalHours = sumHours(worked)
   const activeDays = new Set(worked.map((e) => e.date)).size
@@ -120,7 +123,7 @@ export function workedEntriesInRange(
 ): WorkEntry[] {
   const range = resolveRange(filters.preset, todayKey, filters.from, filters.to)
   return applyFilters(workEntries, filters).filter(
-    (e) => e.status === 'worked' && isWithin(e.date, range.start, range.end),
+    (e) => e.status === 'worked' && isRealEntry(e) && isWithin(e.date, range.start, range.end),
   )
 }
 

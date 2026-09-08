@@ -8,6 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { WorkAutomationSection } from '@/features/work-automation'
 import { useCloseModal, useModalState } from '@/hooks/stores/useUiStore'
 import {
   useProfile,
@@ -113,6 +114,8 @@ export function SettingsDrawer() {
               />
             </>
           )}
+
+          <WorkAutomationSection />
 
           {weeklySummary && (
             <WeeklySummaryEmailSettings

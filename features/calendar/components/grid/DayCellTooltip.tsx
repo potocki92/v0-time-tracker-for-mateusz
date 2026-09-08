@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, Banknote, FileText, Layers } from 'lucide-react'
+import { Banknote, Bot, CalendarDays, Clock, FileText, Layers } from 'lucide-react'
 import type { Client, CURRENCY, WorkEntry } from '@/lib/types'
 import { formatDate, formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -89,6 +89,13 @@ export function DayCellTooltip({ entry, client, earnings }: Props) {
                 </span>
               )}
             </span>
+          </div>
+        )}
+
+        {entry.source === 'automation' && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Bot className="h-3 w-3 shrink-0" />
+            <span className="text-2xs">Automatycznie</span>
           </div>
         )}
 

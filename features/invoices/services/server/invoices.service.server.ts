@@ -510,6 +510,9 @@ export async function runAutoIssueInvoicesAction(): Promise<AutoIssueResult> {
       .select('status, hours, quantity, quantity_from, quantity_to, billing_rate, billing_currency, billing_work_type')
       .eq('user_id', userId)
       .eq('client_id', client.id)
+      // Plan (`predicted`) nie jest wykonaniem — bez tego filtru dzien majacy
+      // i plan, i wpis rzeczywisty trafilby na fakture dwa razy.
+      .eq('entry_kind', 'real')
       .gte('date', period.periodStart)
       .lte('date', period.periodEnd)
 

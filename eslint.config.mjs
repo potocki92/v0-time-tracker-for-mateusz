@@ -99,6 +99,15 @@ export default tseslint.config(
     rules: { 'no-restricted-syntax': 'off', 'no-restricted-properties': 'off' },
   },
 
+  // Baza stref IANA to arytmetyka dat, nie formatowanie: `lib/date/timezone`
+  // zwraca liczby i klucze "YYYY-MM-DD" (automat zapisu pracy musi wiedziec,
+  // ktora godzine ma uzytkownik u siebie). Zakaz Intl pilnuje spojnosci
+  // TEKSTU dla uzytkownika i nadal obowiazuje wszedzie indziej.
+  {
+    files: ['lib/date/timezone.ts'],
+    rules: { 'no-restricted-syntax': 'off', 'no-restricted-properties': 'off' },
+  },
+
   // Testy jednostkowe sprawdzaja wnetrze modulow — to ich zadanie.
   {
     files: ['__test__/**/*.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],

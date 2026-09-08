@@ -1,0 +1,55 @@
+# .github/workflows/work-automation.yml
+#
+# Automatyczne zapisywanie przepracowanych dni.
+#
+# Harmonogram jest CO GODZINE, nie co minute: zadanie samo wybiera daty, dla
+# ktorych ustawiona godzina zostala osiagnieta lub przekroczona, a decyzji
+# jeszcze nie ma. Realne opoznienie wzgledem ustawionej godziny to wiec do
+# ~60 minut plus opoznienie samego GitHub Actions (harmonogramy w godzinach
+# szczytu potrafia spoznic sie o kilkanascie minut). Interfejs mowi o tym
+# wprost — nie obiecujemy dokladnosci co do minuty.
+#
+# Sekrety repozytorium:
+#   APP_URL     — adres wdrozenia, np. https://time-tracker-mateusz.vercel.app
+#   CRON_SECRET — ten sam sekret, co w zmiennych srodowiskowych aplikacji
+
+name: Work Automation
+
+on:
+  schedule:
+    # O pelnej godzinie, przez cala dobe — strefa uzytkownika (IANA) jest
+    # rozstrzygana w aplikacji, wiec cron nie musi znac przesuniec ani DST.
+    - cron: '0 * * * *'
+  # Reczne uruchomienie z GitHub UI. Powtorka nie zdubluje wpisow — decyduje
+  # dziennik `work_automation_runs` i UNIQUE (user_id, date, entry_kind).
+  workflow_dispatch:
+
+jobs:
+  run-work-automation:
+    name: Run Work Automation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Invoke endpoint
+        run: |
+          RESPONSE=$(curl --silent --show-error --fail \
+            --request POST \
+            --url "${{ secrets.APP_URL }}/api/cron/work-automation" \
+            --header "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            --header "Content-Type: application/json" \
+            --data '{}')
+
+          echo "Response: $RESPONSE"
+
+          echo "$RESPONSE" | python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          if 'error' in data:
+              print(f'ERROR: {data[\"error\"]}')
+              sys.exit(1)
+          print(f'Processed: {data.get(\"processed\", 0)}, Created: {data.get(\"created\", 0)}, Skipped: {data.get(\"skipped\", 0)}, Failed: {data.get(\"failed\", 0)}')
+          if data.get('failed', 0):
+              print('\n'.join(data.get('errors', [])))
+              sys.exit(1)
+          "
