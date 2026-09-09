@@ -46,12 +46,15 @@ export function useExitProgress(ref: RefObject<HTMLElement | null>): MotionValue
 }
 
 /**
- * Polowa przerwy miedzy oknami scen (0,07), wiec przejscia sa niemal
- * SEKWENCYJNE: scena gasnie, zanim nastepna zdazy sie pojawic. Pelne
- * przenikanie dwoch gestych ekranow aplikacji dawalo w polowie drogi
- * nieczytelna kalke — dwa naglowki i dwa interfejsy naraz.
+ * DOKLADNIE polowa przerwy miedzy oknami scen (0,07), wiec przejscia sa
+ * scisle sekwencyjne: scena gasnie do zera w tym samym punkcie, w ktorym
+ * nastepna zaczyna sie pojawiac. Zadna para ekranow nie maluje sie naraz.
+ *
+ * Przy 0,045 zakresy zachodzily na siebie o 0,02 postepu i w tym oknie
+ * Kalendarz (opacity 0,11) prosvitywal przez Projekty (0,34) — kalka
+ * dwoch interfejsow, ktora widac bylo w kazdym przewinieciu.
  */
-const FADE = 0.045
+const FADE = 0.035
 
 /**
  * Okno widocznosci jednej warstwy sceny. Warstwy leza na sobie w gridzie,
@@ -69,8 +72,12 @@ export function useLayerFade(
   progress: MotionValue<number>,
   start: number,
   end: number,
-  shift = 20,
-): { opacity: MotionValue<number>; y: MotionValue<number> } {
+  shift = 14,
+): {
+  opacity: MotionValue<number>
+  y: MotionValue<number>
+  visibility: MotionValue<'hidden' | 'visible'>
+} {
   const fadeIn = start - FADE > 0
   const fadeOut = end + FADE < 1
 
@@ -83,8 +90,14 @@ export function useLayerFade(
   const opacities = [...(fadeIn ? [0] : []), 1, 1, ...(fadeOut ? [0] : [])]
   const offsets = [...(fadeIn ? [shift] : []), 0, 0, ...(fadeOut ? [-shift] : [])]
 
+  const opacity = useScrollMap(progress, keyframes, opacities)
+
   return {
-    opacity: useScrollMap(progress, keyframes, opacities),
+    opacity,
     y: useScrollMap(progress, keyframes, offsets),
+    // Warstwa wygaszona znika z malowania calkowicie. Samo `opacity: 0`
+    // zostawia ja w drzewie kompozycji — wystarczy blad zaokraglenia albo
+    // subpikselowe przenikanie, zeby przez aktywny ekran przebil poprzedni.
+    visibility: useTransform(opacity, (value) => (value < 0.02 ? 'hidden' : 'visible')),
   }
 }

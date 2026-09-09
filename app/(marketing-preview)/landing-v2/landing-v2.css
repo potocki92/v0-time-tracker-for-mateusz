@@ -235,6 +235,9 @@
   .lv2 .lv2-layers { display: block; }
   .lv2 .lv2-layer {
     opacity: 1 !important;
+    /* `visibility` tez, bo warstwy wygaszone chowamy nim z kompozycji —
+     * bez tego w tym trybie zostalaby widoczna tylko pierwsza scena. */
+    visibility: visible !important;
     transform: none !important;
     filter: none !important;
   }
@@ -242,6 +245,7 @@
   /* Elementy, ktorych `transform`/`opacity` pochodzi wprost ze scrolla. */
   .lv2 .lv2-motion {
     opacity: 1 !important;
+    visibility: visible !important;
     transform: none !important;
   }
 }

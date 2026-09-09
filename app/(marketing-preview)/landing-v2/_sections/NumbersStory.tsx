@@ -56,7 +56,11 @@ export function NumbersStory({ month }: { month: DemoMonth }) {
               <m.div
                 key={step.caption}
                 className="lv2-layer"
-                style={{ opacity: step.fade.opacity, y: step.fade.y }}
+                style={{
+                  opacity: step.fade.opacity,
+                  y: step.fade.y,
+                  visibility: step.fade.visibility,
+                }}
               >
                 <p
                   className={`lv2-colossal lv2-mono tabular-nums ${step.small ? 'lv2-colossal-sm' : ''}`}
