@@ -1,6 +1,7 @@
 'use client'
 
-import { formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import {
   BUDGET_OVERSPEND_THRESHOLD,
@@ -13,6 +14,7 @@ import { LinearCard } from '../linear/LinearCard'
 import { LINEAR } from '@/components/ui/tokens'
 
 export function BudgetUtilizationSection() {
+  const fmt = useFormat()
   const { data } = useProjectsData()
   const utilisation = useBudgetUtilization(data)
 
@@ -44,10 +46,10 @@ export function BudgetUtilizationSection() {
     >
       <div className={cn('border-b px-4 py-4 sm:px-5', LINEAR.borderInset)}>
         <p className="text-2xl font-semibold tabular-nums tracking-tight text-white sm:text-3xl">
-          {formatMoney(toMinor(utilisation.totalSpent), 'PLN')}
+          {fmt.money(toMinor(utilisation.totalSpent), 'PLN')}
         </p>
         <p className="mt-1 text-xs text-zinc-400">
-          z {formatMoney(toMinor(utilisation.totalBudget), 'PLN')} w umowach ·{' '}
+          z {fmt.money(toMinor(utilisation.totalBudget), 'PLN')} w umowach ·{' '}
           {utilisation.contractedCount}{' '}
           {utilisation.contractedCount === 1 ? 'projekt' : 'projektów'}
         </p>

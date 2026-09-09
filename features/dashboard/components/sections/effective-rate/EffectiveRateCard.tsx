@@ -1,7 +1,7 @@
 'use client'
 
-import { formatMoney, toMinor } from '@/lib/format'
-
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 export type ClientRate = {
   clientId: string
   name: string
@@ -25,6 +25,7 @@ export function EffectiveRateCard({
   clientsCount,
   rates,
 }: Props) {
+  const fmt = useFormat()
   return (
     <section
       aria-label="Stawka efektywna"
@@ -33,7 +34,7 @@ export function EffectiveRateCard({
       {/* Tytul niesie <SectionShell>, zakres — zakladki nad pasem KPI. */}
       <div className="flex items-baseline gap-2">
         <span className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
-          {blendedRate === null ? '—' : formatMoney(toMinor(blendedRate), currency)}
+          {blendedRate === null ? '—' : fmt.money(toMinor(blendedRate), currency)}
         </span>
         <span className="text-xs text-zinc-400 sm:text-sm">/ h</span>
       </div>
@@ -56,7 +57,7 @@ export function EffectiveRateCard({
                   <span className="truncate">{r.name}</span>
                 </span>
                 <span className="shrink-0 text-sm font-semibold tabular-nums text-zinc-300">
-                  {formatMoney(toMinor(r.ratePerHour), r.currency)}
+                  {fmt.money(toMinor(r.ratePerHour), r.currency)}
                   <span className="text-xs font-normal text-zinc-400"> /h</span>
                 </span>
               </div>

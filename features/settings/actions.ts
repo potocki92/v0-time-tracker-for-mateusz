@@ -1,6 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getLocale } from 'next-intl/server'
+
+import type { AppLocale } from '@/i18n/config'
 
 import { requireServerUser } from '@/lib/auth/server-user'
 import { createClient } from '@/lib/supabase/server'
@@ -8,6 +11,7 @@ import { AVATARS_BUCKET } from '@/lib/supabase/avatars'
 import { resolveAvatarUrl } from '@/lib/supabase/avatars.server'
 import { invoiceSettingsSchema } from '@/lib/schemas/invoice-settings.schema'
 import { sendMail } from '@/lib/email/mailer'
+import { fail, ok, type ActionResult } from '@/lib/errors/action-result'
 import { renderWeeklySummaryEmail } from '@/features/dashboard/server'
 import {
   accountSettingsSchema,
@@ -40,12 +44,18 @@ const MAX_AUTO_INVOICE_CLIENTS = 500
 
 const DEFAULT_INVOICE_SETTINGS: InvoiceSettings = invoiceSettingsSchema.parse({})
 
-/** Pierwszy komunikat walidacji — laduje w tym samym toascie, co bledy Supabase. */
-function firstIssue(error: { issues: { message: string }[] }, fallback: string): string {
-  return error.issues[0]?.message ?? fallback
+/**
+ * Server Actions ZWRACAJA kody bledow (`ActionResult`), nie zdania. Warstwa
+ * domenowa nie zna jezyka uzytkownika; tlumaczy dopiero UI, przez
+ * `messages/<locale>/errors.json`. Surowy komunikat Supabase nigdy nie trafia
+ * do uzytkownika — jest po angielsku, niesie szczegoly implementacyjne i
+ * bywa mylacy. Zostaje w logach serwera.
+ */
+function logCause(code: string, cause: unknown): void {
+  console.error(`[settings] ${code}`, cause)
 }
 
-export async function fetchAccountProfileAction(): Promise<AccountProfile> {
+export async function fetchAccountProfileAction(): Promise<ActionResult<AccountProfile>> {
   const user = await requireServerUser()
   const supabase = await createClient()
 
@@ -63,10 +73,11 @@ export async function fetchAccountProfileAction(): Promise<AccountProfile> {
     .limit(MAX_AUTO_INVOICE_CLIENTS)
 
   if (clientsError) {
-    throw new Error(`Nie udało się pobrać klientów dla auto-fakturowania: ${clientsError.message}`)
+    logCause('AUTOMATION_CLIENTS_LOAD_FAILED', clientsError)
+    return fail('AUTOMATION_CLIENTS_LOAD_FAILED')
   }
 
-  return {
+  return ok({
     id: user.id,
     firstName: metadata.first_name?.trim() ?? '',
     lastName: metadata.last_name?.trim() ?? '',
@@ -82,16 +93,14 @@ export async function fetchAccountProfileAction(): Promise<AccountProfile> {
       id: client.id,
       name: client.name,
     })),
-  }
+  })
 }
 
 export async function updateAccountProfileAction(
   values: AccountSettingsFormValues,
-): Promise<void> {
+): Promise<ActionResult> {
   const parsed = accountSettingsSchema.safeParse(values)
-  if (!parsed.success) {
-    throw new Error(firstIssue(parsed.error, 'Nieprawidłowe dane profilu'))
-  }
+  if (!parsed.success) return fail('INVALID_ACCOUNT_SETTINGS')
 
   const user = await requireServerUser()
   const supabase = await createClient()
@@ -107,21 +116,21 @@ export async function updateAccountProfileAction(
   })
 
   if (error) {
-    throw new Error(`Nie udało się zapisać profilu: ${error.message}`)
+    logCause('ACCOUNT_PROFILE_SAVE_FAILED', error)
+    return fail('ACCOUNT_PROFILE_SAVE_FAILED')
   }
 
   // Imie w AppShellu renderuje sie serwerowo w layoucie panelu, poza React
   // Query — to jedyna czesc, ktorej invalidateQueries nie odswiezy.
-  revalidatePath('/(app)', 'layout')
+  revalidatePath('/[locale]/(app)', 'layout')
+  return ok(undefined)
 }
 
 export async function updateInvoiceAutomationSettingsAction(
   values: InvoiceSettings,
-): Promise<void> {
+): Promise<ActionResult> {
   const parsed = invoiceSettingsSchema.safeParse(values)
-  if (!parsed.success) {
-    throw new Error(firstIssue(parsed.error, 'Nieprawidłowe ustawienia faktur'))
-  }
+  if (!parsed.success) return fail('INVALID_INVOICE_SETTINGS')
 
   const user = await requireServerUser()
   const supabase = await createClient()
@@ -135,14 +144,16 @@ export async function updateInvoiceAutomationSettingsAction(
   })
 
   if (error) {
-    throw new Error(`Nie udało się zapisać ustawień faktur: ${error.message}`)
+    logCause('INVOICE_SETTINGS_SAVE_FAILED', error)
+    return fail('INVOICE_SETTINGS_SAVE_FAILED')
   }
 
+  return ok(undefined)
 }
 
 const WEEKLY_SUMMARY_TABLE = 'weekly_summary_email_settings'
 
-export async function fetchWeeklySummaryEmailAction(): Promise<WeeklySummaryEmailSettings> {
+export async function fetchWeeklySummaryEmailAction(): Promise<ActionResult<WeeklySummaryEmailSettings>> {
   const user = await requireServerUser()
   const supabase = await createClient()
 
@@ -153,22 +164,21 @@ export async function fetchWeeklySummaryEmailAction(): Promise<WeeklySummaryEmai
     .maybeSingle()
 
   if (error) {
-    throw new Error(`Nie udało się pobrać ustawień skrótu tygodnia: ${error.message}`)
+    logCause('WEEKLY_SUMMARY_LOAD_FAILED', error)
+    return fail('WEEKLY_SUMMARY_LOAD_FAILED')
   }
 
-  return {
+  return ok({
     enabled: data?.enabled ?? false,
     recipientEmail: data?.recipient_email ?? '',
-  }
+  })
 }
 
 export async function updateWeeklySummaryEmailAction(
   values: WeeklySummaryEmailSettings,
-): Promise<void> {
+): Promise<ActionResult> {
   const parsed = weeklySummaryEmailSchema.safeParse(values)
-  if (!parsed.success) {
-    throw new Error(firstIssue(parsed.error, 'Nieprawidłowe ustawienia skrótu tygodnia'))
-  }
+  if (!parsed.success) return fail('INVALID_WEEKLY_SUMMARY_SETTINGS')
 
   const user = await requireServerUser()
   const supabase = await createClient()
@@ -183,8 +193,11 @@ export async function updateWeeklySummaryEmailAction(
   )
 
   if (error) {
-    throw new Error(`Nie udało się zapisać ustawień skrótu tygodnia: ${error.message}`)
+    logCause('WEEKLY_SUMMARY_SAVE_FAILED', error)
+    return fail('WEEKLY_SUMMARY_SAVE_FAILED')
   }
+
+  return ok(undefined)
 }
 
 /**
@@ -193,32 +206,34 @@ export async function updateWeeklySummaryEmailAction(
  * Nie dotyka `last_sent_*`: proba z ustawien ma nie zabrac ksiegowej
  * cotygodniowego maila.
  */
-export async function sendWeeklySummaryEmailNowAction(): Promise<{ recipient: string }> {
-  const settings = await fetchWeeklySummaryEmailAction()
-  if (!settings.recipientEmail) {
-    throw new Error('Najpierw zapisz adres e-mail odbiorcy')
-  }
+export async function sendWeeklySummaryEmailNowAction(): Promise<
+  ActionResult<{ recipient: string }>
+> {
+  const settingsResult = await fetchWeeklySummaryEmailAction()
+  if (!settingsResult.ok) return settingsResult
+  const settings = settingsResult.data
+
+  if (!settings.recipientEmail) return fail('WEEKLY_SUMMARY_NO_RECIPIENT')
 
   const user = await requireServerUser()
   const supabase = await createClient()
-  const email = await renderWeeklySummaryEmail(supabase, user.id)
+  // Uzytkownik klikajacy „Wyslij teraz" JEST wlascicielem konta, wiec jezyk
+  // jego interfejsu jest wlasciwym jezykiem maila.
+  const locale = (await getLocale()) as AppLocale
+  const email = await renderWeeklySummaryEmail(supabase, user.id, locale)
 
-  if (email.isEmpty) {
-    throw new Error('Brak przepracowanych dni w tym tygodniu — nie ma czego wysłać')
-  }
+  if (email.isEmpty) return fail('WEEKLY_SUMMARY_EMPTY')
 
   await sendMail({ to: settings.recipientEmail, subject: email.subject, text: email.text })
 
-  return { recipient: settings.recipientEmail }
+  return ok({ recipient: settings.recipientEmail })
 }
 
 export async function uploadAvatarAction(
   file: File,
-): Promise<{ avatarPath: string; avatarUrl: string }> {
+): Promise<ActionResult<{ avatarPath: string; avatarUrl: string }>> {
   const parsed = avatarFileSchema.safeParse(file)
-  if (!parsed.success) {
-    throw new Error(firstIssue(parsed.error, 'Nieprawidłowy plik'))
-  }
+  if (!parsed.success) return fail('INVALID_AVATAR_FILE')
 
   const user = await requireServerUser()
   const supabase = await createClient()
@@ -235,7 +250,8 @@ export async function uploadAvatarAction(
     })
 
   if (uploadError) {
-    throw new Error(`Nie udało się wgrać pliku: ${uploadError.message}`)
+    logCause('AVATAR_UPLOAD_FAILED', uploadError)
+    return fail('AVATAR_UPLOAD_FAILED')
   }
 
   const existingMetadata = (user.user_metadata ?? {}) as UserMetadata
@@ -248,17 +264,16 @@ export async function uploadAvatarAction(
   })
 
   if (updateError) {
-    throw new Error(`Nie udało się zapisać avatara: ${updateError.message}`)
+    logCause('AVATAR_SAVE_FAILED', updateError)
+    return fail('AVATAR_SAVE_FAILED')
   }
 
   const avatarUrl = await resolveAvatarUrl(avatarPath, { preferSigned: true })
 
-  if (!avatarUrl) {
-    throw new Error('Nie udało się wygenerować adresu avatara')
-  }
+  if (!avatarUrl) return fail('AVATAR_URL_FAILED')
 
   // Avatar w AppShellu przychodzi z serwerowego layoutu, nie z React Query.
-  revalidatePath('/(app)', 'layout')
+  revalidatePath('/[locale]/(app)', 'layout')
 
-  return { avatarPath, avatarUrl }
+  return ok({ avatarPath, avatarUrl })
 }

@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
-import { SITE, absoluteUrl } from './site'
+import { getTranslations } from 'next-intl/server'
+
+import { OG_LOCALE, type AppLocale } from '@/i18n/config'
+
+import { SITE, absoluteUrl, alternateLanguages, localizedUrl } from './site'
 
 interface BuildMetadataInput {
+  /** Jezyk WERSJI, dla ktorej budujemy metadane. */
+  locale: AppLocale
+  /** Sciezka BEZ prefiksu jezyka, np. `/` albo `/auth/login`. */
+  path?: string
+  /** Nadpisanie tytulu; domyslnie tytul strony glownej z `messages/<locale>/seo.json`. */
   title?: string
   description?: string
-  path?: string
   keywords?: string[]
   noindex?: boolean
   ogImage?: {
@@ -19,14 +27,19 @@ interface BuildMetadataInput {
 }
 
 /**
- * Buduje spójny obiekt `Metadata` z OG + Twitter Cards + canonical + robots.
- * Wywołuj w każdym `page.tsx` / `layout.tsx` (Server Component).
+ * Buduje spójny obiekt `Metadata` z OG + Twitter Cards + canonical + hreflang.
+ *
+ * Kluczowa zasada SEO wielojezycznego: KAZDA wersja ma canonical wskazujacy na
+ * SIEBIE (`/de` → `/de`, nigdy `/de` → `/`), a `alternates.languages` opisuje
+ * pelen komplet wersji plus `x-default`. Bez tego trzy wersje jezykowe tej
+ * samej strony wygladaja dla wyszukiwarki jak zduplikowana tresc.
  */
-export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
+export async function buildLocalizedMetadata(input: BuildMetadataInput): Promise<Metadata> {
   const {
-    title,
-    description = SITE.description,
+    locale,
     path = '/',
+    title,
+    description,
     keywords,
     noindex = false,
     ogImage = SITE.ogImage,
@@ -35,8 +48,11 @@ export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
     modifiedTime,
   } = input
 
-  const fullTitle = title ? title : SITE.title
-  const url = absoluteUrl(path)
+  const t = await getTranslations({ locale, namespace: 'seo' })
+
+  const resolvedTitle = title ?? t('site.title')
+  const resolvedDescription = description ?? t('site.description')
+  const url = localizedUrl(locale, path)
   const ogImageUrl = ogImage.url.startsWith('http')
     ? ogImage.url
     : absoluteUrl(ogImage.url)
@@ -44,10 +60,15 @@ export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
   return {
     metadataBase: new URL(SITE.url),
     title: title
-      ? { absolute: title.includes(SITE.shortName) ? title : `${title} · ${SITE.name}` }
-      : { default: SITE.title, template: SITE.titleTemplate },
-    description,
-    keywords: keywords ?? Array.from(SITE.keywords),
+      ? { absolute: title.includes(SITE.name) ? title : `${title} · ${SITE.name}` }
+      : { default: resolvedTitle, template: SITE.titleTemplate },
+    description: resolvedDescription,
+    keywords:
+      keywords ??
+      t('site.keywords')
+        .split(',')
+        .map((keyword) => keyword.trim())
+        .filter(Boolean),
     applicationName: SITE.name,
     authors: [{ name: SITE.legalName, url: SITE.url }],
     creator: SITE.legalName,
@@ -55,10 +76,10 @@ export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
     category: 'business',
     alternates: {
       canonical: url,
-      languages: {
-        'pl-PL': url,
-        'x-default': url,
-      },
+      // Strony `noindex` (auth) nie potrzebuja mapy wersji jezykowych —
+      // wyszukiwarka i tak ich nie indeksuje, a `hreflang` na nieindeksowanej
+      // stronie jest sygnalem sprzecznym.
+      ...(noindex ? {} : { languages: alternateLanguages(path) }),
     },
     robots: noindex
       ? {
@@ -81,10 +102,11 @@ export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
     openGraph: {
       type,
       siteName: SITE.name,
-      title: fullTitle,
-      description,
+      title: resolvedTitle,
+      description: resolvedDescription,
       url,
-      locale: SITE.locale,
+      locale: OG_LOCALE[locale],
+      alternateLocale: Object.values(OG_LOCALE).filter((tag) => tag !== OG_LOCALE[locale]),
       images: [
         {
           url: ogImageUrl,
@@ -93,14 +115,12 @@ export function buildMetadata(input: BuildMetadataInput = {}): Metadata {
           alt: ogImage.alt ?? SITE.ogImage.alt,
         },
       ],
-      ...(type === 'article' && publishedTime
-        ? { publishedTime, modifiedTime }
-        : {}),
+      ...(type === 'article' && publishedTime ? { publishedTime, modifiedTime } : {}),
     },
     twitter: {
       card: 'summary_large_image',
-      title: fullTitle,
-      description,
+      title: resolvedTitle,
+      description: resolvedDescription,
       site: SITE.twitterHandle,
       creator: SITE.twitterHandle,
       images: [ogImageUrl],

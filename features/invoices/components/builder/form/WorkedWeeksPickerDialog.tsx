@@ -1,7 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { formatHours, formatMoney, toMinor, type Currency } from '@/lib/format'
+import { toMinor, type Currency } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarRange, Loader2 } from 'lucide-react'
 
@@ -41,8 +43,8 @@ function defaultRange() {
   }
 }
 
-function formatAmount(amount: number, currency: string) {
-  return formatMoney(toMinor(amount), currency as Currency)
+function formatAmount(fmt: AppFormat, amount: number, currency: string) {
+  return fmt.money(toMinor(amount), currency as Currency)
 }
 
 /**
@@ -57,6 +59,7 @@ export function WorkedWeeksPickerDialog({
   onClose,
   onConfirm,
 }: WorkedWeeksPickerDialogProps) {
+  const fmt = useFormat()
   const [range, setRange] = React.useState(defaultRange)
   const [selected, setSelected] = React.useState<Set<string>>(new Set())
 
@@ -183,12 +186,12 @@ export function WorkedWeeksPickerDialog({
                           <div className="flex items-baseline justify-between gap-3">
                             <p className="font-medium">{week.id}</p>
                             <p className="text-sm font-semibold">
-                              {formatAmount(week.amount, week.currency)}
+                              {formatAmount(fmt, week.amount, week.currency)}
                             </p>
                           </div>
                           <p className="text-xs text-muted-foreground">
                             {week.start} – {week.end} · {week.workedDays}{' '}
-                            {week.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(week.hours)}
+                            {week.workedDays === 1 ? 'dzień' : 'dni'} · {fmt.hours(week.hours)}
                           </p>
                           {!week.hasRate ? (
                             <p className="mt-1 text-xs text-warning-400">

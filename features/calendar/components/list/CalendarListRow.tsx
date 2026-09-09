@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Bot, Clock, Layers } from 'lucide-react'
-import { formatDayBadge } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import type { Client, WorkEntry } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { STATUS_CONFIG } from '../../domain/calendar.constants'
@@ -18,8 +18,9 @@ interface Props {
  * Kompaktowy layout, tap-friendly target (min-h-[56px]).
  */
 export function CalendarListRow({ entry, client, onClick }: Props) {
+  const fmt = useFormat()
   const cfg = STATUS_CONFIG[entry.status as WorkStatus]
-  const badge = formatDayBadge(entry.date)
+  const badge = fmt.dayBadge(entry.date)
 
   const quantityLabel =
     entry.status === 'worked' && client

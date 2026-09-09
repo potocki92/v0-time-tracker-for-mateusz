@@ -3,6 +3,7 @@ import { renderWeeklySummaryEmail } from '@/features/dashboard/server'
 import { sendMail } from '@/lib/email/mailer'
 import { isSentForWeek, type WeeklySummaryEmailRow } from '@/lib/email/weekly-summary-dispatch'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from '@/i18n/config'
 
 /**
  * Cotygodniowa wysylka skrotu dla ksiegowej.
@@ -35,6 +36,24 @@ function isAuthorized(request: NextRequest): boolean {
   return request.headers.get('authorization') === `Bearer ${secret}`
 }
 
+/**
+ * Jezyk interfejsu wlasciciela konta. Brak preferencji albo blad odczytu
+ * oznacza jezyk bazowy — mail ma wyjsc, nawet gdy metadanych nie da sie
+ * przeczytac.
+ */
+async function ownerLocale(
+  supabase: ReturnType<typeof createAdminClient>,
+  userId: string,
+): Promise<AppLocale> {
+  try {
+    const { data } = await supabase.auth.admin.getUserById(userId)
+    const preferred = data?.user?.user_metadata?.preferred_locale
+    return isAppLocale(preferred) ? preferred : DEFAULT_LOCALE
+  } catch {
+    return DEFAULT_LOCALE
+  }
+}
+
 export async function POST(request: NextRequest) {
   if (!isAuthorized(request)) {
     return json({ error: 'Unauthorized' }, 401)
@@ -59,7 +78,13 @@ export async function POST(request: NextRequest) {
 
     for (const row of rows) {
       try {
-        const email = await renderWeeklySummaryEmail(supabase, row.user_id)
+        // Jezyk maila = `preferred_locale` WLASCICIELA konta. Cron nie ma
+        // requestu uzytkownika, wiec czyta go wprost z Auth Admin API.
+        const email = await renderWeeklySummaryEmail(
+          supabase,
+          row.user_id,
+          await ownerLocale(supabase, row.user_id),
+        )
 
         if (email.isEmpty || isSentForWeek(row, email.weekYear, email.weekNumber)) {
           skipped++

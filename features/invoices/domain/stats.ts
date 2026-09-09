@@ -1,4 +1,4 @@
-import { formatMonthName } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
 import type { CURRENCY, Invoice } from '@/lib/types'
 import { InvoiceStatus, deriveInvoiceStatus } from '@/lib/finance/invoice-status'
 
@@ -105,13 +105,14 @@ function trendPercent(curr: number, prev: number): number | null {
 }
 
 export function computeInvoicesStats(
+  fmt: AppFormat,
   invoices: Invoice[],
   currency: CURRENCY,
   now: Date = new Date(),
 ): InvoicesAggregateStats {
   const monthIndex = now.getMonth()
   const year = now.getFullYear()
-  const monthLabel = formatMonthName(monthKey(year, monthIndex), 'long').toUpperCase()
+  const monthLabel = fmt.monthName(monthKey(year, monthIndex), 'long').toUpperCase()
   const cycleLabel = `Q${quarterFromMonth(monthIndex)}`
 
   const onlyCurrency = invoices.filter((inv) => (inv.currency ?? 'PLN') === currency)
@@ -206,7 +207,7 @@ export function computeInvoicesStats(
     cashflowMonths.push({
       monthIndex: ref.getMonth(),
       year: ref.getFullYear(),
-      label: formatMonthName(monthKey(ref.getFullYear(), ref.getMonth()), 'short'),
+      label: fmt.monthName(monthKey(ref.getFullYear(), ref.getMonth()), 'short'),
       total,
     })
   }

@@ -1,0 +1,33 @@
+{
+  "email": {
+    "required": "Email is required",
+    "invalid": "Enter a valid email address"
+  },
+  "password": {
+    "required": "Password is required",
+    "tooShort": "Password must be at least {min} characters",
+    "tooLong": "Password is too long",
+    "repeat": "Repeat your password",
+    "mismatch": "Passwords must match"
+  },
+  "fullName": {
+    "required": "Full name is required"
+  },
+  "firstName": {
+    "tooShort": "First name must be at least {min} characters",
+    "tooLong": "First name can be at most {max} characters"
+  },
+  "lastName": {
+    "tooShort": "Last name must be at least {min} characters",
+    "tooLong": "Last name can be at most {max} characters"
+  },
+  "username": {
+    "tooShort": "Username must be at least {min} characters",
+    "tooLong": "Username can be at most {max} characters",
+    "pattern": "Use lowercase letters, digits and the characters _ . - only"
+  },
+  "avatar": {
+    "tooLarge": "Maximum file size is {max} MB",
+    "wrongType": "Allowed formats: JPG, PNG, WEBP"
+  }
+}

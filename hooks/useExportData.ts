@@ -12,6 +12,7 @@
  */
 
 import { useCallback, useState } from 'react'
+import { useFormat } from '@/lib/format/client'
 import type { WorkEntry, Client } from '@/lib/types'
 import { calculateEarnings } from '@/lib/finance/earnings'
 
@@ -107,6 +108,7 @@ export function useExportData({
   eurRate,
   periodLabel,
 }: UseExportDataOptions): UseExportDataReturn {
+  const fmt = useFormat()
   const [isExporting, setIsExporting] = useState(false)
 
   const exportCSV = useCallback(() => {
@@ -136,7 +138,7 @@ export function useExportData({
       }
 
       const blob     = await pdf(
-        EarningsReport({ rows, totals, periodLabel })
+        EarningsReport({ rows, totals, periodLabel, fmt })
       ).toBlob()
 
       const url      = URL.createObjectURL(blob)
@@ -149,7 +151,7 @@ export function useExportData({
     } finally {
       setIsExporting(false)
     }
-  }, [entries, clients, eurRate, periodLabel])
+  }, [fmt, entries, clients, eurRate, periodLabel])
 
   return { exportCSV, exportPDF, isExporting }
 }

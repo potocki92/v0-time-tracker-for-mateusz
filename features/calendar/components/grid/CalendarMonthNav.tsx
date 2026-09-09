@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { formatMonthTitle } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getMonthKey } from '@/lib/helpers'
 import { DAY_NAMES } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -22,6 +22,7 @@ export function CalendarMonthNav({
   onNext,
   onToday,
 }: Props) {
+  const fmt = useFormat()
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
@@ -37,7 +38,7 @@ export function CalendarMonthNav({
 
         <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
           <h2 className="truncate text-sm font-semibold tracking-tight text-white sm:text-base">
-            {formatMonthTitle(getMonthKey(currentYear, currentMonth))}
+            {fmt.monthTitle(getMonthKey(currentYear, currentMonth))}
           </h2>
           {!isCurrentMonth && (
             <Button

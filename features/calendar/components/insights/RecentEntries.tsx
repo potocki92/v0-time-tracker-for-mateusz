@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { ArrowUpRight, ClipboardList } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { formatDayBadge, formatHours, formatMoney } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import type { RecentEntry } from '../../domain/calendar.types'
 
@@ -56,11 +56,12 @@ export function RecentEntries({ entries, onViewAll }: Props) {
 }
 
 function RecentRow({ entry }: { entry: RecentEntry }) {
-  const badge = formatDayBadge(entry.date)
+  const fmt = useFormat()
+  const badge = fmt.dayBadge(entry.date)
   const amountStr =
     entry.currency === 'PLN'
-      ? formatMoney(entry.amountMinorPLN, 'PLN')
-      : `${formatMoney(entry.amountMinorNative, entry.currency)} · ${formatMoney(entry.amountMinorPLN, 'PLN')}`
+      ? fmt.money(entry.amountMinorPLN, 'PLN')
+      : `${fmt.money(entry.amountMinorNative, entry.currency)} · ${fmt.money(entry.amountMinorPLN, 'PLN')}`
 
   return (
     <li className="flex items-center gap-3 py-2.5">
@@ -86,7 +87,7 @@ function RecentRow({ entry }: { entry: RecentEntry }) {
 
       <div className="shrink-0 text-right">
         <div className="text-xs font-semibold tabular-nums text-white">
-          {formatHours(entry.hours)}
+          {fmt.hours(entry.hours)}
         </div>
         <div className="text-2xs tabular-nums text-zinc-400">{amountStr}</div>
       </div>

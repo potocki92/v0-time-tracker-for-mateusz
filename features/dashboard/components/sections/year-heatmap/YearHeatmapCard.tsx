@@ -8,7 +8,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { HEATMAP_LEVELS } from '@/components/ui/tokens'
-import { formatCount, formatDate, formatHours, formatWeekday } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import type { WorkEntry } from '@/lib/types'
 import { buildHeatmap, HEATMAP_WEEKS } from './heatmap'
@@ -22,8 +23,8 @@ const DAY_LABELS = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
 /** Widoczne są co drugie — reszta zostaje dla czytnika ekranu. */
 const VISIBLE_DAY_LABELS = new Set([0, 2, 4])
 
-function formatDay(iso: string): string {
-  return `${formatWeekday(iso, 'short')}, ${formatDate(iso, 'dayMonth')}`
+function formatDay(fmt: AppFormat, iso: string): string {
+  return `${fmt.weekday(iso, 'short')}, ${fmt.date(iso, 'dayMonth')}`
 }
 
 /**
@@ -33,7 +34,8 @@ function formatDay(iso: string): string {
  * osobna sekcja tier `archive`: wlasny chunk, montowana leniwie.
  */
 export function YearHeatmapCard({ entries }: Props) {
-  const heatmap = useMemo(() => buildHeatmap(entries), [entries])
+  const fmt = useFormat()
+  const heatmap = useMemo(() => buildHeatmap(fmt, entries), [fmt, entries])
 
   // Siatka roczna jest szersza niz karta na waskich ekranach, a interesujacy
   // jest jej PRAWY koniec — biezacy tydzien. Bez tego telefon pokazywalby
@@ -57,10 +59,10 @@ export function YearHeatmapCard({ entries }: Props) {
         <div ref={scrollRef} className="overflow-x-auto pb-1">
           <div
             role="img"
-            aria-label={`Aktywność z ostatnich ${HEATMAP_WEEKS} tygodni: ${formatCount(
+            aria-label={`Aktywność z ostatnich ${HEATMAP_WEEKS} tygodni: ${fmt.count(
               heatmap.activeDays,
               ['dzień', 'dni', 'dni'],
-            )} z wpisami, łącznie ${formatHours(heatmap.totalHours)}`}
+            )} z wpisami, łącznie ${fmt.hours(heatmap.totalHours)}`}
             className="flex w-fit gap-2"
           >
             <div
@@ -114,8 +116,8 @@ export function YearHeatmapCard({ entries }: Props) {
                           </TooltipTrigger>
                           <TooltipContent side="top" sideOffset={4}>
                             {cell.isFuture
-                              ? `${formatDay(cell.date)} · jeszcze przed nami`
-                              : `${formatDay(cell.date)} · ${formatHours(cell.hours)}`}
+                              ? `${formatDay(fmt, cell.date)} · jeszcze przed nami`
+                              : `${formatDay(fmt, cell.date)} · ${fmt.hours(cell.hours)}`}
                           </TooltipContent>
                         </Tooltip>
                       ))}
@@ -132,8 +134,8 @@ export function YearHeatmapCard({ entries }: Props) {
           <tbody>
             {heatmap.weeks.map((week) => (
               <tr key={week.startDate}>
-                <th scope="row">Tydzień od {formatDay(week.startDate)}</th>
-                <td>{formatHours(week.totalHours)}</td>
+                <th scope="row">Tydzień od {formatDay(fmt, week.startDate)}</th>
+                <td>{fmt.hours(week.totalHours)}</td>
               </tr>
             ))}
           </tbody>
@@ -141,7 +143,7 @@ export function YearHeatmapCard({ entries }: Props) {
 
         <div className="mt-2 flex items-center justify-between gap-3 text-2xs text-zinc-400">
           <span className="tabular-nums">
-            {formatCount(heatmap.activeDays, ['dzień', 'dni', 'dni'])} z wpisami przez
+            {fmt.count(heatmap.activeDays, ['dzień', 'dni', 'dni'])} z wpisami przez
             ostatni rok
           </span>
           <span aria-hidden className="flex items-center gap-1">

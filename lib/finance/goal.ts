@@ -1,4 +1,4 @@
-import { formatDate } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
 import type { Goal } from '@/features/dashboard/domain'
 import { Client, MonthlyTotals, WorkEntry } from '@/lib/types'
 import { calculateEarnings } from './earnings'
@@ -42,6 +42,7 @@ export function getCurrentEarningsForGoal(
  * w walucie celu — spójnie z `getCurrentEarningsForGoal` (izolacja walut).
  */
 export function findGoalReachedDate(
+  fmt: AppFormat,
   entries: WorkEntry[],
   clients: Client[],
   goal: Goal | null,
@@ -60,7 +61,7 @@ export function findGoalReachedDate(
     if (earned.currency !== goal.currency) continue
     cumulative += earned.amount
     if (cumulative >= target) {
-      return formatDate(entry.date, 'dayMonth')
+      return fmt.date(entry.date, 'dayMonth')
     }
   }
   return null

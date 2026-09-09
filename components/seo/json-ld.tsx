@@ -1,3 +1,6 @@
+import { getTranslations } from 'next-intl/server'
+
+import type { AppLocale } from '@/i18n/config'
 import {
   organizationLd,
   websiteLd,
@@ -20,25 +23,31 @@ function JsonLd({ id, data }: JsonLdProps) {
   )
 }
 
-function OrganizationJsonLd() {
-  return <JsonLd id="ld-organization" data={organizationLd()} />
-}
+/**
+ * Globalne wezly JSON-LD (Organization + WebSite + SoftwareApplication).
+ *
+ * Opis i lista funkcji ida z `messages/<locale>/seo.json` i `marketing.json`,
+ * wiec strukturalne dane wyszukiwarki mowia tym samym jezykiem, co strona.
+ */
+export async function GlobalJsonLd({ locale }: { locale: AppLocale }) {
+  const seo = await getTranslations({ locale, namespace: 'seo' })
+  const marketing = await getTranslations({ locale, namespace: 'marketing' })
 
-function WebsiteJsonLd() {
-  return <JsonLd id="ld-website" data={websiteLd()} />
-}
+  const copy = { name: seo('site.title'), description: seo('site.description') }
+  const featureList = [
+    'dayEntries',
+    'clientRates',
+    'projectBudgets',
+    'invoiceBuilder',
+    'reports',
+    'workAutomation',
+  ].map((key) => marketing(`everything.items.${key}.title`))
 
-function SoftwareApplicationJsonLd() {
-  return <JsonLd id="ld-software" data={softwareApplicationLd()} />
-}
-
-/** Wstrzykuje wszystkie globalne węzły JSON-LD (Organization + WebSite + Software). */
-export function GlobalJsonLd() {
   return (
     <>
-      <OrganizationJsonLd />
-      <WebsiteJsonLd />
-      <SoftwareApplicationJsonLd />
+      <JsonLd id="ld-organization" data={organizationLd()} />
+      <JsonLd id="ld-website" data={websiteLd(locale, copy)} />
+      <JsonLd id="ld-software" data={softwareApplicationLd(locale, copy, featureList)} />
     </>
   )
 }

@@ -1,5 +1,6 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import { formatHours, formatMoney, formatNumber, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -17,26 +18,27 @@ type Props = {
  * stopniu pisma i innej hierarchii niż wszystkie sąsiadki w kolumnie.
  */
 export function ChartHeader({ trend, totalHours, totalEarnings, avgHours }: Props) {
+  const fmt = useFormat()
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         {/* Tytul niesie <SectionShell>. */}
         <p className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
-          {formatHours(totalHours)}
+          {fmt.hours(totalHours)}
         </p>
         <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 text-2xs leading-[1.4] tabular-nums text-zinc-400 sm:text-xs">
           <span className="font-medium text-zinc-300">
-            {formatMoney(toMinor(totalEarnings.pln), 'PLN')}
+            {fmt.money(toMinor(totalEarnings.pln), 'PLN')}
           </span>
           {totalEarnings.eur > 0 && (
-            <span>({formatMoney(toMinor(totalEarnings.eur), 'EUR')})</span>
+            <span>({fmt.money(toMinor(totalEarnings.eur), 'EUR')})</span>
           )}
           {/* Srednia w naglowku, a nie jako etykieta na linii odniesienia:
               tam napis lezal na samej linii i na slupkach. */}
           {avgHours > 0 && (
             <>
               <span aria-hidden className="text-zinc-600">·</span>
-              <span>śr. {formatHours(avgHours)}</span>
+              <span>śr. {fmt.hours(avgHours)}</span>
             </>
           )}
         </p>
@@ -61,7 +63,7 @@ export function ChartHeader({ trend, totalHours, totalEarnings, avgHours }: Prop
             <Minus className="h-3 w-3" aria-hidden />
           )}
           {trend > 0 ? '+' : ''}
-          {formatNumber(trend, { decimals: 1 })}%
+          {fmt.number(trend, { decimals: 1 })}%
         </span>
       )}
     </div>

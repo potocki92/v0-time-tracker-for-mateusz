@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { toDateKey } from '@/lib/date/format'
-import { formatDate } from '@/lib/format'
-
+import { useFormat } from '@/lib/format/client'
 type Props = {
   appName?: string
   version?: string
@@ -33,13 +32,14 @@ export function AppFooter({
   version = 'v1.0.0',
   syncedAt,
 }: Props) {
+  const fmt = useFormat()
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 60_000)
     return () => clearInterval(t)
   }, [])
 
-  const today = formatDate(toDateKey(now), 'long')
+  const today = fmt.date(toDateKey(now), 'long')
 
   const synced = syncedAt ? relative(now, syncedAt) : null
 

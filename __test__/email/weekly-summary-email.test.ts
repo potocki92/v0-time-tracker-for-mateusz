@@ -6,6 +6,10 @@ import { formatWeeklySummaryText } from '@/features/dashboard/components/section
 import { isSentForWeek } from '@/lib/email/weekly-summary-dispatch'
 import { weeklySummaryEmailSchema } from '@/features/settings/domain'
 import type { Client, Project, WorkEntry } from '@/lib/types'
+import { createFormat } from '@/lib/format'
+
+/** Formattery jezyka bazowego — testy sprawdzaja logike, nie tlumaczenia. */
+const fmt = createFormat('pl')
 
 // Sobota 22.08.2026, 12:00 — tydzien ISO 34 (17.08–23.08), czyli ten sam,
 // ktory automat wysyla w sobotni wieczor.
@@ -103,8 +107,8 @@ describe('renderWeeklySummaryEmail', () => {
     })
 
     const email = await renderWeeklySummaryEmail(supabase, 'u1')
-    const copied = formatWeeklySummaryText(
-      buildWeeklySummary(ENTRIES, [CLIENT], NOW, undefined, [PROJECT]),
+    const copied = formatWeeklySummaryText(fmt, 
+      buildWeeklySummary(fmt, ENTRIES, [CLIENT], NOW, undefined, [PROJECT]),
     )
 
     expect(email.text).toBe(copied)

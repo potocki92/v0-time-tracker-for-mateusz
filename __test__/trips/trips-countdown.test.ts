@@ -8,6 +8,11 @@ import {
   type Trip,
 } from '@/features/trips/domain'
 
+import { createFormat } from '@/lib/format'
+
+/** Formattery jezyka bazowego — testy sprawdzaja logike, nie tlumaczenia. */
+const fmt = createFormat('pl')
+
 const trip = (start: string, end: string, destination?: string): Trip => ({
   id: `${start}-${end}`,
   startDate: start,
@@ -101,7 +106,7 @@ describe('helpers', () => {
   })
 
   it('formatPlLongDate zwraca dzień tygodnia po polsku', () => {
-    expect(formatPlLongDate('2026-05-31')).toBe('niedziela, 31 maja')
+    expect(formatPlLongDate(fmt, '2026-05-31')).toBe('niedziela, 31 maja')
   })
 
   it('pluralizeDni rozróżnia 1 vs resztę', () => {

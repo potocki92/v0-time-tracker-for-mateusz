@@ -29,7 +29,8 @@ import {
   clientNameToColor,
   readableTextColor,
 } from '@/components/common/ClientDisplay'
-import { formatHours, formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import {
   ACTIVITY_DOT,
@@ -61,6 +62,7 @@ function pluralizeEntries(count: number): string {
 }
 
 export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCardProps) {
+  const fmt = useFormat()
   const [actionsOpen, setActionsOpen] = useState(false)
   const [detailsOpen, setDetailsOpen] = useState(false)
 
@@ -219,7 +221,7 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
           label="Stawka"
           value={
             <>
-              {formatMoney(toMinor(client.rate), client.currency)}
+              {fmt.money(toMinor(client.rate), client.currency)}
               <span className="text-2xs font-normal text-zinc-400">/{unit}</span>
             </>
           }
@@ -227,14 +229,14 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
         <Metric label="Ostatni wpis" value={lastEntry ?? '—'} empty={!lastEntry} />
         <Metric
           label="Godziny"
-          value={client.totalHours > 0 ? `${formatHours(client.totalHours)}` : '—'}
+          value={client.totalHours > 0 ? `${fmt.hours(client.totalHours)}` : '—'}
           empty={client.totalHours <= 0}
         />
         <Metric
           label="Zarobek"
           value={
             client.totalEarningsInClientCurrency > 0
-              ? formatMoney(toMinor(client.totalEarningsInClientCurrency), client.currency)
+              ? fmt.money(toMinor(client.totalEarningsInClientCurrency), client.currency)
               : '—'
           }
           empty={client.totalEarningsInClientCurrency <= 0}

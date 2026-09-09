@@ -1,6 +1,7 @@
 'use client'
 
 import { SURFACE } from '@/components/ui/tokens'
+import { useFormat } from '@/lib/format/client'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Home, Plane, Plus, Settings2 } from 'lucide-react'
 import {
@@ -21,6 +22,7 @@ interface TripCountdownCardProps {
  * - `no_trips` — pusty stan z CTA, by uniknąć martwego kafelka.
  */
 export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
+  const fmt = useFormat()
   if (state.mode === 'no_trips') {
     return (
       <section
@@ -63,7 +65,7 @@ export function TripCountdownCard({ state, onManage }: TripCountdownCardProps) {
 
   const isToday = state.days === 0
   const dayWord = pluralizeDni(state.days)
-  const targetLabel = state.targetDate ? formatPlLongDate(state.targetDate) : null
+  const targetLabel = state.targetDate ? formatPlLongDate(fmt, state.targetDate) : null
 
   return (
     <section

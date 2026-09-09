@@ -21,7 +21,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import type { Client, ClientRateFormData } from '@/lib/types'
 import { useClientRates } from '../hooks/useClientRates'
 import {
@@ -36,6 +37,7 @@ type Props = {
 }
 
 export function RateHistoryDialog({ client, open, onClose }: Props) {
+  const fmt = useFormat()
   const { rates, isLoading, isError } = useClientRates(client?.id ?? null)
   const addRate    = useAddClientRate()
   const deleteRate = useDeleteClientRate()
@@ -109,7 +111,7 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold tabular-nums">
-                            {formatMoney(toMinor(r.rate), r.currency)}
+                            {fmt.money(toMinor(r.rate), r.currency)}
                             <span className="text-xs font-normal text-muted-foreground">
                               /{r.work_type === 'hourly' ? 'h' : (r.unit ?? 'szt')}
                             </span>
@@ -250,12 +252,13 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
 }
 
 function CurrentOnly({ client }: { client: Client }) {
+  const fmt = useFormat()
   const unit = client.work_type === 'hourly' ? 'h' : (client.unit ?? 'szt')
   return (
     <div className="rounded-md border p-3">
       <div className="flex items-center gap-2">
         <span className="font-semibold tabular-nums">
-          {formatMoney(toMinor(client.rate), client.currency)}
+          {fmt.money(toMinor(client.rate), client.currency)}
           <span className="text-xs font-normal text-muted-foreground">/{unit}</span>
         </span>
         <Badge variant="secondary" className="text-2xs">Aktualna</Badge>

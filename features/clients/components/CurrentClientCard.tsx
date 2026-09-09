@@ -8,7 +8,8 @@ import {
   clientNameToColor,
   readableTextColor,
 } from '@/components/common/ClientDisplay'
-import { formatCount, formatHours, formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import {
   ACTIVITY_LABELS,
@@ -36,6 +37,7 @@ type Props = {
  * teraz pracuję i ile mi to daje. Wzorzec wizualny z FeaturedProjectCard.
  */
 export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
+  const fmt = useFormat()
   const activity = deriveActivity(client)
   const initials = clientInitials(client.name)
   const color = client.color?.trim() ? client.color : clientNameToColor(client.name)
@@ -112,7 +114,7 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
                 {client.name}
               </h2>
               <p className="mt-1 text-xs text-zinc-400">
-                {formatMoney(toMinor(client.rate), client.currency)}
+                {fmt.money(toMinor(client.rate), client.currency)}
                 <span className="text-zinc-400">/{unit}</span>
                 {' · '}
                 {WORK_TYPE_LABELS[client.work_type]}
@@ -123,15 +125,15 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <Metric
               label="Godziny (mies.)"
-              value={monthStats.hours > 0 ? `${formatHours(monthStats.hours)}` : '—'}
-              meta={monthStats.days > 0 ? formatCount(monthStats.days, ['dzień', 'dni', 'dni']) : 'Brak wpisów'}
+              value={monthStats.hours > 0 ? `${fmt.hours(monthStats.hours)}` : '—'}
+              meta={monthStats.days > 0 ? fmt.count(monthStats.days, ['dzień', 'dni', 'dni']) : 'Brak wpisów'}
               empty={monthStats.hours <= 0}
             />
             <Metric
               label="Zarobek (mies.)"
               value={
                 monthStats.earnings > 0
-                  ? formatMoney(toMinor(monthStats.earnings), client.currency)
+                  ? fmt.money(toMinor(monthStats.earnings), client.currency)
                   : '—'
               }
               empty={monthStats.earnings <= 0}
@@ -139,10 +141,10 @@ export function CurrentClientCard({ client, monthStats, onOpen }: Props) {
             <Metric label="Ostatni wpis" value={lastEntry ?? '—'} empty={!lastEntry} />
             <Metric
               label="Łącznie godz."
-              value={client.totalHours > 0 ? `${formatHours(client.totalHours)}` : '—'}
+              value={client.totalHours > 0 ? `${fmt.hours(client.totalHours)}` : '—'}
               meta={
                 client.totalEarningsInClientCurrency > 0
-                  ? formatMoney(toMinor(client.totalEarningsInClientCurrency), client.currency)
+                  ? fmt.money(toMinor(client.totalEarningsInClientCurrency), client.currency)
                   : undefined
               }
               empty={client.totalHours <= 0}

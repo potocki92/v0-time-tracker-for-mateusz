@@ -1,6 +1,18 @@
-import { SITE, absoluteUrl } from './site'
+import { INTL_LOCALE, type AppLocale } from '@/i18n/config'
+
+import { SITE, absoluteUrl, localizedUrl } from './site'
 
 type JsonLdNode = Record<string, unknown>
+
+/**
+ * Wezly JSON-LD zawierajace TEKST sa lokalizowane — opis produktu w wynikach
+ * wyszukiwania musi byc w tym samym jezyku, co strona. Wezly czysto
+ * strukturalne (adresy, logo, profile spolecznosciowe) jezyka nie maja.
+ */
+export interface LocalizedSeoCopy {
+  name: string
+  description: string
+}
 
 export function organizationLd(): JsonLdNode {
   return {
@@ -22,56 +34,53 @@ export function organizationLd(): JsonLdNode {
         '@type': 'ContactPoint',
         contactType: 'customer support',
         email: SITE.contact.email,
-        availableLanguage: ['Polish', 'English'],
+        availableLanguage: ['Polish', 'German', 'English'],
       },
     ],
   }
 }
 
-export function websiteLd(): JsonLdNode {
+export function websiteLd(locale: AppLocale, copy: LocalizedSeoCopy): JsonLdNode {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    '@id': absoluteUrl('#website'),
-    url: SITE.url,
+    '@id': `${localizedUrl(locale, '/')}#website`,
+    url: localizedUrl(locale, '/'),
     name: SITE.name,
-    description: SITE.description,
-    inLanguage: SITE.language,
+    description: copy.description,
+    inLanguage: INTL_LOCALE[locale],
     publisher: { '@id': absoluteUrl('#organization') },
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${SITE.url}/dashboard?q={search_term_string}`,
+        urlTemplate: `${localizedUrl(locale, '/dashboard')}?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
   }
 }
 
-export function softwareApplicationLd(): JsonLdNode {
+export function softwareApplicationLd(
+  locale: AppLocale,
+  copy: LocalizedSeoCopy,
+  featureList: string[],
+): JsonLdNode {
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    '@id': absoluteUrl('#app'),
+    '@id': `${localizedUrl(locale, '/')}#app`,
     name: SITE.name,
-    description: SITE.description,
-    url: SITE.url,
+    description: copy.description,
+    url: localizedUrl(locale, '/'),
     applicationCategory: SITE.category,
     applicationSubCategory: 'TimeTrackingApplication',
     operatingSystem: SITE.operatingSystem,
     browserRequirements: 'Requires JavaScript. Requires HTML5.',
-    inLanguage: SITE.language,
+    inLanguage: INTL_LOCALE[locale],
     image: absoluteUrl(SITE.ogImage.url),
     softwareVersion: '3.0',
-    featureList: [
-      'Rejestracja czasu pracy w czasie rzeczywistym',
-      'Generowanie faktur PDF',
-      'Rozliczanie projektów i klientów',
-      'Kalendarz pracy',
-      'Integracja z API NBP (kurs EUR)',
-      'Powiadomienia push',
-    ],
+    featureList,
     offers: {
       '@type': 'Offer',
       price: '0',

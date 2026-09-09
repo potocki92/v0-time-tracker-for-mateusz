@@ -5,6 +5,11 @@ import {
   type ReminderCandidate,
 } from '@/lib/finance/reminder-engine'
 
+import { createFormat } from '@/lib/format'
+
+/** Formattery jezyka bazowego — testy sprawdzaja logike, nie tlumaczenia. */
+const fmt = createFormat('pl')
+
 const TODAY = new Date('2025-06-15T10:00:00Z')
 
 describe('classifyReminderKind', () => {
@@ -46,25 +51,25 @@ describe('renderReminder', () => {
   }
 
   it('renders subject with invoice number', () => {
-    const r = renderReminder(candidate, 'OVERDUE_3D')
+    const r = renderReminder(fmt, candidate, 'OVERDUE_3D')
     expect(r.subject).toContain('FV 1/06/2025')
     expect(r.subject).toContain('po terminie')
   })
 
   it('renders text containing amount and client name', () => {
-    const r = renderReminder(candidate, 'OVERDUE_7D')
+    const r = renderReminder(fmt, candidate, 'OVERDUE_7D')
     expect(r.text).toContain('ACME sp. z o.o.')
     expect(r.text).toMatch(/1.?234,56/)
   })
 
   it('renders html with the same key facts', () => {
-    const r = renderReminder(candidate, 'DUE_TODAY')
+    const r = renderReminder(fmt, candidate, 'DUE_TODAY')
     expect(r.html).toContain('FV 1/06/2025')
     expect(r.html).toContain('Termin płatności przypada na dzisiaj')
   })
 
   it('falls back to invoice_name when invoice_number is null', () => {
-    const r = renderReminder({ ...candidate, invoice_number: null }, 'UPCOMING_3D')
+    const r = renderReminder(fmt, { ...candidate, invoice_number: null }, 'UPCOMING_3D')
     expect(r.subject).toContain('FV za maj')
   })
 })

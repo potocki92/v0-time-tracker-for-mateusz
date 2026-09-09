@@ -19,6 +19,17 @@ export default defineConfig({
 
   use: {
     baseURL: BASE_URL,
+    /**
+     * Jezyk przegladarki przypiety do polskiego.
+     *
+     * Bez tego Playwright wysyla `Accept-Language: en-US`, a negocjacja jezyka
+     * (patrz `docs/i18n.md`) potraktowalaby to jako sygnal od uzytkownika i
+     * przekierowala kazdy test z `/dashboard` na `/en/dashboard`. Testy jada
+     * na jezyku BAZOWYM, czyli na adresach bez prefiksu — dokladnie tak, jak
+     * widzi je polski uzytkownik. Wersje DE/EN pokrywaja testy jednostkowe
+     * routingu i spojnosci jezykowej landingu.
+     */
+    locale: 'pl-PL',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'off',

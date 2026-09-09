@@ -1,0 +1,14 @@
+{
+  "site": {
+    "title": "TimeTracker — time tracking, invoices and billing for freelancers",
+    "description": "TimeTracker is a system for tracking working time, issuing invoices and billing projects, built for freelancers and small businesses. Bill clients faster and without mistakes.",
+    "keywords": "time tracking, time tracker, timesheet, invoices for freelancers, project billing, invoicing app, hours tracking"
+  },
+  "landing": {
+    "title": "TimeTracker — Time, accounted for.",
+    "description": "Track every hour, turn the timesheet into an invoice and let the work automation fill the calendar for you — dashboard, projects, invoices and reports in one place."
+  },
+  "app": {
+    "titleTemplate": "{section} · TimeTracker"
+  }
+}

@@ -17,6 +17,11 @@ import {
   zero,
 } from '@/lib/finance/money'
 
+import { createFormat } from '@/lib/format'
+
+/** Formattery jezyka bazowego — testy sprawdzaja logike, nie tlumaczenia. */
+const fmt = createFormat('pl')
+
 describe('Money.fromMajor', () => {
   it('rounds half away from zero', () => {
     expect(fromMajor(12.345, 'PLN').amountMinor).toBe(BigInt(1235))
@@ -149,14 +154,14 @@ describe('Money predicates', () => {
 
 describe('Money.format', () => {
   it('formats PLN with Polish locale', () => {
-    const formatted = format(fromMajor(1234.5, 'PLN'))
+    const formatted = format(fmt, fromMajor(1234.5, 'PLN'))
     // Non-breaking/narrow-no-break spaces vary by runtime — just assert key chars.
     expect(formatted).toMatch(/1.?234,50/)
     expect(formatted).toMatch(/zł|PLN/)
   })
 
   it('formats EUR', () => {
-    const formatted = format(fromMajor(99, 'EUR'))
+    const formatted = format(fmt, fromMajor(99, 'EUR'))
     expect(formatted).toMatch(/99,00/)
   })
 })

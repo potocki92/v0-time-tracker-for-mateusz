@@ -1,6 +1,8 @@
 import 'server-only'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getWeekRange } from '@/lib/date/week'
+import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config'
+import { createFormat } from '@/lib/format'
 import { toDateKey } from '@/lib/date/format'
 import type { Client, Project, WorkEntry } from '@/lib/types'
 import { buildWeeklySummary } from '../lib/weekly-summary'
@@ -23,6 +25,12 @@ import {
  * `supabase` jest wstrzykiwany, bo maja tu wejsc dwa konteksty: sesja
  * uzytkownika (przycisk „Wyslij teraz", RLS zawezi wiersze) oraz cron na
  * kluczu service-role (bez sesji — stad jawny filtr po `user_id`).
+ *
+ * JEZYK jest ARGUMENTEM, nie odczytem z kontekstu zadania. Ten sam kod
+ * odpala cron sobotni, w ktorym nie ma zadnego requestu uzytkownika — jezyk
+ * musi wiec pochodzic z `preferred_locale` WLASCICIELA konta, a nie z
+ * naglowkow. Adresat maila (ksiegowa) to osobny problem domenowy: jej jezyk
+ * nie jest tu modelowany i celowo idzie za jezykiem wlasciciela.
  */
 
 export type WeeklySummaryEmail = {
@@ -36,6 +44,7 @@ export type WeeklySummaryEmail = {
 export async function renderWeeklySummaryEmail(
   supabase: SupabaseClient,
   userId: string,
+  locale: AppLocale = DEFAULT_LOCALE,
   weekStart: Date = new Date(),
 ): Promise<WeeklySummaryEmail> {
   const { start, end } = getWeekRange(weekStart)
@@ -65,7 +74,9 @@ export async function renderWeeklySummaryEmail(
     throw new Error(`renderWeeklySummaryEmail: ${failed.error.message}`)
   }
 
+  const fmt = createFormat(locale)
   const summary = buildWeeklySummary(
+    fmt,
     (entries.data ?? []) as unknown as WorkEntry[],
     (clients.data ?? []) as unknown as Client[],
     weekStart,
@@ -73,7 +84,7 @@ export async function renderWeeklySummaryEmail(
     (projects.data ?? []) as unknown as Project[],
   )
 
-  const text = formatWeeklySummaryText(summary)
+  const text = formatWeeklySummaryText(fmt, summary)
 
   return {
     // Pierwsza linia raportu jest jednoczesnie tematem — ksiegowa widzi

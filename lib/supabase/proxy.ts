@@ -1,7 +1,24 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function updateSession(request: NextRequest) {
+import { isAppLocale, type AppLocale } from '@/i18n/config'
+
+export interface SessionRefresh {
+  /**
+   * Odpowiedz Z CIASTECZKAMI SESJI. Wolajacy MUSI przeniesc te ciasteczka do
+   * odpowiedzi, ktora naprawde zwroci (patrz uwaga na dole pliku).
+   */
+  response: NextResponse
+  /**
+   * `preferred_locale` z metadanych uzytkownika, odczytany z JWT — bez
+   * dodatkowego zapytania do Supabase. Dzieki temu jezyk konta wchodzi do
+   * negocjacji za darmo, a publiczny landing (ktory tu nie zaglada) nadal
+   * nie dotyka sesji.
+   */
+  preferredLocale: AppLocale | null
+}
+
+export async function updateSession(request: NextRequest): Promise<SessionRefresh> {
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -40,13 +57,20 @@ export async function updateSession(request: NextRequest) {
   // ktory i tak wola `getServerUser()`.
   //
   // Rola middleware jest tu wylacznie odswiezenie ciasteczek sesji.
-  // Autoryzacja zostaje w `app/(app)/layout.tsx` (`getServerUser()` -> redirect).
+  // Autoryzacja zostaje w `app/[locale]/(app)/layout.tsx` (`getServerUser()` -> redirect).
   //
   // WARUNEK: projekt Supabase musi miec asymetryczne klucze podpisu JWT
   // (Dashboard -> Authentication -> JWT Keys -> migracja na ECC P-256).
   // Przy kluczu symetrycznym getClaims() robi fallback na wywolanie sieciowe
   // i nic nie zyskujemy — patrz docs/perf-baseline.md.
-  await supabase.auth.getClaims()
+  const { data } = await supabase.auth.getClaims()
+
+  // Jezyk konta jedzie w tym samym JWT, ktory i tak weryfikujemy. Zaden
+  // dodatkowy odczyt — patrz `SessionRefresh.preferredLocale`.
+  const metadata = data?.claims?.user_metadata as { preferred_locale?: unknown } | undefined
+  const preferredLocale = isAppLocale(metadata?.preferred_locale)
+    ? metadata.preferred_locale
+    : null
 
   // NOTE:
   // We intentionally do not force unauthenticated redirects here for app routes.
@@ -69,6 +93,10 @@ export async function updateSession(request: NextRequest) {
   //    return myNewResponse
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely!
+  //
+  // Warstwa i18n robi dokladnie to, co opisuje punkt 2: `middleware.ts`
+  // przepisuje CALY zestaw ciasteczek z `response` na odpowiedz zwracana
+  // przez `next-intl`. Regresje pilnuje `__test__/i18n/middleware-session.test.ts`.
 
-  return supabaseResponse
+  return { response: supabaseResponse, preferredLocale }
 }

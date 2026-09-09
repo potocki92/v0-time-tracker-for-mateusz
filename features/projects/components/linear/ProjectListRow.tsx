@@ -3,7 +3,9 @@
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { formatDate, formatMoney, formatRelativeDay, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import { cn } from '@/lib/utils'
 import {
@@ -23,8 +25,8 @@ const MS_PER_DAY = 1000 * 60 * 60 * 24
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
 
-function formatDeadlineDate(date: string): string {
-  return formatDate(date.slice(0, 10), 'long')
+function formatDeadlineDate(fmt: AppFormat, date: string): string {
+  return fmt.date(date.slice(0, 10), 'long')
 }
 
 /**
@@ -33,28 +35,30 @@ function formatDeadlineDate(date: string): string {
  * skończonej robocie byłoby fałszywym alarmem.
  */
 function formatDeadline(
+  fmt: AppFormat,
   date: string | null,
   isActive: boolean,
 ): { text: string; urgent: boolean } | null {
   if (!date) return null
   const time = new Date(date).getTime()
   if (Number.isNaN(time)) return null
-  if (!isActive) return { text: formatDeadlineDate(date), urgent: false }
+  if (!isActive) return { text: formatDeadlineDate(fmt, date), urgent: false }
 
   const days = Math.ceil((time - Date.now()) / MS_PER_DAY)
   if (days < 0) return { text: 'Po terminie', urgent: true }
   if (days <= 7) {
     return {
       text: capitalize(
-        formatRelativeDay(date.slice(0, 10), getTodayLocalDateString()),
+        fmt.relativeDay(date.slice(0, 10), getTodayLocalDateString()),
       ),
       urgent: true,
     }
   }
-  return { text: formatDeadlineDate(date), urgent: false }
+  return { text: formatDeadlineDate(fmt, date), urgent: false }
 }
 
 export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
+  const fmt = useFormat()
   const {
     project,
     clientName,
@@ -70,7 +74,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
   const isActive = project.status === 'in_progress'
   const isDone = project.status === 'completed'
   const accent = progressAccentOf(project.status, isAtRisk, budgetUtilization)
-  const deadline = formatDeadline(dueDate, isActive)
+  const deadline = formatDeadline(fmt, dueDate, isActive)
 
   const stats: Array<{ label: string; value: string; danger?: boolean }> = [
     { label: 'Godziny', value: `${Math.round(hoursLogged)} h` },
@@ -200,7 +204,7 @@ export function ProjectListRow({ row, onSelect }: ProjectListRowProps) {
         </div>
         {budget > 0 && (
           <span className="shrink-0 text-2xs tabular-nums text-zinc-400">
-            {formatMoney(toMinor(budget), 'PLN')}
+            {fmt.money(toMinor(budget), 'PLN')}
           </span>
         )}
       </div>

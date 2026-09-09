@@ -1,0 +1,30 @@
+{
+  "title": "Account settings",
+  "description": "Manage your profile, avatar and basic account details.",
+  "loadFailed": "We couldn't load your account details.",
+  "language": {
+    "title": "Interface language",
+    "description": "This choice only affects the language of the app. Currency, time zone, client data and invoice language stay as they are.",
+    "saved": "Interface language saved"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "description": "Pick a colour palette and light or dark mode. Changes apply immediately.",
+    "modeGroup": "Colour mode",
+    "modes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "themeGroup": "Colour theme"
+  },
+  "profile": {
+    "saved": "Account settings saved"
+  },
+  "toast": {
+    "AVATAR_UPDATED": "Avatar updated",
+    "INVOICE_SETTINGS_SAVED": "Invoice automation settings saved",
+    "WEEKLY_SUMMARY_SAVED": "Weekly summary settings saved",
+    "WEEKLY_SUMMARY_SENT": "Summary sent to {recipient}"
+  }
+}

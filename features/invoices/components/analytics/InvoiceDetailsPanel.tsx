@@ -5,7 +5,9 @@ import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { CheckCircle2, ChevronDown, Clock3, Copy, Download, Mail, Pencil, Printer, Trash2 } from 'lucide-react'
 import type { Client, Invoice, InvoiceLifecycleStatus } from '@/lib/types'
-import { formatDate, formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import { displayInvoiceNumber } from '@/lib/finance/invoice-number'
 import {
@@ -43,8 +45,8 @@ const STATUS_PILL: Record<InvoiceStatus, string> = {
   [InvoiceStatus.CANCELLED]: 'bg-zinc-500/10 text-zinc-400 ring-1 ring-zinc-500/20',
 }
 
-function formatShortDate(iso: string | null | undefined): string {
-  return formatDate(iso?.slice(0, 10), 'dayMonth')
+function formatShortDate(fmt: AppFormat, iso: string | null | undefined): string {
+  return fmt.date(iso?.slice(0, 10), 'dayMonth')
 }
 
 export function InvoiceDetailsPanel({
@@ -57,10 +59,11 @@ export function InvoiceDetailsPanel({
   onEdit,
   onDelete,
 }: InvoiceDetailsPanelProps) {
+  const fmt = useFormat()
   const status = deriveInvoiceStatus(invoice)
   const numberLabel = displayInvoiceNumber(invoice)
-  const issued = formatShortDate(invoice.invoice_date ?? invoice.issue_date ?? null)
-  const due = formatShortDate(invoice.due_date)
+  const issued = formatShortDate(fmt, invoice.invoice_date ?? invoice.issue_date ?? null)
+  const due = formatShortDate(fmt, invoice.due_date)
   const projectName = invoice.billing_period?.trim() || invoice.name?.trim() || '—'
 
   const net = Number(invoice.net_amount ?? invoice.amount ?? 0)
@@ -69,10 +72,10 @@ export function InvoiceDetailsPanel({
 
   const isPaid = invoice.is_paid || status === InvoiceStatus.PAID
   const sentLabel = invoice.invoice_date
-    ? `Wysłano · ${formatDate(invoice.invoice_date.slice(0, 10), 'short')}`
+    ? `Wysłano · ${fmt.date(invoice.invoice_date.slice(0, 10), 'short')}`
     : null
-  const draftedLabel = invoice.created_at ? `Utworzono · ${formatDate(invoice.created_at.slice(0, 10), 'short')}` : null
-  const paidLabel = invoice.paid_date ? `Opłacono · ${formatDate(invoice.paid_date.slice(0, 10), 'short')}` : null
+  const draftedLabel = invoice.created_at ? `Utworzono · ${fmt.date(invoice.created_at.slice(0, 10), 'short')}` : null
+  const paidLabel = invoice.paid_date ? `Opłacono · ${fmt.date(invoice.paid_date.slice(0, 10), 'short')}` : null
 
   const mailHref = client?.email
     ? `mailto:${client.email}?subject=${encodeURIComponent(`Faktura ${numberLabel}`)}`
@@ -186,20 +189,20 @@ export function InvoiceDetailsPanel({
           <li className="flex items-center justify-between gap-3">
             <span className="truncate text-zinc-200">{projectName}</span>
             <span className="shrink-0 font-medium tabular-nums text-white">
-              {formatMoney(toMinor(net || gross), invoice.currency)}
+              {fmt.money(toMinor(net || gross), invoice.currency)}
             </span>
           </li>
         </ul>
         <div className="mt-3 space-y-1.5 border-t border-hairline pt-3 text-xs">
-          <Row label="Suma netto" value={formatMoney(toMinor(net || gross), invoice.currency)} />
+          <Row label="Suma netto" value={fmt.money(toMinor(net || gross), invoice.currency)} />
           <Row
             label="VAT"
-            value={vat > 0 ? formatMoney(toMinor(vat), invoice.currency) : '—'}
+            value={vat > 0 ? fmt.money(toMinor(vat), invoice.currency) : '—'}
             mute={vat <= 0}
           />
           <Row
             label={`Razem · ${invoice.currency}`}
-            value={formatMoney(toMinor(gross), invoice.currency)}
+            value={fmt.money(toMinor(gross), invoice.currency)}
             strong
           />
         </div>

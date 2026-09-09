@@ -2,7 +2,7 @@
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { SURFACE } from '@/components/ui/tokens'
-import { formatCount, formatHours, formatNumber } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import { ArrowDownRight, ArrowUpRight, Clock4, type LucideIcon, Minus, Percent, Sigma } from 'lucide-react'
 import type { ReportSummary } from '../lib/types'
@@ -25,6 +25,7 @@ function computeTrend(current: number, previous: number): Trend {
 }
 
 function TrendBadge({ trend }: { trend: Trend }) {
+  const fmt = useFormat()
   const Icon = trend.direction === 'up'
     ? ArrowUpRight
     : trend.direction === 'down'
@@ -41,7 +42,7 @@ function TrendBadge({ trend }: { trend: Trend }) {
       <Icon aria-hidden className="size-3" />
       {trend.direction === 'flat'
         ? 'bez zmian'
-        : `${formatNumber(trend.value, { decimals: 1 })}%`}
+        : `${fmt.number(trend.value, { decimals: 1 })}%`}
     </span>
   )
 }
@@ -73,6 +74,7 @@ function KpiCard({ label, value, hint, trend, icon: Icon }: CardProps) {
 }
 
 export function ReportsKpis({ summary, compareOn }: Props) {
+  const fmt = useFormat()
   const trend = compareOn ? computeTrend(summary.totalHours, summary.prevHours) : undefined
 
   return (
@@ -82,18 +84,18 @@ export function ReportsKpis({ summary, compareOn }: Props) {
     >
       <KpiCard
         label="Łącznie godzin"
-        value={formatHours(summary.totalHours)}
+        value={fmt.hours(summary.totalHours)}
         hint={
           compareOn
-            ? `Poprzednio: ${formatHours(summary.prevHours)}`
-            : formatCount(summary.workedCount, ['wpis', 'wpisy', 'wpisów'])
+            ? `Poprzednio: ${fmt.hours(summary.prevHours)}`
+            : fmt.count(summary.workedCount, ['wpis', 'wpisy', 'wpisów'])
         }
         trend={trend}
         icon={Sigma}
       />
       <KpiCard
         label="Średnia / dzień"
-        value={formatHours(summary.avgPerActiveDay)}
+        value={fmt.hours(summary.avgPerActiveDay)}
         hint="W aktywne dni"
         icon={Clock4}
       />

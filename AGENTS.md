@@ -60,6 +60,23 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. User-Facing Copy Goes Through i18n
+
+**Never hardcode UI strings. Not in Polish, not in English, not in German.**
+
+Every string a user can see or hear belongs in `messages/<locale>/<namespace>.json`:
+visible copy, `aria-label`, `placeholder`, `sr-only` text, toasts, dialog titles,
+validation messages, page metadata.
+
+- Server Actions return stable error CODES (`INVALID_ACCOUNT_SETTINGS`), never sentences.
+  The UI translates them. Raw Supabase errors never reach the user.
+- Plural forms use ICU (`{count, plural, …}`), never `count === 1 ? … : …`.
+- Never translate user DATA: client names, project names, invoice numbers, notes.
+- Never tie UI language to currency, time zone, `client.locale`, or invoice language.
+  They are independent axes.
+
+Full guide with examples: `docs/i18n.md`.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

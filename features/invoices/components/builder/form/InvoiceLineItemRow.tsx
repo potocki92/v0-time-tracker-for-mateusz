@@ -1,6 +1,7 @@
 'use client'
 
 import { SURFACE } from '@/components/ui/tokens'
+import { useFormat } from '@/lib/format/client'
 import * as React from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { useSortable } from '@dnd-kit/sortable'
@@ -46,6 +47,7 @@ export const InvoiceLineItemRow = React.memo(function InvoiceLineItemRow({
   itemCount,
   onRemove,
 }: InvoiceLineItemRowProps) {
+  const fmt = useFormat()
   const { control } = useFormContext<InvoiceBuilderValues>()
 
   // Targeted subscriptions — only the fields that drive totals + the VAT
@@ -210,19 +212,19 @@ export const InvoiceLineItemRow = React.memo(function InvoiceLineItemRow({
               <div className="flex items-baseline gap-1.5">
                 <dt className="text-muted-foreground">Netto</dt>
                 <dd className="font-mono tabular-nums font-medium text-foreground">
-                  {formatMoney(totals.net)}
+                  {formatMoney(fmt, totals.net)}
                 </dd>
               </div>
               <div className="flex items-baseline gap-1.5">
                 <dt className="text-muted-foreground">VAT</dt>
                 <dd className="font-mono tabular-nums">
-                  {formatMoney(totals.vat)}
+                  {formatMoney(fmt, totals.vat)}
                 </dd>
               </div>
               <div className="flex items-baseline gap-1.5">
                 <dt className="text-muted-foreground">Brutto</dt>
                 <dd className="font-mono tabular-nums font-semibold text-foreground">
-                  {formatMoney(totals.gross)}
+                  {formatMoney(fmt, totals.gross)}
                 </dd>
               </div>
             </dl>

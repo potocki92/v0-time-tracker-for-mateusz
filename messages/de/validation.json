@@ -1,0 +1,33 @@
+{
+  "email": {
+    "required": "E-Mail ist erforderlich",
+    "invalid": "Ungültige E-Mail-Adresse"
+  },
+  "password": {
+    "required": "Passwort ist erforderlich",
+    "tooShort": "Das Passwort muss mindestens {min} Zeichen haben",
+    "tooLong": "Das Passwort ist zu lang",
+    "repeat": "Passwort wiederholen",
+    "mismatch": "Die Passwörter stimmen nicht überein"
+  },
+  "fullName": {
+    "required": "Vor- und Nachname sind erforderlich"
+  },
+  "firstName": {
+    "tooShort": "Der Vorname muss mindestens {min} Zeichen haben",
+    "tooLong": "Der Vorname darf höchstens {max} Zeichen haben"
+  },
+  "lastName": {
+    "tooShort": "Der Nachname muss mindestens {min} Zeichen haben",
+    "tooLong": "Der Nachname darf höchstens {max} Zeichen haben"
+  },
+  "username": {
+    "tooShort": "Der Benutzername muss mindestens {min} Zeichen haben",
+    "tooLong": "Der Benutzername darf höchstens {max} Zeichen haben",
+    "pattern": "Nur Kleinbuchstaben, Ziffern und die Zeichen _ . - sind erlaubt"
+  },
+  "avatar": {
+    "tooLarge": "Die maximale Dateigröße beträgt {max} MB",
+    "wrongType": "Erlaubte Formate: JPG, PNG, WEBP"
+  }
+}

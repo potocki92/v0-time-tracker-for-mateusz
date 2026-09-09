@@ -95,7 +95,7 @@ export default tseslint.config(
   // liczby z projektu graficznego (licznik CountUp odtwarza format literalu,
   // ktory dostal, lacznie z lokalizacja en-US).
   {
-    files: ['lib/format/**/*.ts', 'app/(marketing)/**/*.{ts,tsx}'],
+    files: ['lib/format/**/*.ts', 'app/[locale]/(marketing)/**/*.{ts,tsx}'],
     rules: { 'no-restricted-syntax': 'off', 'no-restricted-properties': 'off' },
   },
 

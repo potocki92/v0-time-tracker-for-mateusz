@@ -5,7 +5,9 @@ import type { ReactNode } from 'react'
 import { Pencil, Pin } from 'lucide-react'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { formatDate, formatMoney, NO_DATA, toMinor } from '@/lib/format'
+import { NO_DATA, toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import {
@@ -21,12 +23,13 @@ type FeaturedProjectCardProps = {
   onEdit?: (project: Project) => void
 }
 
-function formatStartedAt(date: string | null): string {
-  const label = formatDate(date?.slice(0, 10), 'long')
+function formatStartedAt(fmt: AppFormat, date: string | null): string {
+  const label = fmt.date(date?.slice(0, 10), 'long')
   return label === NO_DATA ? '' : label
 }
 
 export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardProps) {
+  const fmt = useFormat()
   const { project, clientName, progressPct, hoursLogged, hoursTarget, budget, budgetSpent, budgetUtilization, tasksDone, tasksTotal, isAtRisk } = featured
   const statusPill = PROJECT_STATUS_PILL[project.status]
   const accent = progressAccentOf(project.status, isAtRisk, budgetUtilization)
@@ -101,7 +104,7 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
           </h2>
           <p className="mt-1 text-xs text-zinc-400">
             {clientName}
-            {project.start_date && ` · Start ${formatStartedAt(project.start_date)}`}
+            {project.start_date && ` · Start ${formatStartedAt(fmt, project.start_date)}`}
           </p>
         </div>
 
@@ -128,8 +131,8 @@ export function FeaturedProjectCard({ featured, onEdit }: FeaturedProjectCardPro
 
           <Metric
             label="Wykorzystany budżet"
-            value={budget > 0 ? formatMoney(toMinor(budgetSpent), 'PLN') : '—'}
-            meta={budget > 0 ? `z ${formatMoney(toMinor(budget), 'PLN')}` : 'Brak budżetu'}
+            value={budget > 0 ? fmt.money(toMinor(budgetSpent), 'PLN') : '—'}
+            meta={budget > 0 ? `z ${fmt.money(toMinor(budget), 'PLN')}` : 'Brak budżetu'}
             danger={budget > 0 && isAtRisk}
             empty={budget <= 0}
           />

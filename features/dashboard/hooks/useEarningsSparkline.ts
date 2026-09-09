@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
+import { useFormat } from '@/lib/format/client'
 import { WorkEntry, Client } from '@/lib/types'
 import { calculateEarnings } from '@/lib/finance/earnings'
-import { formatDate } from '@/lib/format'
 import { selectEurRate, usePreferencesStore } from './usePreferencesStore'
 
 export type SparklinePoint = {
@@ -19,6 +19,7 @@ export function useEarningsSparkline(
   clients: Client[],
 ): SparklinePoint[] {
   const eurRate = usePreferencesStore(selectEurRate)
+  const fmt = useFormat()
 
   return useMemo(() => {
     const clientMap = new Map(clients.map((c) => [c.id, c]))
@@ -38,8 +39,8 @@ export function useEarningsSparkline(
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, value]) => ({
         date,
-        label: formatDate(date, 'dayMonth'),
+        label: fmt.date(date, 'dayMonth'),
         value: Math.round(value * 100) / 100,
       }))
-  }, [entries, clients, eurRate])
+  }, [fmt, entries, clients, eurRate])
 }

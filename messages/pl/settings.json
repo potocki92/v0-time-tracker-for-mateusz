@@ -1,0 +1,30 @@
+{
+  "title": "Ustawienia konta",
+  "description": "Zarządzaj profilem, avatarem i podstawowymi informacjami konta.",
+  "loadFailed": "Nie udało się pobrać danych konta.",
+  "language": {
+    "title": "Język interfejsu",
+    "description": "Wybór dotyczy wyłącznie języka aplikacji. Waluta, strefa czasowa, dane klientów i język faktur pozostają bez zmian.",
+    "saved": "Zapisano język interfejsu"
+  },
+  "appearance": {
+    "title": "Wygląd aplikacji",
+    "description": "Wybierz paletę kolorów oraz tryb jasny/ciemny. Zmiany są natychmiastowe.",
+    "modeGroup": "Tryb kolorów",
+    "modes": {
+      "light": "Jasny",
+      "dark": "Ciemny",
+      "system": "Systemowy"
+    },
+    "themeGroup": "Motyw kolorystyczny"
+  },
+  "profile": {
+    "saved": "Zapisano ustawienia konta"
+  },
+  "toast": {
+    "AVATAR_UPDATED": "Avatar został zaktualizowany",
+    "INVOICE_SETTINGS_SAVED": "Zapisano ustawienia automatyzacji faktur",
+    "WEEKLY_SUMMARY_SAVED": "Zapisano ustawienia skrótu tygodnia",
+    "WEEKLY_SUMMARY_SENT": "Wysłano skrót na {recipient}"
+  }
+}

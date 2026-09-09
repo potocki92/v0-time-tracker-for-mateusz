@@ -1,0 +1,68 @@
+{
+  "groups": {
+    "workspace": "Arbeitsbereich",
+    "stats": "Statistiken",
+    "automation": "Automatisierung"
+  },
+  "sections": {
+    "dashboard": "Dashboard",
+    "calendar": "Kalender",
+    "projects": "Projekte",
+    "clients": "Kunden",
+    "invoices": "Rechnungen",
+    "reports": "Berichte",
+    "goals": "Ziele",
+    "earnings": "Einnahmen",
+    "ai-assistant": "KI-Assistent",
+    "integrations": "Integrationen",
+    "automations": "Automatisierungen"
+  },
+  "nested": {
+    "invoices/analytics": "Auswertung"
+  },
+  "badges": {
+    "beta": "Beta",
+    "new": "Neu",
+    "integrations": "Slack · Trello"
+  },
+  "quickActions": {
+    "addProject": "Projekt anlegen",
+    "addClient": "Kunde anlegen"
+  },
+  "pinned": "Angeheftet",
+  "search": "Suchen…",
+  "skipToContent": "Zum Inhalt springen",
+  "skipToMain": "Zum Hauptinhalt springen",
+  "mainNavigation": "Hauptnavigation",
+  "userMenu": {
+    "label": "Benutzermenü",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "theme": {
+      "label": "Design",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System",
+      "modeLight": "Heller Modus",
+      "modeDark": "Dunkler Modus",
+      "modeSystem": "Systemmodus"
+    },
+    "profile": "Profil",
+    "fallbackName": "Benutzer"
+  },
+  "localeSwitcher": {
+    "label": "Sprache der Oberfläche",
+    "current": "Aktuelle Sprache: {locale}",
+    "choose": "Sprache wählen"
+  },
+  "header": {
+    "aria": "Kopfzeile des Arbeitsbereichs",
+    "breadcrumb": "Navigationspfad",
+    "notifications": "Benachrichtigungen",
+    "timerStart": "Zeiterfassung starten",
+    "timerStop": "Zeiterfassung stoppen"
+  },
+  "tracker": {
+    "defaultLabel": "Zeiterfassung"
+  }
+}

@@ -6,15 +6,15 @@ const ROOT = process.cwd()
 const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8')
 
 const registry = read('hooks/prefetch/prefetchRegistry.ts')
-const sidebar = read('app/(app)/_layout/components/sidebar/SidebarNav.tsx')
-const bottomNav = read('app/(app)/_layout/components/bottom-nav/BottomNav.tsx')
+const sidebar = read('app/[locale]/(app)/_layout/components/sidebar/SidebarNav.tsx')
+const bottomNav = read('app/[locale]/(app)/_layout/components/bottom-nav/BottomNav.tsx')
 
 describe('prefetch — rejestr', () => {
-  it('kazda trasa w rejestrze istnieje w app/(app)', () => {
+  it('kazda trasa w rejestrze istnieje w app/[locale]/(app)', () => {
     const routes = [...registry.matchAll(/'(\/[a-z-]+)':\s*\{/g)].map((m) => m[1])
     expect(routes.length, 'rejestr jest pusty — regex przestal pasowac').toBeGreaterThanOrEqual(3)
 
-    const segments = readdirSync(resolve(ROOT, 'app/(app)'), { withFileTypes: true })
+    const segments = readdirSync(resolve(ROOT, 'app/[locale]/(app)'), { withFileTypes: true })
       .filter((e) => e.isDirectory() && !e.name.startsWith('_'))
       .map((e) => `/${e.name}`)
 

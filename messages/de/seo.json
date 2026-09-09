@@ -1,0 +1,14 @@
+{
+  "site": {
+    "title": "TimeTracker — Zeiterfassung, Rechnungen und Abrechnung für Selbstständige",
+    "description": "TimeTracker ist ein System für Zeiterfassung, Rechnungsstellung und Projektabrechnung für Selbstständige und kleine Unternehmen. Rechnen Sie Kunden schneller und fehlerfrei ab.",
+    "keywords": "Zeiterfassung, Time Tracker, Arbeitszeiterfassung, Rechnungen für Freiberufler, Projektabrechnung, Rechnungsprogramm, Stundenerfassung"
+  },
+  "landing": {
+    "title": "TimeTracker — Zeit, abgerechnet.",
+    "description": "Erfassen Sie jede Stunde, machen Sie aus der Zeiterfassung eine Rechnung und lassen Sie die Automatik den Kalender füllen — Dashboard, Projekte, Rechnungen und Berichte an einem Ort."
+  },
+  "app": {
+    "titleTemplate": "{section} · TimeTracker"
+  }
+}

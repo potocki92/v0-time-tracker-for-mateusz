@@ -1,4 +1,4 @@
-// app/(app)/dashboard/_services/dashboard.service.server.ts
+// app/[locale]/(app)/dashboard/_services/dashboard.service.server.ts
 import 'server-only'
 import { requireServerUser } from '@/lib/auth/server-user'
 import {

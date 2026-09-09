@@ -1,6 +1,6 @@
 import type { Client, CURRENCY, Project, WorkEntry } from '@/lib/types'
 import { getISOWeekNumber, getISOWeekYear, getWeekRange } from '@/lib/date/week'
-import { formatDateRange } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import { partitionByRealization } from '@/lib/finance/realization'
 import {
@@ -70,8 +70,8 @@ function toDateKey(d: Date): string {
   return `${y}-${m}-${day}`
 }
 
-function formatRangeLabel(start: Date, end: Date): string {
-  return formatDateRange(toDateKey(start), toDateKey(end))
+function formatRangeLabel(fmt: AppFormat, start: Date, end: Date): string {
+  return fmt.dateRange(toDateKey(start), toDateKey(end))
 }
 
 function dedupeRates(entries: WorkEntry[], fallback: EntryCalculationFallback): AppliedRate[] {
@@ -135,6 +135,7 @@ function buildBlock(
  * @param weekStart dowolna data w obrębie tygodnia, dla którego budujemy raport
  */
 export function buildWeeklySummary(
+  fmt: AppFormat,
   workEntries: WorkEntry[],
   clients: Client[],
   weekStart: Date,
@@ -176,7 +177,7 @@ export function buildWeeklySummary(
   return {
     weekNumber: getISOWeekNumber(start),
     weekYear: getISOWeekYear(start),
-    rangeLabel: formatRangeLabel(start, end),
+    rangeLabel: formatRangeLabel(fmt, start, end),
     from,
     to,
     contractors,

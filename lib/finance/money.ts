@@ -1,4 +1,4 @@
-import { formatMoney } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
 import type { CURRENCY } from '@/lib/types'
 
 /**
@@ -131,8 +131,8 @@ export function isPositive(m: Money): boolean {
 }
 
 /** Prezentacja idzie przez lib/format — tu tylko zamiana bigint → number. */
-export function format(m: Money): string {
-  return formatMoney(Number(m.amountMinor), m.currency)
+export function format(fmt: AppFormat, m: Money): string {
+  return fmt.money(Number(m.amountMinor), m.currency)
 }
 
 /** Build Money from a NUMERIC(12,2) value returned by Supabase. Accepts number | string | null. */

@@ -38,7 +38,7 @@ describe('bundle hygiene — framer-motion', () => {
 })
 
 describe('bundle hygiene — auth routes stay light', () => {
-  const authFiles = walk(resolve(ROOT, 'app/auth')).map((f) => relative(ROOT, f))
+  const authFiles = walk(resolve(ROOT, 'app/[locale]/auth')).map((f) => relative(ROOT, f))
 
   it('never instantiates the Supabase browser client', () => {
     const offenders = authFiles.filter((f) => read(f).includes('@/lib/supabase/client'))
@@ -72,8 +72,8 @@ describe('bundle hygiene — auth routes stay light', () => {
 
   it('drives login and sign-up through server actions', () => {
     for (const action of [
-      'app/auth/_actions/login.action.ts',
-      'app/auth/_actions/sign-up.action.ts',
+      'app/[locale]/auth/_actions/login.action.ts',
+      'app/[locale]/auth/_actions/sign-up.action.ts',
     ]) {
       expect(read(action).startsWith("'use server'"), `${action} bez 'use server'`).toBe(true)
     }
@@ -81,7 +81,7 @@ describe('bundle hygiene — auth routes stay light', () => {
 })
 
 describe('bundle hygiene — data access lives on the server', () => {
-  const appFiles = walk(resolve(ROOT, 'app/(app)'))
+  const appFiles = walk(resolve(ROOT, 'app/[locale]/(app)'))
     .concat(walk(resolve(ROOT, 'features')))
     .map((f) => relative(ROOT, f))
 
@@ -129,14 +129,18 @@ describe('bundle hygiene — data access lives on the server', () => {
 
 describe('bundle hygiene — providers are scoped to the app group', () => {
   it('mounts Providers in (app)/layout, not in the root layout', () => {
-    expect(read('app/(app)/layout.tsx')).toContain('Providers')
+    expect(read('app/[locale]/(app)/layout.tsx')).toContain('Providers')
     expect(read('app/layout.tsx')).not.toContain("from './providers'")
   })
 })
 
 describe('bundle hygiene — fonts', () => {
   it('loads exactly one monospace family across the layouts', () => {
-    const layouts = ['app/layout.tsx', 'app/(marketing)/layout.tsx'].map(read).join('\n')
+    // `app/layout.tsx` jest przezroczysty (patrz komentarz w pliku) — fonty
+    // laduje prawdziwy root layout, czyli `app/[locale]/layout.tsx`.
+    const layouts = ['app/[locale]/layout.tsx', 'app/[locale]/(marketing)/layout.tsx']
+      .map(read)
+      .join('\n')
     const monoFamilies = [...layouts.matchAll(/\b([A-Za-z_]+_Mono)\b/g)].map((m) => m[1])
 
     expect(
@@ -146,8 +150,8 @@ describe('bundle hygiene — fonts', () => {
   })
 
   it('opens no connection to the Google Fonts CDN — next/font self-hosts', () => {
-    expect(read('app/layout.tsx')).not.toContain('fonts.gstatic.com')
-    expect(read('app/layout.tsx')).not.toContain('fonts.googleapis.com')
+    expect(read('app/[locale]/layout.tsx')).not.toContain('fonts.gstatic.com')
+    expect(read('app/[locale]/layout.tsx')).not.toContain('fonts.googleapis.com')
   })
 })
 

@@ -348,7 +348,7 @@ describe('design tokens — the scale is actually used', () => {
   it('nie uzywa bg-black w panelu', () => {
     // Landing (app/(marketing)) to osobna strefa wizualna — jego nie dotyczy.
     const offenders = components
-      .filter((f) => f.startsWith('features/') || f.startsWith('app/(app)'))
+      .filter((f) => f.startsWith('features/') || f.startsWith('app/[locale]/(app)'))
       .filter((f) => /\bbg-black(\/\d+)?\b/.test(readFileSync(resolve(ROOT, f), 'utf8')))
     expect(
       offenders,

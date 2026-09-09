@@ -95,6 +95,10 @@ export async function importInvoicesFromCsvAction(
   const payload = []
 
   for (const row of parsed.data) {
+    // `pl-PL` przypiete CELOWO i NIE idzie za jezykiem interfejsu: to
+    // normalizacja DANYCH przy dopasowywaniu klienta po nazwie. Zwiazanie jej
+    // z jezykiem UI zmienialoby to, ktore wiersze sie dopasuja — ten sam
+    // import dawalby inny wynik po polsku i po niemiecku.
     const normalizedClientName = row.client_name.toLocaleLowerCase('pl-PL')
     let resolvedClientId: string | null = null
 
@@ -128,5 +132,5 @@ export async function importInvoicesFromCsvAction(
   // Badge nieoplaconych faktur w sidebarze liczy sie serwerowo w layoucie
   // panelu (`fetchUnpaidInvoicesCount`), poza React Query — jego trzeba
   // odswiezyc rewalidacja. Reszte robi invalidateQueries w useInvoiceMutations.
-  revalidatePath('/(app)', 'layout')
+  revalidatePath('/[locale]/(app)', 'layout')
 }

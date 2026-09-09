@@ -1,30 +1,63 @@
-export const APP_LOCALE = 'pl-PL' as const
-/** Strefa aplikacji. Pinujemy ja w KAZDYM formatterze daty, zeby serwer
- *  (UTC) i przegladarka uzytkownika renderowaly identyczny tekst. */
+import { INTL_LOCALE, type AppLocale } from '@/i18n/config'
+
+/**
+ * Strefa aplikacji. Pinujemy ja w KAZDYM formatterze daty, zeby serwer
+ * (UTC) i przegladarka uzytkownika renderowaly identyczny tekst.
+ *
+ * STREFA NIE JEST ZWIAZANA Z JEZYKIEM INTERFEJSU. Uzytkownik moze miec UI po
+ * niemiecku i strefe `Europe/Warsaw` — albo odwrotnie. Zmiana jezyka nie
+ * przesuwa ani jednej daty, bo to dana biznesowa konta, a nie preferencja
+ * prezentacji.
+ */
 const APP_TIME_ZONE = 'Europe/Warsaw'
+
 /** Placeholder braku danych — jedyne miejsce w repo, w którym jest definiowany. */
 export const NO_DATA = '—' as const
 
 const dateCache = new Map<string, Intl.DateTimeFormat>()
 const numberCache = new Map<string, Intl.NumberFormat>()
+const relativeCache = new Map<AppLocale, Intl.RelativeTimeFormat>()
 
-/** Konstruktory Intl są drogie — cache po serializacji opcji. */
-export function dateFormatter(options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
-  const key = JSON.stringify(options)
+/**
+ * Tag BCP-47 dla `Intl`. `en` znaczy w produkcie `en-GB` — inaczej daty
+ * wygladalyby amerykansko ("September 9, 2026" zamiast "9 September 2026").
+ */
+export function intlTag(locale: AppLocale): string {
+  return INTL_LOCALE[locale]
+}
+
+/** Konstruktory Intl są drogie — cache po jezyku i serializacji opcji. */
+export function dateFormatter(
+  locale: AppLocale,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  const key = `${locale}|${JSON.stringify(options)}`
   let f = dateCache.get(key)
   if (!f) {
-    f = new Intl.DateTimeFormat(APP_LOCALE, { timeZone: APP_TIME_ZONE, ...options })
+    f = new Intl.DateTimeFormat(intlTag(locale), { timeZone: APP_TIME_ZONE, ...options })
     dateCache.set(key, f)
   }
   return f
 }
 
-export function numberFormatter(options: Intl.NumberFormatOptions): Intl.NumberFormat {
-  const key = JSON.stringify(options)
+export function numberFormatter(
+  locale: AppLocale,
+  options: Intl.NumberFormatOptions,
+): Intl.NumberFormat {
+  const key = `${locale}|${JSON.stringify(options)}`
   let f = numberCache.get(key)
   if (!f) {
-    f = new Intl.NumberFormat(APP_LOCALE, options)
+    f = new Intl.NumberFormat(intlTag(locale), options)
     numberCache.set(key, f)
+  }
+  return f
+}
+
+export function relativeFormatter(locale: AppLocale): Intl.RelativeTimeFormat {
+  let f = relativeCache.get(locale)
+  if (!f) {
+    f = new Intl.RelativeTimeFormat(intlTag(locale), { numeric: 'auto' })
+    relativeCache.set(locale, f)
   }
   return f
 }

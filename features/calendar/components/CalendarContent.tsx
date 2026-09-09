@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutGrid, List } from 'lucide-react'
 import { useEffectiveEurRate } from '@/features/dashboard'
-import { formatMonthTitle } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getDateString, getMonthKey, isFutureDate } from '@/lib/helpers'
 import {
   useCalendarData,
@@ -37,6 +37,7 @@ import { AppFooter } from '@/components/common/AppFooter'
 import { type WorkEntry } from '@/lib/types'
 
 export function CalendarContent() {
+  const fmt = useFormat()
   const { data } = useCalendarData()
   const { clients, projects, workEntries } = data
 
@@ -262,7 +263,7 @@ export function CalendarContent() {
         </Tabs>
 
         <MonthInsights
-          monthName={formatMonthTitle(getMonthKey(nav.currentYear, nav.currentMonth))}
+          monthName={fmt.monthTitle(getMonthKey(nav.currentYear, nav.currentMonth))}
           metrics={metrics}
           insights={insights}
           onViewAllEntries={() => setView('list')}

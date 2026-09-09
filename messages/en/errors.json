@@ -1,0 +1,20 @@
+{
+  "AUTH_INVALID_CREDENTIALS": "Incorrect email or password",
+  "AUTH_SIGN_UP_FAILED": "We couldn't create your account. Please try again.",
+  "INVALID_ACCOUNT_SETTINGS": "Invalid profile details",
+  "INVALID_INVOICE_SETTINGS": "Invalid invoice settings",
+  "INVALID_WEEKLY_SUMMARY_SETTINGS": "Invalid weekly summary settings",
+  "INVALID_AVATAR_FILE": "Invalid file",
+  "ACCOUNT_PROFILE_SAVE_FAILED": "We couldn't save your profile",
+  "INVOICE_SETTINGS_SAVE_FAILED": "We couldn't save the invoice settings",
+  "WEEKLY_SUMMARY_LOAD_FAILED": "We couldn't load the weekly summary settings",
+  "WEEKLY_SUMMARY_SAVE_FAILED": "We couldn't save the weekly summary settings",
+  "WEEKLY_SUMMARY_NO_RECIPIENT": "Save the recipient's email address first",
+  "WEEKLY_SUMMARY_EMPTY": "No days worked this week — there is nothing to send",
+  "AVATAR_UPLOAD_FAILED": "We couldn't upload the file",
+  "AVATAR_SAVE_FAILED": "We couldn't save your avatar",
+  "AVATAR_URL_FAILED": "We couldn't generate the avatar address",
+  "AUTOMATION_CLIENTS_LOAD_FAILED": "We couldn't load the clients for automatic invoicing",
+  "LOCALE_SAVE_FAILED": "We couldn't save the interface language",
+  "UNKNOWN": "Something went wrong. Please try again."
+}

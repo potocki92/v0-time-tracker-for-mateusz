@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Pencil, Trash2 } from 'lucide-react'
 import { clientInitials } from '@/components/common/ClientDisplay'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { formatDate, formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import {
   PROJECT_BUDGET_LABELS,
@@ -22,11 +24,12 @@ type ProjectDetailsPanelProps = {
   onDelete: () => void
 }
 
-function formatDeadlineDate(date: string | null): string {
-  return formatDate(date?.slice(0, 10), 'long')
+function formatDeadlineDate(fmt: AppFormat, date: string | null): string {
+  return fmt.date(date?.slice(0, 10), 'long')
 }
 
 export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPanelProps) {
+  const fmt = useFormat()
   const {
     project,
     clientName,
@@ -106,8 +109,8 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
       </div>
 
       <dl className="mt-3 grid grid-cols-2 gap-3">
-        <DetailField label="START" value={formatDeadlineDate(project.start_date)} />
-        <DetailField label="TERMIN" value={formatDeadlineDate(dueDate)} danger={isAtRisk} />
+        <DetailField label="START" value={formatDeadlineDate(fmt, project.start_date)} />
+        <DetailField label="TERMIN" value={formatDeadlineDate(fmt, dueDate)} danger={isAtRisk} />
         <DetailField label="TYP BUDŻETU" value={PROJECT_BUDGET_LABELS[project.budget_type]} />
         <DetailField label="GODZINY" value={`${Math.round(hoursLogged)}h`} />
       </dl>
@@ -117,7 +120,7 @@ export function ProjectDetailsPanel({ row, onEdit, onDelete }: ProjectDetailsPan
         <div className="mt-2 space-y-1.5 text-xs">
           <Row
             label="Kwota"
-            value={budget > 0 ? formatMoney(toMinor(budget), 'PLN') : '—'}
+            value={budget > 0 ? fmt.money(toMinor(budget), 'PLN') : '—'}
             mute={budget <= 0}
           />
           <Row

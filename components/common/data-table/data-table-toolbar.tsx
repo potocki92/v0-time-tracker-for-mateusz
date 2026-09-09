@@ -1,7 +1,8 @@
 'use client'
 
 import type { Column, RowData } from '@tanstack/react-table'
-import { formatDate as formatIsoDate, NO_DATA } from '@/lib/format'
+import { NO_DATA, type AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { FilterX, Plus, Search, Trash2, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -37,9 +38,9 @@ function isSelectFilter(filter: DataTableFilter): filter is DataTableSelectFilte
   return filter.type !== 'dateRange' && filter.type !== 'numberRange'
 }
 
-function formatDate(iso: string | null | undefined): string {
+function formatDate(fmt: AppFormat, iso: string | null | undefined): string {
   if (!iso) return ''
-  const label = formatIsoDate(iso.slice(0, 10), 'short')
+  const label = fmt.date(iso.slice(0, 10), 'short')
   return label === NO_DATA ? iso : label
 }
 
@@ -241,6 +242,7 @@ type ActiveFilterChip = {
 }
 
 function describeActiveFilters<TData extends RowData>(
+  fmt: AppFormat,
   filters: DataTableFilter[],
   table: DataTableToolbarProps<TData>['table'],
 ): ActiveFilterChip[] {
@@ -255,7 +257,7 @@ function describeActiveFilters<TData extends RowData>(
     if (isDateRangeFilter(filter)) {
       const [from, to] = (value as [string | null, string | null]) ?? [null, null]
       if (!from && !to) continue
-      const range = `${formatDate(from) || '—'} → ${formatDate(to) || '—'}`
+      const range = `${formatDate(fmt, from) || '—'} → ${formatDate(fmt, to) || '—'}`
       chips.push({
         key: `${filter.columnId}-range`,
         label: `${filter.label}: ${range}`,
@@ -306,7 +308,8 @@ export function DataTableToolbar<TData extends RowData>({
 }: DataTableToolbarProps<TData>) {
   // Recomputed every render: filter values come from `table` and aren't part
   // of toolbar props, so memoization with stable deps would mask updates.
-  const activeChips = describeActiveFilters(filters, table)
+  const fmt = useFormat()
+  const activeChips = describeActiveFilters(fmt, filters, table)
   const hasActiveFilters = activeChips.length > 0 || globalFilter.length > 0
 
   function handleClearAll() {

@@ -2,32 +2,41 @@ import { z } from 'zod'
 
 import { PASSWORD_MIN } from './auth.constants'
 
+/**
+ * Schematy auth zwracaja KODY WALIDACJI, nie gotowe zdania.
+ *
+ * Warstwa domenowa nie zna jezyka uzytkownika — Server Action moze zostac
+ * wywolana z dowolna wersja jezykowa interfejsu. Kod (`email.required`) jest
+ * kluczem w `messages/<locale>/validation.json` i tlumaczy go formularz.
+ * Dzieki temu niemieckie UI nigdy nie pokaze polskiego bledu.
+ */
 const emailField = z
-  .string({ required_error: 'Email jest wymagany' })
+  .string({ required_error: 'email.required' })
   .trim()
-  .min(1, 'Email jest wymagany')
-  .email('Niepoprawny adres email')
+  .min(1, 'email.required')
+  .email('email.invalid')
 
 const passwordField = z
-  .string({ required_error: 'Hasło jest wymagane' })
-  .min(PASSWORD_MIN, `Hasło musi mieć min. ${PASSWORD_MIN} znaków`)
-  .max(128, 'Hasło jest zbyt długie')
+  .string({ required_error: 'password.required' })
+  .min(PASSWORD_MIN, 'password.tooShort')
+  .max(128, 'password.tooLong')
 
 export const loginSchema = z.object({
   email:    emailField,
-  password: z.string().min(1, 'Hasło jest wymagane'),
+  password: z.string().min(1, 'password.required'),
 })
+
 export const signUpSchema = z
   .object({
     fullName: z
-      .string({ required_error: 'Imię i nazwisko jest wymagane' })
+      .string({ required_error: 'fullName.required' })
       .trim()
-      .min(2, 'Imię i nazwisko jest wymagane'),
+      .min(2, 'fullName.required'),
     email:           emailField,
     password:        passwordField,
-    confirmPassword: z.string().min(1, 'Powtórz hasło'),
+    confirmPassword: z.string().min(1, 'password.repeat'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path:    ['confirmPassword'],
-    message: 'Hasła muszą być identyczne',
+    message: 'password.mismatch',
   })

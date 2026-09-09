@@ -12,12 +12,12 @@ import {
   DEMO_TRIPS,
   DEMO_WEEK,
   DEMO_WEEK_SCHEDULE,
-} from '@/app/(marketing)/_landing/demo/demo-data'
-import { buildDemoMonth } from '@/app/(marketing)/_landing/demo/demo-month.server'
+} from '@/app/[locale]/(marketing)/_landing/demo/demo-data'
+import { buildDemoMonth } from '@/app/[locale]/(marketing)/_landing/demo/demo-month.server'
 import {
   MARKETING_BOTTOM_SEGMENTS,
   MARKETING_SECTIONS,
-} from '@/app/(marketing)/_landing/product/nav'
+} from '@/app/[locale]/(marketing)/_landing/product/nav'
 
 /**
  * Landing obiecuje dwie rzeczy, ktorych nie da sie sprawdzic okiem:
@@ -32,7 +32,7 @@ import {
  */
 
 const ROOT = path.resolve(__dirname, '../..')
-const LANDING = 'app/(marketing)'
+const LANDING = 'app/[locale]/(marketing)'
 
 function sourceFiles(dir: string): string[] {
   const found: string[] = []
@@ -48,6 +48,12 @@ function sourceFiles(dir: string): string[] {
 }
 
 const read = (file: string) => readFileSync(path.join(ROOT, file), 'utf8')
+
+/** Komentarze zostaja po polsku celowo — audyt dotyczy tekstu dla uzytkownika. */
+const stripComments = (source: string) =>
+  source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '')
 
 describe('landing — miesiac demonstracyjny liczy automat, nie grafik', () => {
   const month = buildDemoMonth()
@@ -67,11 +73,14 @@ describe('landing — miesiac demonstracyjny liczy automat, nie grafik', () => {
   it('trzyma kolejnosc regul automatu: pobyt w domu przed grafikiem', () => {
     // Niedziele 13 i 20 wrzesnia wpadaja w pobyt w domu, wiec automat podaje
     // wlasnie ten powod — reguly maja kolejnosc i landing ja pokazuje.
-    const label = (day: number) => month.days[day - 1].skipLabel
-    expect(label(6)).toBe('Dzień tygodnia wyłączony w grafiku')
-    expect(label(27)).toBe('Dzień tygodnia wyłączony w grafiku')
-    expect(label(13)).toBe('Pobyt w domu')
-    expect(label(20)).toBe('Pobyt w domu')
+    //
+    // Sprawdzamy KLUCZ powodu, nie etykiete: po migracji i18n landing dostaje
+    // z serwera `SkipReason`, a zdanie sklada dopiero warstwa tlumaczen.
+    const reason = (day: number) => month.days[day - 1].skipReason
+    expect(reason(6)).toBe('weekday_off')
+    expect(reason(27)).toBe('weekday_off')
+    expect(reason(13)).toBe('home_stay')
+    expect(reason(20)).toBe('home_stay')
   })
 
   it('nie zapisuje ani jednego dnia pobytu w domu', () => {
@@ -82,7 +91,7 @@ describe('landing — miesiac demonstracyjny liczy automat, nie grafik', () => {
     )
     expect(home).toHaveLength(8)
     expect(home.every((day) => day.hours === null)).toBe(true)
-    expect(home.some((day) => day.skipLabel === 'Pobyt w domu')).toBe(true)
+    expect(home.some((day) => day.skipReason === 'home_stay')).toBe(true)
   })
 
   it('zapisuje dni wyjazdu wedlug grafiku: 10 h w tygodniu, 8 h w sobote', () => {
@@ -183,13 +192,25 @@ describe('landing — nawigacja mockupu laczy klientow ze scena Projekty', () =>
     expect(scene).not.toContain("'clients'")
   })
 
+  it('nie trzyma copy w komponentach — tylko klucze tlumaczen', () => {
+    // Zakaz z zadania: jeden komponent, trzy jezyki. Gdyby ktos wrocil do
+    // literalu w JSX, ten test zapali sie zanim tekst trafi na produkcje.
+    const offenders: string[] = []
+    for (const file of sourceFiles(`${LANDING}/_landing`)) {
+      if (/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(stripComments(read(file)))) offenders.push(file)
+    }
+    expect(offenders, `copy ma isc z messages/:\n${offenders.join('\n')}`).toEqual([])
+  })
+
   it('nadal pokazuje klientow w tresci sceny Projekty', () => {
     // Klienci znikaja z NAWIGACJI mockupu, nie z opowiesci: KPI i tabela
     // stawek sa dowodem relacji klient → stawka, projekt → budzet.
+    //
+    // Po migracji i18n copy nie stoi juz w komponencie — sprawdzamy wiec
+    // KLUCZ tlumaczenia, ktorego ekran uzywa dwa razy (KPI + naglowek tabeli).
     const screen = read(`${LANDING}/_landing/product/screens/ProjectsScreen.tsx`)
     expect(screen).toContain('DEMO_CLIENTS')
-    expect(screen).toMatch(/label="Klienci"/)
-    expect(screen).toContain('<Eyebrow>Klienci</Eyebrow>')
+    expect(screen.match(/t\('clients'\)/g) ?? []).toHaveLength(2)
   })
 
   it('zostawia klientow nietknietych w rejestrze panelu', () => {

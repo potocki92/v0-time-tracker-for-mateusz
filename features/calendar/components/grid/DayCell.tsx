@@ -1,6 +1,7 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import type { Client, WorkEntry } from '@/lib/types'
-import { formatHours, formatMoney, formatNumber, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getDateString, isFutureDate } from '@/lib/helpers'
 import { calculateEarnings } from '@/lib/finance/earnings'
 import { cn } from '@/lib/utils'
@@ -52,6 +53,7 @@ export function DayCell({
   tripMarker,
   onClick,
 }: Props) {
+  const fmt = useFormat()
   const dateStr = getDateString(year, month, day)
   const today = new Date()
   const todayStr = getDateString(today.getFullYear(), today.getMonth(), today.getDate())
@@ -120,12 +122,12 @@ export function DayCell({
         <div className="mt-auto min-w-0 space-y-0.5">
           <div className="truncate text-2xs font-bold leading-none text-white">
             {client?.work_type === 'hourly'
-              ? formatHours(entry.hours)
-              : `${formatNumber(entry.quantity)} ${client?.unit ?? ''}`.trim()}
+              ? fmt.hours(entry.hours)
+              : `${fmt.number(entry.quantity)} ${client?.unit ?? ''}`.trim()}
           </div>
           {earnings && earnings.amount > 0 && (
             <div className="hidden truncate text-2xs font-medium leading-none text-zinc-400 md:block">
-              {formatMoney(toMinor(earnings.amount), earnings.currency)}
+              {fmt.money(toMinor(earnings.amount), earnings.currency)}
             </div>
           )}
         </div>

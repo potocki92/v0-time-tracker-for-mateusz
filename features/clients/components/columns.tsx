@@ -11,7 +11,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ClientDisplay } from '@/components/common/ClientDisplay'
-import { formatCount, formatHours, formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { ClientWithStats } from '../domain/clients.types'
 import {
@@ -27,7 +28,12 @@ export type ClientsTableMeta = {
   onShowHistory: (client: ClientWithStats) => void
 }
 
-export const columns: ColumnDef<ClientWithStats>[] = [
+/**
+ * Kolumny sa FABRYKA, a nie stala: `cell` renderuje TanStack jako zwykla
+ * funkcje, wiec nie wolno tam wolac hooka. Jezyk wchodzi wiec jawnie.
+ */
+export function createClientColumns(fmt: AppFormat): ColumnDef<ClientWithStats>[] {
+  return [
   {
     accessorKey: 'name',
     header: 'Klient',
@@ -69,7 +75,7 @@ export const columns: ColumnDef<ClientWithStats>[] = [
       const unit = row.original.work_type === 'hourly' ? 'h' : (row.original.unit ?? 'szt')
       return (
         <div className="font-semibold tabular-nums">
-          {formatMoney(toMinor(row.original.rate), row.original.currency)}
+          {fmt.money(toMinor(row.original.rate), row.original.currency)}
           <span className="text-xs font-normal text-muted-foreground">/{unit}</span>
         </div>
       )
@@ -83,7 +89,7 @@ export const columns: ColumnDef<ClientWithStats>[] = [
     size: 140,
     cell: ({ row }) =>
       row.original.totalEarningsInClientCurrency > 0
-        ? formatMoney(toMinor(row.original.totalEarningsInClientCurrency), row.original.currency)
+        ? fmt.money(toMinor(row.original.totalEarningsInClientCurrency), row.original.currency)
         : '—',
   },
   {
@@ -96,7 +102,7 @@ export const columns: ColumnDef<ClientWithStats>[] = [
     // na tyle, że treść wchodziła w sąsiednią.
     cell: ({ row }) =>
       row.original.totalHours > 0
-        ? `${formatHours(row.original.totalHours)} · ${formatCount(row.original.totalDays, [
+        ? `${fmt.hours(row.original.totalHours)} · ${fmt.count(row.original.totalDays, [
             'dzień',
             'dni',
             'dni',
@@ -157,4 +163,5 @@ export const columns: ColumnDef<ClientWithStats>[] = [
       )
     },
   },
-]
+  ]
+}

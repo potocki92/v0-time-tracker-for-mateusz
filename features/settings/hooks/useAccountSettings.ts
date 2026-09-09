@@ -1,7 +1,9 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
+import { errorCodeOf, unwrap } from '@/lib/errors/action-result'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/lib/query'
 import type {
   AccountSettingsFormValues,
@@ -18,99 +20,118 @@ import {
   uploadAvatarAction,
 } from '../actions'
 
+/**
+ * Wszystkie mutacje ustawien tlumacza KODY zwrocone przez Server Action —
+ * `messages/<locale>/errors.json` dla bledow, `settings.toast` dla sukcesow.
+ * W tej warstwie nie ma ani jednego zdania po polsku.
+ */
+function useActionToast() {
+  const te = useTranslations('errors')
+  const ts = useTranslations('settings.toast')
+
+  return {
+    success: (key: string, values?: Record<string, string | number>) =>
+      toast.success(ts(key, values)),
+    failure: (error: unknown) => {
+      const { code, values } = errorCodeOf(error)
+      toast.error(te(code, values))
+    },
+  }
+}
+
 export function useProfile() {
   return useQuery({
     queryKey: QUERY_KEYS.accountProfile(),
-    queryFn: fetchAccountProfileAction,
+    queryFn: async () => unwrap(await fetchAccountProfileAction()),
     retry: 1,
   })
 }
 
 export function useUpdateProfile() {
   const qc = useQueryClient()
+  const notify = useActionToast()
+  const tSettings = useTranslations('settings')
 
   return useMutation({
     mutationKey: MUTATION_KEYS.account.updateProfile,
-    mutationFn: (values: AccountSettingsFormValues) => updateAccountProfileAction(values),
+    mutationFn: async (values: AccountSettingsFormValues) =>
+      unwrap(await updateAccountProfileAction(values)),
     onSuccess: async () => {
-      toast.success('Zapisano ustawienia konta')
+      toast.success(tSettings('profile.saved'))
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.accountProfile() })
       // Dashboard wita uzytkownika po imieniu (`resolveUserName` czyta
       // `user_metadata`), wiec zmiana profilu musi uniewaznic takze jego dane.
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.dashboard() })
     },
-    onError: (error: unknown) => {
-      toast.error(error instanceof Error ? error.message : 'Nie udało się zapisać profilu')
-    },
+    onError: notify.failure,
   })
 }
 
 export function useUpdateAvatar() {
   const qc = useQueryClient()
+  const notify = useActionToast()
 
   return useMutation({
     mutationKey: MUTATION_KEYS.account.uploadAvatar,
-    mutationFn: (file: File) => uploadAvatarAction(file),
+    mutationFn: async (file: File) => unwrap(await uploadAvatarAction(file)),
     onSuccess: async () => {
-      toast.success('Avatar został zaktualizowany')
+      notify.success('AVATAR_UPDATED')
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.accountProfile() })
     },
-    onError: (error: unknown) => {
-      toast.error(error instanceof Error ? error.message : 'Nie udało się wgrać avatara')
-    },
+    onError: notify.failure,
   })
 }
 
 export function useUpdateInvoiceAutomationSettings() {
   const qc = useQueryClient()
+  const notify = useActionToast()
 
   return useMutation({
     mutationKey: MUTATION_KEYS.account.updateInvoiceSettings,
-    mutationFn: (values: InvoiceSettings) => updateInvoiceAutomationSettingsAction(values),
+    mutationFn: async (values: InvoiceSettings) =>
+      unwrap(await updateInvoiceAutomationSettingsAction(values)),
     onSuccess: async () => {
-      toast.success('Zapisano ustawienia automatyzacji faktur')
+      notify.success('INVOICE_SETTINGS_SAVED')
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.accountProfile() })
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.invoices() })
     },
-    onError: (error: unknown) => {
-      toast.error(error instanceof Error ? error.message : 'Nie udało się zapisać ustawień faktur')
-    },
+    onError: notify.failure,
   })
 }
 
 export function useWeeklySummaryEmail() {
   return useQuery({
     queryKey: QUERY_KEYS.weeklySummaryEmail(),
-    queryFn: fetchWeeklySummaryEmailAction,
+    queryFn: async () => unwrap(await fetchWeeklySummaryEmailAction()),
     retry: 1,
   })
 }
 
 export function useUpdateWeeklySummaryEmail() {
   const qc = useQueryClient()
+  const notify = useActionToast()
 
   return useMutation({
     mutationKey: MUTATION_KEYS.account.updateWeeklySummaryEmail,
-    mutationFn: (values: WeeklySummaryEmailSettings) => updateWeeklySummaryEmailAction(values),
+    mutationFn: async (values: WeeklySummaryEmailSettings) =>
+      unwrap(await updateWeeklySummaryEmailAction(values)),
     onSuccess: async () => {
-      toast.success('Zapisano ustawienia skrótu tygodnia')
+      notify.success('WEEKLY_SUMMARY_SAVED')
       await qc.invalidateQueries({ queryKey: QUERY_KEYS.weeklySummaryEmail() })
     },
-    onError: (error: unknown) => {
-      toast.error(error instanceof Error ? error.message : 'Nie udało się zapisać ustawień')
-    },
+    onError: notify.failure,
   })
 }
 
 export function useSendWeeklySummaryEmail() {
+  const notify = useActionToast()
+
   return useMutation({
     mutationKey: MUTATION_KEYS.account.sendWeeklySummaryEmail,
-    mutationFn: sendWeeklySummaryEmailNowAction,
+    mutationFn: async () => unwrap(await sendWeeklySummaryEmailNowAction()),
     onSuccess: ({ recipient }) => {
-      toast.success(`Wysłano skrót na ${recipient}`)
+      notify.success('WEEKLY_SUMMARY_SENT', { recipient })
     },
-    onError: (error: unknown) => {
-      toast.error(error instanceof Error ? error.message : 'Nie udało się wysłać skrótu')
-    },
+    onError: notify.failure,
   })
 }

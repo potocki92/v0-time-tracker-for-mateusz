@@ -1,7 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { formatCount, formatHours, formatMoney, toMinor, type Currency } from '@/lib/format'
+import { toMinor, type Currency } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarRange, Check, Loader2 } from 'lucide-react'
 
@@ -39,8 +41,8 @@ interface QuickQuarterlyInvoiceDialogProps {
   onSubmit: (values: InvoiceFormValues) => Promise<void> | void
 }
 
-function formatAmount(amount: number, currency: string) {
-  return formatMoney(toMinor(amount), currency as Currency)
+function formatAmount(fmt: AppFormat, amount: number, currency: string) {
+  return fmt.money(toMinor(amount), currency as Currency)
 }
 
 /**
@@ -58,6 +60,7 @@ export function QuickQuarterlyInvoiceDialog({
   onClose,
   onSubmit,
 }: QuickQuarterlyInvoiceDialogProps) {
+  const fmt = useFormat()
   const [clientId, setClientId] = React.useState<string>('')
   const [selectedId, setSelectedId] = React.useState<string | null>(null)
 
@@ -91,8 +94,8 @@ export function QuickQuarterlyInvoiceDialog({
     const todayIso = new Date().toISOString().slice(0, 10)
     const description =
       selectedQuarter.workType === 'piecework'
-        ? `Praca ${selectedQuarter.quarter} ${selectedQuarter.year} (${selectedQuarter.start} – ${selectedQuarter.end}) — ${formatCount(selectedQuarter.quantity, ['szt.', 'szt.', 'szt.'])}`
-        : `Praca ${selectedQuarter.quarter} ${selectedQuarter.year} (${selectedQuarter.start} – ${selectedQuarter.end}) — ${formatHours(selectedQuarter.hours)}`
+        ? `Praca ${selectedQuarter.quarter} ${selectedQuarter.year} (${selectedQuarter.start} – ${selectedQuarter.end}) — ${fmt.count(selectedQuarter.quantity, ['szt.', 'szt.', 'szt.'])}`
+        : `Praca ${selectedQuarter.quarter} ${selectedQuarter.year} (${selectedQuarter.start} – ${selectedQuarter.end}) — ${fmt.hours(selectedQuarter.hours)}`
     const quantity =
       selectedQuarter.workType === 'piecework'
         ? selectedQuarter.quantity || 1
@@ -244,12 +247,12 @@ export function QuickQuarterlyInvoiceDialog({
                               {q.quarter} {q.year}
                             </p>
                             <p className="text-sm font-semibold">
-                              {formatAmount(q.amount, q.currency)}
+                              {formatAmount(fmt, q.amount, q.currency)}
                             </p>
                           </div>
                           <p className="text-xs text-muted-foreground">
                             {q.start} – {q.end} · {q.workedDays}{' '}
-                            {q.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(q.hours)}
+                            {q.workedDays === 1 ? 'dzień' : 'dni'} · {fmt.hours(q.hours)}
                           </p>
                           {q.invoiced ? (
                             <p className="mt-0.5 text-xs font-medium text-brand-400">

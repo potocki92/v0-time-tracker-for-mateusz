@@ -16,7 +16,8 @@ import {
   StyleSheet,
   Font,
 } from '@react-pdf/renderer'
-import { formatDate, formatHours, formatMoney, NO_DATA, toMinor } from '@/lib/format'
+import { NO_DATA, toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import type { ExportRow } from '@/hooks/useExportData'
 
@@ -137,6 +138,12 @@ const styles = StyleSheet.create({
 interface EarningsReportProps {
   rows:        ExportRow[]
   periodLabel: string
+  /**
+   * Formattery jezyka UI. PDF renderuje wlasny reconciler `@react-pdf/renderer`,
+   * poza drzewem Reacta strony — kontekst `next-intl` tam nie dociera, wiec
+   * jezyk wchodzi jawnie propsem.
+   */
+  fmt: AppFormat
   totals: {
     totalPLN:   number
     totalEUR:   number
@@ -146,8 +153,8 @@ interface EarningsReportProps {
 
 // ── Komponent ─────────────────────────────────────────────────────────────────
 
-export function EarningsReport({ rows, totals, periodLabel }: EarningsReportProps) {
-  const now = formatDate(getTodayLocalDateString(), 'long')
+export function EarningsReport({ rows, totals, periodLabel, fmt }: EarningsReportProps) {
+  const now = fmt.date(getTodayLocalDateString(), 'long')
 
   return (
     <Document
@@ -168,18 +175,18 @@ export function EarningsReport({ rows, totals, periodLabel }: EarningsReportProp
           <View style={styles.totalCard}>
             <Text style={styles.totalLabel}>Łącznie PLN</Text>
             <Text style={styles.totalValue}>
-              {formatMoney(toMinor(totals.totalPLN), 'PLN')}
+              {fmt.money(toMinor(totals.totalPLN), 'PLN')}
             </Text>
           </View>
           <View style={styles.totalCard}>
             <Text style={styles.totalLabel}>Łącznie EUR</Text>
             <Text style={styles.totalValue}>
-              {formatMoney(toMinor(totals.totalEUR), 'EUR')}
+              {fmt.money(toMinor(totals.totalEUR), 'EUR')}
             </Text>
           </View>
           <View style={styles.totalCard}>
             <Text style={styles.totalLabel}>Godziny</Text>
-            <Text style={styles.totalValue}>{formatHours(totals.totalHours)}</Text>
+            <Text style={styles.totalValue}>{fmt.hours(totals.totalHours)}</Text>
           </View>
         </View>
 
@@ -205,13 +212,13 @@ export function EarningsReport({ rows, totals, periodLabel }: EarningsReportProp
               <Text style={styles.colDate}>{row.date}</Text>
               <Text style={styles.colClient}>{row.client}</Text>
               <Text style={styles.colProject}>{row.project}</Text>
-              <Text style={styles.colHours}>{formatHours(row.hours)}</Text>
+              <Text style={styles.colHours}>{fmt.hours(row.hours)}</Text>
               <Text style={styles.colPLN}>
-                {formatMoney(toMinor(row.earningsPLN), 'PLN')}
+                {fmt.money(toMinor(row.earningsPLN), 'PLN')}
               </Text>
               <Text style={styles.colEUR}>
                 {row.earningsEUR > 0
-                  ? formatMoney(toMinor(row.earningsEUR), 'EUR')
+                  ? fmt.money(toMinor(row.earningsEUR), 'EUR')
                   : NO_DATA}
               </Text>
             </View>

@@ -1,0 +1,20 @@
+{
+  "AUTH_INVALID_CREDENTIALS": "E-Mail oder Passwort ist falsch",
+  "AUTH_SIGN_UP_FAILED": "Das Konto konnte nicht erstellt werden. Bitte erneut versuchen.",
+  "INVALID_ACCOUNT_SETTINGS": "Ungültige Profildaten",
+  "INVALID_INVOICE_SETTINGS": "Ungültige Rechnungseinstellungen",
+  "INVALID_WEEKLY_SUMMARY_SETTINGS": "Ungültige Einstellungen für den Wochenrückblick",
+  "INVALID_AVATAR_FILE": "Ungültige Datei",
+  "ACCOUNT_PROFILE_SAVE_FAILED": "Das Profil konnte nicht gespeichert werden",
+  "INVOICE_SETTINGS_SAVE_FAILED": "Die Rechnungseinstellungen konnten nicht gespeichert werden",
+  "WEEKLY_SUMMARY_LOAD_FAILED": "Die Einstellungen für den Wochenrückblick konnten nicht geladen werden",
+  "WEEKLY_SUMMARY_SAVE_FAILED": "Die Einstellungen für den Wochenrückblick konnten nicht gespeichert werden",
+  "WEEKLY_SUMMARY_NO_RECIPIENT": "Speichern Sie zuerst die E-Mail-Adresse des Empfängers",
+  "WEEKLY_SUMMARY_EMPTY": "Diese Woche gibt es keine gearbeiteten Tage — es gibt nichts zu senden",
+  "AVATAR_UPLOAD_FAILED": "Die Datei konnte nicht hochgeladen werden",
+  "AVATAR_SAVE_FAILED": "Das Profilbild konnte nicht gespeichert werden",
+  "AVATAR_URL_FAILED": "Die Adresse des Profilbilds konnte nicht erzeugt werden",
+  "AUTOMATION_CLIENTS_LOAD_FAILED": "Die Kunden für die automatische Rechnungsstellung konnten nicht geladen werden",
+  "LOCALE_SAVE_FAILED": "Die Sprache der Oberfläche konnte nicht gespeichert werden",
+  "UNKNOWN": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+}

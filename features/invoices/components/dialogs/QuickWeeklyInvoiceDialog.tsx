@@ -1,7 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { formatCount, formatHours, formatMoney, toMinor, type Currency } from '@/lib/format'
+import { toMinor, type Currency } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarRange, Loader2 } from 'lucide-react'
 
@@ -50,8 +52,8 @@ function defaultRange() {
   }
 }
 
-function formatAmount(amount: number, currency: string) {
-  return formatMoney(toMinor(amount), currency as Currency)
+function formatAmount(fmt: AppFormat, amount: number, currency: string) {
+  return fmt.money(toMinor(amount), currency as Currency)
 }
 
 function quarterFromIso(iso: string) {
@@ -79,6 +81,7 @@ export function QuickWeeklyInvoiceDialog({
   onClose,
   onSubmit,
 }: QuickWeeklyInvoiceDialogProps) {
+  const fmt = useFormat()
   const [clientId, setClientId] = React.useState<string>('')
   const [range, setRange] = React.useState(defaultRange)
   const [selected, setSelected] = React.useState<Set<string>>(new Set())
@@ -139,8 +142,8 @@ export function QuickWeeklyInvoiceDialog({
     const lineItems = selectedWeeks.map((week) => {
       const description =
         week.workType === 'piecework'
-          ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${formatCount(week.quantity, ['szt.', 'szt.', 'szt.'])}`
-          : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${formatHours(week.hours)}`
+          ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${fmt.count(week.quantity, ['szt.', 'szt.', 'szt.'])}`
+          : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${fmt.hours(week.hours)}`
       const quantity = week.workType === 'piecework' ? week.quantity || 1 : week.hours || 1
       const unit_price_net = quantity > 0 ? Math.round((week.amount / quantity) * 100) / 100 : 0
       return {
@@ -313,12 +316,12 @@ export function QuickWeeklyInvoiceDialog({
                           <div className="flex items-baseline justify-between gap-3">
                             <p className="font-medium">{week.id}</p>
                             <p className="text-sm font-semibold">
-                              {formatAmount(week.amount, week.currency)}
+                              {formatAmount(fmt, week.amount, week.currency)}
                             </p>
                           </div>
                           <p className="text-xs text-muted-foreground">
                             {week.start} – {week.end} · {week.workedDays}{' '}
-                            {week.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(week.hours)}
+                            {week.workedDays === 1 ? 'dzień' : 'dni'} · {fmt.hours(week.hours)}
                           </p>
                         </div>
                       </label>
@@ -338,7 +341,7 @@ export function QuickWeeklyInvoiceDialog({
                 <p className="text-muted-foreground">
                   Suma:{' '}
                   <span className="font-medium text-foreground">
-                    {formatAmount(totalAmount, totalCurrency)}
+                    {formatAmount(fmt, totalAmount, totalCurrency)}
                   </span>{' '}
                   ({selectedWeeks.length} {selectedWeeks.length === 1 ? 'tydzień' : 'tygodni'})
                 </p>

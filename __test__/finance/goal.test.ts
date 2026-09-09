@@ -1,10 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { formatDate } from '@/lib/format'
 import { findGoalReachedDate } from '@/lib/finance/goal'
 import type { Goal } from '@/features/dashboard/domain'
 import type { WorkEntry } from '@/lib/types'
+import { createFormat } from '@/lib/format'
 
-const plDate = (iso: string) => formatDate(iso, 'dayMonth')
+/** Formattery jezyka bazowego — testy sprawdzaja logike, nie tlumaczenia. */
+const fmt = createFormat('pl')
+
+const plDate = (iso: string) => fmt.date(iso, 'dayMonth')
 
 function entry(over: Partial<WorkEntry>): WorkEntry {
   return {
@@ -38,7 +41,7 @@ describe('findGoalReachedDate', () => {
       entry({ id: 'b', date: '2025-06-02', hours: 8, billing_rate: 100 }), // 1600 -> crosses
       entry({ id: 'c', date: '2025-06-03', hours: 8, billing_rate: 100 }),
     ]
-    expect(findGoalReachedDate(entries, [], goal, 4.3)).toBe(plDate('2025-06-02'))
+    expect(findGoalReachedDate(fmt, entries, [], goal, 4.3)).toBe(plDate('2025-06-02'))
   })
 
   it('ignores earnings in a different currency than the goal (currency isolation)', () => {
@@ -48,7 +51,7 @@ describe('findGoalReachedDate', () => {
       entry({ id: 'b', date: '2025-06-05', hours: 2, billing_rate: 60, billing_currency: 'EUR' }), // 120 EUR
     ]
     // PLN entry must not count toward the EUR goal.
-    expect(findGoalReachedDate(entries, [], goal, 4.3)).toBe(plDate('2025-06-05'))
+    expect(findGoalReachedDate(fmt, entries, [], goal, 4.3)).toBe(plDate('2025-06-05'))
   })
 
   it('uses piecework quantity * rate, not hours', () => {
@@ -63,13 +66,13 @@ describe('findGoalReachedDate', () => {
         billing_work_type: 'piecework',
       }), // 50
     ]
-    expect(findGoalReachedDate(entries, [], goal, 4.3)).toBe(plDate('2025-06-04'))
+    expect(findGoalReachedDate(fmt, entries, [], goal, 4.3)).toBe(plDate('2025-06-04'))
   })
 
   it('returns null when goal is unset or never reached', () => {
     const entries = [entry({ id: 'a', billing_rate: 1, hours: 1 })]
-    expect(findGoalReachedDate(entries, [], null, 4.3)).toBeNull()
-    expect(findGoalReachedDate(entries, [], { amount: 0, currency: 'PLN' }, 4.3)).toBeNull()
-    expect(findGoalReachedDate(entries, [], { amount: 9999, currency: 'PLN' }, 4.3)).toBeNull()
+    expect(findGoalReachedDate(fmt, entries, [], null, 4.3)).toBeNull()
+    expect(findGoalReachedDate(fmt, entries, [], { amount: 0, currency: 'PLN' }, 4.3)).toBeNull()
+    expect(findGoalReachedDate(fmt, entries, [], { amount: 9999, currency: 'PLN' }, 4.3)).toBeNull()
   })
 })

@@ -3,7 +3,8 @@
 import { useMemo } from 'react'
 import { DataTable, type DataTableFilter } from '@/components/common/data-table'
 import type { ClientWithStats } from '../domain/clients.types'
-import { columns, type ClientsTableMeta } from './columns'
+import { useFormat } from '@/lib/format/client'
+import { createClientColumns, type ClientsTableMeta } from './columns'
 
 type Props = {
   clients: ClientWithStats[]
@@ -20,6 +21,8 @@ type Props = {
 const INITIAL_VISIBILITY = { currency: false }
 
 export function ClientsTable({ clients, onEdit, onDelete, onShowHistory }: Props) {
+  const fmt = useFormat()
+  const columns = useMemo(() => createClientColumns(fmt), [fmt])
   const tableMeta = useMemo<ClientsTableMeta>(
     () => ({ onEdit, onDelete, onShowHistory }),
     [onDelete, onEdit, onShowHistory],

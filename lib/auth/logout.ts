@@ -9,21 +9,28 @@
  *  3. Skasuj cache React Query (zapobiega wyświetleniu danych poprzedniego usera
  *     przy szybkim re-login).
  *  4. Defensywne czyszczenie kluczy `sb-*` z localStorage (na wypadek SDK quirks).
- *  5. Twardy redirect na /auth/login — pełny request, świeży middleware,
- *     czyste cookies, brak resztek in-memory state.
+ *  5. Twardy redirect na /auth/login W JĘZYKU UŻYTKOWNIKA — pełny request,
+ *     świeży middleware, czyste cookies, brak resztek in-memory state.
  */
 
 import type { QueryClient } from '@tanstack/react-query'
 
+import { DEFAULT_LOCALE, type AppLocale } from '@/i18n/config'
 import { signOutAction } from '@/lib/auth/actions'
 import { usePreferencesStore } from '@/features/dashboard'
 import { useUiStore } from '@/hooks/stores/useUiStore'
 
-const LOGIN_PATH = '/auth/login'
+/** `/auth/login` dla jezyka bazowego, `/de/auth/login` dla pozostalych. */
+function loginPath(locale: AppLocale): string {
+  return locale === DEFAULT_LOCALE ? '/auth/login' : `/${locale}/auth/login`
+}
 
 const PERSISTED_STORE_KEYS = ['user-preferences', 'ui-state'] as const
 
-export async function performLogout(queryClient?: QueryClient): Promise<void> {
+export async function performLogout(
+  queryClient?: QueryClient,
+  locale: AppLocale = DEFAULT_LOCALE,
+): Promise<void> {
   // 1. Server-side session invalidation. `global` revokes the refresh token.
   try {
     await signOutAction()
@@ -63,6 +70,6 @@ export async function performLogout(queryClient?: QueryClient): Promise<void> {
     }
 
     // 5. Hard navigation – middleware zobaczy puste cookies, brak race conditions.
-    window.location.replace(LOGIN_PATH)
+    window.location.replace(loginPath(locale))
   }
 }

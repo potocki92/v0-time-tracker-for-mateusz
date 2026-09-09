@@ -4,7 +4,8 @@ import { SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import type { CURRENCY } from '@/lib/types'
-import { formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import type { InvoiceAgingBuckets } from '../../domain/stats'
 import { MoreHorizontal } from 'lucide-react'
 
@@ -30,6 +31,7 @@ function pluralFaktur(n: number): string {
 }
 
 export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps) {
+  const fmt = useFormat()
   const total = aging.total
   const segmentValues: Record<(typeof SEGMENTS)[number]['key'], number> = {
     current: aging.current,
@@ -53,7 +55,7 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
 
       <div className="mt-3 flex items-baseline gap-2">
         <span className="text-3xl font-semibold tracking-tight tabular-nums text-white sm:text-4xl">
-          {formatMoney(toMinor(total), currency)}
+          {fmt.money(toMinor(total), currency)}
         </span>
         <span className="text-xs text-zinc-400">
           do odzyskania · {aging.invoiceCount} {pluralFaktur(aging.invoiceCount)}
@@ -88,7 +90,7 @@ export function InvoiceARAgingCard({ aging, currency }: InvoiceARAgingCardProps)
               {seg.label}
             </SectionEyebrow>
             <dd className="text-sm font-semibold tabular-nums text-white">
-              {formatMoney(toMinor(segmentValues[seg.key]), currency)}
+              {fmt.money(toMinor(segmentValues[seg.key]), currency)}
             </dd>
           </div>
         ))}

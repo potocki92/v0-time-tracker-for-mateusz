@@ -1,0 +1,53 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { format as formatMoney, fromMajor } from '@/lib/finance/money'
+import { getFormat } from '@/lib/format/server'
+import type { AnalyticsResult } from '@/lib/finance/invoice-analytics'
+
+interface KpiCardProps {
+  title: string
+  value: string
+  footnote?: string
+  tone?: 'default' | 'success' | 'warning' | 'danger'
+}
+
+function KpiCard({ title, value, footnote, tone = 'default' }: KpiCardProps) {
+  const toneClass =
+    tone === 'success'
+      ? 'text-positive-600'
+      : tone === 'warning'
+        ? 'text-warning-600'
+        : tone === 'danger'
+          ? 'text-danger-600'
+          : ''
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className={`text-2xl font-semibold ${toneClass}`}>{value}</div>
+        {footnote ? <p className="text-xs text-muted-foreground mt-1">{footnote}</p> : null}
+      </CardContent>
+    </Card>
+  )
+}
+
+export async function AnalyticsCards({ analytics }: { analytics: AnalyticsResult }) {
+  const { totals, dso } = analytics
+  const format = await getFormat()
+  const fmt = (n: number) => formatMoney(format, fromMajor(n, 'PLN'))
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <KpiCard title="Wystawione (PLN)" value={fmt(totals.issued)} footnote={`${totals.count} faktur`} />
+      <KpiCard title="Opłacone" value={fmt(totals.paid)} footnote={`${totals.paid_count} faktur`} tone="success" />
+      <KpiCard title="Nieopłacone" value={fmt(totals.unpaid)} tone="warning" />
+      <KpiCard
+        title="Zaległe"
+        value={fmt(totals.overdue)}
+        footnote={`${totals.overdue_count} zaległych · średni DSO: ${dso} dni`}
+        tone="danger"
+      />
+    </div>
+  )
+}

@@ -2,6 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { buildWeeklySummary } from '@/features/dashboard/lib/weekly-summary'
 import { toMajor } from '@/lib/finance/money'
 import type { Client, Project, WorkEntry } from '@/lib/types'
+import { createFormat } from '@/lib/format'
+
+/** Formattery jezyka bazowego — testy sprawdzaja logike, nie tlumaczenia. */
+const fmt = createFormat('pl')
 
 const TODAY = '2026-06-30' // po tygodniu, więc wpisy są „zrealizowane"
 const WEEK = new Date(2026, 5, 3) // środa 03.06.2026 → tydzień 01.06–07.06
@@ -79,7 +83,7 @@ function entry(over: Partial<WorkEntry> & { date: string }): WorkEntry {
 
 describe('buildWeeklySummary', () => {
   it('zwraca KW, zakres i pusty raport gdy brak pracy', () => {
-    const summary = buildWeeklySummary([], [], WEEK, TODAY)
+    const summary = buildWeeklySummary(fmt, [], [], WEEK, TODAY)
     expect(summary.weekNumber).toBe(23)
     expect(summary.weekYear).toBe(2026)
     expect(summary.from).toBe('2026-06-01')
@@ -95,7 +99,7 @@ describe('buildWeeklySummary', () => {
       entry({ date: '2026-06-02', client_id: 'c1', hours: 6 }),
       entry({ date: '2026-06-03', client_id: 'c1', hours: 8 }),
     ]
-    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY)
+    const { contractors } = buildWeeklySummary(fmt, entries, [c], WEEK, TODAY)
     expect(contractors).toHaveLength(1)
     const block = contractors[0]
     expect(block.clientName).toBe('Acme')
@@ -117,7 +121,7 @@ describe('buildWeeklySummary', () => {
       entry({ date: '2026-05-31', client_id: 'c1', hours: 8 }), // poza tygodniem
       entry({ date: '2026-06-08', client_id: 'c1', hours: 8 }), // poza tygodniem
     ]
-    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY)
+    const { contractors } = buildWeeklySummary(fmt, entries, [c], WEEK, TODAY)
     expect(contractors).toHaveLength(1)
     expect(contractors[0].totalHours).toBe(8)
     expect(contractors[0].workedDaysCount).toBe(1)
@@ -131,7 +135,7 @@ describe('buildWeeklySummary', () => {
       entry({ date: '2026-06-02', client_id: 'c2', hours: 8 }),
       entry({ date: '2026-06-03', client_id: null, hours: 5 }),
     ]
-    const { contractors } = buildWeeklySummary(entries, [zeta, acme], WEEK, TODAY)
+    const { contractors } = buildWeeklySummary(fmt, entries, [zeta, acme], WEEK, TODAY)
     expect(contractors.map((b) => b.clientName)).toEqual(['Acme', 'Zeta', 'Bez przypisania'])
     expect(contractors[2].clientId).toBeNull()
     expect(contractors[2].client).toBeNull()
@@ -150,7 +154,7 @@ describe('buildWeeklySummary', () => {
         billing_currency: 'EUR',
       }),
     ]
-    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY)
+    const { contractors } = buildWeeklySummary(fmt, entries, [c], WEEK, TODAY)
     const block = contractors[0]
     expect(block.rates).toEqual([
       { rate: 100, currency: 'PLN', workType: 'hourly', unit: null },
@@ -172,7 +176,7 @@ describe('buildWeeklySummary', () => {
       entry({ date: '2026-06-04', client_id: 'c1', project_id: 'p3' }), // brak adresu → nazwa
       entry({ date: '2026-06-05', client_id: 'c1', project_id: null }), // bez projektu
     ]
-    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY, [p1, p2, pNameOnly])
+    const { contractors } = buildWeeklySummary(fmt, entries, [c], WEEK, TODAY, [p1, p2, pNameOnly])
     expect(contractors[0].workLocations).toEqual([
       'ul. Słoneczna 10, Gdańsk',
       'ul. Morska 5, Gdynia',
@@ -183,7 +187,7 @@ describe('buildWeeklySummary', () => {
   it('zwraca puste miejsca pracy gdy brak projektów', () => {
     const c = client({ id: 'c1', name: 'Acme' })
     const entries = [entry({ date: '2026-06-02', client_id: 'c1' })]
-    const { contractors } = buildWeeklySummary(entries, [c], WEEK, TODAY)
+    const { contractors } = buildWeeklySummary(fmt, entries, [c], WEEK, TODAY)
     expect(contractors[0].workLocations).toEqual([])
   })
 })
