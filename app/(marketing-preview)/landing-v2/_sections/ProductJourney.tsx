@@ -128,21 +128,36 @@ function JourneySticky({ month }: { month: DemoMonth }) {
       </h2>
 
       <div ref={trackRef} className="lv2-track relative h-[320vh] lg:h-[520vh]">
-        <div className="lv2-stage sticky top-0 flex h-[100svh] items-center">
-          <div className="mx-auto grid w-full max-w-[1560px] gap-4 px-4 sm:px-6 lg:grid-cols-[minmax(0,30%)_minmax(0,1fr)] lg:gap-8">
+        <div className="lv2-stage sticky top-0 flex h-[100svh] items-center py-12">
+          {/*
+            Narracja bierze wysokosc tresci, ramka cala reszte wiersza.
+            Sztywne `46vh` dawalo na wysokim oknie (np. 919x1700) ramke
+            prawie kwadratowa, plywajaca posrodku czerni.
+          */}
+          <div className="mx-auto grid max-h-full w-full max-w-[1560px] gap-4 px-4 sm:px-6 lg:grid-cols-[minmax(0,32%)_minmax(0,1fr)] lg:items-center lg:gap-8">
             <div className="lv2-layers min-h-[112px] self-center">
               {SCENES.map((scene, index) => (
                 <m.div
                   key={scene.index}
                   className="lv2-layer"
-                  style={{ opacity: fades[index].opacity, y: fades[index].y }}
+                  style={{
+                    opacity: fades[index].opacity,
+                    y: fades[index].y,
+                    visibility: fades[index].visibility,
+                  }}
                 >
                   <SceneCopy scene={scene} />
                 </m.div>
               ))}
             </div>
 
-            <div className="h-[46vh] min-h-[300px] lg:h-[74vh]">
+            {/*
+              Ramka trzyma PROPORCJE okna aplikacji, a nie ulamek viewportu:
+              na telefonie pionowa (tam mock pokazuje uklad mobilny z dolnym
+              paskiem), od `sm` pozioma jak prawdziwe okno. `max-h-full`
+              pilnuje, zeby nigdy nie wyszla poza scene.
+            */}
+            <div className="aspect-[3/4] max-h-[74svh] min-h-[300px] w-full sm:aspect-[4/3] lg:max-h-[70svh]">
               <AppFrame
                 activeMotion={activeMotion}
                 label="Interfejs TimeTrackera: pulpit, kalendarz, projekty, faktura i raporty"
@@ -152,7 +167,10 @@ function JourneySticky({ month }: { month: DemoMonth }) {
                       <m.span
                         key={scene.index}
                         className="lv2-layer flex items-center gap-1.5"
-                        style={{ opacity: fades[index].opacity }}
+                        style={{
+                          opacity: fades[index].opacity,
+                          visibility: fades[index].visibility,
+                        }}
                       >
                         <BreadcrumbLabel segment={scene.segment} />
                       </m.span>
@@ -165,7 +183,11 @@ function JourneySticky({ month }: { month: DemoMonth }) {
                     <m.div
                       key={scene.index}
                       className="lv2-layer h-full min-h-0"
-                      style={{ opacity: fades[index].opacity, y: fades[index].y }}
+                      style={{
+                        opacity: fades[index].opacity,
+                        y: fades[index].y,
+                        visibility: fades[index].visibility,
+                      }}
                     >
                       {screenFor(index, month)}
                     </m.div>
