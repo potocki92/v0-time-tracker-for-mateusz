@@ -1,5 +1,4 @@
 {
-  "/_not-found/page": 125,
   "/(app)/calendar/page": 265,
   "/(app)/clients/page": 360,
   "/(app)/dashboard/page": 275,
@@ -7,8 +6,8 @@
   "/(app)/invoices/page": 350,
   "/(app)/projects/page": 255,
   "/(app)/reports/page": 240,
-  "/(marketing-preview)/landing-v2/page": 165,
-  "/(marketing)/page": 180,
+  "/(marketing)/page": 165,
+  "/_not-found/page": 125,
   "/auth/error/page": 160,
   "/auth/login/page": 170,
   "/auth/sign-up-success/page": 160,

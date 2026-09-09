@@ -7,7 +7,7 @@ This folder implements the **Next.js App Router** entrypoint and route compositi
 The routing tree is organized using route groups and feature segments:
 
 - `app/layout.tsx`: global HTML shell, global providers, metadata, SEO JSON-LD.
-- `app/page.tsx`: landing page.
+- `app/(marketing)/*`: public landing page (`/`) — sections live in `_landing/`.
 - `app/auth/*`: authentication-focused pages and layouts.
 - `app/(app)/*`: authenticated application surface (dashboard, clients, invoices, calendar, projects, settings).
 

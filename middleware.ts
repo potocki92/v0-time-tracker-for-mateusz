@@ -12,9 +12,8 @@ export const config = {
      * - chroniona strefa app
      * - auth flows (redirect po login)
      *
-     * UWAGA: `/` celowo NIE jest w matcherze — root to publiczny landing page.
-     * Obsługa zalogowanego usera na `/` odbywa się w samym page.tsx
-     * (server component czyta sesję i pokazuje CTA "Przejdź do panelu").
+     * UWAGA: `/` celowo NIE jest w matcherze — root to publiczny landing page,
+     * ktory nie czyta sesji ani Supabase i renderuje sie statycznie.
      */
     '/dashboard/:path*',
     '/calendar/:path*',

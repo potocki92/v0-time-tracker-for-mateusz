@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      // Landing zyl przez chwile pod `/landing-v2`, zanim zastapil `/`.
+      // Redirect (308) domyka te sciezke dla linkow, ktore zdazyly wyciec.
+      { source: '/landing-v2', destination: '/', permanent: true },
+    ]
+  },
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }],
   },
