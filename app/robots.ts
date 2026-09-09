@@ -29,6 +29,9 @@ export default function robots(): MetadataRoute.Robots {
           '/clients/',
           '/projects/',
           '/settings/',
+          // Podglad nowego landingu stoi obok produkcyjnego `/` — dopoki trwa
+          // porownanie obu wersji, nie moze z nim konkurowac w wyszukiwarce.
+          '/landing-v2',
           '/_next/',
           '/*?*',
         ],

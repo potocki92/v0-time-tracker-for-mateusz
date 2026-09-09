@@ -7,6 +7,7 @@
   "/(app)/invoices/page": 350,
   "/(app)/projects/page": 255,
   "/(app)/reports/page": 240,
+  "/(marketing-preview)/landing-v2/page": 165,
   "/(marketing)/page": 180,
   "/auth/error/page": 160,
   "/auth/login/page": 170,
