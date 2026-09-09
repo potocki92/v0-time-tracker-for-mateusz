@@ -7,6 +7,7 @@ import {
   Calendar,
   ChevronRight,
   FileText,
+  PanelLeft,
   FolderKanban,
   LayoutDashboard,
   LineChart,
@@ -84,12 +85,37 @@ export interface AppFrameProps {
 export function AppFrame({ active, activeMotion, breadcrumb, label, children }: AppFrameProps) {
   const section = WORKSPACE_SECTIONS.find((entry) => entry.segment === active)
 
+  /**
+   * Sekcje spoza dolnego paska (w praktyce: Raporty) osiaga sie na telefonie
+   * przez sidebar otwierany hamburgerem — dolny pasek ma w aplikacji pięć
+   * pozycji i Raportów wsrod nich nie ma. Bez tego scena „Raporty" zostawiala
+   * caly chrome bez zadnego aktywnego elementu i pasek wygladal na zepsuty.
+   */
+  const menuMotion = activeMotion
+    ? Object.entries(activeMotion).find(
+        ([segment]) => !BOTTOM_SEGMENTS.includes(segment as WorkspaceSegment),
+      )?.[1]
+    : undefined
+  const menuActive = active !== undefined && !BOTTOM_SEGMENTS.includes(active)
+
   return (
     <div className="lv2-device flex h-full min-h-0 w-full" role="img" aria-label={label}>
       <Sidebar active={active} activeMotion={activeMotion} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-9 shrink-0 items-center gap-1.5 border-b border-[var(--lv2-hair)] px-3">
+          <span className="relative -ml-0.5 mr-0.5 flex size-5 shrink-0 items-center justify-center rounded md:hidden">
+            {menuMotion ? (
+              <m.span
+                className="absolute inset-0 rounded bg-[var(--lv2-accent-dim)]"
+                style={{ opacity: menuMotion }}
+              />
+            ) : (
+              menuActive && <span className="absolute inset-0 rounded bg-[var(--lv2-accent-dim)]" />
+            )}
+            <PanelLeft className="relative size-3 text-zinc-400" strokeWidth={1.6} />
+          </span>
+
           <div className="flex min-w-0 flex-1 items-center gap-1.5 lv2-t10">
             {breadcrumb ?? (
               <>
@@ -126,7 +152,7 @@ function Sidebar({
   activeMotion,
 }: Pick<AppFrameProps, 'active' | 'activeMotion'>) {
   return (
-    <aside className="hidden w-[164px] shrink-0 flex-col border-r border-[var(--lv2-hair)] bg-[var(--lv2-s1)] p-2 lg:flex">
+    <aside className="hidden w-[164px] shrink-0 flex-col border-r border-[var(--lv2-hair)] bg-[var(--lv2-s1)] p-2 md:flex">
       <div className="flex items-center gap-1.5 px-1 pb-2">
         <span className="size-4 rounded-[5px] bg-[var(--lv2-accent)]" />
         <span className="lv2-t11 font-semibold tracking-tight text-white">TimeTracker</span>
@@ -253,7 +279,7 @@ function NavRow({
 
 function BottomNav({ active, activeMotion }: Pick<AppFrameProps, 'active' | 'activeMotion'>) {
   return (
-    <nav className="flex h-11 shrink-0 items-stretch border-t border-[var(--lv2-hair)] bg-[var(--lv2-s1)] lg:hidden">
+    <nav className="flex h-11 shrink-0 items-stretch border-t border-[var(--lv2-hair)] bg-[var(--lv2-s1)] md:hidden">
       {BOTTOM_SEGMENTS.map((segment) => {
         const section = WORKSPACE_SECTIONS.find((entry) => entry.segment === segment)!
         const Icon = SECTION_ICONS[segment]
