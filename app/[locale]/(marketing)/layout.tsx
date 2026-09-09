@@ -15,13 +15,15 @@ import './landing.css'
  * roocie — animowane jest tylko to jedno poddrzewo, panel nie placi za nie
  * ani bajta.
  *
- * Tak samo z tlumaczeniami: do przegladarki jedzie WYLACZNIE przestrzen
- * `marketing` (plus `common`) aktywnego jezyka. Landing nie pobiera kluczy
- * faktur ani ustawien, a wersja niemiecka nie pobiera polskiej ani angielskiej.
+ * Tak samo z tlumaczeniami: do przegladarki jedzie tylko to, czego landing
+ * naprawde uzywa — `marketing` (copy), `navigation` (mockup panelu i
+ * przelacznik jezyka) i `common` (jednostki). Klucze faktur, ustawien czy
+ * walidacji tu nie docieraja, a wersja niemiecka nie pobiera polskiej ani
+ * angielskiej.
  */
 export default async function MarketingLayout({ children }: { children: ReactNode }) {
   const locale = toAppLocale(await getLocale())
-  const messages = pickMessages(await loadMessages(locale), ['marketing', 'common'])
+  const messages = pickMessages(await loadMessages(locale), ['marketing', 'navigation', 'common'])
 
   return (
     <>

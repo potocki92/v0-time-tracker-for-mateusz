@@ -15,5 +15,4 @@ import { routing } from './routing'
  *   • kotwice w obrebie strony (`#product`) — prefiks doklada `Link`
  *     nadrzednej trasy, a nie sam hash.
  */
-export const { Link, redirect, permanentRedirect, usePathname, useRouter, getPathname } =
-  createNavigation(routing)
+export const { Link, redirect, usePathname, useRouter } = createNavigation(routing)

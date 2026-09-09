@@ -108,11 +108,3 @@ export function resolveNestedLabel(
   if ((NESTED_LABEL_KEYS as readonly string[]).includes(joined)) return { key: joined }
   return { text: decodeURIComponent(segments[segments.length - 1]) }
 }
-
-/**
- * Klucz tlumaczenia tytulu sekcji. Metadane strony buduje sie z niego przez
- * `navigation.sections.<segment>` — patrz `lib/seo/workspace-metadata.ts`.
- */
-export function sectionTitleKey(segment: WorkspaceSegment): string {
-  return `sections.${segment}`
-}

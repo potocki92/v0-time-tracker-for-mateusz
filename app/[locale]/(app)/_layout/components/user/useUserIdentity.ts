@@ -1,6 +1,7 @@
 'use client'
 
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 import { useProfile } from '@/features/settings'
 import { toPublicAvatarUrl } from '@/lib/supabase/avatars'
@@ -27,6 +28,7 @@ interface UserIdentity {
 }
 
 export function useUserIdentity(user: SupabaseUser | null): UserIdentity {
+  const t = useTranslations('navigation.userMenu')
   const { data: profile } = useProfile()
 
   return useMemo(() => {
@@ -49,7 +51,7 @@ export function useUserIdentity(user: SupabaseUser | null): UserIdentity {
       metadata.username?.trim() ||
       (user?.email?.split('@')[0] ?? '')
 
-    const displayName = profileFullName || profile?.username || fallbackDisplayName || 'Użytkownik'
+    const displayName = profileFullName || profile?.username || fallbackDisplayName || t('fallbackName')
     const email = profile?.email ?? user?.email ?? ''
     const optimisticAvatarUrl = toPublicAvatarUrl(metadata.avatar_path)
     const avatarUrl = profile?.avatarUrl ?? optimisticAvatarUrl ?? undefined
@@ -60,5 +62,5 @@ export function useUserIdentity(user: SupabaseUser | null): UserIdentity {
       avatarUrl,
       initials: getInitials(profileFullName || profile?.username || fallbackDisplayName, email),
     }
-  }, [profile, user])
+  }, [t, profile, user])
 }

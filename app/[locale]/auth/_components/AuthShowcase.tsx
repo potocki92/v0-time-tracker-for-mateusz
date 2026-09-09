@@ -2,14 +2,16 @@
 
 import { Clock3, Receipt, ShieldCheck, Users } from 'lucide-react'
 import { m } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 
 import { BRAND, Logo } from '@/components/brand/logo'
 
+/** Copy idzie z `auth.showcase.*`; tutaj zostaje sama kolejnosc i ikona. */
 const FEATURES = [
-  { icon: Clock3,      label: 'Śledź czas pracy w czasie rzeczywistym' },
-  { icon: Receipt,     label: 'Wystawiaj faktury w kilka kliknięć' },
-  { icon: Users,       label: 'Zarządzaj klientami w jednym miejscu' },
-  { icon: ShieldCheck, label: 'Twoje dane są szyfrowane end-to-end' },
+  { icon: Clock3,      key: 'tracking' },
+  { icon: Receipt,     key: 'invoices' },
+  { icon: Users,       key: 'clients' },
+  { icon: ShieldCheck, key: 'security' },
 ] as const
 
 /**
@@ -20,6 +22,7 @@ const FEATURES = [
  * designer palette (emerald / ocean / etc.) projects its own identity.
  */
 export function AuthShowcase() {
+  const t = useTranslations('auth.showcase')
   return (
     <m.aside
       initial={{ opacity: 0 }}
@@ -75,19 +78,19 @@ export function AuthShowcase() {
             className="space-y-3"
           >
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-white/70">
-              {BRAND.tagline}
+              {t('brandTagline')}
             </p>
             <h2 className="text-3xl font-semibold leading-[1.15] xl:text-h1">
-              Skup się na pracy.
+              {t('headline')}
               <br />
-              <span className="text-white/80">Resztą zajmiemy się my.</span>
+              <span className="text-white/80">{t('tagline')}</span>
             </h2>
           </m.div>
 
           <ul className="space-y-3.5">
-            {FEATURES.map(({ icon: Icon, label }, i) => (
+            {FEATURES.map(({ icon: Icon, key }, i) => (
               <m.li
-                key={label}
+                key={key}
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.35, delay: 0.22 + i * 0.08 }}
@@ -96,14 +99,14 @@ export function AuthShowcase() {
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 backdrop-blur-sm">
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
-                <span>{label}</span>
+                <span>{t(key)}</span>
               </m.li>
             ))}
           </ul>
         </div>
 
         <p className="text-xs text-white/60">
-          © {new Date().getFullYear()} {BRAND.name}. Wszystkie prawa zastrzeżone.
+          © {new Date().getFullYear()} {BRAND.name}. {t('rights')}
         </p>
       </div>
     </m.aside>

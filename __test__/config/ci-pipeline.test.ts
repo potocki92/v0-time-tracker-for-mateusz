@@ -81,6 +81,7 @@ describe('CI — performance budgets', () => {
   })
 
   it('caps the marketing landing page — it is the public first impression', () => {
-    expect(budgets['/(marketing)/page']).toBeLessThanOrEqual(250)
+    // Landing mieszka pod `[locale]` od czasu wprowadzenia routingu jezykowego.
+    expect(budgets['/[locale]/(marketing)/page']).toBeLessThanOrEqual(250)
   })
 })

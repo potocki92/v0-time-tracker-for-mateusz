@@ -47,7 +47,8 @@
       "modeDark": "Dunkler Modus",
       "modeSystem": "Systemmodus"
     },
-    "profile": "Profil"
+    "profile": "Profil",
+    "fallbackName": "Benutzer"
   },
   "localeSwitcher": {
     "label": "Sprache der Oberfläche",

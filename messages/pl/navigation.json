@@ -47,7 +47,8 @@
       "modeDark": "Tryb ciemny",
       "modeSystem": "Tryb systemowy"
     },
-    "profile": "Profil"
+    "profile": "Profil",
+    "fallbackName": "Użytkownik"
   },
   "localeSwitcher": {
     "label": "Język interfejsu",

@@ -35,7 +35,7 @@ export function fail(code: string, values?: ActionError['values']): ActionResult
  * Rzuca bledem, ktorego `message` jest KODEM — do uzycia w warstwie
  * klienckiej (React Query), zeby `onError` mial jedno zrodlo prawdy.
  */
-export class ActionFailure extends Error {
+class ActionFailure extends Error {
   constructor(readonly error: ActionError) {
     super(error.code)
     this.name = 'ActionFailure'

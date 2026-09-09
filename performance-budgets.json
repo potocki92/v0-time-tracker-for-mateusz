@@ -1,15 +1,15 @@
 {
-  "/(app)/calendar/page": 265,
-  "/(app)/clients/page": 360,
-  "/(app)/dashboard/page": 275,
-  "/(app)/invoices/analytics/page": 330,
-  "/(app)/invoices/page": 350,
-  "/(app)/projects/page": 255,
-  "/(app)/reports/page": 240,
-  "/(marketing)/page": 165,
+  "/[locale]/(app)/calendar/page": 272,
+  "/[locale]/(app)/clients/page": 365,
+  "/[locale]/(app)/dashboard/page": 281,
+  "/[locale]/(app)/invoices/analytics/page": 335,
+  "/[locale]/(app)/invoices/page": 356,
+  "/[locale]/(app)/projects/page": 265,
+  "/[locale]/(app)/reports/page": 250,
+  "/[locale]/(marketing)/page": 183,
   "/_not-found/page": 125,
-  "/auth/error/page": 160,
-  "/auth/login/page": 170,
-  "/auth/sign-up-success/page": 160,
-  "/auth/sign-up/page": 170
+  "/[locale]/auth/error/page": 170,
+  "/[locale]/auth/login/page": 178,
+  "/[locale]/auth/sign-up-success/page": 170,
+  "/[locale]/auth/sign-up/page": 178
 }

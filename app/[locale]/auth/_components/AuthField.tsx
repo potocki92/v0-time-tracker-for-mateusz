@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useTranslations } from 'next-intl'
 import { AnimatePresence, m } from 'framer-motion'
 import { Eye, EyeOff } from 'lucide-react'
 
@@ -44,6 +45,7 @@ export function AuthField({
   const errorId = `${fieldId}-error`
   const descId  = description ? `${fieldId}-description` : undefined
 
+  const t = useTranslations('auth')
   const [revealed, setRevealed] = React.useState(false)
   const isPassword = type === 'password'
   const effectiveType = isPassword && revealed ? 'text' : type
@@ -95,7 +97,7 @@ export function AuthField({
             type="button"
             tabIndex={-1}
             onClick={() => setRevealed((v) => !v)}
-            aria-label={revealed ? 'Ukryj hasło' : 'Pokaż hasło'}
+            aria-label={revealed ? t('hidePassword') : t('showPassword')}
             aria-pressed={revealed}
             className="absolute inset-y-0 right-2 flex items-center justify-center rounded-lg px-2 text-muted-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >

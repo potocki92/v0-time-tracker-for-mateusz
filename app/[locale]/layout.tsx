@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
 import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { hasLocale, NextIntlClientProvider } from 'next-intl'
+import { hasLocale } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 
 import { ThemeProvider } from '@/components/theme-provider'
@@ -11,7 +11,6 @@ import { ColorThemeInitScript } from '@/components/color-theme-init-script'
 import { Toaster } from '@/components/ui/sonner'
 import { GlobalJsonLd } from '@/components/seo/json-ld'
 import { APP_LOCALES, type AppLocale } from '@/i18n/config'
-import { loadMessages, pickMessages } from '@/i18n/messages'
 import { routing } from '@/i18n/routing'
 import { buildLocalizedMetadata } from '@/lib/seo/metadata'
 import { SITE } from '@/lib/seo/site'
@@ -84,12 +83,6 @@ export default async function LocaleLayout({
 
   const t = await getTranslations({ locale, namespace: 'navigation' })
 
-  // Do przegladarki jedzie WYLACZNIE `navigation` — jedyna przestrzen, ktorej
-  // uzywa chrome wspolny dla calego dokumentu (skip link, LocaleSwitcher).
-  // Reszta doklada sie w layoutach grup tras, wiec landing nie pobiera kluczy
-  // faktur, a panel kluczy marketingowych.
-  const messages = pickMessages(await loadMessages(locale as AppLocale), ['navigation'])
-
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -103,19 +96,21 @@ export default async function LocaleLayout({
         >
           {t('skipToMain')}
         </a>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <ColorThemeProvider>
-              {children}
-              <Toaster richColors position="top-center" />
-            </ColorThemeProvider>
-          </ThemeProvider>
-        </NextIntlClientProvider>
+        {/* Root NIE montuje `NextIntlClientProvider`. Skip link renderuje sie
+            serwerowo, a slownik dla przegladarki dobiera KAZDA grupa tras
+            osobno — landing nie pobiera kluczy faktur, panel nie pobiera
+            kluczy marketingowych, a strony auth ani jednych, ani drugich. */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ColorThemeProvider>
+            {children}
+            <Toaster richColors position="top-center" />
+          </ColorThemeProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
