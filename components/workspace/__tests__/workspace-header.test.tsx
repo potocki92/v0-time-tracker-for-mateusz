@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react'
 import { render, screen, within } from '@testing-library/react'
+import { NextIntlClientProvider } from 'next-intl'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  WORKSPACE_GROUP_LABELS,
-  WORKSPACE_SECTIONS,
-  sectionHref,
-} from '@/lib/workspace/sections'
+import navigation from '@/messages/pl/navigation.json'
+import { WORKSPACE_SECTIONS, sectionHref } from '@/lib/workspace/sections'
 import { useTimerStore } from '@/hooks/stores/useTimerStore'
 import { WorkspaceHeader } from '../workspace-header'
 import {
@@ -21,17 +19,27 @@ import {
  */
 const pathname = vi.hoisted(() => ({ current: '/dashboard' }))
 
-vi.mock('next/navigation', () => ({
+// Podmieniamy WYLACZNIE `usePathname`; reszta modulu musi zostac prawdziwa,
+// bo `next-intl` buduje z niej swoje `redirect`/`useRouter`.
+vi.mock('next/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/navigation')>()),
   usePathname: () => pathname.current,
 }))
 
+/**
+ * Naglowek czyta etykiety z warstwy i18n, wiec test renderuje go pod
+ * providerem z PRAWDZIWYMI komunikatami PL — asserty porownuja sie z tym
+ * samym plikiem, ktory widzi produkcja, a nie z zaszytym stringiem.
+ */
 function renderHeader(path: string, children?: ReactNode) {
   pathname.current = path
   return render(
-    <WorkspaceHeaderSlotProvider>
-      <WorkspaceHeader />
-      {children}
-    </WorkspaceHeaderSlotProvider>,
+    <NextIntlClientProvider locale="pl" messages={{ navigation }}>
+      <WorkspaceHeaderSlotProvider>
+        <WorkspaceHeader />
+        {children}
+      </WorkspaceHeaderSlotProvider>
+    </NextIntlClientProvider>,
   )
 }
 
@@ -58,8 +66,8 @@ describe('WorkspaceHeader — breadcrumb', () => {
       renderHeader(sectionHref(section))
 
       const crumb = breadcrumb()
-      expect(within(crumb).getByText(WORKSPACE_GROUP_LABELS[section.group])).toBeDefined()
-      expect(within(crumb).getByText(section.label)).toBeDefined()
+      expect(within(crumb).getByText(navigation.groups[section.group])).toBeDefined()
+      expect(within(crumb).getByText(navigation.sections[section.segment])).toBeDefined()
     },
   )
 

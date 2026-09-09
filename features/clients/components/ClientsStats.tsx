@@ -5,7 +5,8 @@ import { Banknote, Clock, Trophy, Users } from 'lucide-react'
 import { StatTile } from '@/components/common/stat/StatTile'
 import { useEffectiveEurRate } from '@/features/dashboard'
 import { calculateEarnings } from '@/lib/finance/earnings'
-import { formatCount, formatHours, formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import type { WorkEntry } from '@/lib/types'
 import { deriveActivity } from '../domain/clients.selectors'
 import type { ClientWithStats } from '../domain/clients.types'
@@ -21,6 +22,7 @@ type Props = {
  * walut — fakty prawdziwe, ale nikomu niepotrzebne codziennie.
  */
 export function ClientsStats({ clients, workEntries }: Props) {
+  const fmt = useFormat()
   const eurRate = useEffectiveEurRate()
 
   const stats = useMemo(() => {
@@ -81,15 +83,15 @@ export function ClientsStats({ clients, workEntries }: Props) {
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <StatTile
         label="Zarobek (mies.)"
-        value={formatMoney(toMinor(stats.monthTotalPLN), 'PLN')}
+        value={fmt.money(toMinor(stats.monthTotalPLN), 'PLN')}
         icon={Banknote}
-        meta={stats.monthEUR > 0 ? `w tym ${formatMoney(toMinor(stats.monthEUR), 'EUR')}` : undefined}
+        meta={stats.monthEUR > 0 ? `w tym ${fmt.money(toMinor(stats.monthEUR), 'EUR')}` : undefined}
       />
       <StatTile
         label="Godziny (mies.)"
-        value={stats.monthHours > 0 ? `${formatHours(stats.monthHours)}` : '0 h'}
+        value={stats.monthHours > 0 ? `${fmt.hours(stats.monthHours)}` : '0 h'}
         icon={Clock}
-        meta={stats.monthDays > 0 ? `${formatCount(stats.monthDays, ['dzień', 'dni', 'dni'])} roboczych` : 'Brak wpisów'}
+        meta={stats.monthDays > 0 ? `${fmt.count(stats.monthDays, ['dzień', 'dni', 'dni'])} roboczych` : 'Brak wpisów'}
       />
       <StatTile
         label="Aktywni"
@@ -103,7 +105,7 @@ export function ClientsStats({ clients, workEntries }: Props) {
         icon={Trophy}
         meta={
           stats.top && stats.top.totalEarningsInClientCurrency > 0
-            ? formatMoney(toMinor(stats.top.totalEarningsInClientCurrency), stats.top.currency)
+            ? fmt.money(toMinor(stats.top.totalEarningsInClientCurrency), stats.top.currency)
             : undefined
         }
         compact

@@ -115,7 +115,7 @@ describe('dashboard — skeleton odwzorowuje tresc', () => {
 
   it('naglowek panelu stoi nad granica Suspense, nie w skeletonie', () => {
     // Bez komentarzy: docblock powloki sam pisze o `<main>`.
-    const shell = codeOf(read('app/(app)/_layout/AppShell.tsx'))
+    const shell = codeOf(read('app/[locale]/(app)/_layout/AppShell.tsx'))
     expect(shell, 'WorkspaceHeader musi byc renderowany raz, w powloce').toContain(
       '<WorkspaceHeader',
     )

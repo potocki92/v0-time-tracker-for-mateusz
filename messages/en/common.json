@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "add": "Add",
+    "retry": "Try again",
+    "copy": "Copy",
+    "export": "Export",
+    "print": "Print",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm"
+  },
+  "states": {
+    "loading": "Loading…",
+    "empty": "No data",
+    "error": "Something went wrong",
+    "saving": "Saving…",
+    "saved": "Saved"
+  },
+  "units": {
+    "hoursShort": "h",
+    "pieceShort": "pcs"
+  },
+  "days": "{count, plural, one {# day} other {# days}}",
+  "hours": "{count, plural, one {# hour} other {# hours}}",
+  "entries": "{count, plural, one {# entry} other {# entries}}",
+  "invoicesCount": "{count, plural, one {# invoice} other {# invoices}}"
+}

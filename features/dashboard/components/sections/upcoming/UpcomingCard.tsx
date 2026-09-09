@@ -1,7 +1,8 @@
 'use client'
 
 import { ChevronRight, Plus } from 'lucide-react'
-import { formatDayBadge } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { toDateKey } from '@/lib/date/format'
 
 export type UpcomingCategory = 'vacation' | 'billing' | 'project' | 'finance' | 'event'
@@ -35,11 +36,12 @@ const CATEGORY_LABEL: Record<UpcomingCategory, string> = {
   event: 'Wydarzenie',
 }
 
-function dayLabel(d: Date): { day: string; month: string } {
-  return formatDayBadge(toDateKey(d))
+function dayLabel(fmt: AppFormat, d: Date): { day: string; month: string } {
+  return fmt.dayBadge(toDateKey(d))
 }
 
 export function UpcomingCard({ items, onAdd }: Props) {
+  const fmt = useFormat()
   return (
     <section
       aria-label="Nadchodzące"
@@ -64,7 +66,7 @@ export function UpcomingCard({ items, onAdd }: Props) {
       ) : (
         <ul role="list" className="divide-y divide-hairline">
           {items.map((it) => {
-            const { day, month } = dayLabel(it.date)
+            const { day, month } = dayLabel(fmt, it.date)
             return (
               <li key={it.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex w-10 flex-col items-center text-center">

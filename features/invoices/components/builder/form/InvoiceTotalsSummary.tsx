@@ -1,6 +1,7 @@
 'use client'
 
 import { SURFACE } from '@/components/ui/tokens'
+import { useFormat } from '@/lib/format/client'
 import * as React from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { AlertTriangle } from 'lucide-react'
@@ -22,6 +23,7 @@ import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
  * dumb: render whatever the engine returns, exactly as it would be saved.
  */
 export function InvoiceTotalsSummary() {
+  const fmt = useFormat()
   const { control } = useFormContext<InvoiceBuilderValues>()
   const items = useWatch({ control, name: 'items' })
   const currency = useWatch({ control, name: 'currency' })
@@ -71,13 +73,13 @@ export function InvoiceTotalsSummary() {
                     </span>
                   </th>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
-                    {formatMoney(row.net)}
+                    {formatMoney(fmt, row.net)}
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums text-muted-foreground">
-                    {formatMoney(row.vat)}
+                    {formatMoney(fmt, row.vat)}
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
-                    {formatMoney(row.gross)}
+                    {formatMoney(fmt, row.gross)}
                   </td>
                 </tr>
               ))
@@ -88,17 +90,17 @@ export function InvoiceTotalsSummary() {
 
       {/* Bottom totals — netto / VAT / brutto and optional PLN equivalent. */}
       <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <TotalsCell label="Razem netto" value={formatMoney(totals.net)} />
-        <TotalsCell label="Razem VAT" value={formatMoney(totals.vat)} />
+        <TotalsCell label="Razem netto" value={formatMoney(fmt, totals.net)} />
+        <TotalsCell label="Razem VAT" value={formatMoney(fmt, totals.vat)} />
         <TotalsCell
           label="Razem brutto"
-          value={formatMoney(totals.gross)}
+          value={formatMoney(fmt, totals.gross)}
           emphasis
         />
         {totals.gross_in_pln ? (
           <TotalsCell
             label={`Brutto w PLN (kurs ${exchangeRate})`}
-            value={formatMoney(totals.gross_in_pln)}
+            value={formatMoney(fmt, totals.gross_in_pln)}
           />
         ) : currency !== 'PLN' ? (
           <div className={cn(SURFACE.cardDashed, 'px-3 py-2 text-xs text-muted-foreground')}>

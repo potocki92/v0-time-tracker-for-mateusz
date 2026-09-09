@@ -1,8 +1,8 @@
 'use client'
 
 import { Check, Flame } from 'lucide-react'
-import { formatCount, formatHours, NO_DATA } from '@/lib/format'
-
+import { NO_DATA } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 type Props = {
   totalHours: number
   /** `null`, gdy nie ma jeszcze zrealizowanego dnia pracy. */
@@ -23,6 +23,7 @@ export function HoursCard({
   overtime,
   streakDays,
 }: Props) {
+  const fmt = useFormat()
   const filled = Math.min(100, goalProgress * 100)
   const reached = targetHours !== null && goalProgress >= 1
 
@@ -34,16 +35,16 @@ export function HoursCard({
       <header className="flex items-start justify-between gap-3">
         <div>
           <p className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
-            {formatHours(totalHours)}{' '}
+            {fmt.hours(totalHours)}{' '}
             {targetHours !== null && (
               <span className="text-xs font-medium text-zinc-400 sm:text-sm">
-                / {formatHours(targetHours)}
+                / {fmt.hours(targetHours)}
               </span>
             )}
           </p>
           <p className="mt-1 text-2xs leading-[1.4] text-zinc-400 sm:text-xs">
-            Średnio {avgPerDay === null ? NO_DATA : formatHours(avgPerDay)}/dzień
-            {overtime > 0 && <> · {formatHours(overtime, { decimals: 0 })} nadgodzin</>}
+            Średnio {avgPerDay === null ? NO_DATA : fmt.hours(avgPerDay)}/dzień
+            {overtime > 0 && <> · {fmt.hours(overtime, { decimals: 0 })} nadgodzin</>}
           </p>
         </div>
 
@@ -60,7 +61,7 @@ export function HoursCard({
               title="Dni robocze z rzędu z wpisem"
             >
               <Flame className="h-3 w-3 text-warning-400" aria-hidden />
-              Seria {formatCount(streakDays, ['dzień', 'dni', 'dni'])}
+              Seria {fmt.count(streakDays, ['dzień', 'dni', 'dni'])}
             </span>
           )}
         </div>
@@ -79,9 +80,9 @@ export function HoursCard({
           </div>
           <div className="mt-1.5 flex justify-between text-2xs tabular-nums text-zinc-400">
             <span>0</span>
-            <span>Cel {formatHours(targetHours)}</span>
+            <span>Cel {fmt.hours(targetHours)}</span>
             <span className={reached ? 'font-semibold text-[var(--chart-1)]' : ''}>
-              {formatHours(totalHours, { decimals: 0 })}
+              {fmt.hours(totalHours, { decimals: 0 })}
             </span>
           </div>
         </div>

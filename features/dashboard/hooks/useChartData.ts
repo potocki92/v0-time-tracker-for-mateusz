@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
+import { useFormat } from '@/lib/format/client'
 import { calculateEntryMoney, fallbackFromClient } from '@/lib/finance/entry-calculations'
 import { add, convert, toMajor, zero } from '@/lib/finance/money'
-import { formatDate, formatMonthName } from '@/lib/format'
 import { Client, WorkEntry } from '@/lib/types'
 import { ChartDataItem, ChartGrouping } from '../types/dashboard.types'
 import { toDateKey } from '@/lib/date/format'           // ← z @/lib
@@ -18,6 +18,8 @@ export function useChartData(
   eurRate: number,
   dateRange: DateRange
 ): ChartDataItemExtended[] {
+  const fmt = useFormat()
+
   return useMemo(() => {
     if (!entries.length || !dateRange.from || !dateRange.to) return []
 
@@ -43,18 +45,18 @@ export function useChartData(
 
       if (grouping === 'daily') {
         key   = toDateKey(cursor)
-        label = formatDate(key, 'dayMonth')
+        label = fmt.date(key, 'dayMonth')
         cursor.setDate(cursor.getDate() + 1)
       } else if (grouping === 'weekly') {
         const ws = getWeekStart(cursor)
         key      = toDateKey(ws)
-        label    = getWeekLabel(ws)
+        label    = getWeekLabel(fmt, ws)
         sortDate = ws
         cursor.setDate(cursor.getDate() + 7)
       } else if (grouping === 'monthly') {
         const ms = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
         key      = `${ms.getFullYear()}-${String(ms.getMonth() + 1).padStart(2, '0')}`
-        label    = formatMonthName(key, 'short')
+        label    = fmt.monthName(key, 'short')
         sortDate = ms
         cursor.setMonth(cursor.getMonth() + 1, 1)
       } else {
@@ -113,5 +115,5 @@ export function useChartData(
         hours:       Math.round(hours * 10) / 10,
         date: sortDate.toISOString(),
       }))
-  }, [entries, clients, grouping, eurRate, dateRange])
+  }, [fmt, entries, clients, grouping, eurRate, dateRange])
 }

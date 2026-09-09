@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Sheet,
@@ -20,6 +22,7 @@ import {
   useWeeklySummaryEmail,
 } from '../hooks'
 import { AppearanceSettings } from './AppearanceSettings'
+import { LanguageSettings } from './LanguageSettings'
 import { AvatarUpload } from './AvatarUpload'
 import { InvoiceAutomationSettings } from './InvoiceAutomationSettings'
 import { ProfileForm } from './ProfileForm'
@@ -49,6 +52,7 @@ function SettingsSkeleton() {
 }
 
 export function SettingsDrawer() {
+  const t = useTranslations('settings')
   const modal = useModalState('settings')
   const closeModal = useCloseModal()
 
@@ -67,10 +71,8 @@ export function SettingsDrawer() {
     <Sheet open={modal.open} onOpenChange={(open) => !open && closeModal('settings')}>
       <SheetContent side="right" className="w-full overflow-y-auto p-0 sm:max-w-xl">
         <SheetHeader className="border-b">
-          <SheetTitle>Ustawienia konta</SheetTitle>
-          <SheetDescription>
-            Zarządzaj profilem, avatarem i podstawowymi informacjami konta.
-          </SheetDescription>
+          <SheetTitle>{t('title')}</SheetTitle>
+          <SheetDescription>{t('description')}</SheetDescription>
         </SheetHeader>
 
         <div className="space-y-6 p-4">
@@ -80,7 +82,7 @@ export function SettingsDrawer() {
             <div className="rounded-xl border border-destructive/40 p-4 text-sm text-destructive">
               {profileQuery.error instanceof Error
                 ? profileQuery.error.message
-                : 'Nie udało się pobrać danych konta.'}
+                : t('loadFailed')}
             </div>
           )}
 
@@ -102,6 +104,8 @@ export function SettingsDrawer() {
                   await updateProfile.mutateAsync(values)
                 }}
               />
+
+              <LanguageSettings />
 
               <AppearanceSettings />
 

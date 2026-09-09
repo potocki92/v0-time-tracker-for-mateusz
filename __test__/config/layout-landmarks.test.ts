@@ -22,7 +22,7 @@ function walk(dir: string, acc: string[] = []): string[] {
   return acc
 }
 
-const PANEL_FILES = walk(resolve(ROOT, 'app/(app)')).concat(walk(resolve(ROOT, 'features')))
+const PANEL_FILES = walk(resolve(ROOT, 'app/[locale]/(app)')).concat(walk(resolve(ROOT, 'features')))
 
 describe('layout — landmarki', () => {
   it('w panelu tylko AppShell renderuje <main>', () => {
@@ -36,7 +36,7 @@ describe('layout — landmarki', () => {
   })
 
   it('AppShell renderuje dokladnie jeden main z celem skip-linka', () => {
-    const shell = stripComments(read('app/(app)/_layout/AppShell.tsx'))
+    const shell = stripComments(read('app/[locale]/(app)/_layout/AppShell.tsx'))
     expect(shell.match(/<main[\s>]/g) ?? []).toHaveLength(1)
     expect(shell).toMatch(/id="main-content"/)
   })

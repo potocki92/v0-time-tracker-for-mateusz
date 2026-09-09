@@ -6,8 +6,8 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowUpRight, CheckCircle2, Clock, FileWarning, Loader2 } from 'lucide-react'
 import { fetchOverallQuartersAction } from '@/features/invoices'
 import type { OverallQuarterSummary } from '@/features/invoices/domain'
-import { formatHours, formatMoney, toMinor } from '@/lib/format'
-
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 const QUERY_KEY = ['dashboard-module', 'data', 'quarterly-summary'] as const
 
 /**
@@ -66,12 +66,13 @@ export function QuarterlySummaryCard() {
 }
 
 function QuarterRow({ quarter: q }: { quarter: OverallQuarterSummary }) {
+  const fmt = useFormat()
   const earningsLabel =
     q.earningsEUR > 0 && q.earningsPLN > 0
-      ? `${formatMoney(toMinor(q.earningsPLN), 'PLN')} · ${formatMoney(toMinor(q.earningsEUR), 'EUR')}`
+      ? `${fmt.money(toMinor(q.earningsPLN), 'PLN')} · ${fmt.money(toMinor(q.earningsEUR), 'EUR')}`
       : q.earningsEUR > 0
-        ? formatMoney(toMinor(q.earningsEUR), 'EUR')
-        : formatMoney(toMinor(q.earningsPLN), 'PLN')
+        ? fmt.money(toMinor(q.earningsEUR), 'EUR')
+        : fmt.money(toMinor(q.earningsPLN), 'PLN')
 
   return (
     <li className="flex items-start gap-3 px-4 py-3">
@@ -105,7 +106,7 @@ function QuarterRow({ quarter: q }: { quarter: OverallQuarterSummary }) {
           </p>
         </div>
         <p className="mt-0.5 truncate text-2xs text-zinc-400">
-          {q.workedDays} {q.workedDays === 1 ? 'dzień' : 'dni'} · {formatHours(q.hours)}
+          {q.workedDays} {q.workedDays === 1 ? 'dzień' : 'dni'} · {fmt.hours(q.hours)}
           {q.invoiceCount > 0
             ? ` · ${q.invoiceCount} ${q.invoiceCount === 1 ? 'faktura' : 'faktur'}`
             : ''}

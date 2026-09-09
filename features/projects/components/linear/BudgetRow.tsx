@@ -1,6 +1,7 @@
 'use client'
 
-import { formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import { BUDGET_OVERSPEND_THRESHOLD, BUDGET_WARNING_THRESHOLD } from '../../types/projects.constants'
 import { LINEAR } from '@/components/ui/tokens'
@@ -20,6 +21,7 @@ export function BudgetRow({
   utilization,
   hours,
 }: BudgetRowProps) {
+  const fmt = useFormat()
   const tone =
     utilization >= BUDGET_OVERSPEND_THRESHOLD
       ? 'text-danger-300'
@@ -33,12 +35,12 @@ export function BudgetRow({
       <div className="min-w-0 flex-1">
         <p className="truncate text-xs font-medium text-white">{projectName}</p>
         <p className="mt-0.5 text-2xs text-zinc-400">
-          {Math.round(hours)} h · {formatMoney(toMinor(spent), 'PLN')} wydane
+          {Math.round(hours)} h · {fmt.money(toMinor(spent), 'PLN')} wydane
         </p>
       </div>
       <div className="shrink-0 text-right">
         <p className="text-xs font-semibold tabular-nums text-white">
-          {formatMoney(toMinor(budget), 'PLN')}
+          {fmt.money(toMinor(budget), 'PLN')}
         </p>
         <p className={cn('text-2xs font-medium tabular-nums', tone)}>
           {Math.round(utilization * 100)}%

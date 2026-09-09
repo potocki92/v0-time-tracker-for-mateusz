@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useFormat } from '@/lib/format/client'
 import { ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -41,6 +42,7 @@ export function TripManagerDialog({
   trips,
   api,
 }: TripManagerDialogProps) {
+  const fmt = useFormat()
   const [draft, setDraft] = useState<DraftTrip>(() => emptyDraft())
   const [error, setError] = useState<string | null>(null)
   const [editingTripId, setEditingTripId] = useState<string | null>(null)
@@ -168,7 +170,7 @@ export function TripManagerDialog({
                               {trip.destination?.trim() || 'Wyjazd'}
                             </p>
                             <p className="truncate text-2xs text-muted-foreground">
-                              {formatPlLongDate(trip.startDate)} → {formatPlLongDate(trip.endDate)}
+                              {formatPlLongDate(fmt, trip.startDate)} → {formatPlLongDate(fmt, trip.endDate)}
                             </p>
                           </div>
                         </button>

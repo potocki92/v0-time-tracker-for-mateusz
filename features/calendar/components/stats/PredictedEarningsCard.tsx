@@ -1,6 +1,6 @@
 import { Wallet } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
-import { formatHours, formatMoney, formatPercent } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import type { CURRENCY } from '@/lib/types'
 import { KPICard } from './KPICard'
 import { countDays } from './format'
@@ -25,25 +25,26 @@ export function PredictedEarningsCard({
   realizedShare,
   currency,
 }: Props) {
+  const fmt = useFormat()
   const hasPlan = plannedDays > 0
 
   return (
     <KPICard
       label="Przewidywany zarobek"
       icon={<Wallet className="h-4 w-4" />}
-      ariaLabel={`Przewidywany zarobek: ${formatMoney(forecastEarningsMinor, currency)}; zrealizowano ${formatPercent(realizedShare)}`}
+      ariaLabel={`Przewidywany zarobek: ${fmt.money(forecastEarningsMinor, currency)}; zrealizowano ${fmt.percent(realizedShare)}`}
     >
       <p className="mt-2 truncate text-2xl font-bold tabular-nums tracking-tight text-white sm:text-3xl">
-        {formatMoney(forecastEarningsMinor, currency)}
+        {fmt.money(forecastEarningsMinor, currency)}
       </p>
 
       <div className="mt-auto space-y-1.5 pt-3">
         <div className="flex items-center justify-between text-2xs">
           <span className="text-zinc-400">
-            Realnie {formatMoney(realizedEarningsMinor, currency)}
+            Realnie {fmt.money(realizedEarningsMinor, currency)}
           </span>
           <span className="font-semibold tabular-nums text-brand-400">
-            {formatPercent(realizedShare)}
+            {fmt.percent(realizedShare)}
           </span>
         </div>
         <Progress
@@ -53,9 +54,9 @@ export function PredictedEarningsCard({
         />
         <p className="text-2xs text-zinc-400">
           {hasPlan
-            ? `Plan: ${formatMoney(plannedEarningsMinor, currency)} • ${countDays(
+            ? `Plan: ${fmt.money(plannedEarningsMinor, currency)} • ${countDays(fmt, 
                 plannedDays,
-              )} • ${formatHours(plannedHours)}`
+              )} • ${fmt.hours(plannedHours)}`
             : 'Brak zaplanowanych dni'}
         </p>
       </div>

@@ -1,4 +1,5 @@
-import { formatHours, formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getQuarterLabel } from '@/lib/date/quarter'
 
 export type TooltipPayload = {
@@ -14,6 +15,7 @@ export function ChartTooltip({ active, payload }: {
   active?: boolean
   payload?: Array<{ payload: TooltipPayload }>
 }) {
+  const fmt = useFormat()
   if (!active || !payload?.length) return null
   const d = payload[0].payload
   if (!d.hours && !d.earningsPLN) return null
@@ -25,22 +27,22 @@ export function ChartTooltip({ active, payload }: {
         <p className="mb-0.5 text-2xs font-semibold text-foreground">{quarterLabel}</p>
       )}
       <p className="mb-1 text-2xs font-medium text-muted-foreground">{d.label}</p>
-      <p className="text-xs font-bold tabular-nums">{formatHours(d.hours)}</p>
+      <p className="text-xs font-bold tabular-nums">{fmt.hours(d.hours)}</p>
       {d.earningsEUR > 0 ? (
         <p className="mt-0.5 text-2xs tabular-nums">
-          <span className="font-semibold">{formatMoney(toMinor(d.earningsEUR), 'EUR')}</span>
+          <span className="font-semibold">{fmt.money(toMinor(d.earningsEUR), 'EUR')}</span>
           <span className="ml-1.5 text-2xs text-muted-foreground">
-            {formatMoney(toMinor(d.earningsPLN), 'PLN')}
+            {fmt.money(toMinor(d.earningsPLN), 'PLN')}
           </span>
         </p>
       ) : d.earningsPLN > 0 ? (
         <p className="mt-0.5 text-2xs font-semibold tabular-nums">
-          {formatMoney(toMinor(d.earningsPLN), 'PLN')}
+          {fmt.money(toMinor(d.earningsPLN), 'PLN')}
         </p>
       ) : null}
       {(d.prevHours ?? 0) > 0 && (
         <p className="mt-1 border-t border-border/40 pt-1 text-2xs text-muted-foreground">
-          Poprzednio: {formatHours(d.prevHours!)}
+          Poprzednio: {fmt.hours(d.prevHours!)}
         </p>
       )}
     </div>

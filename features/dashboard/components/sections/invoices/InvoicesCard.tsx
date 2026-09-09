@@ -12,7 +12,9 @@ import {
   XCircle,
   type LucideIcon,
 } from 'lucide-react'
-import { formatDate, formatMoney, NO_DATA, toMinor } from '@/lib/format'
+import { NO_DATA, toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import type { Invoice } from '@/lib/types'
 import { InvoiceStatus, deriveInvoiceStatus } from '@/lib/finance/invoice-status'
 import { sumInvoicesByCurrency } from '@/lib/finance/invoice-currency-totals'
@@ -67,12 +69,13 @@ const STATUS_PILL: Record<
   },
 }
 
-function shortDue(due: string | null | undefined): string {
-  const label = formatDate(due?.slice(0, 10), 'dayMonth')
+function shortDue(fmt: AppFormat, due: string | null | undefined): string {
+  const label = fmt.date(due?.slice(0, 10), 'dayMonth')
   return label === NO_DATA ? '' : `termin ${label}`
 }
 
 export function InvoicesCard({ invoices }: Props) {
+  const fmt = useFormat()
   const visible = invoices.slice(0, 5)
   const totals = sumInvoicesByCurrency(invoices)
 
@@ -105,7 +108,7 @@ export function InvoicesCard({ invoices }: Props) {
             const key = statusFromInvoice(inv)
             const pill = STATUS_PILL[key]
             const recipient = inv.recipient ?? null
-            const subtitle = [recipient, shortDue(inv.due_date)]
+            const subtitle = [recipient, shortDue(fmt, inv.due_date)]
               .filter(Boolean)
               .join(' · ')
             return (
@@ -135,7 +138,7 @@ export function InvoicesCard({ invoices }: Props) {
                     )}
                   </div>
                   <span className="shrink-0 text-xs font-semibold tabular-nums text-white sm:text-sm">
-                    {formatMoney(toMinor(inv.amount), inv.currency)}
+                    {fmt.money(toMinor(inv.amount), inv.currency)}
                   </span>
                 </Link>
               </li>
@@ -149,14 +152,14 @@ export function InvoicesCard({ invoices }: Props) {
           Łącznie wystawione ·{' '}
           {totals.length === 0 ? (
             <span className="font-semibold tabular-nums text-white">
-              {formatMoney(toMinor(0), 'PLN')}
+              {fmt.money(toMinor(0), 'PLN')}
             </span>
           ) : (
             totals.map((t, index) => (
               <span key={t.currency}>
                 {index > 0 && ' · '}
                 <span className="font-semibold tabular-nums text-white">
-                  {formatMoney(toMinor(t.total), t.currency)}
+                  {fmt.money(toMinor(t.total), t.currency)}
                 </span>
               </span>
             ))

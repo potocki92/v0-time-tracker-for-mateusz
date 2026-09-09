@@ -1,0 +1,185 @@
+{
+  "nav": {
+    "aria": "Main",
+    "product": "Product",
+    "automation": "Automation",
+    "flow": "How it works",
+    "signIn": "Sign in",
+    "openApp": "Open app"
+  },
+  "hero": {
+    "titleLine1": "Every hour.",
+    "titleLine2": "Accounted for.",
+    "lead": "TimeTracker records the days you actually work, turns them into an invoice, and shows what the month was worth.",
+    "ctaPrimary": "Open app",
+    "ctaSecondary": "See how it works",
+    "frameLabel": "TimeTracker dashboard: weekly hours, earnings, chart, projects and invoices"
+  },
+  "journey": {
+    "heading": "Scroll through the product",
+    "frameLabel": "The TimeTracker interface: dashboard, calendar, projects, invoice and reports",
+    "scenes": {
+      "dashboard": {
+        "title": "Know where your time went.",
+        "body": "Hours this week against your target, what they are worth, which projects are moving and which invoices are still open.",
+        "label": "Dashboard: weekly hours, earnings, chart, projects and invoices"
+      },
+      "calendar": {
+        "title": "Your work, day by day.",
+        "body": "One entry per day — hours, client, rate, status. Worked, day off, vacation and sick leave all live on the same grid.",
+        "label": "Calendar: September 2026 grid with hours and amounts"
+      },
+      "projects": {
+        "title": "Every hour knows who it belongs to.",
+        "body": "The client carries the rate, the project carries the budget. Change a rate and the old one stays on the hours it was earned on.",
+        "label": "Projects and clients: budgets, hours and rates"
+      },
+      "invoices": {
+        "title": "Turn work into an invoice.",
+        "body": "Pick a period and the timesheet becomes line items — quantity, rate, VAT, numbering, PDF.",
+        "label": "Invoice built from the month's hours"
+      },
+      "reports": {
+        "title": "See what the month was worth.",
+        "body": "Hours per project, per client, per month — with CSV and PDF export when the accountant asks.",
+        "label": "Reports: hours chart and split by project"
+      }
+    }
+  },
+  "flow": {
+    "eyebrow": "From work to money",
+    "heading": "From work to money",
+    "today": "Today · {project}",
+    "toInvoice": "Ready to invoice",
+    "invoiceReady": "Invoice ready"
+  },
+  "automation": {
+    "eyebrow": "Automation",
+    "heading": "Your calendar can fill itself.",
+    "lead": "Give TimeTracker your week and your trips. It writes the hours you actually worked — and leaves out the Sundays and the weeks you spent at home.",
+    "scheduleTitle": "Weekly schedule",
+    "dayOff": "off",
+    "presenceTitle": "Presence",
+    "presence": {
+      "trip": "Away",
+      "home": "At home"
+    },
+    "outcome": "{hours} · {days, plural, one {# day} other {# days}}",
+    "skipReasons": {
+      "before_start": "Before the automation start date",
+      "home_stay": "At home",
+      "weekday_off": "Weekday switched off in the schedule",
+      "entry_exists": "An entry already exists for this day",
+      "automation_disabled": "Automation was off at the time",
+      "not_due_yet": "Before the write-in time",
+      "already_decided": "Day already settled",
+      "unknown_settings": "No settings history — decide manually"
+    }
+  },
+  "everything": {
+    "eyebrow": "Everything else",
+    "heading": "Built for independent work.",
+    "items": {
+      "dayEntries": { "title": "Day entries", "body": "Hours or piecework quantity, status, notes, tags — one dialog per day." },
+      "clientRates": { "title": "Client rates", "body": "Rate history with effective dates; past hours keep the rate they were earned on." },
+      "projectBudgets": { "title": "Project budgets", "body": "Budget, utilisation, deadline and status on every project." },
+      "invoiceBuilder": { "title": "Invoice builder", "body": "Line items, buyer details, VAT, numbering series and three templates." },
+      "reports": { "title": "Reports & export", "body": "Range filters, comparison to the previous period, CSV and PDF export." },
+      "workAutomation": { "title": "Work automation", "body": "A weekly schedule plus trips — the calendar writes the days you worked." },
+      "weeklyEmail": { "title": "Weekly summary e-mail", "body": "The week that closed, sent to your inbox." },
+      "currencies": { "title": "PLN and EUR", "body": "Rates in either currency, converted where the numbers have to meet." },
+      "themes": { "title": "Themes", "body": "Five colour palettes, light and dark." }
+    }
+  },
+  "finalCta": {
+    "heading": "Start the clock. The rest follows.",
+    "primary": "Open app",
+    "secondary": "Create an account"
+  },
+  "footer": {
+    "aria": "Footer",
+    "tagline": "The clock, the calendar and the invoice in one place.",
+    "signIn": "Sign in",
+    "openApp": "Open app",
+    "github": "GitHub"
+  },
+  "app": {
+    "search": "Search…",
+    "pinned": "Pinned",
+    "dashboard": {
+      "dateline": "{weekday} · {date} · {week}",
+      "hours": "Hours",
+      "hoursMeta": "Target {target} · streak {days, plural, one {# day} other {# days}}",
+      "earnings": "Earnings",
+      "earningsMeta": "This week",
+      "effectiveRate": "Effective rate",
+      "perHour": "per hour",
+      "invoices": "Invoices",
+      "invoicesMeta": "1 draft · 2 sent",
+      "ranges": { "week": "Week", "month": "Month", "year": "Year" },
+      "currentProjects": "Current projects",
+      "toInvoice": "{amount} ready to invoice",
+      "addToday": "Log today: {hours}",
+      "startTimer": "Start timer"
+    },
+    "calendar": {
+      "views": { "grid": "Grid", "list": "List" },
+      "hours": "Hours",
+      "workedDays": "Working days",
+      "workedDaysMeta": "with an entry",
+      "earnings": "Earnings",
+      "streak": "Streak",
+      "streakValue": "{days, plural, one {# day} other {# days}}",
+      "streakMeta": "in a row",
+      "statusesTitle": "Statuses",
+      "statuses": {
+        "worked": "Worked",
+        "notWorked": "Did not work",
+        "vacation": "Vacation",
+        "sick": "Sick leave",
+        "dayOff": "Day off"
+      }
+    },
+    "projects": {
+      "all": "All",
+      "allMeta": "1 planned",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "shareOfTotal": "{percent} of all",
+      "clients": "Clients",
+      "clientsMeta": "2 hourly · 1 piecework",
+      "allProjects": "All projects",
+      "budget": "budget {percent}",
+      "table": { "name": "Name", "billing": "Billing", "rate": "Rate" },
+      "billing": { "hourly": "Hourly", "piecework": "Piecework" },
+      "status": { "planned": "Planned", "in_progress": "In progress", "completed": "Completed" }
+    },
+    "invoice": {
+      "period": "Period: {period}",
+      "issuedAndDue": "Issued {issued} · due {due}",
+      "seller": "Seller",
+      "buyer": "Buyer",
+      "table": { "description": "Description", "quantity": "Quantity", "price": "Price", "value": "Amount" },
+      "lineNote": "Work per time records · {period}",
+      "net": "Net",
+      "vat": "VAT {rate} · {note}",
+      "vatNote": "Reverse charge",
+      "total": "Total due",
+      "status": { "draft": "Draft", "sent": "Sent", "paid": "Paid" }
+    },
+    "reports": {
+      "ranges": { "d7": "7 days", "d30": "30 days", "d90": "90 days" },
+      "exportCsv": "Export CSV",
+      "pdf": "PDF",
+      "hours": "Hours",
+      "revenue": "Revenue",
+      "revenueMeta": "at client rates",
+      "avgPerDay": "Avg. per day",
+      "workingDays": "{days, plural, one {# working day} other {# working days}}",
+      "rate": "Rate",
+      "perHour": "per hour",
+      "monthlyHours": "Hours this month",
+      "byProject": "Split by project"
+    }
+  }
+}

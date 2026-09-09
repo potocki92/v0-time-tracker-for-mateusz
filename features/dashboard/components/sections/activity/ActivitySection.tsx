@@ -3,7 +3,9 @@
 import { useMemo } from 'react'
 import type { Client, Invoice, WorkEntry } from '@/lib/types'
 import { toDateKey } from '@/lib/date/format'
-import { formatDate, formatHours, formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { isRealizedEntry } from '@/lib/finance/realization'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
@@ -16,7 +18,7 @@ import { StatsErrorBoundary } from '../../errors'
 import { ActivityCard, type ActivityItem } from './ActivityCard'
 import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
-function relTime(iso: string): string {
+function relTime(fmt: AppFormat, iso: string): string {
   const t = new Date(iso).getTime()
   if (Number.isNaN(t)) return ''
   const diff = Math.max(0, Date.now() - t)
@@ -28,10 +30,11 @@ function relTime(iso: string): string {
   const d = Math.floor(h / 24)
   if (d === 1) return 'wczoraj'
   if (d < 7) return `${d} dni temu`
-  return formatDate(toDateKey(new Date(t)), 'dayMonth')
+  return fmt.date(toDateKey(new Date(t)), 'dayMonth')
 }
 
 function buildFeed(
+  fmt: AppFormat,
   workEntries: WorkEntry[],
   invoices: Invoice[],
   clients: Client[],
@@ -52,11 +55,11 @@ function buildFeed(
     items.push({
       id: `entry:${e.id}`,
       tone: 'success',
-      ago: relTime(e.created_at ?? e.date),
+      ago: relTime(fmt, e.created_at ?? e.date),
       text: (
         <span>
           <span className="font-medium">{c.name}</span> · zarejestrowano{' '}
-          <span className="font-semibold">{formatHours(e.hours ?? null)}</span>
+          <span className="font-semibold">{fmt.hours(e.hours ?? null)}</span>
           {e.notes ? <> przy <span className="text-zinc-300">{e.notes}</span></> : null}
         </span>
       ),
@@ -76,13 +79,13 @@ function buildFeed(
     items.push({
       id: `inv:${inv.id}`,
       tone: inv.is_paid ? 'success' : 'info',
-      ago: relTime(inv.invoice_date ?? inv.issue_date ?? new Date().toISOString()),
+      ago: relTime(fmt, inv.invoice_date ?? inv.issue_date ?? new Date().toISOString()),
       text: (
         <span>
           {inv.is_paid ? 'Opłacona faktura ' : 'Wystawiona faktura '}
           <span className="font-medium">{inv.invoice_number ?? inv.name}</span>{' '}
           <span className="text-zinc-400">
-            ({formatMoney(toMinor(inv.amount), inv.currency)})
+            ({fmt.money(toMinor(inv.amount), inv.currency)})
           </span>
         </span>
       ),
@@ -94,6 +97,7 @@ function buildFeed(
 }
 
 export function ActivitySection() {
+  const fmt = useFormat()
   const workEntries = useDashboardSlice(selectWorkEntries)
   const clients = useDashboardSlice(selectClients)
   const invoices = useDashboardSlice(selectInvoices)
@@ -120,8 +124,8 @@ export function ActivitySection() {
   }, [workEntries, activeJobs])
 
   const feed = useMemo(
-    () => buildFeed(workEntries, invoices, clients, getTodayLocalDateString()),
-    [workEntries, invoices, clients],
+    () => buildFeed(fmt, workEntries, invoices, clients, getTodayLocalDateString()),
+    [fmt, workEntries, invoices, clients],
   )
 
   const absences = totals.vacationDays + totals.sickDays

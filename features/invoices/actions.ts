@@ -128,5 +128,5 @@ export async function importInvoicesFromCsvAction(
   // Badge nieoplaconych faktur w sidebarze liczy sie serwerowo w layoucie
   // panelu (`fetchUnpaidInvoicesCount`), poza React Query — jego trzeba
   // odswiezyc rewalidacja. Reszte robi invalidateQueries w useInvoiceMutations.
-  revalidatePath('/(app)', 'layout')
+  revalidatePath('/[locale]/(app)', 'layout')
 }

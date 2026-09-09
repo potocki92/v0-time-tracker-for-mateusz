@@ -19,13 +19,15 @@ import {
   usePrivacyMode,
 } from '../../../hooks/useDashboardUiStore'
 import { useExportData } from '@/hooks/useExportData'
-import { formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { GoalEditDialog } from '../../card/GoalEditDialog'
 import { EarningsCardBoundary } from '../../errors'
 import { EarningsCard } from './EarningsCard'
 import { useDashboardDerived } from '../shared/DashboardDerivedContext'
 
 export function EarningsSection() {
+  const fmt = useFormat()
   const clients = useDashboardSlice(selectClients)
   const router = useRouter()
 
@@ -90,7 +92,7 @@ export function EarningsSection() {
   }, [])
 
   const handleCopyAmount = useCallback(() => {
-    const formatted = formatMoney(toMinor(totals.totalEarningsAllPLN), 'PLN')
+    const formatted = fmt.money(toMinor(totals.totalEarningsAllPLN), 'PLN')
     if (typeof navigator === 'undefined' || !navigator.clipboard) {
       toast.error('Schowek niedostępny')
       return
@@ -99,7 +101,7 @@ export function EarningsSection() {
       .writeText(formatted)
       .then(() => toast.success(`Skopiowano: ${formatted}`))
       .catch(() => toast.error('Nie udało się skopiować'))
-  }, [totals.totalEarningsAllPLN])
+  }, [fmt, totals.totalEarningsAllPLN])
 
   return (
     <>
@@ -123,7 +125,7 @@ export function EarningsSection() {
         />
       </EarningsCardBoundary>
       <p className="mt-2 text-sm text-zinc-400">
-        Przewidywane zarobki: <span className="font-medium text-zinc-100">{formatMoney(toMinor(projectedTotals.totalEarningsAllPLN), 'PLN')}</span>
+        Przewidywane zarobki: <span className="font-medium text-zinc-100">{fmt.money(toMinor(projectedTotals.totalEarningsAllPLN), 'PLN')}</span>
       </p>
 
       <GoalEditDialog

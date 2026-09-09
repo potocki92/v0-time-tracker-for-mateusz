@@ -4,7 +4,9 @@ import { SURFACE } from '@/components/ui/tokens'
 import { FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Client, Invoice } from '@/lib/types'
-import { formatDate, formatMoney, NO_DATA, toMinor } from '@/lib/format'
+import { NO_DATA, toMinor } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { displayInvoiceNumber } from '@/lib/finance/invoice-number'
 import {
   INVOICE_STATUS_LABELS_PL,
@@ -28,8 +30,8 @@ const STATUS_PILL: Record<InvoiceStatus, string> = {
   [InvoiceStatus.CANCELLED]: 'bg-zinc-500/10 text-zinc-400 ring-1 ring-zinc-500/20',
 }
 
-function formatShortDate(iso: string | null | undefined): string {
-  const label = formatDate(iso?.slice(0, 10), 'dayMonth')
+function formatShortDate(fmt: AppFormat, iso: string | null | undefined): string {
+  const label = fmt.date(iso?.slice(0, 10), 'dayMonth')
   return label === NO_DATA ? '' : label
 }
 
@@ -40,11 +42,12 @@ export function InvoiceListItem({
   hours,
   onSelect,
 }: InvoiceListItemProps) {
+  const fmt = useFormat()
   const status = deriveInvoiceStatus(invoice)
   const numberLabel = displayInvoiceNumber(invoice)
   const period = invoice.billing_period?.trim() || invoice.name?.trim() || ''
   const clientName = client?.name ?? invoice.recipient ?? 'Bez klienta'
-  const dateLabel = formatShortDate(invoice.invoice_date ?? invoice.issue_date ?? null)
+  const dateLabel = formatShortDate(fmt, invoice.invoice_date ?? invoice.issue_date ?? null)
 
   return (
     <article
@@ -100,7 +103,7 @@ export function InvoiceListItem({
             {dateLabel && <span>{dateLabel}</span>}
           </div>
           <span className="text-sm font-semibold text-white">
-            {formatMoney(toMinor(invoice.amount), invoice.currency)}
+            {fmt.money(toMinor(invoice.amount), invoice.currency)}
           </span>
         </footer>
       </button>

@@ -1,0 +1,33 @@
+{
+  "email": {
+    "required": "Email jest wymagany",
+    "invalid": "Niepoprawny adres email"
+  },
+  "password": {
+    "required": "Hasło jest wymagane",
+    "tooShort": "Hasło musi mieć min. {min} znaków",
+    "tooLong": "Hasło jest zbyt długie",
+    "repeat": "Powtórz hasło",
+    "mismatch": "Hasła muszą być identyczne"
+  },
+  "fullName": {
+    "required": "Imię i nazwisko jest wymagane"
+  },
+  "firstName": {
+    "tooShort": "Imię musi mieć min. {min} znaki",
+    "tooLong": "Imię może mieć maks. {max} znaków"
+  },
+  "lastName": {
+    "tooShort": "Nazwisko musi mieć min. {min} znaki",
+    "tooLong": "Nazwisko może mieć maks. {max} znaków"
+  },
+  "username": {
+    "tooShort": "Nazwa użytkownika musi mieć min. {min} znaki",
+    "tooLong": "Nazwa użytkownika może mieć maks. {max} znaków",
+    "pattern": "Użyj tylko małych liter, cyfr oraz znaków: _ . -"
+  },
+  "avatar": {
+    "tooLarge": "Maksymalny rozmiar to {max} MB",
+    "wrongType": "Dozwolone formaty: JPG, PNG, WEBP"
+  }
+}

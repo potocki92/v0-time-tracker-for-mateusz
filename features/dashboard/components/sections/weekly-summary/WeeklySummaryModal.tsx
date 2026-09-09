@@ -16,6 +16,8 @@ import type {
   ContractorBlock,
   WeeklySummary,
 } from '../../../lib/weekly-summary'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { formatWeeklySummaryText } from './format'
 import { formatDate, formatHours, formatRate, formatTotals } from './presentation'
 
@@ -28,7 +30,7 @@ type Props = {
   canGoNext: boolean
 }
 
-function ContractorCard({ block }: { block: ContractorBlock }) {
+function ContractorCard({ fmt, block }: { fmt: AppFormat; block: ContractorBlock }) {
   const address = [
     block.client?.address,
     [block.client?.postal_code, block.client?.city].filter(Boolean).join(' '),
@@ -53,12 +55,12 @@ function ContractorCard({ block }: { block: ContractorBlock }) {
           <Row label="Miejsce pracy">{block.workLocations.join('; ')}</Row>
         )}
         <Row label="Dni pracy (od – do)">
-          {formatDate(block.workedFrom)} – {formatDate(block.workedTo)}
+          {formatDate(fmt, block.workedFrom)} – {formatDate(fmt, block.workedTo)}
           <span className="text-zinc-400 print:text-gray-500"> ({block.workedDaysCount} dni)</span>
         </Row>
-        <Row label="Godziny">{formatHours(block.totalHours)}</Row>
-        <Row label="Stawka na fakturze">{block.rates.map(formatRate).join(', ')}</Row>
-        <Row label="Do rozliczenia">{formatTotals(block)}</Row>
+        <Row label="Godziny">{formatHours(fmt, block.totalHours)}</Row>
+        <Row label="Stawka na fakturze">{block.rates.map((rate) => formatRate(fmt, rate)).join(', ')}</Row>
+        <Row label="Do rozliczenia">{formatTotals(fmt, block)}</Row>
       </dl>
     </section>
   )
@@ -83,14 +85,15 @@ export function WeeklySummaryModal({
   onNextWeek,
   canGoNext,
 }: Props) {
+  const fmt = useFormat()
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(formatWeeklySummaryText(summary))
+      await navigator.clipboard.writeText(formatWeeklySummaryText(fmt, summary))
       toast.success('Skopiowano podsumowanie do schowka')
     } catch {
       toast.error('Nie udało się skopiować do schowka')
     }
-  }, [summary])
+  }, [fmt, summary])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -132,7 +135,7 @@ export function WeeklySummaryModal({
             </p>
           ) : (
             summary.contractors.map((block) => (
-              <ContractorCard key={block.clientId ?? '__unassigned__'} block={block} />
+              <ContractorCard fmt={fmt} key={block.clientId ?? '__unassigned__'} block={block} />
             ))
           )}
         </div>

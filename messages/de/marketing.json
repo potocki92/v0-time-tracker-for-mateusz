@@ -1,0 +1,185 @@
+{
+  "nav": {
+    "aria": "Hauptnavigation",
+    "product": "Produkt",
+    "automation": "Automatisierung",
+    "flow": "So funktioniert es",
+    "signIn": "Anmelden",
+    "openApp": "App öffnen"
+  },
+  "hero": {
+    "titleLine1": "Jede Stunde.",
+    "titleLine2": "Abgerechnet.",
+    "lead": "TimeTracker erfasst die Tage, an denen Sie wirklich arbeiten, macht daraus eine Rechnung und zeigt, was der Monat wert war.",
+    "ctaPrimary": "App öffnen",
+    "ctaSecondary": "So funktioniert es",
+    "frameLabel": "TimeTracker-Dashboard: Wochenstunden, Einnahmen, Diagramm, Projekte und Rechnungen"
+  },
+  "journey": {
+    "heading": "Durch das Produkt scrollen",
+    "frameLabel": "Die TimeTracker-Oberfläche: Dashboard, Kalender, Projekte, Rechnung und Berichte",
+    "scenes": {
+      "dashboard": {
+        "title": "Wissen, wohin Ihre Zeit geht.",
+        "body": "Die Stunden dieser Woche im Verhältnis zum Ziel, was sie wert sind, welche Projekte laufen und welche Rechnungen noch offen sind.",
+        "label": "Dashboard: Wochenstunden, Einnahmen, Diagramm, Projekte und Rechnungen"
+      },
+      "calendar": {
+        "title": "Ihre Arbeit, Tag für Tag.",
+        "body": "Ein Eintrag pro Tag — Stunden, Kunde, Satz, Status. Arbeitstag, freier Tag, Urlaub und Krankmeldung liegen im selben Raster.",
+        "label": "Kalender: Raster für September 2026 mit Stunden und Beträgen"
+      },
+      "projects": {
+        "title": "Jede Stunde weiß, wem sie gehört.",
+        "body": "Der Kunde trägt den Satz, das Projekt trägt das Budget. Ändern Sie den Satz, behalten vergangene Stunden den Satz, zu dem sie verdient wurden.",
+        "label": "Projekte und Kunden: Budgets, Stunden und Sätze"
+      },
+      "invoices": {
+        "title": "Aus Arbeit wird eine Rechnung.",
+        "body": "Zeitraum wählen und aus der Zeiterfassung werden Rechnungspositionen — Menge, Satz, USt., Nummernkreis, PDF.",
+        "label": "Rechnung, aufgebaut aus den Stunden des Monats"
+      },
+      "reports": {
+        "title": "Sehen, was der Monat wert war.",
+        "body": "Stunden pro Projekt, pro Kunde, pro Monat — mit CSV- und PDF-Export, wenn die Buchhaltung fragt.",
+        "label": "Berichte: Stundendiagramm und Aufteilung nach Projekten"
+      }
+    }
+  },
+  "flow": {
+    "eyebrow": "Von der Arbeit zum Geld",
+    "heading": "Von der Arbeit zum Geld",
+    "today": "Heute · {project}",
+    "toInvoice": "Abzurechnen",
+    "invoiceReady": "Rechnung fertig"
+  },
+  "automation": {
+    "eyebrow": "Automatisierung",
+    "heading": "Ihr Kalender kann sich selbst füllen.",
+    "lead": "Geben Sie TimeTracker Ihre Woche und Ihre Einsätze. Er trägt die Stunden ein, die Sie wirklich gearbeitet haben — und lässt Sonntage und Wochen zu Hause aus.",
+    "scheduleTitle": "Wochenplan",
+    "dayOff": "frei",
+    "presenceTitle": "Anwesenheit",
+    "presence": {
+      "trip": "Einsatz",
+      "home": "Zu Hause"
+    },
+    "outcome": "{hours} · {days, plural, one {# Tag} other {# Tage}}",
+    "skipReasons": {
+      "before_start": "Vor dem Startdatum der Automatik",
+      "home_stay": "Zu Hause",
+      "weekday_off": "Wochentag im Plan deaktiviert",
+      "entry_exists": "Für diesen Tag gibt es bereits einen Eintrag",
+      "automation_disabled": "Die Automatik war zu dem Zeitpunkt aus",
+      "not_due_yet": "Vor der Eintragungszeit",
+      "already_decided": "Tag bereits entschieden",
+      "unknown_settings": "Keine Einstellungshistorie — bitte manuell entscheiden"
+    }
+  },
+  "everything": {
+    "eyebrow": "Alles Weitere",
+    "heading": "Gebaut für selbstständiges Arbeiten.",
+    "items": {
+      "dayEntries": { "title": "Tageseinträge", "body": "Stunden oder Stückzahl, Status, Notizen, Tags — ein Dialog pro Tag." },
+      "clientRates": { "title": "Kundensätze", "body": "Satzhistorie mit Gültigkeitsdatum; vergangene Stunden behalten den Satz, zu dem sie verdient wurden." },
+      "projectBudgets": { "title": "Projektbudgets", "body": "Budget, Auslastung, Termin und Status bei jedem Projekt." },
+      "invoiceBuilder": { "title": "Rechnungs-Builder", "body": "Positionen, Käuferdaten, USt., Nummernkreise und drei Vorlagen." },
+      "reports": { "title": "Berichte und Export", "body": "Zeitraumfilter, Vergleich mit der Vorperiode, CSV- und PDF-Export." },
+      "workAutomation": { "title": "Arbeitszeit-Automatik", "body": "Wochenplan plus Einsätze — der Kalender trägt die gearbeiteten Tage selbst ein." },
+      "weeklyEmail": { "title": "Wochenrückblick per E-Mail", "body": "Die abgeschlossene Woche, direkt in Ihr Postfach." },
+      "currencies": { "title": "PLN und EUR", "body": "Sätze in beiden Währungen, umgerechnet dort, wo die Zahlen zusammenkommen müssen." },
+      "themes": { "title": "Themes", "body": "Fünf Farbpaletten, hell und dunkel." }
+    }
+  },
+  "finalCta": {
+    "heading": "Uhr starten. Der Rest folgt.",
+    "primary": "App öffnen",
+    "secondary": "Konto anlegen"
+  },
+  "footer": {
+    "aria": "Fußzeile",
+    "tagline": "Uhr, Kalender und Rechnung an einem Ort.",
+    "signIn": "Anmelden",
+    "openApp": "App öffnen",
+    "github": "GitHub"
+  },
+  "app": {
+    "search": "Suchen…",
+    "pinned": "Angeheftet",
+    "dashboard": {
+      "dateline": "{weekday} · {date} · {week}",
+      "hours": "Stunden",
+      "hoursMeta": "Ziel {target} · Serie {days, plural, one {# Tag} other {# Tage}}",
+      "earnings": "Einnahmen",
+      "earningsMeta": "Diese Woche",
+      "effectiveRate": "Effektiver Satz",
+      "perHour": "pro Stunde",
+      "invoices": "Rechnungen",
+      "invoicesMeta": "1 Entwurf · 2 versendet",
+      "ranges": { "week": "Woche", "month": "Monat", "year": "Jahr" },
+      "currentProjects": "Aktuelle Projekte",
+      "toInvoice": "{amount} abzurechnen",
+      "addToday": "Heute eintragen: {hours}",
+      "startTimer": "Timer starten"
+    },
+    "calendar": {
+      "views": { "grid": "Raster", "list": "Liste" },
+      "hours": "Stunden",
+      "workedDays": "Arbeitstage",
+      "workedDaysMeta": "mit Eintrag",
+      "earnings": "Einnahmen",
+      "streak": "Serie",
+      "streakValue": "{days, plural, one {# Tag} other {# Tage}}",
+      "streakMeta": "in Folge",
+      "statusesTitle": "Status",
+      "statuses": {
+        "worked": "Gearbeitet",
+        "notWorked": "Nicht gearbeitet",
+        "vacation": "Urlaub",
+        "sick": "Krank",
+        "dayOff": "Freier Tag"
+      }
+    },
+    "projects": {
+      "all": "Alle",
+      "allMeta": "1 geplant",
+      "inProgress": "Laufend",
+      "completed": "Abgeschlossen",
+      "shareOfTotal": "{percent} aller Projekte",
+      "clients": "Kunden",
+      "clientsMeta": "2 nach Stunden · 1 nach Stück",
+      "allProjects": "Alle Projekte",
+      "budget": "Budget {percent}",
+      "table": { "name": "Name", "billing": "Abrechnung", "rate": "Satz" },
+      "billing": { "hourly": "Stundenbasis", "piecework": "Stückbasis" },
+      "status": { "planned": "Geplant", "in_progress": "Laufend", "completed": "Abgeschlossen" }
+    },
+    "invoice": {
+      "period": "Zeitraum: {period}",
+      "issuedAndDue": "Ausgestellt {issued} · fällig {due}",
+      "seller": "Verkäufer",
+      "buyer": "Käufer",
+      "table": { "description": "Beschreibung", "quantity": "Menge", "price": "Preis", "value": "Betrag" },
+      "lineNote": "Leistungen laut Zeiterfassung · {period}",
+      "net": "Netto",
+      "vat": "USt. {rate} · {note}",
+      "vatNote": "Reverse-Charge",
+      "total": "Gesamtbetrag",
+      "status": { "draft": "Entwurf", "sent": "Versendet", "paid": "Bezahlt" }
+    },
+    "reports": {
+      "ranges": { "d7": "7 Tage", "d30": "30 Tage", "d90": "90 Tage" },
+      "exportCsv": "CSV-Export",
+      "pdf": "PDF",
+      "hours": "Stunden",
+      "revenue": "Umsatz",
+      "revenueMeta": "nach Kundensätzen",
+      "avgPerDay": "Ø pro Tag",
+      "workingDays": "{days, plural, one {# Arbeitstag} other {# Arbeitstage}}",
+      "rate": "Satz",
+      "perHour": "pro Stunde",
+      "monthlyHours": "Stunden im Monat",
+      "byProject": "Aufteilung nach Projekten"
+    }
+  }
+}

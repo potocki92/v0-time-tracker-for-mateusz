@@ -5,6 +5,10 @@ import {
   HEATMAP_WEEKS,
 } from '@/features/dashboard/components/sections/year-heatmap/heatmap'
 import type { WorkEntry } from '@/lib/types'
+import { createFormat } from '@/lib/format'
+
+/** Formattery jezyka bazowego — testy sprawdzaja logike, nie tlumaczenia. */
+const fmt = createFormat('pl')
 
 function entry(date: string, hours: number, status: WorkEntry['status'] = 'worked'): WorkEntry {
   return {
@@ -35,7 +39,7 @@ const TODAY = new Date(2026, 7, 12, 1, 0, 0)
 
 describe('buildHeatmap — okno siatki', () => {
   it('ma 52 kolumny po 7 dni, poniedzialek u gory', () => {
-    const map = buildHeatmap([], TODAY)
+    const map = buildHeatmap(fmt, [], TODAY)
     expect(map.weeks).toHaveLength(HEATMAP_WEEKS)
     for (const week of map.weeks) {
       expect(week.days).toHaveLength(7)
@@ -45,7 +49,7 @@ describe('buildHeatmap — okno siatki', () => {
   })
 
   it('ostatnia kolumna to tydzien biezacy, a dni po dzis sa oznaczone jako przyszle', () => {
-    const map = buildHeatmap([], TODAY)
+    const map = buildHeatmap(fmt, [], TODAY)
     const last = map.weeks[HEATMAP_WEEKS - 1]
     expect(last.startDate).toBe('2026-08-10') // poniedzialek tygodnia z 12.08
     expect(last.days.map((d) => d.isFuture)).toEqual([
@@ -58,7 +62,7 @@ describe('buildHeatmap — okno siatki', () => {
     // Poprzednia wersja kotwiczyla sie na niedzieli NADCHODZACEJ liczonej od
     // dzis, wiec w poniedzialek siatka pokazywala 6 pustych dni z przyszlosci.
     const monday = new Date(2026, 7, 10, 12, 0, 0)
-    const map = buildHeatmap([], monday)
+    const map = buildHeatmap(fmt, [], monday)
     expect(map.weeks[HEATMAP_WEEKS - 1].days.at(-1)!.date).toBe('2026-08-16')
     expect(map.weeks[0].days[0].date).toBe('2025-08-18')
   })
@@ -69,20 +73,20 @@ describe('buildHeatmap — kubelkowanie godzin', () => {
     // Klucz szedl wczesniej przez toISOString(), czyli przez UTC: lokalna
     // polnoc w UTC+2 to 22:00 dnia poprzedniego, wiec wpis ladowal o dzien
     // wczesniej. Test jest odporny na strefe, bo porownuje po kluczu wpisu.
-    const map = buildHeatmap([entry('2026-08-11', 7.5)], TODAY)
+    const map = buildHeatmap(fmt, [entry('2026-08-11', 7.5)], TODAY)
     const cells = map.weeks.flatMap((w) => w.days).filter((d) => d.hours > 0)
     expect(cells).toHaveLength(1)
     expect(cells[0].date).toBe('2026-08-11')
   })
 
   it('sumuje kilka wpisow tego samego dnia', () => {
-    const map = buildHeatmap([entry('2026-08-11', 4), { ...entry('2026-08-11', 3), id: 'e2' }], TODAY)
+    const map = buildHeatmap(fmt, [entry('2026-08-11', 4), { ...entry('2026-08-11', 3), id: 'e2' }], TODAY)
     const cell = map.weeks.flatMap((w) => w.days).find((d) => d.date === '2026-08-11')
     expect(cell?.hours).toBe(7)
   })
 
   it('liczy wylacznie dni przepracowane', () => {
-    const map = buildHeatmap(
+    const map = buildHeatmap(fmt, 
       [entry('2026-08-10', 8, 'vacation'), entry('2026-08-11', 8, 'sick_leave')],
       TODAY,
     )
@@ -91,12 +95,12 @@ describe('buildHeatmap — kubelkowanie godzin', () => {
   })
 
   it('ignoruje wpisy spoza okna', () => {
-    const map = buildHeatmap([entry('2024-01-15', 8)], TODAY)
+    const map = buildHeatmap(fmt, [entry('2024-01-15', 8)], TODAY)
     expect(map.activeDays).toBe(0)
   })
 
   it('podaje sume tygodnia dla tabeli czytnika ekranu', () => {
-    const map = buildHeatmap([entry('2026-08-10', 6), entry('2026-08-11', 2)], TODAY)
+    const map = buildHeatmap(fmt, [entry('2026-08-10', 6), entry('2026-08-11', 2)], TODAY)
     expect(map.weeks.at(-1)!.totalHours).toBe(8)
     expect(map.activeDays).toBe(2)
     expect(map.totalHours).toBe(8)
@@ -105,7 +109,7 @@ describe('buildHeatmap — kubelkowanie godzin', () => {
   it('oznacza etykieta miesiaca tylko pierwsza kolumne danego miesiaca', () => {
     // Kolumna zerowa zostaje bez etykiety: pierwszy miesiac okna jest uciety,
     // wiec jego napis staje tuz obok nastepnego i oba sie zlewaja.
-    const weeks = buildHeatmap([], TODAY).weeks
+    const weeks = buildHeatmap(fmt, [], TODAY).weeks
     const labels = weeks.map((w) => w.monthLabel)
     expect(labels[0]).toBeNull()
     expect(labels.filter(Boolean)).toEqual([
@@ -115,7 +119,7 @@ describe('buildHeatmap — kubelkowanie godzin', () => {
   })
 
   it('etykiety miesiecy nie stoja w sasiednich kolumnach', () => {
-    const labelled = buildHeatmap([], TODAY)
+    const labelled = buildHeatmap(fmt, [], TODAY)
       .weeks.map((w, i) => (w.monthLabel ? i : -1))
       .filter((i) => i >= 0)
     for (let i = 1; i < labelled.length; i += 1) {

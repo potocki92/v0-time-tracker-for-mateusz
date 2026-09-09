@@ -7,7 +7,8 @@ import {
   getCurrentEarningsForGoal,
 } from '@/lib/finance/goal'
 import { isRealizedEntry } from '@/lib/finance/realization'
-import { formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import type { WorkEntry } from '@/lib/types'
 import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
@@ -45,6 +46,7 @@ function calcStreak(entries: WorkEntry[], todayIso: string): number {
 }
 
 export function GoalSection() {
+  const fmt = useFormat()
   // `clients` nadal potrzebne: findGoalReachedDate liczy skumulowany zarobek
   // po wpisach, wiec musi znac stawki. `workEntries` — bo seria idzie po
   // wszystkich wpisach, nie tylko po tych z zakresu.
@@ -61,8 +63,8 @@ export function GoalSection() {
   )
 
   const reachedDate = useMemo(
-    () => findGoalReachedDate(realized, clients, goal, eurRate),
-    [realized, clients, goal, eurRate],
+    () => findGoalReachedDate(fmt, realized, clients, goal, eurRate),
+    [fmt, realized, clients, goal, eurRate],
   )
 
   // Seria liczona po wszystkich zrealizowanych wpisach (nie tylko z zakresu).
@@ -94,7 +96,7 @@ export function GoalSection() {
         <p className="mt-2 text-sm text-muted-foreground">
           W planie:{' '}
           <span className="font-medium text-foreground">
-            {formatMoney(toMinor(predictedCurrent), currency)}
+            {fmt.money(toMinor(predictedCurrent), currency)}
           </span>
         </p>
       )}

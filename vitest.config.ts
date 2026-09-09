@@ -16,6 +16,12 @@ const alias = {
   // poza nim pakiet celowo rzuca. Bez tego aliasu testy nie tkna zadnego
   // modulu `*.server.ts`.
   'server-only': path.resolve(__dirname, 'node_modules/server-only/empty.js'),
+  // `next-intl` importuje `next/navigation` jako bare specifier z pliku ESM
+  // w node_modules; Vite nie rozwiazuje tam rozszerzenia sam. Alias wskazuje
+  // konkretny plik, dzieki czemu `vi.mock('next/navigation')` nadal dziala —
+  // mock jest wiazany po rozwiazaniu sciezki.
+  'next/navigation': path.resolve(__dirname, 'node_modules/next/navigation.js'),
+  'next/server': path.resolve(__dirname, 'node_modules/next/server.js'),
 }
 
 export default defineConfig({
@@ -32,6 +38,9 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           globals: true,
+          // Patrz komentarz przy aliasach: `next-intl` musi przejsc przez Vite,
+          // zeby jego importy `next/*` rozwiazaly sie po naszych aliasach.
+          server: { deps: { inline: ['next-intl'] } },
           include: ['__test__/**/*.test.ts', 'lib/**/__tests__/**/*.test.ts'],
           exclude: [
             '**/rls.test.ts',
@@ -53,6 +62,10 @@ export default defineConfig({
           name: 'components',
           environment: 'jsdom',
           globals: true,
+          // `next-intl` jest ESM-em w node_modules i importuje `next/navigation`
+          // jako bare specifier bez rozszerzenia. Node go nie rozwiaze —
+          // dopiero inline przepuszcza pakiet przez Vite, ktory zna alias.
+          server: { deps: { inline: ['next-intl'] } },
           include: [
             'components/**/__tests__/**/*.test.tsx',
             '__test__/**/*.test.tsx',

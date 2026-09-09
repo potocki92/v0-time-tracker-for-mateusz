@@ -1,4 +1,4 @@
-import { formatMonthName } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import type { WorkEntry } from '@/lib/types'
 
@@ -56,6 +56,7 @@ export function levelFromHours(hours: number): HeatmapCell['level'] {
  *    i gubiła sześć dni przeszłych.
  */
 export function buildHeatmap(
+  fmt: AppFormat,
   entries: WorkEntry[],
   today: Date = new Date(),
 ): Heatmap {
@@ -123,7 +124,7 @@ export function buildHeatmap(
     weeks.push({
       startDate: days[0].date,
       monthLabel:
-        isNewMonth && w > 0 ? formatMonthName(days[3].date, 'short') : null,
+        isNewMonth && w > 0 ? fmt.monthName(days[3].date, 'short') : null,
       days,
       totalHours: weekHours,
     })

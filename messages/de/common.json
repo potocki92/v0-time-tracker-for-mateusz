@@ -1,0 +1,32 @@
+{
+  "actions": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "add": "Hinzufügen",
+    "retry": "Erneut versuchen",
+    "copy": "Kopieren",
+    "export": "Exportieren",
+    "print": "Drucken",
+    "back": "Zurück",
+    "next": "Weiter",
+    "confirm": "Bestätigen"
+  },
+  "states": {
+    "loading": "Wird geladen…",
+    "empty": "Keine Daten",
+    "error": "Etwas ist schiefgelaufen",
+    "saving": "Wird gespeichert…",
+    "saved": "Gespeichert"
+  },
+  "units": {
+    "hoursShort": "Std.",
+    "pieceShort": "Stk."
+  },
+  "days": "{count, plural, one {# Tag} other {# Tage}}",
+  "hours": "{count, plural, one {# Stunde} other {# Stunden}}",
+  "entries": "{count, plural, one {# Eintrag} other {# Einträge}}",
+  "invoicesCount": "{count, plural, one {# Rechnung} other {# Rechnungen}}"
+}

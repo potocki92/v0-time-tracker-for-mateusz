@@ -1,4 +1,6 @@
-import { APP_LOCALE, NO_DATA, numberFormatter } from './intl'
+import type { AppLocale } from '@/i18n/config'
+
+import { intlTag, NO_DATA, numberFormatter } from './intl'
 
 /**
  * Formatowanie liczb bezwymiarowych: godzin, procentów i liczebników.
@@ -12,12 +14,13 @@ import { APP_LOCALE, NO_DATA, numberFormatter } from './intl'
  * obok "18 200,00 zł".
  */
 export function formatHours(
+  locale: AppLocale,
   hours: number | null | undefined,
   opts: { decimals?: 0 | 1 } = {},
 ): string {
   if (hours === null || hours === undefined || !Number.isFinite(hours)) return NO_DATA
   const decimals = opts.decimals ?? (Number.isInteger(hours) ? 0 : 1)
-  const value = numberFormatter({
+  const value = numberFormatter(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
     useGrouping: 'always',
@@ -33,30 +36,41 @@ export function formatHours(
  * `max` przycina wynik tam, gdzie UI nie ma czym pokazać nadwyżki (pasek postępu).
  */
 export function formatPercent(
+  locale: AppLocale,
   ratio: number | null | undefined,
   opts: { max?: number } = {},
 ): string {
   if (ratio === null || ratio === undefined || !Number.isFinite(ratio)) return NO_DATA
   const raw = ratio < 1 ? Math.floor(ratio * 100) : Math.round(ratio * 100)
   const percent = opts.max === undefined ? raw : Math.min(raw, opts.max)
-  return `${numberFormatter({ maximumFractionDigits: 0, useGrouping: 'always' }).format(percent)}%`
+  return `${numberFormatter(locale, { maximumFractionDigits: 0, useGrouping: 'always' }).format(percent)}%`
 }
 
-/** Zwykła liczba w polskiej notacji: ilości akordowe, sztuki, mnożniki. */
+/** Zwykła liczba w notacji jezyka UI: ilości akordowe, sztuki, mnożniki. */
 export function formatNumber(
+  locale: AppLocale,
   value: number | null | undefined,
   opts: { decimals?: number } = {},
 ): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return NO_DATA
   const decimals = opts.decimals ?? 0
-  return numberFormatter({
+  return numberFormatter(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
     useGrouping: 'always',
   }).format(value)
 }
 
-const pluralRules = new Intl.PluralRules(APP_LOCALE)
+const pluralCache = new Map<AppLocale, Intl.PluralRules>()
+
+function pluralRules(locale: AppLocale): Intl.PluralRules {
+  let rules = pluralCache.get(locale)
+  if (!rules) {
+    rules = new Intl.PluralRules(intlTag(locale))
+    pluralCache.set(locale, rules)
+  }
+  return rules
+}
 
 /** pl ma trzy formy mnogie; `two`/`zero`/`other` nie występują dla liczb całkowitych. */
 const PLURAL_FORM: Record<Intl.LDMLPluralRule, 0 | 1 | 2> = {
@@ -68,10 +82,27 @@ const PLURAL_FORM: Record<Intl.LDMLPluralRule, 0 | 1 | 2> = {
   other: 2,
 }
 
-/** Polska odmiana liczebnika: "1 dzień" / "2 dni" / "5 dni" / "22 dni". */
-export function formatCount(count: number, forms: [string, string, string]): string {
-  const value = numberFormatter({ maximumFractionDigits: 0, useGrouping: 'always' }).format(
-    count,
-  )
-  return `${value} ${forms[PLURAL_FORM[pluralRules.select(count)]]}`
+/**
+ * Odmiana liczebnika z JAWNIE podanymi formami: "1 dzień" / "2 dni" / "5 dni".
+ *
+ * NIE UZYWAJ TEGO W NOWYM KODZIE. Komunikat zalezny od jezyka nalezy do
+ * plikow tlumaczen jako komunikat ICU:
+ *
+ *   "workedDays": "{count, plural, one {# dzień} few {# dni} other {# dni}}"
+ *
+ * Funkcja zostaje wylacznie dla ekranow, ktore czekaja jeszcze na migracje —
+ * lista stoi w `docs/i18n.md`.
+ *
+ * @deprecated Uzyj komunikatu ICU `{count, plural, …}` z `messages/`.
+ */
+export function formatCount(
+  locale: AppLocale,
+  count: number,
+  forms: [string, string, string],
+): string {
+  const value = numberFormatter(locale, {
+    maximumFractionDigits: 0,
+    useGrouping: 'always',
+  }).format(count)
+  return `${value} ${forms[PLURAL_FORM[pluralRules(locale).select(count)]]}`
 }

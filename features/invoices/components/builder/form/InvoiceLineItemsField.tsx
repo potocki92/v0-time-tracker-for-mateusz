@@ -1,7 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { formatCount, formatHours } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import {
   closestCenter,
@@ -43,11 +44,11 @@ interface InvoiceLineItemsFieldProps {
   clientId: string | null
 }
 
-function weekToLineItem(week: WorkedWeekSummary) {
+function weekToLineItem(fmt: AppFormat, week: WorkedWeekSummary) {
   const description =
     week.workType === 'piecework'
-      ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${formatCount(week.quantity, ['szt.', 'szt.', 'szt.'])}`
-      : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${formatHours(week.hours)}`
+      ? `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${fmt.count(week.quantity, ['szt.', 'szt.', 'szt.'])}`
+      : `Praca w tygodniu ${week.id} (${week.start} – ${week.end}) — ${fmt.hours(week.hours)}`
 
   const quantity = week.workType === 'piecework' ? week.quantity || 1 : week.hours || 1
   const unit_price_net = quantity > 0 ? Math.round((week.amount / quantity) * 100) / 100 : 0
@@ -64,6 +65,7 @@ function weekToLineItem(week: WorkedWeekSummary) {
 }
 
 export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) {
+  const fmt = useFormat()
   const { control, formState, getValues, setValue } = useFormContext<InvoiceBuilderValues>()
   const { fields, append, remove, move } = useFieldArray<InvoiceBuilderValues, 'items', 'fieldArrayId'>({
     control,
@@ -106,7 +108,7 @@ export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) 
 
   const handleApplyWeeks = React.useCallback(
     (weeks: WorkedWeekSummary[]) => {
-      const newItems = weeks.map(weekToLineItem)
+      const newItems = weeks.map((week) => weekToLineItem(fmt, week))
       const current = getValues('items') ?? []
 
       // Heuristic: if the only existing item is a fresh blank one (no
@@ -121,7 +123,7 @@ export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) 
       setValue('items', next, { shouldDirty: true, shouldValidate: true })
       setPickerOpen(false)
     },
-    [getValues, setValue],
+    [fmt, getValues, setValue],
   )
 
   const handleRemove = React.useCallback(

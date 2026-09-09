@@ -8,6 +8,11 @@ import {
 } from '@/lib/finance/invoice-builder-engine'
 import type { LineItemInput } from '@/lib/schemas/invoice-builder.schema'
 
+import { createFormat } from '@/lib/format'
+
+/** Formattery jezyka bazowego — testy sprawdzaja logike, nie tlumaczenia. */
+const fmt = createFormat('pl')
+
 function line(overrides: Partial<LineItemInput> = {}): LineItemInput {
   return {
     id: overrides.id ?? `line_${Math.random().toString(36).slice(2, 8)}`,
@@ -170,7 +175,7 @@ describe('formatMoney', () => {
       currency: 'EUR',
       items: [line({ quantity: 1, unit_price_net: 100, vat_rate: 23 })],
     })
-    expect(formatMoney(totals.gross)).toMatch(/123,00/) // pl-PL formatting
-    expect(formatMoney(totals.gross)).toMatch(/EUR/)
+    expect(formatMoney(fmt, totals.gross)).toMatch(/123,00/) // pl-PL formatting
+    expect(formatMoney(fmt, totals.gross)).toMatch(/EUR/)
   })
 })

@@ -1,12 +1,8 @@
 'use client'
 
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
-import {
-  formatDayBadge,
-  formatIsoWeek,
-  formatMonthName,
-  formatWeekday,
-} from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import type { TimeRange } from '../../../types/dashboard.types'
 
@@ -31,19 +27,20 @@ function greetingByHour(): string {
   return 'Dobry wieczór'
 }
 
-function formatDateline(iso: string): string {
-  const badge = formatDayBadge(iso)
-  const weekday = formatWeekday(iso, 'long').toUpperCase()
+function formatDateline(fmt: AppFormat, iso: string): string {
+  const badge = fmt.dayBadge(iso)
+  const weekday = fmt.weekday(iso, 'long').toUpperCase()
   return `${weekday} · ${badge.day} ${badge.month} ${iso.slice(0, 4)}`
 }
 
-function shapingCopy(iso: string): string {
-  return `Tak prezentuje się ${formatMonthName(iso, 'long')}.`
+function shapingCopy(fmt: AppFormat, iso: string): string {
+  return `Tak prezentuje się ${fmt.monthName(iso, 'long')}.`
 }
 
 export function HeroGreeting({ userName, range, onChangeRange }: Props) {
+  const fmt = useFormat()
   const today = getTodayLocalDateString()
-  const dateline = `${formatDateline(today)} · ${formatIsoWeek(today)}`
+  const dateline = `${formatDateline(fmt, today)} · ${fmt.isoWeek(today)}`
   const name = userName?.split(' ')[0] ?? ''
 
   return (
@@ -54,11 +51,11 @@ export function HeroGreeting({ userName, range, onChangeRange }: Props) {
         <h1 className="text-2xl font-semibold leading-[1.25] text-white sm:text-3xl">
           {greetingByHour()}{name ? `, ${name}` : ''}
           <span className="ml-2 hidden font-normal text-zinc-400 sm:inline">
-            — {shapingCopy(today)}
+            — {shapingCopy(fmt, today)}
           </span>
         </h1>
         <p className="mt-1 text-xs leading-[1.4] text-zinc-400 sm:hidden">
-          {shapingCopy(today)}
+          {shapingCopy(fmt, today)}
         </p>
       </div>
 

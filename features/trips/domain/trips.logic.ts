@@ -1,6 +1,5 @@
 import type { Trip, TripCountdownState } from './trips.types'
-import { formatDate, formatWeekday } from '@/lib/format'
-
+import type { AppFormat } from '@/lib/format'
 const ISO_RE = /^\d{4}-\d{2}-\d{2}$/
 
 /** Parsuje YYYY-MM-DD do dnia UTC, by uniknąć przesunięć strefy czasowej. */
@@ -81,8 +80,8 @@ export function computeTripCountdown(
 }
 
 /** "niedziela, 1 czerwca" — używane jako data celu pod licznikiem. */
-export function formatPlLongDate(iso: string): string {
-  return `${formatWeekday(iso, 'long')}, ${formatDate(iso, 'dayMonthLong')}`
+export function formatPlLongDate(fmt: AppFormat, iso: string): string {
+  return `${fmt.weekday(iso, 'long')}, ${fmt.date(iso, 'dayMonthLong')}`
 }
 
 /** Polska forma "dzień / dni" — singular tylko dla |days| === 1. */

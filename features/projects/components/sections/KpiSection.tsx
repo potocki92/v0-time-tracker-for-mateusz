@@ -2,11 +2,13 @@
 
 import { CheckCircle2, FolderKanban, ListChecks, Wallet } from 'lucide-react'
 import { StatTile } from '@/components/common/stat/StatTile'
-import { formatMoney, toMinor } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { useProjectsData } from '../../hooks/useProjectsData'
 import { useProjectsKpis } from '../../hooks/useProjectsKpis'
 
 export function KpiSection() {
+  const fmt = useFormat()
   const { data } = useProjectsData()
   const kpis = useProjectsKpis(data.projects)
 
@@ -37,7 +39,7 @@ export function KpiSection() {
       />
       <StatTile
         label="Budżet"
-        value={formatMoney(toMinor(kpis.totalBudget), kpis.totalBudgetCurrency)}
+        value={fmt.money(toMinor(kpis.totalBudget), kpis.totalBudgetCurrency)}
         icon={Wallet}
         meta={kpis.total > 0 ? `${kpis.total} umów` : 'Brak umów'}
         accent="warning"

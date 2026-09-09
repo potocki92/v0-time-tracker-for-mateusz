@@ -1,6 +1,7 @@
 'use client'
 
 import { PageContainer } from '@/components/common/section/PageContainer'
+import { useFormat } from '@/lib/format/client'
 import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
@@ -94,6 +95,7 @@ function formatTestInvoiceDateTag(date: Date) {
 }
 
 export function InvoicesContent() {
+  const fmt = useFormat()
   const { data } = useInvoicesData()
   const saveMutation = useSaveInvoice()
   const deleteMutation = useDeleteInvoice()
@@ -133,13 +135,13 @@ export function InvoicesContent() {
   const isSaving = saveMutation.isPending
 
   const stats = useMemo(
-    () => computeInvoicesStats(data.invoices, currency),
-    [data.invoices, currency],
+    () => computeInvoicesStats(fmt, data.invoices, currency),
+    [fmt, data.invoices, currency],
   )
 
   const otherCurrencyStats = useMemo(
-    () => computeInvoicesStats(data.invoices, currency === 'EUR' ? 'PLN' : 'EUR'),
-    [data.invoices, currency],
+    () => computeInvoicesStats(fmt, data.invoices, currency === 'EUR' ? 'PLN' : 'EUR'),
+    [fmt, data.invoices, currency],
   )
 
   const clientsById = useMemo(

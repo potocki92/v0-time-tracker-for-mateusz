@@ -1,3 +1,12 @@
+import createNextIntlPlugin from 'next-intl/plugin'
+
+/**
+ * Plugin `next-intl` wiaze `i18n/request.ts` z runtime'em Next — bez niego
+ * Server Components nie znajdyja konfiguracji requestu i `getTranslations()`
+ * rzuca w czasie budowania.
+ */
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -34,4 +43,4 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+export default withNextIntl(nextConfig)

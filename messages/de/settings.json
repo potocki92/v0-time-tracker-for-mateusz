@@ -1,0 +1,30 @@
+{
+  "title": "Kontoeinstellungen",
+  "description": "Verwalten Sie Profil, Profilbild und die Grunddaten Ihres Kontos.",
+  "loadFailed": "Die Kontodaten konnten nicht geladen werden.",
+  "language": {
+    "title": "Sprache der Oberfläche",
+    "description": "Diese Auswahl betrifft nur die Sprache der Anwendung. Währung, Zeitzone, Kundendaten und Rechnungssprache bleiben unverändert.",
+    "saved": "Sprache der Oberfläche gespeichert"
+  },
+  "appearance": {
+    "title": "Darstellung",
+    "description": "Wählen Sie Farbpalette und hellen bzw. dunklen Modus. Änderungen wirken sofort.",
+    "modeGroup": "Farbmodus",
+    "modes": {
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    },
+    "themeGroup": "Farbschema"
+  },
+  "profile": {
+    "saved": "Kontoeinstellungen gespeichert"
+  },
+  "toast": {
+    "AVATAR_UPDATED": "Profilbild aktualisiert",
+    "INVOICE_SETTINGS_SAVED": "Rechnungsautomatik gespeichert",
+    "WEEKLY_SUMMARY_SAVED": "Einstellungen für den Wochenrückblick gespeichert",
+    "WEEKLY_SUMMARY_SENT": "Rückblick an {recipient} gesendet"
+  }
+}

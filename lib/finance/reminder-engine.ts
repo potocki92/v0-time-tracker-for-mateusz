@@ -1,4 +1,5 @@
 import type { CURRENCY } from '@/lib/types'
+import type { AppFormat } from '@/lib/format'
 import { format as formatMoney, fromMajor } from './money'
 
 export const REMINDER_KINDS = [
@@ -49,8 +50,8 @@ export interface RenderedReminder {
   html: string
 }
 
-function formatAmount(amount: number, currency: CURRENCY): string {
-  return formatMoney(fromMajor(amount, currency))
+function formatAmount(fmt: AppFormat, amount: number, currency: CURRENCY): string {
+  return formatMoney(fmt, fromMajor(amount, currency))
 }
 
 function headline(kind: ReminderKind): string {
@@ -71,11 +72,12 @@ function headline(kind: ReminderKind): string {
 }
 
 export function renderReminder(
+  fmt: AppFormat,
   candidate: ReminderCandidate,
   kind: ReminderKind,
 ): RenderedReminder {
   const invoiceLabel = candidate.invoice_number ?? candidate.invoice_name
-  const amount = formatAmount(candidate.amount, candidate.currency)
+  const amount = formatAmount(fmt, candidate.amount, candidate.currency)
   const subject = `${headline(kind)} — ${invoiceLabel}`
 
   const greeting = candidate.client_name ? `Dzień dobry, ${candidate.client_name}` : 'Dzień dobry'

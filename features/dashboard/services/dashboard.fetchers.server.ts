@@ -1,4 +1,4 @@
-// app/(app)/dashboard/_services/dashboard.fetchers.server.ts
+// app/[locale]/(app)/dashboard/_services/dashboard.fetchers.server.ts
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import { getWorkEntriesWindowStart } from '@/lib/date/work-entries-window'

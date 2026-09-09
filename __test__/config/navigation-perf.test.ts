@@ -15,7 +15,7 @@ function walk(dir: string, acc: string[] = []): string[] {
   return acc
 }
 
-const APP_PAGES = walk(resolve(ROOT, 'app/(app)')).filter((f) => /page\.tsx$/.test(f))
+const APP_PAGES = walk(resolve(ROOT, 'app/[locale]/(app)')).filter((f) => /page\.tsx$/.test(f))
 
 describe('nawigacja — Router Cache', () => {
   const config = read('next.config.mjs')
@@ -91,9 +91,12 @@ describe('nawigacja — middleware nie robi round-tripu do GoTrue', () => {
   })
 
   it('autoryzacja zostaje w serwerowym layoucie', () => {
-    const layout = read('app/(app)/layout.tsx')
+    const layout = read('app/[locale]/(app)/layout.tsx')
     expect(layout).toMatch(/getServerUser\(\)/)
-    expect(layout).toMatch(/redirect\('\/auth\/login'\)/)
+    // Redirect jest swiadomy jezyka (`@/i18n/navigation`), wiec niesie
+    // `locale` — bez tego Niemiec z `/de/dashboard` wypadalby na polskie
+    // logowanie.
+    expect(layout).toMatch(/redirect\(\{ href: '\/auth\/login', locale \}\)/)
   })
 })
 
@@ -141,7 +144,9 @@ describe('nawigacja — mutacje nie kasuja calego Router Cache', () => {
       for (const m of read(file).matchAll(/revalidatePath\(\s*['"]([^'"]+)['"]/g)) {
         // Dozwolony wyjatek: layout panelu renderuje badge nieoplaconych faktur
         // serwerowo, poza React Query — jego musi odswiezyc revalidatePath.
-        if (m[1] === '/(app)') continue
+        // Sciezka niesie segment `[locale]`, bo panel mieszka pod nim od
+        // czasu wprowadzenia routingu jezykowego.
+        if (m[1] === '/[locale]/(app)') continue
         offenders.push(`${file}: revalidatePath('${m[1]}')`)
       }
     }

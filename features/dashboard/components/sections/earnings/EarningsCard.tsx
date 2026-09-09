@@ -13,7 +13,8 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { formatDate, formatMoney, formatNumber, NO_DATA, toMinor } from '@/lib/format'
+import { NO_DATA, toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { maskValue } from '../../../hooks/useDashboardUiStore'
 import type { EarningsTrendData } from '../../../hooks/useEarningsTrend'
 import type { SparklinePoint } from '../../../hooks/useEarningsSparkline'
@@ -99,9 +100,10 @@ export const EarningsCard = memo(function EarningsCard({
   onSetGoal,
   onCopyAmount,
 }: Props) {
+  const fmt = useFormat()
   const series = useMemo(
-    () => buildSeries(sparklineData, compareMode ? prevSparklineData : undefined),
-    [sparklineData, prevSparklineData, compareMode],
+    () => buildSeries(fmt, sparklineData, compareMode ? prevSparklineData : undefined),
+    [fmt, sparklineData, prevSparklineData, compareMode],
   )
 
   const dailyStats = useMemo(() => computeDailyStats(sparklineData), [sparklineData])
@@ -136,14 +138,14 @@ export const EarningsCard = memo(function EarningsCard({
     return Array.from({ length: count }, (_, i) => series[Math.round(i * step)].date)
   }, [series])
 
-  const totalPLNStr = maskValue(formatMoney(toMinor(totalPLN), 'PLN'), privacyMode)
-  const totalEURStr = maskValue(formatMoney(toMinor(totalEUR), 'EUR'), privacyMode)
+  const totalPLNStr = maskValue(fmt.money(toMinor(totalPLN), 'PLN'), privacyMode)
+  const totalEURStr = maskValue(fmt.money(toMinor(totalEUR), 'EUR'), privacyMode)
   const avgStr = maskValue(
-    formatMoney(toMinor(dailyStats.averagePerDay), 'PLN'),
+    fmt.money(toMinor(dailyStats.averagePerDay), 'PLN'),
     privacyMode,
   )
   const bestStr = dailyStats.bestDay
-    ? maskValue(formatMoney(toMinor(dailyStats.bestDay.value), 'PLN'), privacyMode)
+    ? maskValue(fmt.money(toMinor(dailyStats.bestDay.value), 'PLN'), privacyMode)
     : NO_DATA
 
   return (
@@ -167,7 +169,7 @@ export const EarningsCard = memo(function EarningsCard({
               >
                 <TrendIcon className="h-3 w-3" aria-hidden />
                 {trend.percent > 0 ? '+' : ''}
-                {formatNumber(trend.percent, { decimals: 1 })}%
+                {fmt.number(trend.percent, { decimals: 1 })}%
               </span>
             )}
             {privacyMode && (
@@ -195,7 +197,7 @@ export const EarningsCard = memo(function EarningsCard({
               <>
                 <span className={isUp ? 'text-positive-400' : 'text-danger-400'}>
                   {diffSign}
-                  {maskValue(formatMoney(toMinor(diffAbs), 'PLN'), privacyMode)}
+                  {maskValue(fmt.money(toMinor(diffAbs), 'PLN'), privacyMode)}
                 </span>{' '}
                 {isUp ? 'powyżej' : 'poniżej'} poprzedniego okresu
               </>
@@ -205,7 +207,7 @@ export const EarningsCard = memo(function EarningsCard({
                 {showCompareLine && <span className="mx-1">·</span>}
                 <span>
                   Prognoza{' '}
-                  {maskValue(formatMoney(toMinor(forecastValue), 'PLN'), privacyMode)}
+                  {maskValue(fmt.money(toMinor(forecastValue), 'PLN'), privacyMode)}
                 </span>
               </>
             )}
@@ -236,13 +238,13 @@ export const EarningsCard = memo(function EarningsCard({
         <EarningsKpi
           icon={CalendarDays}
           label="Aktywne dni"
-          value={formatNumber(dailyStats.activeDays)}
+          value={fmt.number(dailyStats.activeDays)}
         />
         <EarningsKpi
           icon={Sparkles}
           label="Najlepszy dzień"
           value={bestStr}
-          hint={formatDate(dailyStats.bestDay?.date ?? null, 'dayMonth')}
+          hint={fmt.date(dailyStats.bestDay?.date ?? null, 'dayMonth')}
         />
       </div>
 

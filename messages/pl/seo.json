@@ -1,0 +1,14 @@
+{
+  "site": {
+    "title": "TimeTracker — rejestr czasu pracy, faktury i rozliczenia dla freelancerów",
+    "description": "TimeTracker to system do rejestracji czasu pracy, wystawiania faktur i rozliczania projektów dla freelancerów oraz małych firm. Rozliczaj klientów szybciej i bez błędów.",
+    "keywords": "rejestr czasu pracy, time tracker, ewidencja czasu pracy, faktury dla freelancerów, rozliczanie projektów, aplikacja do fakturowania, ewidencja godzin"
+  },
+  "landing": {
+    "title": "TimeTracker — czas, rozliczony.",
+    "description": "Zapisuj każdą godzinę, zamień ewidencję w fakturę i pozwól automatowi wypełnić kalendarz — pulpit, projekty, faktury i raporty w jednym miejscu."
+  },
+  "app": {
+    "titleTemplate": "{section} · TimeTracker"
+  }
+}

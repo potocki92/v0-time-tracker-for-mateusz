@@ -1,0 +1,185 @@
+{
+  "nav": {
+    "aria": "Główna",
+    "product": "Produkt",
+    "automation": "Automatyzacja",
+    "flow": "Jak to działa",
+    "signIn": "Zaloguj się",
+    "openApp": "Otwórz aplikację"
+  },
+  "hero": {
+    "titleLine1": "Każda godzina.",
+    "titleLine2": "Rozliczona.",
+    "lead": "TimeTracker zapisuje dni, w których naprawdę pracujesz, zamienia je w fakturę i pokazuje, ile był wart miesiąc.",
+    "ctaPrimary": "Otwórz aplikację",
+    "ctaSecondary": "Zobacz, jak to działa",
+    "frameLabel": "Pulpit aplikacji TimeTracker: godziny tygodnia, zarobki, wykres, projekty i faktury"
+  },
+  "journey": {
+    "heading": "Przewiń przez produkt",
+    "frameLabel": "Interfejs TimeTrackera: pulpit, kalendarz, projekty, faktura i raporty",
+    "scenes": {
+      "dashboard": {
+        "title": "Wiedz, na co poszedł Twój czas.",
+        "body": "Godziny tego tygodnia na tle celu, ile są warte, które projekty idą do przodu i które faktury wciąż czekają na zapłatę.",
+        "label": "Pulpit: godziny tygodnia, zarobki, wykres, projekty i faktury"
+      },
+      "calendar": {
+        "title": "Twoja praca, dzień po dniu.",
+        "body": "Jeden wpis na dzień — godziny, klient, stawka, status. Praca, dzień wolny, urlop i zwolnienie leżą na tej samej siatce.",
+        "label": "Kalendarz: siatka września 2026 z godzinami i kwotami"
+      },
+      "projects": {
+        "title": "Każda godzina wie, do kogo należy.",
+        "body": "Klient niesie stawkę, projekt niesie budżet. Zmień stawkę, a stara zostaje przy godzinach, na których została zarobiona.",
+        "label": "Projekty i klienci: budżety, godziny i stawki"
+      },
+      "invoices": {
+        "title": "Zamień pracę w fakturę.",
+        "body": "Wybierz okres, a ewidencja czasu staje się pozycjami faktury — ilość, stawka, VAT, numeracja, PDF.",
+        "label": "Faktura zbudowana z godzin miesiąca"
+      },
+      "reports": {
+        "title": "Zobacz, ile był wart miesiąc.",
+        "body": "Godziny na projekt, na klienta, na miesiąc — z eksportem CSV i PDF, gdy poprosi księgowa.",
+        "label": "Raporty: wykres godzin i podział na projekty"
+      }
+    }
+  },
+  "flow": {
+    "eyebrow": "Od pracy do pieniędzy",
+    "heading": "Od pracy do pieniędzy",
+    "today": "Dzisiaj · {project}",
+    "toInvoice": "Do wystawienia",
+    "invoiceReady": "Faktura gotowa"
+  },
+  "automation": {
+    "eyebrow": "Automatyzacja",
+    "heading": "Kalendarz może wypełnić się sam.",
+    "lead": "Podaj TimeTrackerowi swój tydzień i wyjazdy. Zapisze godziny, które naprawdę przepracowałeś — i pominie niedziele oraz tygodnie spędzone w domu.",
+    "scheduleTitle": "Grafik tygodnia",
+    "dayOff": "wolne",
+    "presenceTitle": "Obecność",
+    "presence": {
+      "trip": "Wyjazd",
+      "home": "Pobyt w domu"
+    },
+    "outcome": "{hours} · {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
+    "skipReasons": {
+      "before_start": "Przed datą uruchomienia automatu",
+      "home_stay": "Pobyt w domu",
+      "weekday_off": "Dzień tygodnia wyłączony w grafiku",
+      "entry_exists": "Wpis na ten dzień już istnieje",
+      "automation_disabled": "Automat był wtedy wyłączony",
+      "not_due_yet": "Przed godziną zapisu",
+      "already_decided": "Dzień już rozstrzygnięty",
+      "unknown_settings": "Brak historii ustawień — rozstrzygnij ręcznie"
+    }
+  },
+  "everything": {
+    "eyebrow": "Cała reszta",
+    "heading": "Zbudowane pod pracę na swoim.",
+    "items": {
+      "dayEntries": { "title": "Wpisy dzienne", "body": "Godziny albo ilość akordowa, status, notatki, tagi — jeden dialog na dzień." },
+      "clientRates": { "title": "Stawki klientów", "body": "Historia stawek z datami obowiązywania; przeszłe godziny zachowują stawkę, na której zostały zarobione." },
+      "projectBudgets": { "title": "Budżety projektów", "body": "Budżet, wykorzystanie, termin i status przy każdym projekcie." },
+      "invoiceBuilder": { "title": "Builder faktur", "body": "Pozycje, dane nabywcy, VAT, serie numeracji i trzy szablony." },
+      "reports": { "title": "Raporty i eksport", "body": "Filtry zakresu, porównanie z poprzednim okresem, eksport CSV i PDF." },
+      "workAutomation": { "title": "Automat zapisu pracy", "body": "Grafik tygodnia plus wyjazdy — kalendarz sam wpisuje przepracowane dni." },
+      "weeklyEmail": { "title": "Skrót tygodnia mailem", "body": "Zamknięty tydzień, wysłany na Twoją skrzynkę." },
+      "currencies": { "title": "PLN i EUR", "body": "Stawki w obu walutach, przeliczane tam, gdzie liczby muszą się spotkać." },
+      "themes": { "title": "Motywy", "body": "Pięć palet kolorów, jasna i ciemna." }
+    }
+  },
+  "finalCta": {
+    "heading": "Włącz licznik. Reszta pójdzie sama.",
+    "primary": "Otwórz aplikację",
+    "secondary": "Załóż konto"
+  },
+  "footer": {
+    "aria": "Stopka",
+    "tagline": "Licznik, kalendarz i faktura w jednym miejscu.",
+    "signIn": "Zaloguj się",
+    "openApp": "Otwórz aplikację",
+    "github": "GitHub"
+  },
+  "app": {
+    "search": "Szukaj…",
+    "pinned": "Przypięte",
+    "dashboard": {
+      "dateline": "{weekday} · {date} · {week}",
+      "hours": "Godziny",
+      "hoursMeta": "Cel {target} · seria {days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
+      "earnings": "Zarobki",
+      "earningsMeta": "Ten tydzień",
+      "effectiveRate": "Stawka efektywna",
+      "perHour": "za godzinę",
+      "invoices": "Faktury",
+      "invoicesMeta": "1 szkic · 2 wysłane",
+      "ranges": { "week": "Tydzień", "month": "Miesiąc", "year": "Rok" },
+      "currentProjects": "Aktualne projekty",
+      "toInvoice": "{amount} do wystawienia",
+      "addToday": "Dodaj dziś: {hours}",
+      "startTimer": "Uruchom timer"
+    },
+    "calendar": {
+      "views": { "grid": "Siatka", "list": "Lista" },
+      "hours": "Godziny",
+      "workedDays": "Dni robocze",
+      "workedDaysMeta": "z wpisem",
+      "earnings": "Zarobki",
+      "streak": "Seria",
+      "streakValue": "{days, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
+      "streakMeta": "z rzędu",
+      "statusesTitle": "Statusy",
+      "statuses": {
+        "worked": "Pracowałem",
+        "notWorked": "Nie pracowałem",
+        "vacation": "Urlop",
+        "sick": "L4",
+        "dayOff": "Dzień wolny"
+      }
+    },
+    "projects": {
+      "all": "Wszystkie",
+      "allMeta": "1 zaplanowany",
+      "inProgress": "W trakcie",
+      "completed": "Zakończone",
+      "shareOfTotal": "{percent} całości",
+      "clients": "Klienci",
+      "clientsMeta": "2 godzinowi · 1 akordowy",
+      "allProjects": "Wszystkie projekty",
+      "budget": "budżet {percent}",
+      "table": { "name": "Nazwa", "billing": "Rozliczenie", "rate": "Stawka" },
+      "billing": { "hourly": "Godzinowe", "piecework": "Akordowe" },
+      "status": { "planned": "Zaplanowany", "in_progress": "W trakcie", "completed": "Zakończony" }
+    },
+    "invoice": {
+      "period": "Okres: {period}",
+      "issuedAndDue": "Wystawiona {issued} · termin {due}",
+      "seller": "Sprzedawca",
+      "buyer": "Nabywca",
+      "table": { "description": "Opis", "quantity": "Ilość", "price": "Cena", "value": "Wartość" },
+      "lineNote": "Prace wg ewidencji czasu · {period}",
+      "net": "Netto",
+      "vat": "VAT {rate} · {note}",
+      "vatNote": "Odwrotne obciążenie",
+      "total": "Razem do zapłaty",
+      "status": { "draft": "Szkic", "sent": "Wysłana", "paid": "Opłacona" }
+    },
+    "reports": {
+      "ranges": { "d7": "7 dni", "d30": "30 dni", "d90": "90 dni" },
+      "exportCsv": "Eksport CSV",
+      "pdf": "PDF",
+      "hours": "Godziny",
+      "revenue": "Przychód",
+      "revenueMeta": "wg stawek klientów",
+      "avgPerDay": "Śr. na dzień",
+      "workingDays": "{days, plural, one {# dzień roboczy} few {# dni robocze} many {# dni roboczych} other {# dnia roboczego}}",
+      "rate": "Stawka",
+      "perHour": "za godzinę",
+      "monthlyHours": "Godziny w miesiącu",
+      "byProject": "Podział na projekty"
+    }
+  }
+}

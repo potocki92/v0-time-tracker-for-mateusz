@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Play, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { formatHours } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getTodayLocalDateString } from '@/lib/helpers'
 import { useTimerStore } from '@/hooks/stores/useTimerStore'
 import { useTrips } from '@/features/trips'
@@ -22,6 +22,7 @@ import { useEffectiveEurRate } from '../hooks/usePreferencesStore'
  * logowania od nowa: prowadzi do formularza dnia w Kalendarzu (`?day=`).
  */
 export function HeroToday() {
+  const fmt = useFormat()
   const workEntries = useDashboardSlice(selectWorkEntries)
   const clients = useDashboardSlice(selectClients)
   const eurRate = useEffectiveEurRate()
@@ -45,7 +46,7 @@ export function HeroToday() {
       {/* Bez datownika: powitanie nad Pulpitem pokazuje juz „PONIEDZIALEK ·
           07 WRZ 2026 · KW 37/2026", a tytul sekcji niesie naglowek nad karta. */}
       <p className="text-3xl font-semibold leading-[1.15] tabular-nums text-white sm:text-4xl">
-        {glance.hours > 0 ? formatHours(glance.hours) : 'Brak wpisu na dziś'}
+        {glance.hours > 0 ? fmt.hours(glance.hours) : 'Brak wpisu na dziś'}
       </p>
 
       <div className="mt-2 flex flex-wrap items-center gap-2 text-2xs text-zinc-400 sm:text-xs">
@@ -70,7 +71,7 @@ export function HeroToday() {
         {/* min-h-[44px]: to jest najczesciej dotykany przycisk w calej aplikacji. */}
         <Button asChild variant="accent" className="min-h-[44px]">
           <Link href={`/calendar?day=${today}`}>
-            Dodaj dziś: {formatHours(glance.normHours, { decimals: 0 })}
+            Dodaj dziś: {fmt.hours(glance.normHours, { decimals: 0 })}
             {glance.defaultClientName ? ` · ${glance.defaultClientName}` : ''}
           </Link>
         </Button>

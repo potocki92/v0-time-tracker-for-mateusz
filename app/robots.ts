@@ -1,5 +1,18 @@
 import type { MetadataRoute } from 'next'
+
+import { APP_LOCALES, DEFAULT_LOCALE } from '@/i18n/config'
 import { SITE, absoluteUrl } from '@/lib/seo/site'
+
+/** Segmenty wymagajace sesji — nie maja czego szukac w indeksie. */
+const PRIVATE_SEGMENTS = [
+  'auth',
+  'dashboard',
+  'calendar',
+  'invoices',
+  'clients',
+  'projects',
+  'settings',
+] as const
 
 /**
  * Dynamiczny /robots.txt — zgodny z Next.js App Router.
@@ -20,15 +33,16 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: ['/'],
+        // Strefa prywatna jest wycieta w KAZDEJ wersji jezykowej — bez
+        // prefiksu (pl) i z prefiksem (`/de/dashboard`, `/en/auth/...`).
         disallow: [
           '/api/',
-          '/auth/',
-          '/dashboard/',
-          '/calendar/',
-          '/invoices/',
-          '/clients/',
-          '/projects/',
-          '/settings/',
+          ...PRIVATE_SEGMENTS.flatMap((segment) => [
+            `/${segment}/`,
+            ...APP_LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map(
+              (locale) => `/${locale}/${segment}/`,
+            ),
+          ]),
           '/_next/',
           '/*?*',
         ],

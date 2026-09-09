@@ -23,20 +23,22 @@ describe('cache formatterów', () => {
 
   it('1000 wywołań formatMoney tworzy dokładnie jedną instancję Intl.NumberFormat', async () => {
     const spy = countConstructions('NumberFormat')
-    const { formatMoney } = await import('@/lib/format')
+    const { createFormat } = await import('@/lib/format')
+    const fmt = createFormat('pl')
 
-    for (let i = 0; i < 1000; i += 1) formatMoney(i * 100, 'PLN')
+    for (let i = 0; i < 1000; i += 1) fmt.money(i * 100, 'PLN')
 
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
   it('1000 wywołań formatDate tworzy dokładnie jedną instancję Intl.DateTimeFormat', async () => {
     const spy = countConstructions('DateTimeFormat')
-    const { formatDate } = await import('@/lib/format')
+    const { createFormat } = await import('@/lib/format')
+    const fmt = createFormat('pl')
 
     for (let i = 1; i <= 28; i += 1) {
       for (let repeat = 0; repeat < 36; repeat += 1) {
-        formatDate(`2026-08-${String(i).padStart(2, '0')}`, 'short')
+        fmt.date(`2026-08-${String(i).padStart(2, '0')}`, 'short')
       }
     }
 

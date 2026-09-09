@@ -11,7 +11,7 @@ import {
 } from 'recharts'
 import { useMemo } from 'react'
 import { ChartContainer, ChartTooltip as ShadTooltip, type ChartConfig } from '@/components/ui/chart'
-import { formatHours } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { ChartTooltip } from './ChartTooltip'
 
 // Kolory z tokenow motywu, nie z literalow oklch: panel ma piec palet
@@ -52,6 +52,7 @@ function withRollingAverage(data: DataItem[]) {
 }
 
 export function ChartBars({ data, avgHours, isYearDaily }: Props) {
+  const fmt = useFormat()
   const enriched = useMemo(() => withRollingAverage(data), [data])
   const showRolling = data.length >= 7
   const showBrush = data.length > 14
@@ -68,7 +69,7 @@ export function ChartBars({ data, avgHours, isYearDaily }: Props) {
           </defs>
           <CartesianGrid vertical={false} stroke={GRID} strokeDasharray="4 6" />
           <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} minTickGap={isYearDaily ? 40 : 18} tick={{ fontSize: 11, fill: AXIS }} />
-          <YAxis tickLine={false} axisLine={false} width={36} tick={{ fontSize: 11, fill: AXIS }} tickFormatter={(v) => formatHours(v)} />
+          <YAxis tickLine={false} axisLine={false} width={36} tick={{ fontSize: 11, fill: AXIS }} tickFormatter={(v) => fmt.hours(v)} />
           {avgHours > 0 && (
             <ReferenceLine
               y={avgHours}
@@ -97,7 +98,7 @@ export function ChartBars({ data, avgHours, isYearDaily }: Props) {
           {data.map((d) => (
             <tr key={d.date || d.label}>
               <th scope="row">{d.label}</th>
-              <td>{formatHours(d.hours)}</td>
+              <td>{fmt.hours(d.hours)}</td>
             </tr>
           ))}
         </tbody>

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
-import { WORKSPACE_GROUP_LABELS, WORKSPACE_SECTIONS, sectionHref } from '../lib/workspace/sections'
+import navigation from '../messages/pl/navigation.json'
+import { WORKSPACE_SECTIONS, sectionHref } from '../lib/workspace/sections'
 
 /**
  * Ujednolicony naglowek obszaru roboczego.
@@ -36,8 +37,10 @@ for (const section of ROUTED_SECTIONS) {
     await expect(page.getByTestId('workspace-breadcrumb')).toHaveCount(1)
 
     const breadcrumb = page.getByTestId('workspace-breadcrumb')
-    await expect(breadcrumb).toContainText(WORKSPACE_GROUP_LABELS[section.group])
-    await expect(breadcrumb).toContainText(section.label)
+    // E2E jedzie na jezyku bazowym (`/dashboard`, bez prefiksu), wiec
+    // porownujemy z polskimi komunikatami — tym samym plikiem, co produkcja.
+    await expect(breadcrumb).toContainText(navigation.groups[section.group])
+    await expect(breadcrumb).toContainText(navigation.sections[section.segment])
 
     expect(errors, `bledy konsoli na ${sectionHref(section)}:\n${errors.join('\n')}`).toEqual([])
   })

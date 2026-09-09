@@ -1,0 +1,20 @@
+{
+  "AUTH_INVALID_CREDENTIALS": "Nieprawidłowy email lub hasło",
+  "AUTH_SIGN_UP_FAILED": "Nie udało się utworzyć konta. Spróbuj ponownie.",
+  "INVALID_ACCOUNT_SETTINGS": "Nieprawidłowe dane profilu",
+  "INVALID_INVOICE_SETTINGS": "Nieprawidłowe ustawienia faktur",
+  "INVALID_WEEKLY_SUMMARY_SETTINGS": "Nieprawidłowe ustawienia skrótu tygodnia",
+  "INVALID_AVATAR_FILE": "Nieprawidłowy plik",
+  "ACCOUNT_PROFILE_SAVE_FAILED": "Nie udało się zapisać profilu",
+  "INVOICE_SETTINGS_SAVE_FAILED": "Nie udało się zapisać ustawień faktur",
+  "WEEKLY_SUMMARY_LOAD_FAILED": "Nie udało się pobrać ustawień skrótu tygodnia",
+  "WEEKLY_SUMMARY_SAVE_FAILED": "Nie udało się zapisać ustawień skrótu tygodnia",
+  "WEEKLY_SUMMARY_NO_RECIPIENT": "Najpierw zapisz adres e-mail odbiorcy",
+  "WEEKLY_SUMMARY_EMPTY": "Brak przepracowanych dni w tym tygodniu — nie ma czego wysłać",
+  "AVATAR_UPLOAD_FAILED": "Nie udało się wgrać pliku",
+  "AVATAR_SAVE_FAILED": "Nie udało się zapisać avatara",
+  "AVATAR_URL_FAILED": "Nie udało się wygenerować adresu avatara",
+  "AUTOMATION_CLIENTS_LOAD_FAILED": "Nie udało się pobrać klientów dla auto-fakturowania",
+  "LOCALE_SAVE_FAILED": "Nie udało się zapisać języka interfejsu",
+  "UNKNOWN": "Coś poszło nie tak. Spróbuj ponownie."
+}

@@ -11,6 +11,8 @@ import {
 import { buildWeeklySummary, type ContractorBlock } from '../../../lib/weekly-summary'
 import { getWeekStart } from '@/lib/date/week'
 import { WeeklySummaryModal } from './WeeklySummaryModal'
+import type { AppFormat } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { formatDate, formatHours, formatRate, formatTotals } from './presentation'
 
 /**
@@ -20,6 +22,7 @@ import { formatDate, formatHours, formatRate, formatTotals } from './presentatio
  * (druk/PDF, kopiowanie, nawigacja ◀/▶ po poprzednich tygodniach).
  */
 export function WeeklySummarySection() {
+  const fmt = useFormat()
   const workEntries = useDashboardSlice(selectWorkEntries)
   const clients = useDashboardSlice(selectClients)
   const projects = useDashboardSlice(selectProjects)
@@ -33,8 +36,8 @@ export function WeeklySummarySection() {
   }, [weekOffset])
 
   const summary = useMemo(
-    () => buildWeeklySummary(workEntries, clients, weekStart, undefined, projects),
-    [workEntries, clients, projects, weekStart],
+    () => buildWeeklySummary(fmt, workEntries, clients, weekStart, undefined, projects),
+    [fmt, workEntries, clients, projects, weekStart],
   )
 
   return (
@@ -69,7 +72,7 @@ export function WeeklySummarySection() {
       ) : (
         <ul role="list" className="divide-y divide-hairline">
           {summary.contractors.map((block) => (
-            <ContractorRow key={block.clientId ?? '__unassigned__'} block={block} />
+            <ContractorRow fmt={fmt} key={block.clientId ?? '__unassigned__'} block={block} />
           ))}
         </ul>
       )}
@@ -86,19 +89,19 @@ export function WeeklySummarySection() {
   )
 }
 
-function ContractorRow({ block }: { block: ContractorBlock }) {
+function ContractorRow({ fmt, block }: { fmt: AppFormat; block: ContractorBlock }) {
   return (
     <li className="px-4 py-3">
       <div className="flex items-baseline justify-between gap-3">
         <p className="truncate text-xs font-semibold text-white">{block.clientName}</p>
-        <p className="shrink-0 text-xs tabular-nums text-zinc-300">{formatTotals(block)}</p>
+        <p className="shrink-0 text-xs tabular-nums text-zinc-300">{formatTotals(fmt, block)}</p>
       </div>
       <p className="mt-0.5 truncate text-2xs text-zinc-400">
-        {formatDate(block.workedFrom)} – {formatDate(block.workedTo)} ({block.workedDaysCount} dni)
+        {formatDate(fmt, block.workedFrom)} – {formatDate(fmt, block.workedTo)} ({block.workedDaysCount} dni)
         {' · '}
-        {formatHours(block.totalHours)}
+        {formatHours(fmt, block.totalHours)}
         {' · '}
-        {block.rates.map(formatRate).join(', ')}
+        {block.rates.map((rate) => formatRate(fmt, rate)).join(', ')}
       </p>
     </li>
   )

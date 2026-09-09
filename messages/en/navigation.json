@@ -1,0 +1,67 @@
+{
+  "groups": {
+    "workspace": "Workspace",
+    "stats": "Insights",
+    "automation": "Automation"
+  },
+  "sections": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "projects": "Projects",
+    "clients": "Clients",
+    "invoices": "Invoices",
+    "reports": "Reports",
+    "goals": "Goals",
+    "earnings": "Earnings",
+    "ai-assistant": "AI assistant",
+    "integrations": "Integrations",
+    "automations": "Automations"
+  },
+  "nested": {
+    "invoices/analytics": "Analytics"
+  },
+  "badges": {
+    "beta": "Beta",
+    "new": "New",
+    "integrations": "Slack · Trello"
+  },
+  "quickActions": {
+    "addProject": "Add project",
+    "addClient": "Add client"
+  },
+  "pinned": "Pinned",
+  "search": "Search…",
+  "skipToContent": "Skip to content",
+  "skipToMain": "Skip to main content",
+  "mainNavigation": "Main navigation",
+  "userMenu": {
+    "label": "User menu",
+    "settings": "Settings",
+    "logout": "Sign out",
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "modeLight": "Light mode",
+      "modeDark": "Dark mode",
+      "modeSystem": "System mode"
+    },
+    "profile": "Profile"
+  },
+  "localeSwitcher": {
+    "label": "Interface language",
+    "current": "Current language: {locale}",
+    "choose": "Choose language"
+  },
+  "header": {
+    "aria": "Workspace header",
+    "breadcrumb": "Breadcrumb",
+    "notifications": "Notifications",
+    "timerStart": "Start tracking",
+    "timerStop": "Stop tracking"
+  },
+  "tracker": {
+    "defaultLabel": "Time tracking"
+  }
+}

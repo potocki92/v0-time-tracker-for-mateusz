@@ -3,6 +3,7 @@
 import type { ComponentType } from 'react'
 import { Check, Monitor, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { COLOR_THEMES, type ColorTheme, type ColorThemeId } from '@/lib/themes/color-themes'
 import {
@@ -12,14 +13,14 @@ import {
 
 type ModeOption = {
   id: 'light' | 'dark' | 'system'
-  label: string
   icon: ComponentType<{ className?: string }>
 }
 
+/** Etykiety ida z `settings.appearance.modes.<id>`. */
 const MODE_OPTIONS: readonly ModeOption[] = [
-  { id: 'light', label: 'Jasny', icon: Sun },
-  { id: 'dark', label: 'Ciemny', icon: Moon },
-  { id: 'system', label: 'Systemowy', icon: Monitor },
+  { id: 'light', icon: Sun },
+  { id: 'dark', icon: Moon },
+  { id: 'system', icon: Monitor },
 ] as const
 
 /**
@@ -115,6 +116,7 @@ function ThemeCard({
 }
 
 export function AppearanceSettings() {
+  const t = useTranslations('settings.appearance')
   const activeTheme = useColorTheme()
   const setColorTheme = useSetColorTheme()
   const { theme: mode, setTheme: setMode } = useTheme()
@@ -122,19 +124,17 @@ export function AppearanceSettings() {
   return (
     <section className="space-y-5 rounded-xl border p-4">
       <header>
-        <h3 className="text-sm font-semibold">Wygląd aplikacji</h3>
-        <p className="text-xs text-muted-foreground">
-          Wybierz paletę kolorów oraz tryb jasny/ciemny. Zmiany są natychmiastowe.
-        </p>
+        <h3 className="text-sm font-semibold">{t('title')}</h3>
+        <p className="text-xs text-muted-foreground">{t('description')}</p>
       </header>
 
       {/* Tryb jasny / ciemny / systemowy */}
       <div
         role="radiogroup"
-        aria-label="Tryb kolorów"
+        aria-label={t('modeGroup')}
         className="grid grid-cols-3 gap-2"
       >
-        {MODE_OPTIONS.map(({ id, label, icon: Icon }) => {
+        {MODE_OPTIONS.map(({ id, icon: Icon }) => {
           const selected = mode === id
           return (
             <button
@@ -152,7 +152,7 @@ export function AppearanceSettings() {
               )}
             >
               <Icon className="h-4 w-4" aria-hidden="true" />
-              <span>{label}</span>
+              <span>{t(`modes.${id}`)}</span>
             </button>
           )
         })}
@@ -163,7 +163,7 @@ export function AppearanceSettings() {
         <p className="text-xs font-medium text-muted-foreground">Motyw kolorystyczny</p>
         <div
           role="radiogroup"
-          aria-label="Motyw kolorystyczny"
+          aria-label={t('themeGroup')}
           className="grid grid-cols-1 gap-3 sm:grid-cols-2"
         >
           {COLOR_THEMES.map((theme) => (

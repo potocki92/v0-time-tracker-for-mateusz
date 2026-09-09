@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { UNASSIGNED_PROJECT_ID } from '@/lib/metrics/adapter'
-import { formatIsoWeekShort } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { isoWeekKey } from '@/lib/metrics/period'
 import type { MonthMetrics } from '@/lib/metrics/types'
 import type { Client, Project, WorkEntry } from '@/lib/types'
@@ -35,15 +35,16 @@ export function useCalendarInsights({
   projects,
   eurRate,
 }: Args): CalendarInsights {
+  const fmt = useFormat()
   const weekly = useMemo<WeeklyHoursBar[]>(() => {
     const currentWeek = isoWeekKey(metrics.today)
     return metrics.byWeek.map((week) => ({
       key: week.isoWeek,
-      label: formatIsoWeekShort(week.isoWeek),
+      label: fmt.isoWeekShort(week.isoWeek),
       hours: week.hours,
       isCurrent: week.isoWeek === currentWeek,
     }))
-  }, [metrics.byWeek, metrics.today])
+  }, [fmt, metrics.byWeek, metrics.today])
 
   const weeklyAggregates = useMemo(() => {
     const active = weekly.filter((w) => w.hours > 0)

@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { formatDate, formatHours, formatWeekday } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 
 import {
@@ -37,6 +37,7 @@ function reasonLabel(record: RunDecisionRecord): string {
  * ktora wykona zadanie serwerowe.
  */
 export function WorkAutomationStatus({ overview, isResuming, onResume }: Props) {
+  const fmt = useFormat()
   const { settings, presence, preview, recentRuns, nextRun, today } = overview
   const [resumeDate, setResumeDate] = useState(today)
 
@@ -49,7 +50,7 @@ export function WorkAutomationStatus({ overview, isResuming, onResume }: Props) 
           <dt className="text-xs text-muted-foreground">Najbliższy zapis</dt>
           <dd className="text-sm font-medium">
             {nextRun
-              ? `${formatWeekday(nextRun.date, 'long')}, ${formatDate(nextRun.date, 'dayMonthLong')}, ${nextRun.time}`
+              ? `${fmt.weekday(nextRun.date, 'long')}, ${fmt.date(nextRun.date, 'dayMonthLong')}, ${nextRun.time}`
               : 'Automat wyłączony'}
           </dd>
         </div>
@@ -100,7 +101,7 @@ export function WorkAutomationStatus({ overview, isResuming, onResume }: Props) 
           {preview.map((day) => (
             <li key={day.date} className="flex items-center justify-between gap-3 px-3 py-2">
               <span className="text-sm">
-                {formatWeekday(day.date, 'short')} {formatDate(day.date, 'dayMonth')}
+                {fmt.weekday(day.date, 'short')} {fmt.date(day.date, 'dayMonth')}
               </span>
               <span
                 className={cn(
@@ -110,7 +111,7 @@ export function WorkAutomationStatus({ overview, isResuming, onResume }: Props) 
               >
                 {day.hours === null
                   ? (day.reason ? SKIP_REASON_LABELS[day.reason] : 'Brak zapisu')
-                  : formatHours(day.hours)}
+                  : fmt.hours(day.hours)}
               </span>
             </li>
           ))}
@@ -128,7 +129,7 @@ export function WorkAutomationStatus({ overview, isResuming, onResume }: Props) 
                 key={record.localDate}
                 className="flex items-center justify-between gap-3 px-3 py-2"
               >
-                <span className="text-sm">{formatDate(record.localDate, 'short')}</span>
+                <span className="text-sm">{fmt.date(record.localDate, 'short')}</span>
                 <span
                   className={cn(
                     'text-right text-xs',
@@ -136,7 +137,7 @@ export function WorkAutomationStatus({ overview, isResuming, onResume }: Props) 
                   )}
                 >
                   {reasonLabel(record)}
-                  {record.hours !== null && ` · ${formatHours(record.hours)}`}
+                  {record.hours !== null && ` · ${fmt.hours(record.hours)}`}
                 </span>
               </li>
             ))}

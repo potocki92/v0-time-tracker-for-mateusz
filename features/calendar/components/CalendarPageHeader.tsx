@@ -2,7 +2,7 @@
 
 import { CalendarDays } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
-import { formatMonthTitle } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getMonthKey } from '@/lib/helpers'
 
 interface Props {
@@ -23,6 +23,7 @@ export function CalendarPageHeader({
   workDays,
   totalEntries,
 }: Props) {
+  const fmt = useFormat()
   return (
     // `top-14 z-20`: nad tym paskiem stoi przyklejony WorkspaceHeader (h-14, z-30).
     <div className="sticky top-14 z-20 border-b border-hairline bg-surface-0/80 backdrop-blur-sm">
@@ -37,7 +38,7 @@ export function CalendarPageHeader({
         <Separator orientation="vertical" className="h-5 bg-hairline" />
 
         <span className="truncate text-xs text-zinc-400">
-          {formatMonthTitle(getMonthKey(currentYear, currentMonth))}
+          {fmt.monthTitle(getMonthKey(currentYear, currentMonth))}
         </span>
 
         <div className="ml-auto flex items-center gap-2 text-2xs text-zinc-400">

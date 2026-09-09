@@ -1,6 +1,6 @@
 import { Banknote, Bot, CalendarDays, Clock, FileText, Layers } from 'lucide-react'
 import type { Client, CURRENCY, WorkEntry } from '@/lib/types'
-import { formatDate, formatMoney } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import { STATUS_CONFIG } from '../../domain/calendar.constants'
 import type { WorkStatus } from '../../domain/calendar.types'
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export function DayCellTooltip({ entry, client, earnings }: Props) {
+  const fmt = useFormat()
   const cfg = STATUS_CONFIG[entry.status as WorkStatus]
 
   return (
@@ -22,7 +23,7 @@ export function DayCellTooltip({ entry, client, earnings }: Props) {
       <div className="flex items-center gap-2 border-b bg-muted/50 px-3 py-2">
         <CalendarDays className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
         <span className="font-medium text-foreground">
-          {formatDate(entry.date, 'long')}
+          {fmt.date(entry.date, 'long')}
         </span>
         <span className={cn('ml-auto rounded px-1.5 py-0.5 text-2xs font-semibold', cfg?.pill)}>
           {cfg?.label}
@@ -78,14 +79,14 @@ export function DayCellTooltip({ entry, client, earnings }: Props) {
             <Banknote className="h-3 w-3 shrink-0" />
             <span>
               <span className="font-semibold text-foreground">
-                {formatMoney(
+                {fmt.money(
                   Math.round(earnings.amount * 100),
                   earnings.currency as CURRENCY,
                 )}
               </span>
               {earnings.currency !== 'PLN' && (
                 <span className="text-2xs text-muted-foreground ml-1">
-                  ≈ {formatMoney(Math.round(earnings.amountInPLN * 100), 'PLN')}
+                  ≈ {fmt.money(Math.round(earnings.amountInPLN * 100), 'PLN')}
                 </span>
               )}
             </span>

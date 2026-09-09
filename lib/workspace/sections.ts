@@ -8,11 +8,12 @@
 
 export type WorkspaceGroup = 'workspace' | 'stats' | 'automation'
 
-export const WORKSPACE_GROUP_LABELS: Record<WorkspaceGroup, string> = {
-  workspace: 'Obszar roboczy',
-  stats: 'Statystyki',
-  automation: 'Automatyzacja',
-}
+/**
+ * Etykiety NIE mieszkaja w rejestrze — rejestr jest strukturą, a nie copy.
+ * Nazwy grup i sekcji stoja w `messages/<locale>/navigation.json` pod
+ * kluczami `groups.<group>` i `sections.<segment>`; konsument tlumaczy je
+ * przez `useTranslations('navigation')`.
+ */
 
 /**
  * Segmenty sciezek panelu. Unia stoi obok tablicy celowo: dopisanie sekcji bez
@@ -33,42 +34,43 @@ export type WorkspaceSegment =
   | 'automations'
 
 export interface WorkspaceSection {
-  /** Pierwszy segment sciezki panelu, np. "projects". */
+  /**
+   * Pierwszy segment sciezki panelu, np. "projects". Jest jednoczesnie
+   * KLUCZEM tlumaczenia (`navigation.sections.<segment>`).
+   */
   segment: WorkspaceSegment
-  label: string
   group: WorkspaceGroup
   /**
-   * Czy sekcja ma wlasna trase w `app/(app)`. `false` = pozycja zapowiedziana
+   * Czy sekcja ma wlasna trase w `app/[locale]/(app)`. `false` = pozycja zapowiedziana
    * w sidebarze, prowadzaca do kotwicy `#segment` zamiast do strony.
    */
   routed: boolean
   /** Skrot klawiszowy pokazywany w sidebarze. */
   shortcut?: string
-  /** Etykieta wskaznika w sidebarze (np. "Beta"). */
-  badge?: string
+  /** Klucz wskaznika w sidebarze — `navigation.badges.<badge>`. */
+  badge?: 'beta' | 'new' | 'integrations'
 }
 
 export const WORKSPACE_SECTIONS: readonly WorkspaceSection[] = [
-  { segment: 'dashboard',    label: 'Pulpit',        group: 'workspace',  routed: true,  shortcut: 'D' },
-  { segment: 'calendar',     label: 'Kalendarz',     group: 'workspace',  routed: true,  shortcut: 'C' },
-  { segment: 'projects',     label: 'Projekty',      group: 'workspace',  routed: true,  shortcut: 'P' },
-  { segment: 'clients',      label: 'Klienci',       group: 'workspace',  routed: true },
-  { segment: 'invoices',     label: 'Faktury',       group: 'workspace',  routed: true,  shortcut: 'I' },
-  { segment: 'reports',      label: 'Raporty',       group: 'stats',      routed: true },
-  { segment: 'goals',        label: 'Cele',          group: 'stats',      routed: false },
-  { segment: 'earnings',     label: 'Zarobki',       group: 'stats',      routed: false },
-  { segment: 'ai-assistant', label: 'Asystent AI',   group: 'stats',      routed: false, badge: 'Beta' },
-  { segment: 'integrations', label: 'Integracje',    group: 'automation', routed: false, badge: 'Slack · Trello' },
-  { segment: 'automations',  label: 'Automatyzacje', group: 'automation', routed: false, badge: 'Nowość' },
+  { segment: 'dashboard',    group: 'workspace',  routed: true,  shortcut: 'D' },
+  { segment: 'calendar',     group: 'workspace',  routed: true,  shortcut: 'C' },
+  { segment: 'projects',     group: 'workspace',  routed: true,  shortcut: 'P' },
+  { segment: 'clients',      group: 'workspace',  routed: true },
+  { segment: 'invoices',     group: 'workspace',  routed: true,  shortcut: 'I' },
+  { segment: 'reports',      group: 'stats',      routed: true },
+  { segment: 'goals',        group: 'stats',      routed: false },
+  { segment: 'earnings',     group: 'stats',      routed: false },
+  { segment: 'ai-assistant', group: 'stats',      routed: false, badge: 'beta' },
+  { segment: 'integrations', group: 'automation', routed: false, badge: 'integrations' },
+  { segment: 'automations',  group: 'automation', routed: false, badge: 'new' },
 ]
 
 /**
  * Trasy zagniezdzone, ktorych ostatni segment nie jest nazwa encji — tam
- * surowy segment z URL-a bylby zla etykieta breadcrumba.
+ * surowy segment z URL-a bylby zla etykieta breadcrumba. Wartosc jest
+ * KLUCZEM `navigation.nested.<key>`.
  */
-const NESTED_LABELS: Record<string, string> = {
-  'invoices/analytics': 'Analityka',
-}
+const NESTED_LABEL_KEYS = ['invoices/analytics'] as const
 
 const pathSegments = (pathname: string) =>
   pathname.split(/[?#]/)[0].split('/').filter(Boolean)
@@ -90,17 +92,27 @@ export function resolveSection(pathname: string): WorkspaceSection | undefined {
 }
 
 /**
- * Trzeci czlon breadcrumba dla trasy zagniezdzonej — nazwa encji z URL-a
- * albo etykieta z `NESTED_LABELS`. `undefined` na trasie sekcji.
+ * Trzeci czlon breadcrumba dla trasy zagniezdzonej.
+ *
+ * Zwraca albo `{ key }` — klucz tlumaczenia z `navigation.nested` — albo
+ * `{ text }`, gdy ostatni segment jest NAZWA ENCJI z URL-a. Nazwy encji
+ * (projekt, klient, numer faktury) to dane uzytkownika i NIE podlegaja
+ * tlumaczeniu. `undefined` na trasie sekcji.
  */
-export function resolveNestedLabel(pathname: string): string | undefined {
+export function resolveNestedLabel(
+  pathname: string,
+): { key: string } | { text: string } | undefined {
   const segments = pathSegments(pathname)
   if (segments.length < 2) return undefined
-  return NESTED_LABELS[segments.join('/')] ?? decodeURIComponent(segments[segments.length - 1])
+  const joined = segments.join('/')
+  if ((NESTED_LABEL_KEYS as readonly string[]).includes(joined)) return { key: joined }
+  return { text: decodeURIComponent(segments[segments.length - 1]) }
 }
 
-/** Tytul strony w spojnym formacie `Sekcja · TimeTracker`. */
-export function workspaceMetadata(segment: WorkspaceSegment): { title: string } {
-  const section = WORKSPACE_SECTIONS.find((entry) => entry.segment === segment)!
-  return { title: `${section.label} · TimeTracker` }
+/**
+ * Klucz tlumaczenia tytulu sekcji. Metadane strony buduje sie z niego przez
+ * `navigation.sections.<segment>` — patrz `lib/seo/workspace-metadata.ts`.
+ */
+export function sectionTitleKey(segment: WorkspaceSegment): string {
+  return `sections.${segment}`
 }

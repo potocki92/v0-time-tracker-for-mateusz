@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { formatNumber } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import * as RechartsPrimitive from 'recharts'
 
 import { cn } from '@/lib/utils'
@@ -127,6 +127,7 @@ function ChartTooltipContent({
     nameKey?: string
     labelKey?: string
   }) {
+  const fmt = useFormat()
   const { config } = useChart()
 
   const tooltipLabel = React.useMemo(() => {
@@ -235,7 +236,7 @@ function ChartTooltipContent({
                     </div>
                     {item.value && (
                       <span className="text-foreground font-mono font-medium tabular-nums">
-                        {formatNumber(Number(item.value))}
+                        {fmt.number(Number(item.value))}
                       </span>
                     )}
                   </div>

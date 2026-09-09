@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Copy, Trash2 } from 'lucide-react'
 import type { Client, Project, WorkEntry } from '@/lib/types'
-import { formatDate } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { getDateString } from '@/lib/helpers'
 import type { WorkStatus } from '../../domain/calendar.types'
 import { ClientSelect } from './ClientSelect'
@@ -104,6 +104,7 @@ export function DayEntryDialog({
   onClonePrevious,
   isSaving,
 }: Props) {
+  const fmt = useFormat()
   const isPredicted = entryKind === 'predicted'
   const isWorked = isPredicted || status === 'worked'
   const saveDisabled = isSaving || (isWorked && !clientId)
@@ -114,7 +115,7 @@ export function DayEntryDialog({
         <DialogHeader className="border-b bg-muted/30 px-4 py-3.5 sm:px-5 sm:py-4">
           <DialogTitle className="text-sm font-semibold sm:text-base">
             {selectedDay &&
-              formatDate(
+              fmt.date(
                 getDateString(currentYear, currentMonth, selectedDay),
                 'long',
               )}

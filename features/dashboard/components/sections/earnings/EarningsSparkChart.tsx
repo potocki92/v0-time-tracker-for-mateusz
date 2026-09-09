@@ -9,9 +9,10 @@ import {
   XAxis,
   type TooltipProps,
 } from 'recharts'
-import { formatDate } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
+import { toMinor } from '@/lib/format'
+import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
-import { formatMoney, toMinor } from '@/lib/format'
 import { maskValue } from '../../../hooks/useDashboardUiStore'
 import type { SeriesPoint } from './series'
 
@@ -21,7 +22,7 @@ import type { SeriesPoint } from './series'
  * i KPI renderują się od razu, wykres dojeżdża chwilę później.
  */
 
-function makeChartTooltip(privacyMode: boolean, compareMode: boolean) {
+function makeChartTooltip(fmt: AppFormat, privacyMode: boolean, compareMode: boolean) {
   return function ChartTooltip({ active, payload }: TooltipProps<number, string>) {
     if (!active || !payload?.[0]) return null
     const row = payload[0].payload as SeriesPoint
@@ -33,11 +34,11 @@ function makeChartTooltip(privacyMode: boolean, compareMode: boolean) {
       <div className="rounded-lg border border-hairline bg-surface-1 px-2.5 py-1.5 text-xs shadow-2xl">
         <p className="font-medium text-white">{row.label}</p>
         <p className={cn('tabular-nums', isForecast ? 'text-zinc-400' : 'text-[var(--chart-1)]')}>
-          {maskValue(formatMoney(toMinor(value), 'PLN'), privacyMode)}
+          {maskValue(fmt.money(toMinor(value), 'PLN'), privacyMode)}
         </p>
         {compareMode && row.prevCumulative !== null && (
           <p className="tabular-nums text-zinc-400">
-            Poprz.: {maskValue(formatMoney(toMinor(row.prevCumulative), 'PLN'), privacyMode)}
+            Poprz.: {maskValue(fmt.money(toMinor(row.prevCumulative), 'PLN'), privacyMode)}
           </p>
         )}
         {isForecast && (
@@ -56,6 +57,7 @@ type Props = {
 }
 
 export function EarningsSparkChart({ series, ticks, privacyMode, compareMode }: Props) {
+  const fmt = useFormat()
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={series} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
@@ -74,14 +76,14 @@ export function EarningsSparkChart({ series, ticks, privacyMode, compareMode }: 
         <XAxis
           dataKey="date"
           ticks={ticks}
-          tickFormatter={(iso: string) => formatDate(iso, 'dayMonth')}
+          tickFormatter={(iso: string) => fmt.date(iso, 'dayMonth')}
           stroke="var(--hairline-strong)"
           tickLine={false}
           axisLine={false}
           tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
         />
         <Tooltip
-          content={makeChartTooltip(privacyMode, compareMode)}
+          content={makeChartTooltip(fmt, privacyMode, compareMode)}
           cursor={{ stroke: 'var(--chart-1)', strokeOpacity: 0.3 }}
         />
 

@@ -1,5 +1,5 @@
 import { toDateKey } from '@/lib/date/format'
-import { formatDate } from '@/lib/format'
+import type { AppFormat } from '@/lib/format'
 import type { SparklinePoint } from '../../../hooks/useEarningsSparkline'
 
 /**
@@ -33,6 +33,7 @@ function cumulate(points: SparklinePoint[]): { day: number; value: number }[] {
 }
 
 export function buildSeries(
+  fmt: AppFormat,
   current: SparklinePoint[],
   previous: SparklinePoint[] | undefined,
 ): SeriesPoint[] {
@@ -50,7 +51,7 @@ export function buildSeries(
     return {
       date: p.date,
       day,
-      label: formatDate(p.date, 'dayMonth'),
+      label: fmt.date(p.date, 'dayMonth'),
       cumulative: Math.round(acc * 100) / 100,
       forecast: null,
       prevCumulative: prevByDay.get(day) ?? null,
@@ -74,7 +75,7 @@ export function buildSeries(
       series.push({
         date: iso,
         day,
-        label: formatDate(iso, 'dayMonth'),
+        label: fmt.date(iso, 'dayMonth'),
         cumulative: Number.NaN as unknown as number,
         forecast: projected,
         prevCumulative: prevByDay.get(day) ?? null,
