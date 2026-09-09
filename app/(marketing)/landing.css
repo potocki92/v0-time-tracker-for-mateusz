@@ -1,598 +1,252 @@
 /* ================================================================
- * Landing Page — standalone dark design system
- * Scoped under .landing-root
+ * Landing — arkusz strony marketingowej. Wszystko jest zagniezdzone pod
+ * klasa `.lp` (landing page) z `layout.tsx`, wiec zaden token ani zadna
+ * klasa tej strony nie wycieka do panelu.
+ *
+ * Tokeny powierzchni i akcentu sa PRZEPISANE 1:1 z ciemnego motywu
+ * panelu (`app/globals.css`, blok `.dark[data-theme='emerald']`).
+ * Marketingowa replika interfejsu ma wygladac jak aplikacja, a nie
+ * jak jej interpretacja — dlatego kopiujemy wartosci, a nie klasy:
+ * `bg-surface-2` bez klasy `.dark` na <html> rozwinelaby sie do
+ * palety JASNEJ.
  * ================================================================ */
 
-/* ─── Tokens ─── */
-.landing-root {
-  --ink-1: rgba(255, 255, 255, 0.95);
-  --ink-2: rgba(255, 255, 255, 0.60);
-  --ink-3: rgba(255, 255, 255, 0.35);
-  --hair: rgba(255, 255, 255, 0.08);
-  --hair-2: rgba(255, 255, 255, 0.12);
+.lp {
+  /* ── powierzchnie panelu (1:1 z ciemnym motywem) ── */
+  --lp-s0: oklch(0 0 0);
+  --lp-s1: oklch(0.145 0 0);
+  --lp-s2: oklch(0.164 0 0);
+  --lp-s3: oklch(0.195 0 0);
+  --lp-hair: oklch(0.226 0 0);
+  --lp-hair-2: oklch(0.269 0 0);
+  --lp-accent: oklch(0.65 0.2 160);
+  --lp-accent-dim: oklch(0.65 0.2 160 / 0.14);
 
-  background: #000;
-  color: var(--ink-1);
+  /* ── warstwy tekstu ── */
+  --lp-ink-1: rgba(255, 255, 255, 0.95);
+  --lp-ink-2: rgba(255, 255, 255, 0.62);
+  /* 0,50 to najnizsza wartosc, przy ktorej 11-pikselowy nadtytul jeszcze
+   * spelnia WCAG AA (4,5:1) na czerni. Nizej wygladalo lepiej na makiecie
+   * i gorzej na ekranie. */
+  --lp-ink-3: rgba(255, 255, 255, 0.5);
+
+  background: var(--lp-s0);
+  color: var(--lp-ink-1);
   min-height: 100svh;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
+  /* `clip`, nie `hidden`: `overflow-x: hidden` robi z tego kontenera
+   * przewijania (druga os przechodzi w `auto`) i UNIERUCHAMIA kazdy
+   * `position: sticky` w srodku — cala scenografia scrollytellingu
+   * przestaje sie przyklejac. `clip` przycina to samo, nie tworzac
+   * kontenera przewijania. */
+  overflow-x: clip;
 }
 
-/* ─── Typography ─── */
-.landing-root .display {
+/* ─── Typografia ─── */
+.lp .lp-display {
   font-weight: 600;
   letter-spacing: -0.045em;
-  line-height: 0.95;
+  line-height: 0.94;
   text-wrap: balance;
 }
-.landing-root .display-lg { font-size: clamp(48px, 9.5vw, 156px); }
-.landing-root .display-md { font-size: clamp(40px, 6.4vw, 96px); }
-.landing-root .display-sm { font-size: clamp(30px, 4.2vw, 64px); }
+.lp .lp-d1 { font-size: clamp(44px, 8.4vw, 124px); }
+.lp .lp-d2 { font-size: clamp(32px, 5vw, 68px); }
+.lp .lp-d3 { font-size: clamp(24px, 3vw, 40px); }
 
-.landing-root .eyebrow {
+/* Kolosalna liczba w sekwencji „from work to money". Jednolita biel zamiast
+ * gradientu do czerni: gradient gubil dolna trzecia cyfry na czarnym tle. */
+.lp .lp-colossal {
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: clamp(64px, 17vw, 260px);
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 0.86;
+  color: var(--lp-ink-1);
+}
+
+.lp .lp-colossal-sm { font-size: clamp(40px, 10vw, 148px); }
+
+.lp .lp-eyebrow {
   font-size: 11px;
+  font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 500;
+  color: var(--lp-ink-3);
+}
+.lp .lp-mono { font-family: var(--font-geist-mono, ui-monospace, monospace); }
+
+/* ─── Drobna typografia ───
+ * Chrome nawigacji i replika panelu renderuja sie w skali mniejszej niz
+ * drabinka `--text-*` aplikacji (panel pokazany w ramce ma okolo polowy
+ * swojej naturalnej szerokosci). Zamknieta skala stoi TUTAJ, zeby w JSX
+ * nie bylo ani jednego arbitralnego `text-[Npx]`.
+ */
+.lp .lp-t7  { font-size: 7px; }
+.lp .lp-t8  { font-size: 8px; }
+.lp .lp-t9  { font-size: 9px; }
+.lp .lp-t10 { font-size: 10px; }
+.lp .lp-t11 { font-size: 11px; }
+.lp .lp-t12 { font-size: 12px; }
+.lp .lp-t13 { font-size: 13px; }
+
+/* ─── Fokus: jeden pierscien dla calej strony ─── */
+.lp :focus-visible {
+  outline: 2px solid var(--lp-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
-.landing-root .ink-gradient {
-  background: linear-gradient(180deg, #FFFFFF 0%, #C7CCD3 55%, #84898F 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.landing-root .em-text {
-  background: linear-gradient(180deg, #6BF0A8 0%, #22E07A 60%, #14B864 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* ─── Numeric / mono ─── */
-.landing-root .num {
-  font-family: var(--font-geist-mono, 'Geist Mono', monospace);
-}
-.landing-root .mono {
-  font-family: var(--font-geist-mono, 'Geist Mono', monospace);
-}
-
-/* ─── Mesh / grid overlay ─── */
-.landing-root .mesh {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(1200px 720px at 8% -10%, rgba(34,224,122,.10), transparent 60%),
-    radial-gradient(900px 560px at 92% 10%, rgba(60,120,255,.05), transparent 60%),
-    radial-gradient(800px 600px at 50% 110%, rgba(34,224,122,.06), transparent 65%);
-}
-.landing-root .grid-mesh {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: .35;
-  background-image:
-    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 80%);
-}
-.landing-root .orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  pointer-events: none;
-}
-
-/* ─── Live chip ─── */
-.landing-root .live-chip {
+/* ─── CTA ─── */
+.lp .lp-cta,
+.lp .lp-cta-ghost {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 7px 12px 7px 10px;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.lp .lp-cta {
+  background: var(--lp-ink-1);
+  color: #000;
+}
+.lp .lp-cta:hover { background: #fff; }
+.lp .lp-cta-ghost {
+  color: var(--lp-ink-1);
+  border: 1px solid var(--lp-hair-2);
+}
+.lp .lp-cta-ghost:hover { border-color: rgba(255, 255, 255, 0.45); }
+
+/* ─── Replika powierzchni panelu ─── */
+.lp .lp-card {
+  background: var(--lp-s2);
+  border: 1px solid var(--lp-hair-2);
+  border-radius: 16px;
+}
+.lp .lp-card-nested {
+  background: var(--lp-s3);
+  border: 1px solid var(--lp-hair-2);
+  border-radius: 12px;
+}
+.lp .lp-hair { border: 1px solid var(--lp-hair); }
+.lp .lp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(34,224,122,.10);
-  border: 1px solid rgba(34,224,122,.30);
-  color: #C8F8DF;
-  font-size: 12px;
-  text-decoration: none;
-}
-.landing-root .live-chip .dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #22E07A;
-  box-shadow: 0 0 12px rgba(34,224,122,.7);
-  animation: pulseDot 1.6s ease-in-out infinite;
-  flex-shrink: 0;
-}
-
-/* ─── CTAs ─── */
-.landing-root .cta-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-size: 13.5px;
+  font-size: 10px;
   font-weight: 600;
-  color: #031509;
-  background: linear-gradient(180deg,#26E97E 0%, #1AC868 100%);
-  border: 1px solid rgba(0,0,0,.4);
-  box-shadow: 0 0 0 1px rgba(34,224,122,.25), 0 10px 32px -10px rgba(34,224,122,.55), inset 0 1px 0 rgba(255,255,255,.30);
-  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
-  white-space: nowrap;
-  text-decoration: none;
-  cursor: pointer;
+  line-height: 1.6;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--lp-hair-2);
+  color: var(--lp-ink-2);
 }
-.landing-root .cta-primary:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-  box-shadow: 0 0 0 1px rgba(34,224,122,.35), 0 14px 40px -10px rgba(34,224,122,.7), inset 0 1px 0 rgba(255,255,255,.30);
-}
-.landing-root .cta-ghost {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--ink-1);
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--hair);
-  transition: all .2s ease;
-  white-space: nowrap;
-  text-decoration: none;
-  cursor: pointer;
-}
-.landing-root .cta-ghost:hover {
-  background: rgba(255,255,255,.06);
-  border-color: var(--hair-2);
+.lp .lp-pill-accent {
+  background: var(--lp-accent-dim);
+  border-color: color-mix(in oklab, var(--lp-accent) 35%, transparent);
+  color: color-mix(in oklab, var(--lp-accent) 80%, white);
 }
 
-/* ─── Device frame ─── */
-.landing-root .device {
-  position: relative;
-  border-radius: 22px;
-  padding: 14px;
-  background: linear-gradient(180deg, #1A1C1F 0%, #0A0B0D 100%);
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.02),
-    0 60px 120px -40px rgba(0,0,0,.9),
-    0 30px 60px -20px rgba(34,224,122,.20),
-    inset 0 1px 0 rgba(255,255,255,.06);
-}
-.landing-root .device-screen {
-  border-radius: 12px;
+/* Ramka urzadzenia. Jeden cien, zero glow — bohaterem jest interfejs. */
+.lp .lp-device {
+  background: var(--lp-s1);
+  border: 1px solid var(--lp-hair-2);
+  border-radius: 14px;
   overflow: hidden;
-  background: #06070A;
-  border: 1px solid rgba(255,255,255,.06);
-}
-.landing-root .device-glow {
-  position: absolute;
-  inset: -2px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(34,224,122,.30), transparent 50%);
-  filter: blur(40px);
-  opacity: .6;
-  z-index: -1;
+  box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.9);
 }
 
-/* ─── Noise overlay ─── */
-.landing-root .noise::after {
+/* ─── Sceny sterowane scrollem ─── */
+/* Warstwy leza w tej samej komorce gridu — bez `position:absolute`, wiec
+ * wysokosc sceny bierze sie z najwyzszej warstwy i nic nie skacze. */
+.lp .lp-layers { display: grid; }
+.lp .lp-layers > * { grid-area: 1 / 1; }
+
+/* Pierwsza warstwa jest widoczna PRZED hydratacja — inaczej piec ekranow
+ * nakladaloby sie na siebie w pierwszej klatce. */
+.lp .lp-layer { opacity: 0; }
+.lp .lp-layer:first-child { opacity: 1; }
+
+/* ─── Siatka kalendarza (replika DayCell z aplikacji) ─── */
+.lp .lp-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--lp-hair);
+  border-radius: 8px;
+  background: var(--lp-s1);
+  padding: 4px;
+  min-height: 42px;
+}
+.lp .lp-day-weekend { background: var(--lp-s2); }
+
+/* Na telefonie scena automatu musi zmiescic naglowek, grafik, os obecnosci
+ * I kalendarz w jednym ekranie — komorka oddaje na to cztery piksele. */
+@media (max-width: 639px) {
+  .lp .lp-day { min-height: 38px; }
+  .lp .lp-stage { padding-top: 3.5rem; }
+}
+.lp .lp-day-fill {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--lp-hair);
+  border-left: 3px solid var(--lp-accent);
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--lp-accent) 7%, var(--lp-s1));
+  pointer-events: none;
+}
+.lp .lp-day-trip::after {
   content: '';
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  opacity: .35;
-  mix-blend-mode: overlay;
-}
-
-/* ─── Marquee ─── */
-.landing-root .marquee {
-  display: flex;
-  gap: 64px;
-  animation: scroll-marq 38s linear infinite;
-  width: max-content;
-}
-.landing-root .fade-edges {
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-}
-
-/* ─── Reveal ─── */
-.landing-root .reveal-row {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity .9s cubic-bezier(.2,.6,.2,1), transform .9s cubic-bezier(.2,.6,.2,1);
-}
-.landing-root .reveal-row.in {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ─── Section label ─── */
-.landing-root .sec-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 11px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.landing-root .sec-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22E07A;
-  box-shadow: 0 0 12px rgba(34,224,122,.6);
-  flex-shrink: 0;
-}
-
-/* ─── Sticky story ─── */
-.landing-root .story-stage {
-  position: sticky;
-  top: 96px;
-  height: calc(100vh - 120px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.landing-root .step-num {
-  font-family: var(--font-geist-mono, 'Geist Mono', monospace);
-  font-size: 11px;
-  letter-spacing: .18em;
-  color: var(--ink-3);
-}
-
-/* ─── Big number ─── */
-.landing-root .colossal {
-  font-size: clamp(140px, 28vw, 460px);
-  font-weight: 600;
-  letter-spacing: -0.06em;
-  line-height: 0.85;
-  background: linear-gradient(180deg, #FFFFFF 0%, #1B1D20 95%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-family: var(--font-geist-mono, 'Geist Mono', monospace);
-}
-
-/* ─── Aurora ─── */
-.landing-root .aurora {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-.landing-root .aurora-band {
-  position: absolute;
-  left: -10%;
-  right: -10%;
-  height: 60vh;
-  filter: blur(80px);
-  opacity: .55;
-  background:
-    radial-gradient(40% 60% at 20% 50%, rgba(34,224,122,.35), transparent 70%),
-    radial-gradient(35% 50% at 60% 40%, rgba(60,130,255,.18), transparent 70%),
-    radial-gradient(30% 50% at 85% 60%, rgba(34,224,122,.25), transparent 70%);
-}
-
-/* ─── Mark / clock art ─── */
-.landing-root .mark-stage {
-  position: relative;
-  width: min(880px, 92vw);
-  aspect-ratio: 1/1;
-  margin: 0 auto;
-}
-.landing-root .mark-rotate {
-  animation: spin 120s linear infinite;
-  transform-origin: center;
-}
-.landing-root .mark-rotate-rev {
-  animation: spin 180s linear infinite reverse;
-  transform-origin: center;
-}
-.landing-root .particle {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #22E07A;
-  filter: blur(1px);
-  opacity: .7;
-}
-
-/* ─── Logo marquee ─── */
-.landing-root .logo-cell {
-  display: inline-flex;
-  align-items: center;
-  height: 36px;
-  color: var(--ink-3);
-  transition: color .25s ease;
-}
-.landing-root .logo-cell:hover { color: var(--ink-1); }
-.landing-root .logo-cell svg { height: 100%; width: auto; }
-
-/* ─── Bento ─── */
-.landing-root .bento {
-  background: linear-gradient(180deg, #0E0F11, #0A0B0D);
-  border: 1px solid var(--hair);
-  border-radius: 18px;
-  padding: 20px;
-  transition: border-color .3s ease, transform .3s ease;
-}
-.landing-root .bento:hover { border-color: var(--hair-2); transform: translateY(-2px); }
-
-/* ─── Bar chart ─── */
-.landing-root .bar {
-  background: linear-gradient(180deg, rgba(34,224,122,.22), rgba(34,224,122,.05));
-  border-radius: 3px;
-}
-.landing-root .bar.now {
-  background: linear-gradient(180deg, #26E97E, #1AC868);
-  box-shadow: 0 0 12px rgba(34,224,122,.5);
-}
-
-/* ─── Divider ─── */
-.landing-root .divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--hair-2), transparent);
-}
-
-/* ─── Pricing cards ─── */
-.landing-root .price-card {
-  background: linear-gradient(180deg, #0E0F11, #0A0B0D);
-  border: 1px solid var(--hair);
-  border-radius: 18px;
-  transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
-}
-.landing-root .price-card:hover { transform: translateY(-2px); }
-.landing-root .price-card.hot {
-  background: linear-gradient(180deg, rgba(34,224,122,.08), rgba(10,11,13,.9));
-  border: 1px solid rgba(34,224,122,.30);
-  box-shadow: 0 0 0 1px rgba(34,224,122,.12), 0 30px 80px -30px rgba(34,224,122,.35);
-}
-
-/* ─── Em hover ─── */
-.landing-root .em-hover {
-  transition: color .25s ease;
-  text-decoration: none;
-  color: var(--ink-2);
-}
-.landing-root .em-hover:hover { color: #C8F8DF; }
-
-/* ─── From app design system (used in mockups) ─── */
-.landing-root .panel {
-  background: #0D0E10;
-  border: 1px solid var(--hair);
-  border-radius: 10px;
-  padding: 12px;
-}
-.landing-root .panel-flat {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--hair);
-  border-radius: 8px;
-}
-.landing-root .stat-label {
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 500;
-}
-.landing-root .section-title {
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-  font-weight: 500;
-  padding: 0 4px;
-}
-.landing-root .nav-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  color: var(--ink-2);
-  font-size: 11.5px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.landing-root .nav-item:hover { background: rgba(255,255,255,0.04); }
-.landing-root .nav-item.active {
-  background: rgba(34,224,122,0.08);
-  color: #C8F8DF;
-}
-.landing-root .seg {
-  display: inline-flex;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--hair);
-  border-radius: 8px;
-  padding: 2px;
-}
-.landing-root .seg button {
-  padding: 4px 12px;
-  font-size: 11px;
-  border-radius: 6px;
-  color: var(--ink-3);
-  transition: all 0.15s ease;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-.landing-root .seg button[aria-selected='true'] {
-  background: rgba(255,255,255,0.08);
-  color: var(--ink-1);
-}
-.landing-root .pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 500;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: var(--ink-2);
-}
-.landing-root .chip-emerald {
-  background: rgba(34,224,122,0.12);
-  border: 1px solid rgba(34,224,122,0.30);
-  color: #9CEEBE;
-}
-.landing-root .chip-amber {
-  background: rgba(230,160,50,0.12);
-  border: 1px solid rgba(230,160,50,0.30);
-  color: #F0C070;
-}
-.landing-root .chip-mute {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: var(--ink-2);
-}
-.landing-root .live-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22E07A;
-  animation: pulseDot 1.6s ease-in-out infinite;
-  flex-shrink: 0;
-}
-.landing-root .day-empty {
-  opacity: 0;
+  background: color-mix(in oklab, var(--lp-accent) 8%, transparent);
   pointer-events: none;
 }
-.landing-root .day-off {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.05);
-}
-.landing-root .day-active {
-  background: rgba(34,224,122,0.30) !important;
-  border: 1px solid rgba(34,224,122,0.50) !important;
-  color: #C8F8DF !important;
-}
-.landing-root .day-today {
-  outline: 2px solid #22E07A;
-  outline-offset: -2px;
-}
-.landing-root .hair {
-  border: 1px solid var(--hair);
-  border-radius: 8px;
-}
-.landing-root .hair-strong {
-  border: 1px solid var(--hair-2);
-}
-.landing-root .divide-hair > * + * {
-  border-top: 1px solid var(--hair);
-}
-.landing-root .btn-ghost {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--hair);
-  color: var(--ink-2);
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-.landing-root .btn-ghost:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: var(--hair-2);
-}
 
-/* ─── Nav links ─── */
-.landing-root .nav-link {
-  color: var(--ink-2);
-  font-size: 13px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: color .2s ease, background .2s ease;
+/* ─── Wykres slupkowy ─── */
+.lp .lp-bar {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
 }
-.landing-root .nav-link:hover {
-  color: var(--ink-1);
-  background: rgba(255,255,255,.03);
-}
+.lp .lp-bar-accent { background: var(--lp-accent); }
 
-/* ─── FAQ ─── */
-.landing-root .faq-item {
-  border: 1px solid var(--hair);
-  border-radius: 12px;
-  background: linear-gradient(180deg, #0E0F11, #0A0B0D);
-  overflow: hidden;
-  transition: border-color .25s ease;
-}
-.landing-root .faq-item:hover { border-color: var(--hair-2); }
-.landing-root .faq-item[open] { border-color: rgba(34,224,122,.30); }
-.landing-root .faq-q {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px;
-  cursor: pointer;
-  list-style: none;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--ink-1);
-}
-.landing-root .faq-q::-webkit-details-marker { display: none; }
-.landing-root .faq-chevron {
-  color: var(--ink-3);
-  transition: transform .25s ease, color .25s ease;
-}
-.landing-root .faq-item[open] .faq-chevron {
-  transform: rotate(180deg);
-  color: #22E07A;
-}
-.landing-root .faq-a {
-  padding: 0 20px 18px;
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ink-2);
-  max-width: 680px;
-}
-.landing-root .faq-item[open] .faq-a {
-  animation: faqReveal .25s ease;
-}
+/* ================================================================
+ * prefers-reduced-motion
+ *
+ * Kompletny fallback BEZ JavaScriptu: sticky staje sie zwyklym blokiem,
+ * tory przewijania traca sztuczna wysokosc, a warstwy scen ida w normalny
+ * przeplyw — kazda informacja zostaje na stronie. `!important` bije style
+ * inline, ktore dopisuje Framer Motion.
+ * ================================================================ */
 @media (prefers-reduced-motion: reduce) {
-  .landing-root .faq-item[open] .faq-a { animation: none; }
-}
-
-/* ─── Keyframes ─── */
-@keyframes faqReveal {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes scroll-marq {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-@keyframes pulseDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%       { transform: scale(1.5); opacity: 0.6; }
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes drift1 {
-  0%, 100% { transform: translate(0, 0); }
-  50%       { transform: translate(20px, -30px); }
-}
-@keyframes drift2 {
-  0%, 100% { transform: translate(0, 0); }
-  50%       { transform: translate(-25px, 20px); }
-}
-@keyframes drift3 {
-  0%, 100% { transform: translate(0, 0); }
-  50%       { transform: translate(15px, 35px); }
+  .lp .lp-track { height: auto !important; }
+  .lp .lp-stage {
+    position: static !important;
+    height: auto !important;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  .lp .lp-layers { display: block; }
+  .lp .lp-layer {
+    opacity: 1 !important;
+    /* `visibility` tez, bo warstwy wygaszone chowamy nim z kompozycji —
+     * bez tego w tym trybie zostalaby widoczna tylko pierwsza scena. */
+    visibility: visible !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .lp .lp-layer + .lp-layer { margin-top: 3rem; }
+  /* Elementy, ktorych `transform`/`opacity` pochodzi wprost ze scrolla. */
+  .lp .lp-motion {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
 }

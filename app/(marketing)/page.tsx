@@ -1,56 +1,48 @@
 import type { Metadata } from 'next'
 
-import { createClient } from '@/lib/supabase/server'
 import { buildMetadata } from '@/lib/seo/metadata'
 
-import {
-  LandingNavbarSection,
-  HeroSection,
-  StatsStripSection,
-  IconicMarkSection,
-  BigNumbersSection,
-  FeatureShowcaseSection,
-  FeaturesSection,
-  HowItWorksSection,
-  TestimonialSection,
-  PricingSection,
-  FaqSection,
-  FinalCtaSection,
-  FooterSection,
-} from './_landing/components'
+import { buildDemoMonth } from './_landing/demo/demo-month.server'
+import { AutomationShowcase } from './_landing/sections/AutomationShowcase'
+import { EverythingElse } from './_landing/sections/EverythingElse'
+import { FinalCta } from './_landing/sections/FinalCta'
+import { Footer } from './_landing/sections/Footer'
+import { HeroScene } from './_landing/sections/HeroScene'
+import { Navbar } from './_landing/sections/Navbar'
+import { NumbersStory } from './_landing/sections/NumbersStory'
+import { ProductJourney } from './_landing/sections/ProductJourney'
 
 export const metadata: Metadata = buildMetadata({
   path: '/',
   title: 'TimeTracker — Time, accounted for.',
   description:
-    'The clock for independent work. Track every hour, build invoices from the timesheet, and get paid — without the spreadsheet.',
+    'Track every hour, turn the timesheet into an invoice and let the work automation fill the calendar for you — dashboard, projects, invoices and reports in one place.',
 })
 
-export default async function LandingPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  const isAuthenticated = Boolean(user)
+/**
+ * Landing jest Server Component i NIE czyta sesji ani Supabase — strona ma
+ * dzialac bez logowania i renderowac sie statycznie. Jedyna praca serwera to
+ * policzenie miesiaca demonstracyjnego prawdziwym automatem aplikacji
+ * (`buildDemoMonth`); wynik jedzie do sekcji jako zwykle propsy, wiec bundle
+ * kliencki nie dostaje ani domeny automatu, ani zoda.
+ */
+export default function LandingPage() {
+  const month = buildDemoMonth()
 
   return (
     <>
-      <div className="mesh" aria-hidden="true" />
-      <LandingNavbarSection isAuthenticated={isAuthenticated} />
-      <main id="main-content" tabIndex={-1} className="focus:outline-none relative z-10">
-        <HeroSection />
-        <StatsStripSection />
-        <IconicMarkSection />
-        <BigNumbersSection />
-        <FeatureShowcaseSection />
-        <FeaturesSection />
-        <HowItWorksSection />
-        <TestimonialSection />
-        <PricingSection />
-        <FaqSection />
-        <FinalCtaSection isAuthenticated={isAuthenticated} />
+      <Navbar />
+
+      <main id="main-content" tabIndex={-1} className="relative focus:outline-none">
+        <HeroScene month={month} />
+        <ProductJourney month={month} />
+        <NumbersStory month={month} />
+        <AutomationShowcase month={month} />
+        <EverythingElse />
+        <FinalCta />
       </main>
-      <FooterSection />
+
+      <Footer />
     </>
   )
 }
