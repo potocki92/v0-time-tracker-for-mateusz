@@ -153,13 +153,23 @@
   color: color-mix(in oklab, var(--lp-accent) 80%, white);
 }
 
-/* Ramka urzadzenia. Jeden cien, zero glow — bohaterem jest interfejs. */
+/* Ramka urzadzenia. Jeden cien, zero glow — bohaterem jest interfejs.
+ *
+ * Na TELEFONIE cienia nie ma wcale. `box-shadow` o promieniu 120 px pod
+ * elementem, ktory jest skalowany i przesuwany przez caly scroll, kaze
+ * przegladarce przerysowywac rozmyty prostokat wiekszy niz ekran w kazdej
+ * klatce. Na czarnym tle ten cien i tak nie niesie zadnej informacji —
+ * czern rozmyta w czerni. Desktop zostawiamy z cieniem: tam ramka lezy na
+ * wiekszej scenie i separacja od tla jest widoczna.
+ */
 .lp .lp-device {
   background: var(--lp-s1);
   border: 1px solid var(--lp-hair-2);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.9);
+}
+@media (min-width: 1024px) {
+  .lp .lp-device { box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.9); }
 }
 
 /* ─── Sceny sterowane scrollem ─── */
@@ -172,6 +182,74 @@
  * nakladaloby sie na siebie w pierwszej klatce. */
 .lp .lp-layer { opacity: 0; }
 .lp .lp-layer:first-child { opacity: 1; }
+
+/*
+ * Przelaczanie scen na TELEFONIE.
+ *
+ * Mobilny `ProductJourney` nie prowadzi warstw scrollem — trzyma w DOM
+ * aktywna scene (i, przez czas przejscia, poprzednia) i przelacza je
+ * atrybutem. Cale przejscie robi wiec CSS: przegladarka dostaje dwie
+ * wlasciwosci kompozytowalne i zaden JavaScript nie liczy tu klatek.
+ *
+ * 180 ms to ta sama wartosc, co `SWITCH_MS` w `ProductJourney.tsx` — tam
+ * decyduje, jak dlugo poprzednia scena zostaje zamontowana.
+ *
+ * `visibility` schodzi dopiero PO wygaszeniu (`0s linear 180ms`): warstwa
+ * przestaje istniec dla malowania i czytnika ekranu dokladnie wtedy, gdy
+ * przestaje byc widoczna, ani chwili wczesniej.
+ */
+.lp .lp-scene-switch {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    visibility 0s linear 180ms;
+}
+.lp .lp-scene-switch[data-active='true'] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    visibility 0s;
+}
+
+/*
+ * Scena wchodzaca jest DOPIERO CO wstawiona do DOM i od razu ma
+ * `data-active="true"` — bez stanu poczatkowego przegladarka nie ma czego
+ * animowac i nowy ekran po prostu wyskakuje. `@starting-style` daje jej ten
+ * stan, wiec przejscie jest prawdziwym crossfade'em: nowa scena narasta na
+ * schodzacej, a nie podmienia jej ciecie na ciecie.
+ *
+ * Przegladarki bez `@starting-style` degraduja sie do natychmiastowego
+ * pojawienia — nadal bez czarnej klatki, tylko bez przenikania.
+ */
+@starting-style {
+  .lp .lp-scene-switch[data-active='true'] {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/*
+ * Tory przewijania scenografii.
+ *
+ * Wysokosc siedzi w CSS, a NIE w klasie zaleznej od profilu ruchu: profil
+ * przelacza sie dopiero po hydratacji (patrz `_landing/motion/profile.ts`),
+ * wiec gdyby od niego zalezala wysokosc toru, desktop przesuwalby cala strone
+ * w chwili hydratacji.
+ *
+ * Jednostka to `svh`, nie `vh`. Na iOS `vh` odnosi sie do viewportu BEZ
+ * paska Safari, wiec tor jest wyzszy niz ekran i kazde chowanie/pokazywanie
+ * paska zmienia postep sceny w srodku ruchu palca. `svh` jest stale.
+ */
+.lp .lp-track-journey { height: 400svh; }
+@media (min-width: 1024px) {
+  .lp .lp-track-journey { height: 520svh; }
+}
 
 /* ─── Siatka kalendarza (replika DayCell z aplikacji) ─── */
 .lp .lp-day {
@@ -243,6 +321,15 @@
     filter: none !important;
   }
   .lp .lp-layer + .lp-layer { margin-top: 3rem; }
+  /* Mobilny przelacznik scen nie renderuje sie w tym trybie (`ProductJourney`
+   * oddaje wtedy `JourneyStatic`), ale gdyby kiedys zaczal — ma byc widoczny
+   * i nieruchomy, jak kazda inna warstwa. */
+  .lp .lp-scene-switch {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    transition: none !important;
+  }
   /* Elementy, ktorych `transform`/`opacity` pochodzi wprost ze scrolla. */
   .lp .lp-motion {
     opacity: 1 !important;

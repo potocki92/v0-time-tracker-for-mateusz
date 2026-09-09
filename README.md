@@ -68,6 +68,8 @@ Open: `http://localhost:3000`
 
 Weekly summary e-mails (SMTP + cron secrets): [`docs/weekly-summary-email.md`](docs/weekly-summary-email.md)
 
+Landing page motion architecture (Motion version, hardware acceleration, mobile profile): [`docs/landing-motion.md`](docs/landing-motion.md)
+
 ## Development Workflow
 
 1. **Run locally** using `npm run dev`.

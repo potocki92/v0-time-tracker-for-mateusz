@@ -1,36 +1,65 @@
 'use client'
 
 import type { RefObject } from 'react'
-import { transform, useScroll, useTransform, type MotionValue } from 'framer-motion'
+import { useScroll, useTransform, type MotionValue } from 'framer-motion'
 
 /**
- * Motion landingu — trzy funkcje, wszystkie na MotionValue.
+ * Motion landingu — postep scen i warstwy sterowane scrollem.
  *
  * Zasady, ktore te helpery wymuszaja:
  *  - jedno zrodlo postepu na scene (`useScroll` z targetem), zero wlasnych
  *    listenerow `window.scroll`,
  *  - zaden przelicznik nie dotyka stanu Reacta, wiec przewijanie nie
- *    powoduje rerenderow — animuja sie wylacznie `transform` i `opacity`.
+ *    powoduje rerenderow,
+ *  - animujemy WYLACZNIE `opacity` i `transform`, i to w formie, ktora Motion
+ *    potrafi oddac przegladarce (patrz nizej).
+ *
+ * ── Dlaczego `transform` jako gotowy string, a nie `y` / `scale` ──
+ *
+ * Motion przenosi wartosc sterowana scrollem na natywna animacje
+ * (ScrollTimeline / ViewTimeline + Web Animations API) tylko wtedy, gdy klucz
+ * stylu jest na jego liscie akcelerowalnych: `opacity`, `transform`,
+ * `filter`, `clipPath`, `backgroundColor`. Skladowe transformu — `y`, `scale`,
+ * `rotateX` — na tej liscie NIE SA, bo Motion musi je najpierw skleic w jeden
+ * string. Kazda taka skladowa zostaje wiec w JS i placi za siebie zapisem
+ * stylu w kazdej klatce przewijania.
+ *
+ * Dlatego sceny skladaja caly transform samodzielnie i podaja go jako jedna
+ * wartosc. Animacja trafia na kompozytor: main thread nie robi w klatce
+ * przewijania nic, a Safari od 26.4 liczy takie animacje na osobnym watku.
+ * Cena: keyframe'y transformu musza miec IDENTYCZNA strukture (te same
+ * funkcje CSS w tej samej kolejnosci), inaczej przegladarka nie ma czego
+ * interpolowac.
+ *
+ * ── Dlaczego zniknal `useScrollMap` ──
+ *
+ * Do wersji 12.38 stal tu wlasny helper, ktory PODAWAL Motion gotowa funkcje
+ * zamiast pary tablic — wylacznie po to, zeby zablokowac sciezke akcelerowana.
+ * Blad byl w Motion, nie w scenach: `useScroll({ target })` budowal
+ * ViewTimeline w chwili, gdy `ref.current` byl jeszcze pusty, wiec wpadal na
+ * ScrollTimeline calego dokumentu i cache'owal go na stale. Postep liczyl sie
+ * wzgledem strony, nie wzgledem toru sceny — pierwsza warstwa nigdy nie
+ * gasla, dwie sceny zostawaly widoczne naraz.
+ *
+ * Motion 12.39 naprawil to wprost ("useScroll: Fix hardware acceleration when
+ * tracking an element" + "Support hydrating target and container refs from
+ * anywhere in the tree"): przypiecie timeline'u czeka teraz na hydratacje
+ * refa. Workaround stracil powod istnienia i zostal usuniety — sceny wracaja
+ * na standardowe `useTransform(source, inputRange, outputRange)`.
  */
 
 /**
- * Interpolacja wartosci sterowanej scrollem.
+ * Interpolacja `transform` sterowana scrollem.
  *
- * Rownowazna `useTransform(value, inputRange, outputRange)` z JEDNA roznica:
- * przekazujemy gotowa funkcje zamiast pary tablic, przez co Framer nie moze
- * przepiac wyniku na akceleracje WAAPI (`value.accelerate`, patrz
- * `use-transform.mjs`). Sciezka akcelerowana oddaje klatki natywnej animacji
- * na ViewTimeline i w scenach tej strony liczyla postep wzgledem calego
- * dokumentu zamiast wzgledem toru sceny — pierwsza warstwa nigdy nie gasla,
- * a dwie sceny naraz zostawaly widoczne. Wersja funkcyjna liczy sie w JS,
- * nadal bez ani jednego rerenderu Reacta.
+ * Kazdy keyframe dostaje ten sam zestaw funkcji CSS — to warunek, zeby
+ * interpolowala go przegladarka, a nie JavaScript.
  */
-export function useScrollMap<T extends number | string>(
+export function useScrollTransform(
   source: MotionValue<number>,
   inputRange: readonly number[],
-  outputRange: readonly T[],
-): MotionValue<T> {
-  return useTransform(source, transform([...inputRange], [...outputRange]))
+  outputRange: readonly string[],
+): MotionValue<string> {
+  return useTransform(source, [...inputRange], [...outputRange])
 }
 
 /** Postep toru przewijania: 0 gdy tor wchodzi pod gorna krawedz, 1 gdy wychodzi. */
@@ -56,28 +85,30 @@ export function useExitProgress(ref: RefObject<HTMLElement | null>): MotionValue
  */
 const FADE = 0.035
 
+export interface LayerFade {
+  opacity: MotionValue<number>
+  transform: MotionValue<string>
+  visibility: MotionValue<'hidden' | 'visible'>
+}
+
 /**
  * Okno widocznosci jednej warstwy sceny. Warstwy leza na sobie w gridzie,
- * wiec przejscie to zmiana `opacity` + kilkanascie pikseli `y` — bez
- * przerysowania ukladu.
+ * wiec przejscie to zmiana `opacity` + kilkanascie pikseli przesuniecia —
+ * bez przerysowania ukladu.
  *
- * Klatki NIE MOGA wyjsc poza <0, 1>: przy scroll-linked animacji Framer
+ * Klatki NIE MOGA wyjsc poza <0, 1>: przy scroll-linked animacji Motion
  * oddaje je Web Animations API, ktore odrzuca ujemne i wieksze od jedynki
- * offsety (`Offsets must be monotonically non-decreasing`) i wywala cala
- * hydratacje. Dlatego pierwsza warstwa nie ma wejscia, a ostatnia wyjscia —
- * co zreszta jest tym, czego chcemy: scena otwierajaca stoi na miejscu od
- * przyklejenia sceny, a zamykajaca zostaje az do jej zwolnienia.
+ * offsety (`Offsets must be monotonically non-decreasing`). Dlatego pierwsza
+ * warstwa nie ma wejscia, a ostatnia wyjscia — co zreszta jest tym, czego
+ * chcemy: scena otwierajaca stoi na miejscu od przyklejenia sceny, a
+ * zamykajaca zostaje az do jej zwolnienia.
  */
 export function useLayerFade(
   progress: MotionValue<number>,
   start: number,
   end: number,
   shift = 14,
-): {
-  opacity: MotionValue<number>
-  y: MotionValue<number>
-  visibility: MotionValue<'hidden' | 'visible'>
-} {
+): LayerFade {
   const fadeIn = start - FADE > 0
   const fadeOut = end + FADE < 1
 
@@ -90,14 +121,22 @@ export function useLayerFade(
   const opacities = [...(fadeIn ? [0] : []), 1, 1, ...(fadeOut ? [0] : [])]
   const offsets = [...(fadeIn ? [shift] : []), 0, 0, ...(fadeOut ? [-shift] : [])]
 
-  const opacity = useScrollMap(progress, keyframes, opacities)
+  const opacity = useTransform(progress, keyframes, opacities)
 
   return {
     opacity,
-    y: useScrollMap(progress, keyframes, offsets),
+    transform: useScrollTransform(
+      progress,
+      keyframes,
+      offsets.map((offset) => `translateY(${offset}px)`),
+    ),
     // Warstwa wygaszona znika z malowania calkowicie. Samo `opacity: 0`
     // zostawia ja w drzewie kompozycji — wystarczy blad zaokraglenia albo
     // subpikselowe przenikanie, zeby przez aktywny ekran przebil poprzedni.
+    //
+    // To JEDYNA wartosc sceny, ktora zostaje w JS: `visibility` nie jest
+    // wlasciwoscia akcelerowalna. Kosztuje tyle, co jej zmiany — a zmienia
+    // sie dwa razy na scene, nie raz na klatke.
     visibility: useTransform(opacity, (value) => (value < 0.02 ? 'hidden' : 'visible')),
   }
 }
