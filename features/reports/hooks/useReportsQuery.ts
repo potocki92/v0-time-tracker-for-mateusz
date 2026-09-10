@@ -25,5 +25,9 @@ export function useReportsQuery(filters: ReportFilters, today: DateKey) {
       projectId: filters.projectId,
     }),
     placeholderData: keepPreviousData,
+    // Blad pobrania ma trafic do `ReportsContentBoundary`, a nie zawiesic
+    // ekran na skeletonie w nieskonczonosc. `useQuery` domyslnie tylko
+    // ustawia `isError`, wiec granica bledu nigdy by go nie zobaczyla.
+    throwOnError: true,
   })
 }

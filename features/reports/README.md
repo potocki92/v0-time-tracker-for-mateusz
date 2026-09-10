@@ -373,22 +373,44 @@ npm run test                              # calosc
 
 ## 19. Jak bezpiecznie usunac ten modul
 
-Raport jest wyspa: nic z niego nie jest importowane przez inne feature'y.
-Usuniecie sprowadza sie do pieciu krokow:
+Raport jest wyspa: **zaden inny feature nie importuje z `features/reports`**.
+Zaleznosci, ktore zostaja, sa wylacznie po stronie rejestrow aplikacji —
+segment `reports` jest tam pozycja na liscie, nie kodem raportu.
 
-1. `rm -rf features/reports`
-2. `rm -rf "app/[locale]/(app)/reports"` (page, loading, searchParams)
-3. `rm -rf app/api/reports`
-4. `rm messages/{pl,en,de}/reports.json` oraz wpisy `reports` w
-   `i18n/messages.ts` (`MESSAGE_NAMESPACES` + trzy bloki `LOADERS`)
-   i w `pickMessages` w `app/[locale]/(app)/layout.tsx`
-5. usun wpis `reports` z `lib/workspace/sections.ts`, `lib/seo/workspace-metadata.ts`,
-   `app/[locale]/(app)/_layout/config/nav.config.ts`, `components/seo/json-ld.tsx`
-   i budzet trasy z `performance-budgets.json`
+Kolejnosc krokow (zweryfikowana `npm run typecheck` po kazdym z nich):
 
-Opcjonalnie: `QUERY_KEYS.reports` / `QUERY_CONFIG.reports` w `lib/query`
-i testy z `__test__/reports/` (oraz sekcja raportowa w
-`__test__/work-automation/billing-integration.test.ts`).
+1. **Kod modulu i trasy**
+   * `rm -rf features/reports`
+   * `rm -rf "app/[locale]/(app)/reports"` (page, loading, searchParams)
+   * `rm -rf app/api/reports`
+2. **Tlumaczenia**
+   * `rm messages/{pl,en,de}/reports.json`
+   * `i18n/messages.ts`: usun `'reports'` z `MESSAGE_NAMESPACES` i trzy wpisy
+     `reports:` z `LOADERS`
+   * `app/[locale]/(app)/layout.tsx`: usun `'reports'` z `pickMessages`
+3. **Rejestr obszaru roboczego** — segment `reports` wystepuje w typie
+   `WorkspaceSegment`, wiec TypeScript wskaze KAZDE miejsce, ktore trzeba
+   tknac:
+   * `lib/workspace/sections.ts` (typ + wpis listy)
+   * `lib/seo/workspace-metadata.ts` (`case 'reports'`)
+   * `app/[locale]/(app)/_layout/config/nav.config.ts` (ikona)
+   * `components/seo/json-ld.tsx`
+4. **Landing** — marketingowa replika ekranu raportu jest niezalezna od tego
+   modulu (ma wlasne teksty w `marketing.app.reports`), ale odwoluje sie do
+   tego samego segmentu:
+   * `app/[locale]/(marketing)/_landing/product/AppFrame.tsx`
+   * `app/[locale]/(marketing)/_landing/sections/ProductJourney.tsx`
+   * `app/[locale]/(marketing)/_landing/sections/EverythingElse.tsx`
+   * `app/[locale]/(marketing)/_landing/product/screens/ReportsScreen.tsx`
+     (caly plik) i klucze `marketing.app.reports`
+5. **Testy i budzety**
+   * `rm -rf __test__/reports`
+   * `__test__/work-automation/billing-integration.test.ts`: usun sekcje
+     „raporty nie naliczaja planu i wykonania dla tej samej daty" (reszta
+     pliku pilnuje fakturowania i zostaje)
+   * usun wpis trasy z `performance-budgets.json`
+6. **Opcjonalnie** `QUERY_KEYS.reports` / `QUERY_CONFIG.reports` w `lib/query`.
 
-Po tych krokach `npm run typecheck` i `npm run build` przechodza bez
-przepisywania dashboardu, kalendarza czy faktur.
+Po tych krokach `npm run typecheck`, `npm run lint` i `npm run build`
+przechodza bez przepisywania dashboardu, kalendarza czy faktur — zaden
+z tych modulow nie wie o istnieniu raportu.

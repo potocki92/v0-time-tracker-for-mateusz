@@ -1,5 +1,6 @@
 import { QueryErrorBoundary } from '@/components/common/errors'
 import type { SectionBoundaryProps } from '@/components/common/errors'
+import { ReportsErrorFallback } from './ReportsErrorFallback'
 
 /**
  * Granica bledu raportu. Jeden wariant wystarczy: raport to jedno zapytanie,
@@ -7,7 +8,11 @@ import type { SectionBoundaryProps } from '@/components/common/errors'
  */
 export function ReportsContentBoundary({ children, onError }: SectionBoundaryProps) {
   return (
-    <QueryErrorBoundary sectionName="ReportsContent" onError={onError}>
+    <QueryErrorBoundary
+      sectionName="ReportsContent"
+      onError={onError}
+      fallback={ReportsErrorFallback}
+    >
       {children}
     </QueryErrorBoundary>
   )
