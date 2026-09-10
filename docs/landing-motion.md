@@ -1,10 +1,10 @@
 # Landing — architektura ruchu
 
-Strona marketingowa (`app/[locale]/(marketing)`) jest scrollytellingiem: piec
-sekcji reaguje na przewijanie, w tym trzy przyklejone (`ProductJourney`,
-`NumbersStory`, `AutomationShowcase`) i jedna nieprzyklejona
-(`CapabilityCards`, sekcja 7). Ten dokument opisuje, na czym ten ruch stoi i
-dlaczego telefon dostaje inny profil niz desktop.
+Strona marketingowa (`app/[locale]/(marketing)`) jest scrollytellingiem: cztery
+sekcje reaguja na przewijanie, w tym trzy przyklejone (`ProductJourney`,
+`NumbersStory`, `AutomationShowcase`) i `HeroScene`, ktora oddaje ekran w gore.
+Ten dokument opisuje, na czym ten ruch stoi i dlaczego telefon dostaje inny
+profil niz desktop.
 
 Jesli szukasz konkretnego uzasadnienia liczbowego — stoi w komentarzu przy kodzie.
 Tutaj jest mapa.
@@ -134,11 +134,10 @@ przesuwa ani jednego piksela.
 | sekcja | desktop | telefon |
 |---|---|---|
 | `HeroScene` | `rotateX 12°→0°`, `scale 0.94→1.06`, `y 0→-70`, `perspective: 1600px` | bez `rotateX` i bez `perspective`; `scale 0.98→1.02`, `y 0→-24` |
-| `ProductJourney` | 5 ekranow na sobie, scroll prowadzi `opacity` i `transform` kazdej warstwy | scroll wyznacza **indeks sceny**; w DOM 1 ekran (2 na czas przejscia), crossfade 180 ms na CSS |
+| `ProductJourney` | 5 ekranow na sobie, scroll prowadzi `transform` kazdej warstwy (`opacity` tylko narracji) | scroll wyznacza **indeks sceny**; w DOM 1 ekran (2 na czas przejscia), wjazd 180 ms na CSS |
 | `MonthGrid` | wypelnianie **dzien po dniu** — 60 wartosci | wypelnianie **tygodniami** — 5 wartosci |
 | `Navbar` | `backdrop-blur-md` po przewinieciu | bez `backdrop-filter`; mocniejsze tlo `rgba(0,0,0,0.92)` |
 | `lp-device` | `box-shadow` 120 px | bez cienia |
-| `CapabilityCards` | bento 7+5 / 4+4+4, 5 ramek + 20 wartosci tresci | jedna kolumna, 5 ramek, tresc nieruchoma |
 
 ### Mobilny `ProductJourney`
 
@@ -150,20 +149,17 @@ i z powrotem.
 `setState` wola sie cztery razy na cala sekcje — w chwili faktycznej zmiany
 sceny, nie raz na klatke.
 
-Przejscie robi CSS (`.lp-scene-switch` + `@starting-style`), a nie Motion:
-przegladarka dostaje dwie wlasciwosci kompozytowalne i zaden JavaScript nie
-liczy tu klatek.
+Przejscie robi CSS (`.lp-scene-slide` i `.lp-scene-switch` + `@starting-style`),
+a nie Motion: przegladarka dostaje wylacznie wlasciwosci kompozytowalne i zaden
+JavaScript nie liczy tu klatek. Zasada jest ta sama, co na desktopie — ekran
+wjezdza, narracja zmienia sie sekwencyjnie (sekcja 7).
 
 ### Dlaczego telefon nie moze zostac na wariancie desktopowym
 
-Poza kosztem pieciu zamontowanych replik aplikacji: `useLayerFade` ma **celowo
-rozdzielone** okna widocznosci, wiec miedzy scenami istnieje punkt, w ktorym
-obie warstwy maja `opacity` 0. Zmierzone na torze `ProductJourney`: 52 z 201
-punktow pomiarowych ponizej progu widocznosci, minimum **0** — czyli calkowicie
-czarna klatka. Na desktopie to kilkanascie pikseli dlugiego toru. Na telefonie
-jeden flick potrafi wyladowac dokladnie w nim.
-
-Wariant mobilny ma tego punktu zero (`minTotalOpacity = 1`).
+Piec zamontowanych replik aplikacji to piec drzew utrzymywanych w kompozycji
+przez cala sekcje — na telefonie sam ich rozmiar zjada budzet klatki. To jedyny
+powod, ktory zostal: samo **przejscie** oba warianty robia dzis tak samo (patrz
+sekcja 7), wiec czarnej klatki nie ma juz zaden z nich.
 
 ---
 
@@ -211,7 +207,7 @@ zero sticky i zero elementow niedostepnych przez `visibility`.
 10. **Mierz przed i po.** Zadna z powyzszych regul nie powstala z intuicji.
 
 Reguly 1-6 pilnuje `__test__/landing/motion.test.ts`, a 9 —
-`__test__/landing/capability-motion.test.ts`.
+`__test__/landing/scene-motion.test.ts`.
 
 ---
 
@@ -225,7 +221,8 @@ Metryki, ktore cos znacza dla plynnosci przewijania, w kolejnosci waznosci:
 | elementy zmieniajace styl | `Set` celow tego samego obserwatora | jednocyfrowa |
 | animacje sterowane scrollem | `document.getAnimations().filter(a => a.timeline !== document.timeline)` | im wiecej tym lepiej — to te, ktore zeszly z main threadu |
 | ekrany w DOM | `#product .lp-screens > *` | 5 desktop / 1-2 telefon |
-| czarna klatka miedzy scenami | suma `opacity` widocznych warstw wzdluz toru | nigdy ponizej ~0,9 |
+| odslonieta ramka miedzy scenami | suma mnogosciowa pasow `translateX` warstw widocznych, dzielona przez szerokosc ramki | **1,000** na kazdym punkcie toru |
+| dwa interfejsy naraz | `opacity` warstw ekranu wzdluz toru | **zawsze 1** — ekran nie animuje jasnosci |
 
 Sam `ScriptDuration` wprowadza w blad: profil CPU sekcji `#product` pokazuje, ze
 okolo 70 procent czasu to `(program)`, czyli uklad i malowanie przegladarki, a
@@ -233,162 +230,156 @@ nie JavaScript.
 
 ---
 
-## 7. `CapabilityCards` — piec kart na jednym postepie
+## 7. `ProductJourney` — sceny 01-05
 
-Sekcja `#capabilities` (`_landing/sections/capabilities/`) pokazuje piec
-mozliwosci produktu: tracker, kalendarz, faktury, raporty i wymiana danych.
-Cala jej mechanika stoi w `_landing/motion/capability.ts`.
+Sekcja `#product` pokazuje piec scen na JEDNYM, nieruchomym interfejsie: chrome
+aplikacji renderuje sie raz, a przewijanie zmienia tylko warstwe tresci,
+podswietlenie w sidebarze i breadcrumb. Timeline stoi w `useSceneLayer`
+(`motion/scene.ts`), a cala jego arytmetyka — w czystej funkcji
+`sceneKeyframes`.
 
-### Czym rozni sie od pozostalych scen
+### Dwa przejscia, ktore tu NIE dzialaja
 
-Trzy starsze sceny stoja na **przyklejonym torze**: strona zatrzymuje sie, a
-scena gra na miejscu. Ta sekcja **nie zatrzymuje niczego** — karty leza w
-normalnym przeplywie i skladaja sie w miare, jak wjezdzaja na ekran.
+| | co robi | dlaczego odpada |
+|---|---|---|
+| rozdzielone okna (`useLayerFade`) | scena gasnie do zera tam, gdzie nastepna zaczyna sie pojawiac | miedzy scenami jest punkt, w ktorym OBIE warstwy maja `opacity` 0. Zmierzone: 52 z 201 punktow ponizej progu widocznosci, **minimum 0** — pusta ramka aplikacji |
+| przenikanie (okna nasuniete) | obie warstwy zmieniaja `opacity` w tym samym oknie | pustego punktu nie ma, ale w polowie przejscia widac OBA ekrany naraz. Na zrzucie 1440x900: siatka kalendarza i tabela projektow jedna przez druga — na gestym UI czyta sie to jak blad renderowania |
 
-To swiadoma roznica. Przyklejenie piatki kart wymagaloby albo zmieszczenia ich
-wszystkich na jednym ekranie telefonu (nie mieszcza sie — same karty maja
-~1500 px), albo drugiego mechanizmu „jedna karta naraz", czyli przepisania
-sekcji na `ProductJourney`. Wspolne z tamtymi scenami zostaje wszystko, co
-decyduje o wrazeniu i o koszcie: **jedno** zrodlo postepu na cala sekcje, zero
-listenerow `scroll`, zero postepu w stanie Reacta, `opacity` i gotowy
-`transform` jako jedyne animowane wlasciwosci.
+Przenikania nie da sie uratowac zmiana krzywych. Nawet gdy warstwa wchodzaca
+niesie nieprzezroczyste tlo i jasnosc zlozenia wynosi rowno 1 na calym torze
+(sprawdzone w przegladarce), w polowie przejscia nadal widac dwa interfejsy —
+bo tym wlasnie JEST przenikanie.
 
-### Skad bierze sie postep
+### Co dziala: ekran WCHODZI
 
-```ts
-const progress = useEntryProgress(gridRef) // offset ['start end', 'end end']
-```
+Warstwa ekranu niesie nieprzezroczyste tlo powierzchni (`--lp-s1`) i wjezdza z
+prawej na poprzednia, ktora cofa sie o 18% w glab. Przycina je `overflow-clip`
+na `.lp-screens`, czyli na kontenerze warstw — nie na wyzszym elemencie z
+paddingiem, bo warstwa musi miec DOKLADNIE rozmiar swojego pola przyciecia.
 
-`useEntryProgress` (`motion/scene.ts`) mierzy **siatke kart**, nie cala sekcje.
-Droga miedzy jego koncami to dokladnie wysokosc siatki, wiec **wysokosc okna
-nie wchodzi do wzoru** i `p` ma czytelne znaczenie geometryczne:
+Szczelnosc jest wlasnoscia geometrii, nie doborem liczb. W kazdym punkcie
+przejscia lewa krawedz ekranu wchodzacego stoi na `SCREEN_IN · (1 − t)`, a
+prawa krawedz schodzacego na `100 − SCREEN_OUT · t`. Przy `SCREEN_OUT (18) <
+SCREEN_IN (100)` ta druga jest zawsze na prawo od pierwszej, wiec **miedzy
+ekranami nie ma ani jednej klatki z odslonieta ramka** — i nie ma ani jednej z
+dwoma ekranami naraz, bo `opacity` ekranu nie zmienia sie nigdy.
 
-> `p` to ulamek siatki, ktory zdazyl przejsc nad dolna krawedzia ekranu.
+Kierunek bierze sie z jednej, MONOTONICZNEJ krzywej, wiec przewijanie w gore to
+ten sam ruch odtworzony wstecz. Nie ma osobnej krzywej wejscia i wyjscia do
+zestrojenia.
 
-Karta lezaca na glebokosci `f` staje sie widoczna dokladnie przy `p = f` — na
-kazdym telefonie i na kazdym monitorze tak samo. Dzieki temu okna czasowe kart
-czyta sie **jak pozycje w ukladzie**, a nie jak liczby dobrane na oko.
+### Narracja i breadcrumb ida inaczej, i to celowo
 
-`useTrackProgress` by tego nie dal: jego `['start start', 'end end']` opisuje
-tor przyklejonej sceny, gdzie zero wypada dopiero wtedy, gdy gora sekcji
-dojedzie do gory ekranu — czyli gdy pierwsza karta jest juz dawno widoczna.
+Tekst nie ma prawa przenikac przez tekst: dwa akapity po 50% to nie przenikanie
+filmowe, tylko dwie nieczytelne warstwy liter. Copy dostaje wiec przejscie
+**sekwencyjne** — stara mysl gasnie na poczatku przejscia, nowa zapala sie na
+jego koncu, z przerwa rowna 10% przejscia (na torze desktopu okolo 34 px
+przewijania). Przerwa nie boli, bo ramka obok jest w tym czasie pelna: „brak
+tekstu przez chwile" to nie to samo, co „czarny ekran".
+
+Podswietlenie sekcji w sidebarze ma trzecia krzywa (`spotlight`) — zapala sie
+na wejsciu sceny, gasnie na wejsciu nastepnej. Nie moze isc pozycja ekranu, bo
+ta jest monotoniczna: sidebar zapalalby sie narastajaco i na koncu toru
+swiecilaby cala nawigacja.
 
 ### Timeline
 
-Jedno miejsce z liczbami: tablica `ENTER` w `motion/capability.ts`. Kazdy wpis
-to `[poczatek wejscia, koniec wejscia]` w ulamku wysokosci siatki.
-
-| karta | desktop (>= 1024 px) | telefon |
-|---|---|---|
-| tracker | 0,00 → 0,30 | 0,00 → 0,14 |
-| kalendarz | 0,05 → 0,35 | 0,22 → 0,35 |
-| faktury | 0,49 → 0,79 | 0,42 → 0,58 |
-| raporty | 0,54 → 0,84 | 0,68 → 0,79 |
-| wymiana | 0,59 → 0,89 | 0,85 → 0,96 |
-
-Wartosci pochodza z **pomiaru** siatki w Chromium (1280x720, 1440x900,
-390x844, 393x852, 430x932; jezyk polski, bo ma najdluzsze copy). Zmierzone
-glebokosci kart stoja w komentarzu przy `ENTER`.
-
-**Desktop ma DWA takty, nie piec.** Bento uklada karty w dwa wiersze (7+5 /
-4+4+4), a karty jednego wiersza maja te sama glebokosc — nie da sie ich
-rozsunac w czasie inaczej niz o kilka procent. Rozsuniecie „dla efektu"
-znaczyloby animowanie karty, ktora stoi na ekranie od sekundy, czyli dokladnie
-te „animacje doganiajaca scroll", ktorej ta sekcja ma nie miec. Pieciu
-osobnych taktow dorabia sie dopiero uklad jednokolumnowy, czyli telefon.
-
-### Charakter ruchu
+Zero recznie dobranych okien: wszystko liczy sie z indeksu sceny, wiec szosta
+scena nie wymaga przestrajania pozostalych pieciu.
 
 | | |
 |---|---|
-| wejscie karty | `opacity` 0,30 → 1, `translateY` 22 px → 0, `scale` 0,978 → 1 |
-| po takcie | `opacity` przygasa do 0,90 i **tam zostaje** |
-| tresc karty | to samo, ale pasmo przesuniete o 35% dlugosci okna i `translateY` 6-10 px |
-| slupek raportu | `scaleY(0) → scaleY(1)`, `transform-origin: bottom` |
-| poswiata trackera | `translateY` -18 → 18 px na caly tor, tylko desktop |
+| takt sceny | `1/n` toru (przy pieciu scenach: 0,20) |
+| przejscie | `SWAP` = 0,09 toru, symetrycznie wokol granicy `i/n` |
+| krzywa | `smoothstep` (3t² − 2t³) w pieciu klatkach |
+| ekran | `translateX` 100% → 0 (wchodzacy), 0 → −18% (schodzacy) |
+| narracja | `opacity` 0 → 1 i `translateY` 14 px → 0, w 45% przejscia |
 
-Karta **nigdy nie schodzi do zera**. Po pierwsze dlatego, ze ma sie wylaniac, a
-nie wskakiwac. Po drugie — i wazniejsze — bo dzieki temu zadna klatka toru nie
-jest niewidoczna: takze przed hydratacja i takze gdyby JavaScript nigdy nie
-wystartowal.
+Na torze 520svh (desktop) `SWAP` to okolo 38svh przewijania — 2-3 klikniecia
+kolka. Warunek na wartosc: `SWAP < 1/n`, inaczej okna sasiadow zachodza na
+siebie i `useTransform` dostaje niemonotoniczny zakres wejsciowy.
 
-Przygaszanie do 0,90 ma granice od kontrastu: najsciemniejszy tekst w karcie to
-`--lp-ink-2` (0,62 alfy na czerni), czyli po przygasnieciu 0,558 — nadal nad
-progiem 0,50, ponizej ktorego 11-pikselowy tekst przestaje spelniac WCAG AA.
-Dlatego karty uzywaja `lp-cap-label` (`--lp-ink-2`), a nie `lp-eyebrow`
-(`--lp-ink-3`, 0,50 alfy).
+**Krzywej nie podajemy jako `ease`.** Motion akceleruje sprzetowo wylacznie pare
+tablic (sekcja 2), wiec latwiejsze wejscie i wyjscie robimy dodatkowymi
+klatkami. Piec punktow wystarcza: miedzy nimi zostaje odcinek prosty, a
+maksymalny blad wzgledem prawdziwego `smoothstep` to okolo 0,02.
+
+### `visibility` — jedyna wartosc, ktora zostaje w JS
+
+Nie jest wlasciwoscia akcelerowalna, wiec liczy ja main thread. Kosztuje tyle,
+co jej zmiany — a zmienia sie dwa razy na scene, nie raz na klatke. Bez niej
+ekran przykryty przez nastepny nadal malowalby sie pod spodem, a wygaszony
+akapit nadal czytalby czytnik ekranu.
+
+Konce zakresu widocznosci skrajnych scen sa **nieskonczone**, a nie zaciete na 0
+i 1: postep potrafi wyjsc poza tor (bounce Safari, `scrollRestoration`), a
+pierwsza i ostatnia scena nie maja wtedy prawa zniknac.
+
+### Telefon: ta sama zasada, inny silnik
+
+Wariant mobilny nie prowadzi warstw scrollem — trzyma w DOM aktywna scene (i
+przez 180 ms poprzednia) i przelacza je atrybutem. Zasade realizuje `landing.css`:
+
+| | |
+|---|---|
+| `.lp-scene-slide` | ekran: `translateX` 100% → 0, schodzacy → −18% |
+| `.lp-scene-switch` | narracja: 90 ms na zgaszenie starej, 90 ms na zapalenie nowej |
+| kto lezy wyzej | `z-index` na `[data-active='true']`, a **nie** kolejnosc w DOM |
+| kierunek | `data-back` z `previous > active` |
+
+`z-index` jest konieczny, bo warstwy montuja sie rosnaco po indeksie — przy
+powrocie „wstecz" schodzaca scena lezalaby wyzej. `data-back` odwraca kierunek
+wjazdu, inaczej cofniecie wygladaloby jak kolejne wejscie w przod.
+
+### Zmierzone w przegladarce
+
+Chromium, `/pl`, 81 punktow pomiarowych na torze:
+
+| | desktop 1440x900 | telefon 393x852 |
+|---|---|---|
+| pokrycie ramki | **1,000** na kazdym punkcie | 1,000 wstecz, 0,997 w przod |
+| `opacity` ekranu | 1 zawsze | 1 zawsze |
+| ekrany malowane naraz | 1-2 | 1-2 |
+| akapity widoczne naraz | 0-1 | 0-1 |
+| suma podswietlen sidebara | 1,000 | — |
+| animacje poza main threadem | 104 | — |
+
+Te 0,997 na telefonie to jedna klatka na wejsciu w przod (okolo piksela):
+warstwa wchodzaca rusza o klatke pozniej niz schodzaca, bo `@starting-style`
+potrzebuje jednego przeliczenia stylu. Proba wyrownania tego opoznieniem 16 ms
+na warstwie schodzacej pogarsza wynik do 0,983 — nie ma czego wyrownywac.
 
 ### Pulapka: tor trzeba domknac jawnie
 
-Klatki kazdej krzywej sieegaja **0 i 1**, nawet jesli okno karty konczy sie na
-0,35. Buduje je `holdOutside`.
+Klatki kazdej krzywej siegaja **0 i 1**, nawet jesli okno sceny konczy sie na
+0,245. Buduje je `closeTrack`.
 
 Powod jest twardy: kiedy Motion odda wartosc przegladarce, lista klatek staje
 sie zwyklym `KeyframeEffect`, a WAAPI **dopisuje neutralna klatke o wartosci
-wyjsciowej elementu**, jesli skrajna klatka nie stoi na offsecie 0 albo 1.
-Zmierzone w Chromium na tej sekcji przed poprawka: karta „Faktury" osiagala
-0,99 przy `p = 0,80` i wracala do 0,30 przy `p = 1,00` — gasla dokladnie
-wtedy, gdy uzytkownik na nia patrzyl.
-
-Sceny przyklejone tego nie widza, bo przy `p = 1` sa juz za ekranem. Sekcja,
-ktora **zostaje na ekranie**, musi domknac tor sama.
-
-### Desktop kontra telefon
-
-| | desktop | telefon |
-|---|---|---|
-| siatka | bento 7+5 / 4+4+4 | jedna kolumna |
-| takty | 2 wiersze + przesuniecie 0,05 w wierszu | 5 osobnych |
-| ramki kart na scrollu | 5 | 5 |
-| tresc kart na scrollu | 20 wartosci (panel, 5 tygodni, 3 faktury, 6 slupkow, 5 chipow) | **0** |
-| poswiata trackera | parallaksa | nieruchoma |
-
-Ponizej `lg` siatka ma jedna kolumne takze na tablecie. To nie jest tylko
-zwezenie ukladu: uklad dwukolumnowy w pasmie 640-1023 px dawalby trzy wiersze,
-czyli TRZECI timeline do wystrojenia przy dwoch profilach ruchu.
-
-Na telefonie scroll prowadzi wylacznie **ramki** kart — piec wartosci na cala
-sekcje. Tresc w srodku stoi gotowa. Powod jest ten sam, dla ktorego `MonthGrid`
-animuje tam tygodniami zamiast dniami: druga, zagniezdzona animacja pod palcem
-na ekranie o szerokosci 390 px nie dodaje informacji, a mnozy zapisy stylu w
-klatce przewijania.
-
-Wariant wybiera sie **komponentem** (`{reveal ? <XReveal /> : <X />}`), nie
-warunkiem w hooku — liczba hookow nie moze zalezec od profilu. Ten sam wzorzec
-co `DayCellReveal` / `DayCell` w `MonthGrid`.
+wyjsciowej elementu**, jesli skrajna nie stoi na offsecie 0 albo 1. Warstwa
+wracalaby wtedy do stanu poczatkowego dokladnie wtedy, gdy uzytkownik na nia
+patrzy.
 
 ### `prefers-reduced-motion`
 
-Bez drugiego systemu: kazdy element sterowany scrollem nosi `lp-motion`, a
-`landing.css` daje mu w bloku `reduce` `opacity: 1 !important` i `transform:
-none !important`. Slupki wracaja przez to do pelnej wysokosci (`--lp-bar` nigdy
-nie animuje), a karty do pelnej jasnosci.
+`ProductJourney` oddaje wtedy `JourneyStatic`: piec scen jedna pod druga, kazda
+z wlasnym interfejsem. Drugi bezpiecznik stoi w CSS — `.lp-layer`,
+`.lp-scene-switch` i `.lp-scene-slide` dostaja `opacity: 1 !important`,
+`visibility: visible !important` i `transform: none !important`.
 
-Dwa ruchy tej sekcji nie ida z Motion, wiec maja wlasne wylaczniki w tym samym
-bloku: mikroskala hovera (`.lp-capability`) i pulsowanie kropki „mierze czas"
-(`.lp-cap-dot-live`). Licznik trackera startuje wtedy **zatrzymany** — tresc
-zostaje w calosci, a przycisk startu dziala (WCAG 2.2.2).
+### Jak dodac szosta scene
 
-Dodatkowo sekcja nie MONTUJE wtedy wartosci sterujacych trescia:
-`reveal = profile === 'desktop' && !reduceMotion`. CSS i tak by je zneutralizowal,
-ale przeliczalyby sie w kazdej klatce — praca za nic dokladnie u osoby, ktora
-poprosila o jej mniej.
-
-### Jak dodac szosta karte
-
-1. Dopisz klucz do `CAPABILITY_KEYS` (kolejnosc = kolejnosc opowiesci).
-2. Dopisz jej okno w OBU profilach w `ENTER` i **przelicz sasiadow** — okna sa
-   pozycjami w ukladzie, wiec nowy wiersz przesuwa wszystko pod soba.
-3. Dodaj komponent karty w `sections/capabilities/cards/` z wariantem
-   statycznym i wariantem `Reveal`.
-4. Uzupelnij `marketing.capabilities.cards.<klucz>` w trzech jezykach.
-5. Przejedz `__test__/landing/capabilities.test.ts` i
-   `capability-motion.test.ts` — sprawdzaja liczbe kart, kolejnosc, zakresy
-   klatek i to, ze zaden punkt toru nie chowa karty.
+1. Dopisz wpis do `SCENES` w `ProductJourney.tsx` (indeks, segment,
+   `highlights`, `copyKey`).
+2. Dodaj szoste wywolanie `useSceneLayer` — hooki musza byc bezwarunkowe, wiec
+   sa wypisane jawnie. **Okien nie przeliczasz**: timeline liczy sie z indeksu.
+3. Dodaj ekran w `product/screens/` i galaz w `screenFor`.
+4. Uzupelnij `marketing.journey.scenes.<klucz>` w trzech jezykach.
+5. Przejedz `__test__/landing/scene-motion.test.ts` — sprawdza pokrycie ramki na
+   calym torze, monotonicznosc, sume podswietlen i domkniecie klatek.
 
 ### Czego w tej sekcji nie wolno animowac
 
-`height` slupka (jest stala, w `--lp-bar`), `width`, `top`, `margin`,
-`padding`. Hover nie moze przesuwac karty — scroll jest tu glowna osia ruchu,
-hover ma byc potwierdzeniem, ze karta zyje (skala 1,008, wylacznie pod
-`(hover: hover) and (pointer: fine)`).
+`width`, `height`, `top`, `margin`, `padding` — patrz sekcja 5. Nie wolno tez
+animowac `opacity` EKRANU (to natychmiast wraca kalka dwoch interfejsow) ani
+zdejmowac warstwie nieprzezroczystego tla.
