@@ -76,6 +76,49 @@
       "unknown_settings": "Keine Einstellungshistorie — bitte manuell entscheiden"
     }
   },
+  "capabilities": {
+    "eyebrow": "Funktionen",
+    "heading": "Alles dort, wo du danach greifst.",
+    "cards": {
+      "tracker": {
+        "label": "Timer",
+        "title": "Ein Klick. Start, Pause, Stopp.",
+        "body": "Der Timer läuft in der Seitenleiste und im Kopfbereich — überall dieselbe Zeit. Du hältst ihn an, wenn du die Baustelle verlässt.",
+        "running": "Läuft",
+        "paused": "Pausiert",
+        "pause": "Pause",
+        "resume": "Fortsetzen",
+        "stop": "Stopp"
+      },
+      "calendar": {
+        "label": "Kalender",
+        "title": "Ein Monat, in Stunden gemalt.",
+        "body": "Die Sättigung eines Tages ist die Länge der Schicht. Ein Klick auf das Feld öffnet den Eintrag."
+      },
+      "invoices": {
+        "label": "Rechnungen",
+        "title": "Von Stunden direkt zur Rechnung.",
+        "body": "Die Positionen kommen aus den Einträgen, die Nummer aus der Serie, der Status wacht über die Frist."
+      },
+      "reports": {
+        "label": "Berichte",
+        "title": "Sechs Monate auf einen Blick.",
+        "body": "Aufgeteilt nach Kunden, Projekten und Sätzen, mit Vergleich zum vorherigen Zeitraum."
+      },
+      "integrations": {
+        "label": "Datenaustausch",
+        "title": "Geht dorthin, wo es hin muss.",
+        "body": "Keine Plugins und keine Ankündigungen — diese Formate gibt es heute.",
+        "chips": {
+          "csv": "Buchhaltungs-CSV",
+          "pdf": "Rechnungs-PDF",
+          "json": "Bericht-JSON",
+          "csvImport": "CSV-Import",
+          "email": "Wochen-E-Mail"
+        }
+      }
+    }
+  },
   "everything": {
     "eyebrow": "Alles Weitere",
     "heading": "Gebaut für selbstständiges Arbeiten.",

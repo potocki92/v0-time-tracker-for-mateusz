@@ -76,6 +76,49 @@
       "unknown_settings": "Brak historii ustawień — rozstrzygnij ręcznie"
     }
   },
+  "capabilities": {
+    "eyebrow": "Możliwości",
+    "heading": "Wszystko tam, gdzie po to sięgasz.",
+    "cards": {
+      "tracker": {
+        "label": "Licznik",
+        "title": "Jedno kliknięcie. Start, pauza, koniec.",
+        "body": "Licznik chodzi w pasku bocznym i w nagłówku — ten sam czas widzisz wszędzie. Zatrzymujesz go, gdy schodzisz z budowy.",
+        "running": "Mierzę czas",
+        "paused": "Wstrzymane",
+        "pause": "Pauza",
+        "resume": "Wznów",
+        "stop": "Stop"
+      },
+      "calendar": {
+        "label": "Kalendarz",
+        "title": "Miesiąc pomalowany godzinami.",
+        "body": "Nasycenie dnia to długość zmiany. Kliknięcie w kratkę otwiera wpis."
+      },
+      "invoices": {
+        "label": "Faktury",
+        "title": "Z godzin prosto na fakturę.",
+        "body": "Pozycje liczą się z wpisów, numer idzie serią, status pilnuje terminu płatności."
+      },
+      "reports": {
+        "label": "Raporty",
+        "title": "Sześć miesięcy w jednym spojrzeniu.",
+        "body": "Podział na klientów, projekty i stawki, z porównaniem do poprzedniego okresu."
+      },
+      "integrations": {
+        "label": "Wymiana danych",
+        "title": "Wychodzi tam, gdzie trzeba.",
+        "body": "Bez wtyczek i bez zapowiedzi — te formaty działają dzisiaj.",
+        "chips": {
+          "csv": "CSV księgowy",
+          "pdf": "PDF faktury",
+          "json": "JSON raportu",
+          "csvImport": "Import CSV",
+          "email": "E-mail tygodnia"
+        }
+      }
+    }
+  },
   "everything": {
     "eyebrow": "Cała reszta",
     "heading": "Zbudowane pod pracę na swoim.",

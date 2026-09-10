@@ -25,8 +25,15 @@ function sourceFiles(dir: string): string[] {
 }
 
 const files = sourceFiles(LANDING)
-/** Pliki, ktore naprawde czytaja postep przewijania — tylko ich dotycza te reguly. */
-const scrollDriven = files.filter((file) => /from '.*motion\/scene'/.test(read(file)))
+/**
+ * Pliki, ktore naprawde czytaja postep przewijania — tylko ich dotycza te
+ * reguly. Sa dwa wejscia do warstwy ruchu: `motion/scene` (zrodla postepu i
+ * warstwy scen) oraz `motion/capability` (timeline sekcji „mozliwosci",
+ * ktory sam stoi na `motion/scene`).
+ */
+const scrollDriven = files.filter((file) =>
+  /from '.*motion\/(scene|capability)'/.test(read(file)),
+)
 
 describe('landing motion — animujemy tylko to, co potrafi kompozytor', () => {
   it('nie animuje scrollem zadnej wlasciwosci ukladu', () => {

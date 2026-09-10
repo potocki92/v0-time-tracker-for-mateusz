@@ -75,6 +75,35 @@ export function useExitProgress(ref: RefObject<HTMLElement | null>): MotionValue
 }
 
 /**
+ * Postep sekcji WCHODZACEJ w ekran: 0 gdy jej gorna krawedz dotyka dolu
+ * okna, 1 gdy dolna krawedz dotyka dolu okna.
+ *
+ * ── Dlaczego wlasnie ten offset ──
+ *
+ * Droga miedzy tymi dwoma stanami to DOKLADNIE wysokosc sekcji, wiec
+ * wysokosc okna nie wchodzi do wzoru. Postep ma przez to czytelne znaczenie
+ * geometryczne: `p` to ulamek sekcji, ktory zdazyl przejsc nad dolna
+ * krawedzia ekranu. Element lezacy na glebokosci `f` (w ulamku wysokosci
+ * sekcji) staje sie widoczny dokladnie przy `p = f` — na kazdym telefonie i
+ * na kazdym monitorze tak samo.
+ *
+ * To jest wlasnosc, na ktorej stoi timeline sekcji `capabilities`: okna
+ * czasowe kart czyta sie tam jak POZYCJE W UKLADZIE, a nie jak liczby
+ * dobrane na oko (patrz `./capability.ts`).
+ *
+ * `useTrackProgress` tego nie da: jego `['start start', 'end end']` opisuje
+ * tor przyklejonej sceny, gdzie 0 wypada dopiero wtedy, gdy gora sekcji
+ * dojedzie do gory ekranu — czyli gdy pierwsza karta jest juz dawno widoczna.
+ *
+ * `['start end', 'end end']` to nazwany zakres `ViewTimeline` (`entry`), wiec
+ * sciezka akcelerowana sprzetowo zostaje otwarta (patrz naglowek pliku).
+ */
+export function useEntryProgress(ref: RefObject<HTMLElement | null>): MotionValue<number> {
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end end'] })
+  return scrollYProgress
+}
+
+/**
  * DOKLADNIE polowa przerwy miedzy oknami scen (0,07), wiec przejscia sa
  * scisle sekwencyjne: scena gasnie do zera w tym samym punkcie, w ktorym
  * nastepna zaczyna sie pojawiac. Zadna para ekranow nie maluje sie naraz.
