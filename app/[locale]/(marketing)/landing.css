@@ -269,8 +269,28 @@
  * I kalendarz w jednym ekranie — komorka oddaje na to cztery piksele. */
 @media (max-width: 639px) {
   .lp .lp-day { min-height: 38px; }
-  .lp .lp-stage { padding-top: 3.5rem; }
+  .lp .lp-stage {
+    padding-top: 3.5rem;
+    /* Dol sceny oddaje 24 px ramce. Gora nie moze — 3,5rem to wysokosc
+     * przyklejonego navbara i mniej znaczyloby, ze pasek wchodzi na tresc. */
+    padding-bottom: 1.5rem;
+  }
 }
+
+/*
+ * Siatka rozciagnieta na wysokosc rodzica (`fill`) — kalendarz w replice
+ * aplikacji.
+ *
+ * `min-height` komorki i `grid-auto-rows: minmax(0, 1fr)` to sprzecznosc:
+ * tor wiersza wolno zjechac do zera, ale element w srodku upiera sie przy
+ * swojej wysokosci. Gdy rodzic jest nizszy niz 5 × 38 px, kazdy wiersz
+ * wychodzi poza swoj tor i NACHODZI na nastepny — miesiac wygladal wtedy
+ * jak podwojnie naswietlone zdjecie.
+ *
+ * W trybie `fill` o wysokosci decyduje rodzic, wiec komorka nie moze miec
+ * wlasnego minimum. Tresc (numer dnia + godziny) mieszczą sie w ~25 px.
+ */
+.lp .lp-month-fill .lp-day { min-height: 0; }
 .lp .lp-day-fill {
   position: absolute;
   inset: -1px;

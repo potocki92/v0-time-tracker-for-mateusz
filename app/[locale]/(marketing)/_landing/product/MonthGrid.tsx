@@ -136,7 +136,13 @@ export function MonthGrid({
   })
 
   return (
-    <div className={fill ? 'flex h-full flex-col' : undefined}>
+    /*
+      `lp-month-fill` zdejmuje z komorek wlasne `min-height`. W tym trybie o
+      wysokosci wiersza decyduje rodzic (`grid-auto-rows: minmax(0, 1fr)`), a
+      dwa zrodla prawdy o wysokosci konczyly sie nachodzacymi na siebie
+      tygodniami. Szczegoly w `landing.css`.
+    */
+    <div className={fill ? 'lp-month-fill flex h-full flex-col' : undefined}>
       <div className="mb-1 grid grid-cols-7 gap-1">
         {DEMO_WEEKDAY_DATES.map((date) => (
           <span key={date} className="text-center lp-t8 uppercase tracking-wide text-zinc-400">

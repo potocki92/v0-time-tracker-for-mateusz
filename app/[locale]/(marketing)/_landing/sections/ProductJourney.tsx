@@ -346,8 +346,15 @@ function JourneyStage({
               na telefonie pionowa (tam mock pokazuje uklad mobilny z dolnym
               paskiem), od `sm` pozioma jak prawdziwe okno. `max-h-full`
               pilnuje, zeby nigdy nie wyszla poza scene.
+
+              9/14, a nie 3/4: przy 3/4 ramka miala szerokosc telefonu i POLOWE
+              jego wysokosci, a w srodku stal uklad zaprojektowany na pelny
+              ekran. Ekran Kalendarza nie miescil wtedy miesiaca — na siatke
+              zostawalo 72 px zamiast potrzebnych 206. 9/14 to najwyzsza
+              proporcja, ktora miesci sie w scenie na wszystkich rozmiarach
+              iPhone'a (zmierzone: 390x844, 393x852, 430x932) z zapasem.
             */}
-            <div className="aspect-[3/4] max-h-[74svh] min-h-[300px] w-full sm:aspect-[4/3] lg:max-h-[70svh]">
+            <div className="aspect-[9/14] max-h-[74svh] min-h-[300px] w-full sm:aspect-[4/3] lg:max-h-[70svh]">
               {frame}
             </div>
           </div>

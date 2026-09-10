@@ -154,6 +154,31 @@ describe('landing motion — MonthGrid nie mnozy wartosci na telefonie', () => {
   })
 })
 
+describe('landing — replika aplikacji miesci sie w ramce', () => {
+  const css = read('app/[locale]/(marketing)/landing.css')
+  const grid = read(`${LANDING}/product/MonthGrid.tsx`)
+  const journey = read(`${LANDING}/sections/ProductJourney.tsx`)
+
+  it('nie daje komorce wlasnej wysokosci, gdy o wysokosci decyduje rodzic', () => {
+    // `min-height` komorki i `grid-auto-rows: minmax(0, 1fr)` to sprzecznosc:
+    // tor wiersza wolno zjechac do zera, ale element w srodku upiera sie przy
+    // swojej wysokosci. Gdy rodzic byl nizszy niz 5 x 38 px, kazdy tydzien
+    // wychodzil poza swoj tor i NACHODZIL na nastepny.
+    expect(grid).toContain('lp-month-fill')
+    expect(css).toMatch(/\.lp \.lp-month-fill \.lp-day \{ min-height: 0; \}/)
+  })
+
+  it('daje ramce na telefonie proporcje telefonu, nie polowy telefonu', () => {
+    // Przy 3/4 ramka miala szerokosc telefonu i polowe jego wysokosci, a w
+    // srodku stal uklad zaprojektowany na pelny ekran — ekran Kalendarza nie
+    // miescil miesiaca. Zmierzone na 390x844, 393x852 i 430x932: 9/14 to
+    // najwyzsza proporcja, ktora nadal miesci sie w scenie.
+    const frame = journey.match(/className="(aspect-\[[^"]*)"/)![1]
+    expect(frame).toContain('aspect-[9/14]')
+    expect(frame, 'desktop zostaje pozioma jak okno aplikacji').toContain('sm:aspect-[4/3]')
+  })
+})
+
 describe('landing motion — kosztowne efekty tylko tam, gdzie je widac', () => {
   const css = read('app/[locale]/(marketing)/landing.css')
 
