@@ -12,9 +12,9 @@ import {
   DEMO_INVOICE,
   DEMO_MONTH,
   DEMO_WEEK,
-  demoProject,
   type DemoMonth,
 } from '../demo/demo-data'
+import { useDemoNames } from '../demo/useDemoNames'
 import { useLayerFade, useTrackProgress } from '../motion/scene'
 
 /**
@@ -30,6 +30,7 @@ import { useLayerFade, useTrackProgress } from '../motion/scene'
 export function NumbersStory({ month }: { month: DemoMonth }) {
   const t = useTranslations('marketing.flow')
   const fmt = useFormat()
+  const names = useDemoNames()
   const trackRef = useRef<HTMLDivElement>(null)
   const progress = useTrackProgress(trackRef)
 
@@ -43,7 +44,7 @@ export function NumbersStory({ month }: { month: DemoMonth }) {
     {
       fade: fade0,
       value: fmt.hours(10),
-      caption: t('today', { project: demoProject(DEMO_AUTOMATION_TARGET.projectId).name }),
+      caption: t('today', { project: names.project(DEMO_AUTOMATION_TARGET.projectId) }),
       small: false,
     },
     {

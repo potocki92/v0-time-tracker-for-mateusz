@@ -15,6 +15,7 @@ import {
   demoClient,
   type DemoMonth,
 } from '../../demo/demo-data'
+import { useDemoNames } from '../../demo/useDemoNames'
 import { Bars, Card, Dot, Eyebrow, Meter, Pill, StatTile } from '../ui'
 
 /** „Dzisiaj" w mockupie — jeden dzien odniesienia dla calej repliki Pulpitu. */
@@ -30,6 +31,7 @@ export function DashboardScreen({ month }: { month: DemoMonth }) {
   const t = useTranslations('marketing.app.dashboard')
   const tInvoice = useTranslations('marketing.app.invoice.status')
   const fmt = useFormat()
+  const names = useDemoNames()
   const weekEarnings = DEMO_WEEK.hours * DEMO_RATE_EUR
 
   return (
@@ -111,7 +113,7 @@ export function DashboardScreen({ month }: { month: DemoMonth }) {
                 <div className="flex items-center gap-1.5">
                   <Dot color={demoClient(project.clientId).color} />
                   <span className="min-w-0 flex-1 truncate lp-t10 text-zinc-200">
-                    {project.name}
+                    {names.project(project.id)}
                   </span>
                   <span className="lp-mono lp-t9 tabular-nums text-zinc-400">
                     {fmt.hours(project.hours)}

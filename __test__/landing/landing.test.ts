@@ -3,11 +3,18 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_WEEK_SCHEDULE } from '@/features/work-automation/domain'
+import { APP_LOCALES } from '@/i18n/config'
 import { WORKSPACE_SECTIONS } from '@/lib/workspace/sections'
 
+import marketingDe from '@/messages/de/marketing.json'
+import marketingEn from '@/messages/en/marketing.json'
+import marketingPl from '@/messages/pl/marketing.json'
+
 import {
+  DEMO_CLIENTS,
   DEMO_HOME_STAY,
   DEMO_INVOICES,
+  DEMO_PROJECTS,
   DEMO_RATE_EUR,
   DEMO_TRIPS,
   DEMO_WEEK,
@@ -217,5 +224,29 @@ describe('landing — nawigacja mockupu laczy klientow ze scena Projekty', () =>
     // Ten test jest bezpiecznikiem: naprawa marketingowego sidebara nie moze
     // wyciac sekcji klientow z prawdziwej aplikacji.
     expect(WORKSPACE_SECTIONS.some((section) => section.segment === 'clients')).toBe(true)
+  })
+})
+
+/**
+ * Konto demonstracyjne stoi w dwoch warstwach: `demo-data.ts` trzyma
+ * STRUKTURE (id, stawki, relacje, liczby), a `messages/<locale>/marketing.json`
+ * OBSADE (nazwy klientow, projektow i wystawcy). Podzial ma sens tylko dopoki
+ * obie warstwy sie pokrywaja — dopisany klient bez nazwy pokazalby na
+ * landingu surowy klucz `marketing.demo.clients.<id>`.
+ */
+describe('landing — struktura demo i jego obsada nie moga sie rozjechac', () => {
+  const CAST = { pl: marketingPl.demo, de: marketingDe.demo, en: marketingEn.demo }
+
+  it.each(APP_LOCALES)('%s nazywa kazdego klienta i kazdy projekt', (locale) => {
+    const demo = CAST[locale]
+
+    expect(Object.keys(demo.clients).sort()).toEqual(DEMO_CLIENTS.map((c) => c.id).sort())
+    expect(Object.keys(demo.projects).sort()).toEqual(DEMO_PROJECTS.map((p) => p.id).sort())
+  })
+
+  it.each(APP_LOCALES)('%s trzyma inicjaly wystawcy w rozmiarze awatara', (locale) => {
+    // Awatar w sidebarze mockupu to kolko 16 px — pelne imie by z niego wyjechalo.
+    expect(CAST[locale].seller.initials.length).toBeLessThanOrEqual(2)
+    expect(CAST[locale].seller.name.length).toBeGreaterThan(0)
   })
 })

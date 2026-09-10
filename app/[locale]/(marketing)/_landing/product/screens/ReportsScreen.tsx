@@ -13,6 +13,7 @@ import {
   demoClient,
   type DemoMonth,
 } from '../../demo/demo-data'
+import { useDemoNames } from '../../demo/useDemoNames'
 import { Bars, Card, Dot, Eyebrow, Meter, StatTile } from '../ui'
 
 /**
@@ -24,6 +25,7 @@ import { Bars, Card, Dot, Eyebrow, Meter, StatTile } from '../ui'
 export function ReportsScreen({ month }: { month: DemoMonth }) {
   const t = useTranslations('marketing.app.reports')
   const fmt = useFormat()
+  const names = useDemoNames()
   const totalProjectHours = DEMO_PROJECTS.reduce((sum, project) => sum + project.hours, 0)
 
   return (
@@ -96,7 +98,7 @@ export function ReportsScreen({ month }: { month: DemoMonth }) {
               <li key={project.id} className="space-y-1">
                 <div className="flex items-center gap-1.5 lp-t9">
                   <Dot color={demoClient(project.clientId).color} />
-                  <span className="min-w-0 flex-1 truncate text-zinc-200">{project.name}</span>
+                  <span className="min-w-0 flex-1 truncate text-zinc-200">{names.project(project.id)}</span>
                   <span className="lp-mono tabular-nums text-zinc-300">
                     {fmt.hours(project.hours)}
                   </span>
