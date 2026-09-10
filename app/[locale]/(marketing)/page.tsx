@@ -6,7 +6,6 @@ import { buildLocalizedMetadata } from '@/lib/seo/metadata'
 
 import { buildDemoMonth } from './_landing/demo/demo-month.server'
 import { AutomationShowcase } from './_landing/sections/AutomationShowcase'
-import { CapabilityCards } from './_landing/sections/capabilities/CapabilityCards'
 import { EverythingElse } from './_landing/sections/EverythingElse'
 import { FinalCta } from './_landing/sections/FinalCta'
 import { Footer } from './_landing/sections/Footer'
@@ -60,7 +59,6 @@ export default async function LandingPage({
         <ProductJourney month={month} />
         <NumbersStory month={month} />
         <AutomationShowcase month={month} />
-        <CapabilityCards month={month} />
         <EverythingElse />
         <FinalCta />
       </main>

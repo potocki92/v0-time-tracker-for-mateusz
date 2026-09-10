@@ -17,7 +17,7 @@ import type { WorkspaceSegment } from '@/lib/workspace/sections'
 import type { DemoMonth } from '../demo/demo-data'
 import { resolveSceneIndex } from '../motion/active-scene'
 import { useMotionProfile, usePrefersReducedMotion } from '../motion/profile'
-import { useLayerFade, useTrackProgress } from '../motion/scene'
+import { useSceneLayer, useTrackProgress } from '../motion/scene'
 import { AppFrame } from '../product/AppFrame'
 import { MARKETING_SECTIONS } from '../product/nav'
 import { CalendarScreen } from '../product/screens/CalendarScreen'
@@ -43,18 +43,26 @@ import { ReportsScreen } from '../product/screens/ReportsScreen'
  *
  * `JourneyMobile` — ten sam uklad, inna mechanika. Scroll wyznacza tylko
  * INDEKS sceny (`resolveSceneIndex`), w DOM stoi jeden ekran, a przelaczenie
- * to 180 ms crossfade'u na czystym CSS. Powody sa dwa i oba mierzalne:
- *   1. piec ekranow to piec drzew utrzymywanych w drzewie kompozycji przez
- *      cala sekcje — na telefonie sam ich rozmiar zjada budzet klatki,
- *   2. rozdzielone okna widocznosci (patrz `useLayerFade`) daja miedzy
- *      scenami punkt, w ktorym OBIE warstwy maja `opacity` 0. Na desktopie
- *      to kilkanascie pikseli toru, na telefonie jeden flick potrafi wyladowac
- *      dokladnie w nim — i wtedy widac czarna klatke miedzy scenami.
- *      Crossfade z nakladajacymi sie warstwami nie ma takiego punktu.
+ * to 180 ms przenikania na czystym CSS. Powod jest mierzalny: piec ekranow to
+ * piec drzew utrzymywanych w kompozycji przez cala sekcje — na telefonie sam
+ * ich rozmiar zjada budzet klatki.
  *
  * `JourneyStatic` — `prefers-reduced-motion`. Te same sceny jedna pod druga,
  * kazda z wlasnym interfejsem. Fallback musi rozniac sie DOM-em, bo pieciu
  * nalozonych warstw nie da sie rozsunac sama zmiana CSS.
+ *
+ * ── Ekran WCHODZI, tekst sie ZMIENIA ──
+ *
+ * Ekran nie przenika przez ekran. Warstwa wchodzaca niesie nieprzezroczyste
+ * tlo powierzchni (`bg-[var(--lp-s1)]` — dokladnie tlo ramki, wiec poza
+ * przejsciem nie widac go wcale) i WJEZDZA z prawej na poprzednia, ktora
+ * cofa sie o kilkanascie procent w glab. Przycina je `overflow-hidden` ramki.
+ * Zadna klatka nie jest przez to ani pusta, ani podwojnie naswietlona.
+ *
+ * Narracja i breadcrumb ida osobno i sekwencyjnie: stara mysl gasnie, nowa
+ * sie zapala. Tekst nie ma prawa przenikac przez tekst. Pelne uzasadnienie i
+ * pomiary stoja przy `useSceneLayer` w `../motion/scene`; na telefonie te
+ * sama role pelni `z-index` i regula `.lp-scene-switch` w `landing.css`.
  *
  * Klasa `lp-screens` na kontenerze ekranow nie niesie stylu — jest zaczepem
  * dla pomiarow, ktore licza, ile ekranow stoi naraz w DOM.
@@ -125,17 +133,22 @@ function JourneyDesktop({ month }: { month: DemoMonth }) {
   const progress = useTrackProgress(trackRef)
 
   // Piec jawnych wywolan zamiast petli: hooki musza byc bezwarunkowe, a scen
-  // jest stala piatka. Okna sasiaduja z zakladka rowna czasowi przenikania.
-  const fade0 = useLayerFade(progress, 0.0, 0.14)
-  const fade1 = useLayerFade(progress, 0.21, 0.35)
-  const fade2 = useLayerFade(progress, 0.42, 0.56)
-  const fade3 = useLayerFade(progress, 0.63, 0.77)
-  const fade4 = useLayerFade(progress, 0.84, 1.0)
-  const fades = [fade0, fade1, fade2, fade3, fade4]
+  // jest stala piatka. Timeline liczy sie z indeksu — zadnych recznie
+  // dobranych okien, wiec dodanie szostej sceny nie wymaga przestrajania
+  // pozostalych piec.
+  const layer0 = useSceneLayer(progress, 0, SCENES.length)
+  const layer1 = useSceneLayer(progress, 1, SCENES.length)
+  const layer2 = useSceneLayer(progress, 2, SCENES.length)
+  const layer3 = useSceneLayer(progress, 3, SCENES.length)
+  const layer4 = useSceneLayer(progress, 4, SCENES.length)
+  const layers = [layer0, layer1, layer2, layer3, layer4]
 
+  // Podswietlenie w sidebarze idzie krzywa `spotlight`, a NIE `opacity`
+  // warstwy: ta ostatnia zostaje na jedynce po wejsciu sceny, wiec zapalilaby
+  // wszystkie sekcje, przez ktore uzytkownik juz przejechal.
   const activeMotion: Partial<Record<WorkspaceSegment, MotionValue<number>>> = {}
   SCENES.forEach((scene, index) => {
-    for (const segment of scene.highlights) activeMotion[segment] = fades[index].opacity
+    for (const segment of scene.highlights) activeMotion[segment] = layers[index].spotlight
   })
 
   return (
@@ -147,9 +160,9 @@ function JourneyDesktop({ month }: { month: DemoMonth }) {
           key={scene.index}
           className="lp-layer"
           style={{
-            opacity: fades[index].opacity,
-            transform: fades[index].transform,
-            visibility: fades[index].visibility,
+            opacity: layers[index].copy.opacity,
+            transform: layers[index].copy.transform,
+            visibility: layers[index].copy.visibility,
           }}
         >
           <SceneCopy scene={scene} />
@@ -166,8 +179,8 @@ function JourneyDesktop({ month }: { month: DemoMonth }) {
                   key={scene.index}
                   className="lp-layer flex items-center gap-1.5"
                   style={{
-                    opacity: fades[index].opacity,
-                    visibility: fades[index].visibility,
+                    opacity: layers[index].copy.opacity,
+                    visibility: layers[index].copy.visibility,
                   }}
                 >
                   <BreadcrumbLabel segment={scene.segment} />
@@ -176,15 +189,21 @@ function JourneyDesktop({ month }: { month: DemoMonth }) {
             </span>
           }
         >
-          <div className="lp-screens lp-layers h-full">
+          <div className="lp-screens lp-layers h-full overflow-clip">
             {SCENES.map((scene, index) => (
               <m.div
                 key={scene.index}
-                className="lp-layer h-full min-h-0"
+                /*
+                  `opacity: 1` jest tu JAWNIE, bo `.lp-layer` w `landing.css`
+                  gasi wszystkie warstwy poza pierwsza — to zabezpieczenie na
+                  czas PRZED hydratacja, gdy zadna warstwa nie stoi jeszcze
+                  poza ramka. Ekran nie animuje jasnosci ani przez chwile.
+                */
+                className="lp-layer h-full min-h-0 bg-[var(--lp-s1)]"
                 style={{
-                  opacity: fades[index].opacity,
-                  transform: fades[index].transform,
-                  visibility: fades[index].visibility,
+                  opacity: 1,
+                  transform: layers[index].screen.transform,
+                  visibility: layers[index].screen.visibility,
                 }}
               >
                 {screenFor(index, month)}
@@ -264,8 +283,14 @@ function JourneyMobile({ month }: { month: DemoMonth }) {
   const { active, previous } = useActiveScene(progress, SCENES.length)
 
   // Kolejnosc rosnaca, zeby wejscie i wyjscie ze sceny mialy ten sam porzadek
-  // malowania w obie strony przewijania.
+  // malowania w obie strony przewijania. O tym, ktora warstwa lezy na wierzchu,
+  // decyduje `z-index` w `landing.css`, a nie ta kolejnosc.
   const mounted = previous === -1 ? [active] : [active, previous].sort((a, b) => a - b)
+
+  // Kierunek przewijania. CSS sam go nie widzi, a bez niego powrot „wstecz"
+  // wygladalby jak kolejne wejscie w przod: ekran wjezdzalby z prawej takze
+  // wtedy, gdy uzytkownik sie cofa.
+  const back = previous > active
 
   return (
     <JourneyStage
@@ -277,7 +302,12 @@ function JourneyMobile({ month }: { month: DemoMonth }) {
         swojej tresci. Przelacza je klasa, nie wartosc sterowana scrollem.
       */
       copy={SCENES.map((scene, index) => (
-        <div key={scene.index} className="lp-scene-switch" data-active={index === active}>
+        <div
+          key={scene.index}
+          className="lp-scene-switch"
+          data-active={index === active}
+          data-back={back}
+        >
           <SceneCopy scene={scene} />
         </div>
       ))}
@@ -287,12 +317,13 @@ function JourneyMobile({ month }: { month: DemoMonth }) {
           label={t('frameLabel')}
           breadcrumb={<BreadcrumbLabel segment={SCENES[active].segment} />}
         >
-          <div className="lp-screens lp-layers h-full">
+          <div className="lp-screens lp-layers h-full overflow-clip">
             {mounted.map((index) => (
               <div
                 key={SCENES[index].index}
-                className="lp-scene-switch h-full min-h-0"
+                className="lp-scene-slide h-full min-h-0 bg-[var(--lp-s1)]"
                 data-active={index === active}
+                data-back={back}
               >
                 {screenFor(index, month)}
               </div>

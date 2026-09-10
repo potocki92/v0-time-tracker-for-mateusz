@@ -76,49 +76,6 @@
       "unknown_settings": "No settings history — decide manually"
     }
   },
-  "capabilities": {
-    "eyebrow": "Capabilities",
-    "heading": "Every tool, where you reach for it.",
-    "cards": {
-      "tracker": {
-        "label": "Live tracker",
-        "title": "One click. Start, pause, stop.",
-        "body": "The timer runs in the sidebar and in the header — the same clock everywhere. You stop it when you leave the site.",
-        "running": "Tracking",
-        "paused": "Paused",
-        "pause": "Pause",
-        "resume": "Resume",
-        "stop": "Stop"
-      },
-      "calendar": {
-        "label": "Calendar",
-        "title": "A month painted in hours.",
-        "body": "A day's saturation is the length of the shift. One click on a cell opens the entry."
-      },
-      "invoices": {
-        "label": "Invoices",
-        "title": "From hours straight to an invoice.",
-        "body": "Line items come from the entries, the number from the series, the status watches the due date."
-      },
-      "reports": {
-        "label": "Reports",
-        "title": "Six months at a single glance.",
-        "body": "Split by client, project and rate, with a comparison to the previous period."
-      },
-      "integrations": {
-        "label": "Data exchange",
-        "title": "It goes where it needs to go.",
-        "body": "No plugins and no announcements — these formats work today.",
-        "chips": {
-          "csv": "Accounting CSV",
-          "pdf": "Invoice PDF",
-          "json": "Report JSON",
-          "csvImport": "CSV import",
-          "email": "Weekly e-mail"
-        }
-      }
-    }
-  },
   "everything": {
     "eyebrow": "Everything else",
     "heading": "Built for independent work.",

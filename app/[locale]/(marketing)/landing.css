@@ -188,31 +188,88 @@
  *
  * Mobilny `ProductJourney` nie prowadzi warstw scrollem — trzyma w DOM
  * aktywna scene (i, przez czas przejscia, poprzednia) i przelacza je
- * atrybutem. Cale przejscie robi wiec CSS: przegladarka dostaje dwie
+ * atrybutem. Cale przejscie robi wiec CSS: przegladarka dostaje wylacznie
  * wlasciwosci kompozytowalne i zaden JavaScript nie liczy tu klatek.
  *
  * 180 ms to ta sama wartosc, co `SWITCH_MS` w `ProductJourney.tsx` — tam
  * decyduje, jak dlugo poprzednia scena zostaje zamontowana.
  *
- * `visibility` schodzi dopiero PO wygaszeniu (`0s linear 180ms`): warstwa
+ * Zasada jest DOKLADNIE ta sama, co w wariancie desktopowym (`useSceneLayer`
+ * w `_landing/motion/scene.ts`), tylko silnik inny:
+ *
+ *   `.lp-scene-slide`  — ekran WJEZDZA na poprzedni, nigdy przez niego nie
+ *                        przenika (nieprzezroczyste tlo niesie JSX),
+ *   `.lp-scene-switch` — narracja zmienia sie SEKWENCYJNIE: 90 ms na
+ *                        zgaszenie starego akapitu, 90 ms na zapalenie
+ *                        nowego, zero klatek z dwoma tekstami naraz.
+ *
+ * `data-back` niesie kierunek przewijania — bez niego powrot „wstecz"
+ * wygladalby jak kolejne wejscie w przod, a nie jak cofniecie.
+ *
+ * `z-index` (a nie kolejnosc w DOM) stawia aktywna scene na wierzchu:
+ * warstwy montuja sie rosnaco po indeksie, wiec przy powrocie schodzaca
+ * scena lezalaby wyzej.
+ *
+ * `visibility` schodzi dopiero PO przejsciu (`0s linear 180ms`): warstwa
  * przestaje istniec dla malowania i czytnika ekranu dokladnie wtedy, gdy
  * przestaje byc widoczna, ani chwili wczesniej.
  */
+.lp .lp-scene-switch,
+.lp .lp-scene-slide {
+  z-index: 0;
+  visibility: hidden;
+}
+.lp .lp-scene-switch[data-active='true'],
+.lp .lp-scene-slide[data-active='true'] {
+  z-index: 1;
+  visibility: visible;
+}
+
+/* ── narracja: stary tekst gasnie, potem zapala sie nowy ── */
 .lp .lp-scene-switch {
   opacity: 0;
-  visibility: hidden;
   transform: translateY(8px);
   transition:
-    opacity 180ms ease,
-    transform 180ms ease,
+    opacity 90ms ease,
+    transform 90ms ease,
     visibility 0s linear 180ms;
 }
 .lp .lp-scene-switch[data-active='true'] {
   opacity: 1;
-  visibility: visible;
   transform: none;
   transition:
-    opacity 180ms ease,
+    opacity 90ms ease 90ms,
+    transform 90ms ease 90ms,
+    visibility 0s;
+}
+
+/*
+ * ── ekran: wjezdza na poprzedni, ktory cofa sie w glab ──
+ *
+ * Rowno 100%, i to jest warunek szczelnosci, a nie zaokraglenie: warstwa ma
+ * dokladnie rozmiar swojego pola przyciecia (`overflow-clip` na
+ * `.lp-screens`), a 18 < 100, wiec prawa krawedz ekranu schodzacego jest w
+ * kazdej klatce na prawo od lewej krawedzi wchodzacego. Przy 105% miedzy
+ * ekranami otwierala sie na dwie klatki szpara odslaniajaca ramke — zmierzone
+ * na 393x852: pokrycie spadalo do 0,992.
+ *
+ * Zostaje jedna klatka opoznienia na wejsciu w PRZOD (pokrycie 0,997, czyli
+ * okolo piksela na ekranie 393 px): wchodzaca warstwa rusza o klatke pozniej
+ * niz schodzaca, bo `@starting-style` potrzebuje jednego przeliczenia stylu.
+ * Proba wyrownania tego opoznieniem `16ms` na warstwie schodzacej POGARSZA
+ * wynik (zmierzone: 0,983), wiec zostaje tak — nie ma czego wyrownywac.
+ */
+.lp .lp-scene-slide {
+  opacity: 1;
+  transform: translateX(-18%);
+  transition:
+    transform 180ms ease,
+    visibility 0s linear 180ms;
+}
+.lp .lp-scene-slide[data-back='true'] { transform: translateX(100%); }
+.lp .lp-scene-slide[data-active='true'] {
+  transform: none;
+  transition:
     transform 180ms ease,
     visibility 0s;
 }
@@ -221,16 +278,21 @@
  * Scena wchodzaca jest DOPIERO CO wstawiona do DOM i od razu ma
  * `data-active="true"` — bez stanu poczatkowego przegladarka nie ma czego
  * animowac i nowy ekran po prostu wyskakuje. `@starting-style` daje jej ten
- * stan, wiec przejscie jest prawdziwym crossfade'em: nowa scena narasta na
- * schodzacej, a nie podmienia jej ciecie na ciecie.
+ * stan, wiec wjazd jest prawdziwym ruchem, a nie cieciem.
  *
  * Przegladarki bez `@starting-style` degraduja sie do natychmiastowego
- * pojawienia — nadal bez czarnej klatki, tylko bez przenikania.
+ * pojawienia — nadal bez czarnej klatki, tylko bez ruchu.
  */
 @starting-style {
   .lp .lp-scene-switch[data-active='true'] {
     opacity: 0;
     transform: translateY(8px);
+  }
+  .lp .lp-scene-slide[data-active='true'] {
+    transform: translateX(100%);
+  }
+  .lp .lp-scene-slide[data-active='true'][data-back='true'] {
+    transform: translateX(-18%);
   }
 }
 
@@ -308,173 +370,6 @@
   pointer-events: none;
 }
 
-/* ================================================================
- * Karty mozliwosci (sekcja `#capabilities`)
- *
- * Ruch tych kart prowadzi scroll (`_landing/motion/capability.ts`). TUTAJ
- * stoi wylacznie to, czego scroll nie dotyka: powierzchnia, hover i stale
- * geometrie wizualizacji. Podzial jest scisly — kazda wlasciwosc, ktora
- * zmienia sie w klatce przewijania, jedzie z Motion jako `opacity` albo
- * gotowy `transform`, i nigdy odwrotnie.
- * ================================================================ */
-
-/*
- * Powierzchnia karty. `height: 100%` wyrownuje karty w wierszu bento —
- * rodzic jest elementem sterowanym scrollem, wiec sam nie moze rozciagac
- * sie flexem bez mieszania sie do transformu.
- *
- * Kolumna flex, bo wizualizacja siada na DOLE karty (`margin-top: auto` w
- * `CapabilityCard`). Bez tego karta wyzsza od swojej tresci — a w wierszu
- * bento zawsze jakas taka jest — konczyla sie pustym pasem pod wykresem.
- */
-.lp .lp-capability {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 20px;
-  background: var(--lp-s2);
-  border: 1px solid var(--lp-hair-2);
-  border-radius: 16px;
-  transition: border-color 200ms ease, transform 200ms ease;
-}
-
-/*
- * Hover siedzi na WNETRZU karty, nie na elemencie sterowanym scrollem:
- * `transform` istnieje na wezle raz, wiec styl inline dopisywany przez
- * Motion skasowalby skale z CSS. Rozdzielenie znaczy tez, ze hover nie
- * kosztuje ani jednej wartosci JavaScriptu.
- *
- * `(hover: hover) and (pointer: fine)` odcina dotyk, gdzie `:hover` zostaje
- * przyklejony po tapnieciu i karta zostawalaby powiekszona.
- *
- * 1,008 — tyle, ile widac katem oka na krawedzi. Scroll jest tu glowna osia
- * ruchu; hover ma byc potwierdzeniem, ze karta zyje, a nie drugim gestem.
- */
-@media (hover: hover) and (pointer: fine) {
-  .lp .lp-capability:hover {
-    border-color: color-mix(in oklab, var(--lp-accent) 28%, var(--lp-hair-2));
-    transform: scale(1.008);
-  }
-}
-
-/*
- * Nadtytul karty. `--lp-ink-2` (0,62 alfy), a NIE `--lp-ink-3` (0,50) jak
- * `lp-eyebrow`: karta po swoim takcie przygasa do `opacity: 0.9`, wiec
- * najsciemniejszy tekst schodzi w niej do 0,558 alfy. Przy 0,50 wyszloby
- * 0,45 — ponizej progu WCAG AA dla 11-pikselowego tekstu na czerni.
- */
-.lp .lp-cap-label {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--lp-ink-2);
-}
-
-/* Poswiata karty trackera. Lezy pod trescia i nie lapie zdarzen. */
-.lp .lp-cap-orb {
-  position: absolute;
-  top: -90px;
-  right: -90px;
-  width: 260px;
-  height: 260px;
-  border-radius: 999px;
-  pointer-events: none;
-  background: radial-gradient(
-    circle,
-    color-mix(in oklab, var(--lp-accent) 20%, transparent) 0%,
-    transparent 70%
-  );
-}
-
-/* Panel licznika — ta sama para kolorow, co tracker w sidebarze aplikacji. */
-.lp .lp-cap-timer {
-  position: relative;
-  padding: 16px;
-  border-radius: 12px;
-  background: color-mix(in oklab, var(--lp-accent) 6%, transparent);
-  border: 1px solid color-mix(in oklab, var(--lp-accent) 20%, transparent);
-}
-
-/*
- * Zegar licznika. Rozmiar stoi TUTAJ, a nie jako `text-[40px]` w JSX — landing
- * ma zamknieta skale typografii (`lp-t7`..`lp-d1`) i ani jednej arbitralnej
- * wartosci w komponentach; pilnuje tego `__test__/config/design-tokens.test.ts`.
- */
-.lp .lp-cap-clock {
-  font-size: clamp(30px, 6vw, 40px);
-  line-height: 1;
-  letter-spacing: 0.02em;
-  color: var(--lp-accent);
-}
-
-.lp .lp-cap-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.3);
-}
-.lp .lp-cap-dot-live {
-  background: var(--lp-accent);
-  animation: lp-cap-pulse 2.4s ease-in-out infinite;
-}
-@keyframes lp-cap-pulse {
-  0%,
-  100% { opacity: 1; }
-  50% { opacity: 0.35; }
-}
-
-.lp .lp-cap-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 8px;
-  font-size: 11px;
-  color: var(--lp-ink-2);
-  border: 1px solid var(--lp-hair-2);
-  background: rgba(255, 255, 255, 0.04);
-  transition: color 150ms ease, border-color 150ms ease;
-}
-.lp .lp-cap-btn:hover {
-  color: var(--lp-ink-1);
-  border-color: rgba(255, 255, 255, 0.35);
-}
-
-/* Komorka kafelki miesiaca. Trzy poziomy — tyle, ile zna miesiac demo. */
-.lp .lp-heat {
-  height: 22px;
-  border-radius: 5px;
-  border: 1px solid var(--lp-hair);
-  background: rgba(255, 255, 255, 0.03);
-}
-.lp .lp-heat[data-level='1'] {
-  background: color-mix(in oklab, var(--lp-accent) 11%, transparent);
-  border-color: color-mix(in oklab, var(--lp-accent) 24%, transparent);
-}
-.lp .lp-heat[data-level='2'] {
-  background: color-mix(in oklab, var(--lp-accent) 24%, transparent);
-  border-color: color-mix(in oklab, var(--lp-accent) 38%, transparent);
-}
-
-/*
- * Slupek raportu.
- *
- * Wysokosc jest STALA i przychodzi jako `--lp-bar` — ustawiana raz, przy
- * renderze, nigdy w klatce przewijania. Wzrost robi wylacznie `scaleY`
- * zaczepiony przy podstawie, czyli transformacja kompozytora. Animowanie
- * `height`, jak robilo to stare bento, kazaloby przegladarce przeliczac
- * uklad calego wiersza w kazdej klatce (zasada 1 z `docs/landing-motion.md`).
- */
-.lp .lp-cap-bar {
-  height: var(--lp-bar, 0%);
-  min-height: 2px;
-  border-radius: 2px;
-  transform-origin: bottom;
-  background: rgba(255, 255, 255, 0.14);
-}
-.lp .lp-cap-bar-accent { background: var(--lp-accent); }
-
 /* ─── Wykres slupkowy ─── */
 .lp .lp-bar {
   background: rgba(255, 255, 255, 0.1);
@@ -511,7 +406,8 @@
   /* Mobilny przelacznik scen nie renderuje sie w tym trybie (`ProductJourney`
    * oddaje wtedy `JourneyStatic`), ale gdyby kiedys zaczal — ma byc widoczny
    * i nieruchomy, jak kazda inna warstwa. */
-  .lp .lp-scene-switch {
+  .lp .lp-scene-switch,
+  .lp .lp-scene-slide {
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
@@ -523,19 +419,4 @@
     visibility: visible !important;
     transform: none !important;
   }
-
-  /*
-   * Karty mozliwosci. `lp-motion` wyzej odblokowuje ramke i tresc; tutaj
-   * gasna dwa ruchy, ktore NIE ida z Motion, wiec tamta regula ich nie
-   * dosiega: mikroskala hovera i pulsowanie kropki „tracking".
-   *
-   * Slupki raportu nie potrzebuja wlasnej reguly — ich `scaleY` jest
-   * transformem z Motion, wiec `transform: none !important` przywraca im
-   * pelna, docelowa wysokosc (`--lp-bar` stoi w CSS i nigdy nie animuje).
-   */
-  .lp .lp-capability {
-    transform: none !important;
-    transition: none !important;
-  }
-  .lp .lp-cap-dot-live { animation: none !important; }
 }
