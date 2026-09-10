@@ -180,7 +180,17 @@
     "pdfTopClients": "Kunden",
     "pdfTopProjects": "Projekte",
     "pdfShare": "Anteil",
-    "pdfNote": "Der Arbeitswert stammt aus Arbeitseinträgen, nicht aus gestellten Rechnungen."
+    "pdfNote": "Der Arbeitswert stammt aus Arbeitseinträgen, nicht aus gestellten Rechnungen.",
+    "worksiteGroup": "Für die Buchhaltung",
+    "worksitePdf": "Einsatzorte-Aufstellung (PDF)",
+    "worksiteCsv": "Einsatzorte-Aufstellung (CSV)",
+    "worksiteFileName": "einsatzorte",
+    "worksiteTitle": "Einsatzorte und Arbeitszeiträume",
+    "worksiteLocation": "Einsatzort",
+    "worksiteDays": "Arbeitstage",
+    "worksiteTotal": "Gesamt",
+    "worksiteNoLocation": "Keine Projektadresse",
+    "worksiteNote": "Erfasst nur eingetragene Arbeitstage im gewählten Zeitraum. Die Zeile „Gesamt” zählt verschiedene Tage — derselbe Tag in zwei Projekten zählt einmal."
   },
   "states": {
     "noEntriesTitle": "Noch nichts zu berichten",

@@ -22,8 +22,11 @@ export const REPORTS_WORK_ENTRY_COLUMNS =
 /** Klienci w roli fallbacku rozliczenia (`lib/finance`) i etykiety breakdownu. */
 export const REPORTS_CLIENT_COLUMNS = 'id, name, rate, currency, work_type'
 
-/** Projekty w roli etykiety i kaskady filtrow — stad `client_id`. */
-export const REPORTS_PROJECT_COLUMNS = 'id, name, client_id'
+/**
+ * Projekty w roli etykiety i kaskady filtrow — stad `client_id`.
+ * `address` jest miejscem wykonywania pracy w zestawieniu dla ksiegowej.
+ */
+export const REPORTS_PROJECT_COLUMNS = 'id, name, client_id, address'
 
 /**
  * Sufity odczytu. Zakres raportu jest zawezony datami, wiec limit jest

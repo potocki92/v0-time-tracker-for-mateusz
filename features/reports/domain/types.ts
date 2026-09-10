@@ -83,8 +83,15 @@ export type ReportClientRef = Pick<
   'id' | 'name' | 'rate' | 'currency' | 'work_type'
 >
 
-/** Projekt w roli etykiety i kaskady „klient → jego projekty". */
-export type ReportProjectRef = Pick<import('@/lib/types').Project, 'id' | 'name' | 'client_id'>
+/**
+ * Projekt w roli etykiety, kaskady „klient → jego projekty" i MIEJSCA PRACY.
+ * `address` jest adresem wykonywania pracy — to on trafia do zestawienia dla
+ * ksiegowej (patrz `WorksitePeriod`).
+ */
+export type ReportProjectRef = Pick<
+  import('@/lib/types').Project,
+  'id' | 'name' | 'client_id' | 'address'
+>
 
 export type ReportsDataset = {
   /** Okno, ktore serwer naprawde pobral (szersze niz zakres raportu, gdy wlaczony compare). */
@@ -111,6 +118,8 @@ export type ReportRecord = {
   clientName: string | null
   projectId: string | null
   projectName: string | null
+  /** Adres projektu = miejsce wykonywania pracy. `null`, gdy projekt go nie ma. */
+  projectAddress: string | null
   hours: number
   /** Ilosc akordowa; 0 dla rozliczenia godzinowego. */
   quantity: number
@@ -203,6 +212,30 @@ export type BreakdownItem = {
   valueBaseMinor: number
   effectiveHourlyRateMinor: number | null
   entryCount: number
+}
+
+/**
+ * Jeden projekt jako OKRES PRACY w miejscu jej wykonywania.
+ *
+ * To wiersz zestawienia dla ksiegowej: co, gdzie, od kiedy do kiedy, ile dni
+ * i ile godzin. Taki komplet danych trzeba podac przy przedluzaniu
+ * zaswiadczenia A1, dlatego nie ma tu pieniedzy — kwoty maja wlasne eksporty.
+ *
+ * `from`/`to` to PIERWSZY i OSTATNI dzien z praca w tym projekcie wewnatrz
+ * zakresu raportu, a nie granice samego zakresu.
+ */
+export type WorksitePeriod = {
+  projectId: string | null
+  /** Nazwa projektu — dana uzytkownika. `null` = wpisy bez projektu. */
+  projectName: string | null
+  clientName: string | null
+  /** Adres projektu. `null`, gdy projekt nie ma zapisanego adresu. */
+  location: string | null
+  from: DateKey
+  to: DateKey
+  /** Liczba ROZNYCH dni z praca w tym projekcie. */
+  workedDays: number
+  hours: number
 }
 
 /** Poniedzialek = 0 … niedziela = 6. */

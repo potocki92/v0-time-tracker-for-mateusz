@@ -24,6 +24,7 @@ function record(overrides: Partial<ReportRecord> = {}): ReportRecord {
     clientName: 'Acme',
     projectId: 'project-a',
     projectName: 'Alpha',
+    projectAddress: null,
     hours: 8,
     quantity: 0,
     workType: 'hourly',

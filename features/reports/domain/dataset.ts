@@ -104,6 +104,7 @@ function toRecord(
     clientName: client?.name ?? null,
     projectId: entry.project_id,
     projectName: project?.name ?? null,
+    projectAddress: project?.address?.trim() || null,
     hours: Number.isFinite(entry.hours) && entry.hours ? entry.hours : 0,
     quantity: workType === 'piecework' ? resolveQuantity(entry as WorkEntry) : 0,
     workType,

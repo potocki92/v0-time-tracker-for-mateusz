@@ -1,6 +1,7 @@
-import { Document, Font, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import type { AppFormat } from '@/lib/format'
 import type { BreakdownItem, ReportModel } from '../../domain'
+import { PDF_COLORS, pdfBaseStyles } from './pdf-theme'
 
 /**
  * Szablon PDF raportu.
@@ -14,64 +15,26 @@ import type { BreakdownItem, ReportModel } from '../../domain'
  * arkusz i tak przetworzy lepiej niz oko na wydruku.
  */
 
-Font.register({
-  family: 'Inter',
-  fonts: [
-    { src: '/fonts/Inter-Regular.ttf', fontWeight: 400 },
-    { src: '/fonts/Inter-SemiBold.ttf', fontWeight: 600 },
-    { src: '/fonts/Inter-Bold.ttf', fontWeight: 700 },
-  ],
-})
-
-const COLORS = {
-  ink: '#18181b',
-  muted: '#71717a',
-  border: '#e4e4e7',
-  surface: '#f9fafb',
-}
-
 const styles = StyleSheet.create({
-  page: {
-    fontFamily: 'Inter',
-    fontSize: 9,
-    color: COLORS.ink,
-    paddingTop: 40,
-    paddingBottom: 48,
-    paddingHorizontal: 40,
-  },
-  header: { marginBottom: 20, borderBottom: `1pt solid ${COLORS.border}`, paddingBottom: 12 },
-  title: { fontSize: 18, fontWeight: 700, marginBottom: 4 },
-  subtitle: { fontSize: 10, color: COLORS.muted },
-  metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
-  meta: { fontSize: 8, color: COLORS.muted },
-  sectionTitle: {
-    fontSize: 8,
-    fontWeight: 700,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    color: COLORS.muted,
-    marginBottom: 8,
-    marginTop: 16,
-  },
+  ...pdfBaseStyles,
   kpiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   kpiCard: {
     width: '31.5%',
     borderRadius: 6,
-    backgroundColor: COLORS.surface,
-    border: `1pt solid ${COLORS.border}`,
+    backgroundColor: PDF_COLORS.surface,
+    border: `1pt solid ${PDF_COLORS.border}`,
     padding: 8,
   },
-  kpiLabel: { fontSize: 7, color: COLORS.muted, marginBottom: 3 },
+  kpiLabel: { fontSize: 7, color: PDF_COLORS.muted, marginBottom: 3 },
   kpiValue: { fontSize: 12, fontWeight: 700 },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 4,
-    borderBottom: `0.5pt solid ${COLORS.border}`,
+    borderBottom: `0.5pt solid ${PDF_COLORS.border}`,
   },
   rowLabel: { width: '50%' },
   rowCell: { width: '16%', textAlign: 'right' },
-  footnote: { marginTop: 18, fontSize: 7, color: COLORS.muted },
 })
 
 export type ReportPdfLabels = {
