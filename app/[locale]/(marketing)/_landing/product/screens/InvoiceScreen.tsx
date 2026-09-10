@@ -10,6 +10,7 @@ import {
   DEMO_INVOICE,
   DEMO_MONTH,
   DEMO_RATE_EUR,
+  DEMO_SELLER,
   demoClient,
   demoProject,
   type DemoMonth,
@@ -57,7 +58,7 @@ export function InvoiceScreen({ month }: { month: DemoMonth }) {
         <div className="grid grid-cols-2 gap-2 border-b border-[var(--lp-hair)] py-2">
           <div>
             <Eyebrow>{t('seller')}</Eyebrow>
-            <p className="mt-1 lp-t9 text-zinc-300">Mateusz Potocki</p>
+            <p className="mt-1 lp-t9 text-zinc-300">{DEMO_SELLER.name}</p>
           </div>
           <div>
             <Eyebrow>{t('buyer')}</Eyebrow>

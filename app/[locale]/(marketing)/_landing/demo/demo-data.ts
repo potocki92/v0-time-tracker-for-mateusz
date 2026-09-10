@@ -3,8 +3,8 @@
  *
  * Zasady:
  *  - model odwzorowuje `lib/types.ts` (klient, projekt, wpis, faktura),
- *  - nazwy projektow sa te same, co przypiete w sidebarze aplikacji
- *    (`app/[locale]/(app)/_layout/config/nav.config.ts`),
+ *  - klienci, projekty i wystawca faktury sa FIKCYJNI: landing jest publiczny,
+ *    wiec nie moze pokazywac zadnych danych z prawdziwego konta,
  *  - liczby sa SPOJNE: miesiac demonstracyjny liczy sie z grafiku i wyjazdow
  *    (`demo-month.server.ts`), a stawka z `DEMO_RATE_EUR` — dzieki temu
  *    godziny na Pulpicie, kwota na fakturze i sekwencja „od pracy do pieniedzy"
@@ -57,34 +57,34 @@ export const DEMO_MONTH = {
 export const DEMO_RATE_EUR = 24
 
 export const DEMO_CLIENTS: readonly DemoClient[] = [
-  { id: 'jh',     name: 'JH Smart Solutions',  workType: 'hourly',    rate: 24, color: '#7898C5' },
-  { id: 'gawlik', name: 'Gawlik & Co',         workType: 'hourly',    rate: 22, color: '#8FB89A' },
-  { id: 'ignor',  name: 'Ignor Bau',           workType: 'piecework', rate: 32, color: '#C97A8A' },
+  { id: 'musterbau',  name: 'Musterbau GmbH',   workType: 'hourly',    rate: 24, color: '#7898C5' },
+  { id: 'beispiel',   name: 'Beispiel Technik', workType: 'hourly',    rate: 22, color: '#8FB89A' },
+  { id: 'mustersohn', name: 'Muster & Sohn',    workType: 'piecework', rate: 32, color: '#C97A8A' },
 ] as const
 
 export const DEMO_PROJECTS: readonly DemoProject[] = [
   {
-    id: 'winkel',
-    name: 'Im Winkel 51',
-    clientId: 'jh',
+    id: 'musterstrasse',
+    name: 'Musterstraße 51',
+    clientId: 'musterbau',
     status: 'in_progress',
     hours: 194,
     budgetUtilization: 62,
     dueDate: '2026-09-30',
   },
   {
-    id: 'boeckler',
-    name: 'Hans-Böckler-Str. 284',
-    clientId: 'ignor',
+    id: 'beispielweg',
+    name: 'Beispielweg 284',
+    clientId: 'mustersohn',
     status: 'planned',
     hours: 0,
     budgetUtilization: 0,
     dueDate: '2026-10-12',
   },
   {
-    id: 'gustavsburger',
-    name: 'Gustavsburger 25–35',
-    clientId: 'gawlik',
+    id: 'musterallee',
+    name: 'Musterallee 25–35',
+    clientId: 'beispiel',
     status: 'completed',
     hours: 168,
     budgetUtilization: 94,
@@ -94,9 +94,22 @@ export const DEMO_PROJECTS: readonly DemoProject[] = [
 
 /** Projekt i klient, na ktore automat zapisuje godziny w demo. */
 export const DEMO_AUTOMATION_TARGET = {
-  clientId: 'jh',
-  projectId: 'winkel',
+  clientId: 'musterbau',
+  projectId: 'musterstrasse',
 } as const
+
+/**
+ * Adres budowy, na ktora jedzie automat. Wyprowadzony z projektu, a nie
+ * wpisany drugi raz — wyjazdy i tracker w sidebarze nie moga pokazac innego
+ * adresu niz pozycja na fakturze.
+ */
+export const DEMO_SITE = demoProject(DEMO_AUTOMATION_TARGET.projectId).name
+
+/**
+ * Wystawca faktury demonstracyjnej — fikcyjny jednoosobowy wykonawca.
+ * Inicjaly stoja obok nazwy, bo sidebar mockupu pokazuje awatar.
+ */
+export const DEMO_SELLER = { name: 'Jan Kowalski', initials: 'JK' } as const
 
 /**
  * Grafik tygodnia — kopia `DEFAULT_WEEK_SCHEDULE` z automatu.
@@ -146,8 +159,8 @@ export const DEMO_PRESENCE = [
 
 /** Wyjazdy i pobyt w domu — dokladnie ten model, ktory czyta automat. */
 export const DEMO_TRIPS = [
-  { id: 'trip-1', startDate: '2026-09-01', endDate: '2026-09-12', destination: 'Im Winkel 51' },
-  { id: 'trip-2', startDate: '2026-09-21', endDate: '2026-09-30', destination: 'Im Winkel 51' },
+  { id: 'trip-1', startDate: '2026-09-01', endDate: '2026-09-12', destination: DEMO_SITE },
+  { id: 'trip-2', startDate: '2026-09-21', endDate: '2026-09-30', destination: DEMO_SITE },
 ] as const
 
 /** Okno miedzy wyjazdami — automat nie dopisuje wtedy godzin. */
@@ -174,7 +187,7 @@ export const DEMO_INVOICE = {
   status: 'draft' as DemoInvoiceStatus,
   issueDate: '2026-09-30',
   dueDate: '2026-10-14',
-  clientId: 'jh',
+  clientId: 'musterbau',
   vatRate: 0,
 } as const
 
