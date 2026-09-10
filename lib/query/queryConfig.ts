@@ -47,6 +47,12 @@ export const QUERY_CONFIG = {
   calendar: {
     ...QUERY_PROFILES.warm,
   },
+  // Raport jest zdjeciem przeszlosci: dane sprzed tygodnia nie zmienia sie
+  // z minuty na minute, a kazda zmiana filtra to nowy klucz, wiec dluzszy
+  // staleTime zamienia powroty do wczesniejszego zakresu w odczyt z cache.
+  reports: {
+    ...QUERY_PROFILES.cold,
+  },
   invoices: {
     ...QUERY_PROFILES.hot,
   },

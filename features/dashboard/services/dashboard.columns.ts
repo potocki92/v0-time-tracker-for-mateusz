@@ -17,10 +17,14 @@
  *   `note`       — legacy z migracji `create_tables`; aplikacja pisze `notes`,
  *   `updated_at` — nieużywane nigdzie w repo.
  *
- * `notes` i `tags` MUSZĄ tu zostać mimo że są to najcięższe pola:
- *   `notes` czyta ActivitySection / ProjectsSection / UpcomingSection,
- *   `tags`  czyta moduł raportów (filtr po tagu + eksport CSV), który jedzie
- *           na tym samym `useDashboardData()`.
+ * `notes` MUSI tu zostać mimo że jest to najcięższe pole wiersza —
+ * czyta je ActivitySection / ProjectsSection / UpcomingSection.
+ *
+ * `tags` zostało tu dla modułu raportów, który jechał na tym samym
+ * `useDashboardData()`. Raporty mają własne zapytanie
+ * (`features/reports/services`), więc dziś żaden konsument tej listy `tags`
+ * nie czyta — kolumna jest kandydatem do usunięcia przy okazji zmian
+ * w payloadzie dashboardu.
  */
 export const DASHBOARD_WORK_ENTRY_COLUMNS =
   'id, client_id, project_id, date, status, entry_kind, hours, quantity, quantity_from, quantity_to, tags, notes, billing_rate, billing_currency, billing_work_type, billing_unit, created_at'

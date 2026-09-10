@@ -10,5 +10,4 @@
 export { DashboardContent } from './components/DashboardContent'
 export { DashboardSkeleton } from './components/DashboardSkeleton'
 export { DashboardContentBoundary } from './components/errors'
-export { useDashboardData } from './hooks/useDashboardData'
 export { usePreferencesStore, useEffectiveEurRate } from './hooks/usePreferencesStore'

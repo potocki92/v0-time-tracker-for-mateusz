@@ -1,102 +1,142 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import type { Client, Project, WorkEntry } from '@/lib/types'
-import { workedEntriesInRange, todayKey, resolveRange } from '../lib/analytics'
-import type { ReportsFilters } from '../lib/types'
-import type { DateKey } from '../lib/date-keys'
+import { useFormat } from '@/lib/format/client'
+import { buildReportCsv, buildReportJson, exportFileName } from '../domain/export'
+import type { ReportModel } from '../domain'
 
 type Params = {
-  workEntries: WorkEntry[]
-  clients:     Client[]
-  projects:    Project[]
-  filters:     ReportsFilters
-  today:       DateKey | null
-}
-
-function escapeCsv(value: string | number): string {
-  const s = String(value)
-  return s.includes(',') || s.includes('"') || s.includes('\n')
-    ? `"${s.replace(/"/g, '""')}"`
-    : s
-}
-
-function download(content: string, filename: string, type: string): void {
-  const blob = new Blob([content], { type })
-  const url  = URL.createObjectURL(blob)
-  const a    = document.createElement('a')
-  a.href     = url
-  a.download = filename
-  a.click()
-  URL.revokeObjectURL(url)
+  model: ReportModel | null
+  /** Opis aktywnych filtrow do naglowka PDF — sklada go komponent, bo zna nazwy klientow. */
+  filtersSummary: string
 }
 
 export type UseReportsExportReturn = {
-  exportCsv:  () => void
+  exportCsv: () => void
   exportJson: () => void
+  exportPdf: () => Promise<void>
+  isGeneratingPdf: boolean
 }
 
-export function useReportsExport({
-  workEntries,
-  clients,
-  projects,
-  filters,
-  today,
-}: Params): UseReportsExportReturn {
-  const buildEntries = useCallback(() => {
-    const t     = today ?? todayKey()
-    const range = resolveRange(filters.preset, t, filters.from, filters.to)
-    const rows  = workedEntriesInRange(workEntries, filters, t)
-    return { range, rows }
-  }, [workEntries, filters, today])
+function download(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
+/**
+ * Trzy eksporty raportu.
+ *
+ * Tresc plikow buduja czyste funkcje z `domain/export`; hook odpowiada tylko
+ * za pobranie i komunikat. PDF dochodzi dynamicznym importem — `@react-pdf/renderer`
+ * wazy wielokrotnie wiecej niz caly modul raportow, wiec nie moze byc czescia
+ * bundla trasy tylko dlatego, ze w menu jest jedna pozycja wiecej.
+ */
+export function useReportsExport({ model, filtersSummary }: Params): UseReportsExportReturn {
+  const t = useTranslations('reports')
+  const fmt = useFormat()
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
 
   const exportCsv = useCallback(() => {
+    if (!model) return
     try {
-      const { range, rows } = buildEntries()
-      const clientById  = new Map(clients .map((c) => [c.id, c.name]))
-      const projectById = new Map(projects.map((p) => [p.id, p.name]))
-
-      const lines = [
-        'Data,Klient,Projekt,Godziny,Tagi',
-        ...rows.map((e) =>
-          [
-            e.date,
-            clientById .get(e.client_id  ?? '') ?? '—',
-            projectById.get(e.project_id ?? '') ?? '—',
-            e.hours ?? 0,
-            e.tags.join('|'),
-          ]
-            .map(escapeCsv)
-            .join(','),
-        ),
-      ].join('\n')
-
-      // BOM dla poprawnego otwarcia w Excelu (PL-locale).
-      download(`﻿${lines}`, `reports_${range.start}_${range.end}.csv`, 'text/csv;charset=utf-8;')
-      toast.success('Eksport CSV gotowy')
+      const csv = buildReportCsv(
+        model,
+        {
+          date: t('table.date'),
+          client: t('table.client'),
+          project: t('table.project'),
+          workType: t('table.workType'),
+          hours: t('table.hours'),
+          quantity: t('table.quantity'),
+          rate: t('table.rate'),
+          currency: t('table.currency'),
+          value: t('table.value'),
+          valueBase: t('table.value'),
+          billable: t('kpi.billable.label'),
+          tags: t('table.tags'),
+          source: t('table.source'),
+        },
+        { yes: t('export.yes'), no: t('export.no') },
+      )
+      download(
+        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
+        exportFileName(t('export.fileName'), model, 'csv'),
+      )
+      toast.success(t('export.successCsv'))
     } catch {
-      toast.error('Nie udało się wygenerować CSV')
+      toast.error(t('export.errorCsv'))
     }
-  }, [buildEntries, clients, projects])
+  }, [model, t])
 
   const exportJson = useCallback(() => {
+    if (!model) return
     try {
-      const { range, rows } = buildEntries()
+      const json = buildReportJson(model, new Date().toISOString())
       download(
-        JSON.stringify(rows, null, 2),
-        `reports_${range.start}_${range.end}.json`,
-        'application/json',
+        new Blob([json], { type: 'application/json' }),
+        exportFileName(t('export.fileName'), model, 'json'),
       )
-      toast.success('Eksport JSON gotowy')
+      toast.success(t('export.successJson'))
     } catch {
-      toast.error('Nie udało się wygenerować JSON')
+      toast.error(t('export.errorJson'))
     }
-  }, [buildEntries])
+  }, [model, t])
 
-  return { exportCsv, exportJson }
-}
+  const exportPdf = useCallback(async () => {
+    if (!model) return
+    setIsGeneratingPdf(true)
+    const pending = toast.loading(t('export.generating'))
 
-export function uniqueTags(entries: WorkEntry[]): string[] {
-  return Array.from(new Set(entries.flatMap((e) => e.tags))).sort()
+    try {
+      const [{ pdf }, { ReportPdfDocument }] = await Promise.all([
+        import('@react-pdf/renderer'),
+        import('../components/export/ReportPdfDocument'),
+      ])
+
+      const blob = await pdf(
+        ReportPdfDocument({
+          model,
+          filtersSummary,
+          generatedAt: fmt.date(new Date().toISOString().slice(0, 10), 'long'),
+          fmt,
+          labels: {
+            title: t('export.pdfTitle'),
+            range: t('export.pdfRange'),
+            generatedAt: t('export.pdfGeneratedAt'),
+            filters: t('export.pdfFilters'),
+            noFilters: t('export.pdfNoFilters'),
+            kpis: t('export.pdfKpis'),
+            clients: t('export.pdfTopClients'),
+            projects: t('export.pdfTopProjects'),
+            share: t('export.pdfShare'),
+            note: t('export.pdfNote'),
+            unassigned: t('breakdown.unassigned'),
+            kpiLabels: {
+              totalHours: t('kpi.totalHours.label'),
+              workValue: t('kpi.workValue.label'),
+              activeDays: t('kpi.activeDays.label'),
+              avgPerActiveDay: t('kpi.avgPerActiveDay.label'),
+              effectiveRate: t('kpi.effectiveRate.label'),
+              billable: t('kpi.billable.label'),
+            },
+          },
+        }),
+      ).toBlob()
+
+      download(blob, exportFileName(t('export.fileName'), model, 'pdf'))
+      toast.success(t('export.successPdf'), { id: pending })
+    } catch {
+      toast.error(t('export.errorPdf'), { id: pending })
+    } finally {
+      setIsGeneratingPdf(false)
+    }
+  }, [model, filtersSummary, fmt, t])
+
+  return { exportCsv, exportJson, exportPdf, isGeneratingPdf }
 }

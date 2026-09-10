@@ -2,5 +2,194 @@
   "meta": {
     "title": "Reports",
     "description": "Hours and revenue for the selected period."
+  },
+  "header": {
+    "eyebrow": "Insights",
+    "title": "Reports",
+    "customRange": "{from} – {to}"
+  },
+  "period": {
+    "label": "Period",
+    "from": "From",
+    "to": "To",
+    "last7d": "Last 7 days",
+    "last30d": "Last 30 days",
+    "last90d": "Last 90 days",
+    "thisMonth": "This month",
+    "lastMonth": "Last month",
+    "thisQuarter": "This quarter",
+    "thisYear": "This year",
+    "lastYear": "Last year",
+    "custom": "Custom range"
+  },
+  "filters": {
+    "sectionLabel": "Report filters",
+    "open": "Filters",
+    "activeCount": "{count, plural, one {# active filter} other {# active filters}}",
+    "sheetTitle": "Report filters",
+    "sheetDescription": "Adjust the period and the breakdown",
+    "apply": "Apply",
+    "reset": "Reset filters",
+    "clear": "Clear filters",
+    "client": "Client",
+    "allClients": "All clients",
+    "project": "Project",
+    "allProjects": "All projects",
+    "tag": "Tag",
+    "allTags": "All tags",
+    "compare": "Compare with previous period",
+    "compareShort": "Compare",
+    "refreshing": "Refreshing report data"
+  },
+  "kpi": {
+    "sectionLabel": "Key metrics",
+    "totalHours": {
+      "label": "Total hours",
+      "hint": "{count, plural, one {# entry} other {# entries}}"
+    },
+    "workValue": {
+      "label": "Work value",
+      "hint": "Work performed, not invoices"
+    },
+    "activeDays": {
+      "label": "Active days",
+      "hint": "of {count, plural, one {# day} other {# days}} in range"
+    },
+    "avgPerActiveDay": {
+      "label": "Average / day",
+      "hint": "On active days"
+    },
+    "effectiveRate": {
+      "label": "Effective rate",
+      "hint": "Work value per hour"
+    },
+    "billable": {
+      "label": "Billable",
+      "hint": "Share of billable hours"
+    }
+  },
+  "compare": {
+    "previous": "Previously: {value}",
+    "flat": "no change",
+    "new": "new",
+    "noData": "nothing to compare",
+    "increase": "up by {value}",
+    "decrease": "down by {value}",
+    "rangeLabel": "Previous period: {from} – {to}"
+  },
+  "trend": {
+    "title": "Trend",
+    "sectionLabel": "Trend over time",
+    "metricHours": "Hours",
+    "metricValue": "Work value",
+    "metricSwitcher": "Chart metric",
+    "unitDay": "per day",
+    "unitWeek": "per week",
+    "unitMonth": "per month",
+    "currentSeries": "Current period",
+    "previousSeries": "Previous period",
+    "summary": "Chart of {metric} {unit} for {from} – {to}.",
+    "tableFallback": "Chart data as a list",
+    "empty": "Nothing to plot yet"
+  },
+  "breakdown": {
+    "title": "Work breakdown",
+    "sectionLabel": "Work breakdown",
+    "dimensionSwitcher": "Breakdown dimension",
+    "client": "Clients",
+    "project": "Projects",
+    "tag": "Tags",
+    "unassigned": "Unassigned",
+    "untagged": "No tag",
+    "tagOverlapNote": "An entry with several tags counts towards each of them.",
+    "showAll": "Show all ({count})",
+    "showLess": "Show less",
+    "shareOf": "{label}: {share} of period hours",
+    "empty": "No data in the selected range"
+  },
+  "insights": {
+    "title": "Work rhythm",
+    "sectionLabel": "Work rhythm",
+    "busiestWeekday": "Busiest weekday",
+    "longestStreak": "Longest streak",
+    "longestStreakValue": "{count, plural, one {# day} other {# days}}",
+    "longestDay": "Longest day",
+    "daysWithoutWork": "Days without work",
+    "daysWithoutWorkValue": "{count, plural, one {# day} other {# days}}",
+    "weekdayDistribution": "Week distribution",
+    "weekdayHours": "{weekday}: {hours}",
+    "empty": "Not enough data to show a rhythm"
+  },
+  "heatmap": {
+    "title": "Intensity",
+    "sectionLabel": "Work intensity day by day",
+    "legendLess": "less",
+    "legendMore": "more",
+    "dayLabel": "{date}: {hours}",
+    "noWork": "{date}: no work"
+  },
+  "table": {
+    "title": "Details",
+    "sectionLabel": "Detailed entry data",
+    "date": "Date",
+    "client": "Client",
+    "project": "Project",
+    "workType": "Billing",
+    "hours": "Hours",
+    "quantity": "Quantity",
+    "rate": "Rate",
+    "currency": "Currency",
+    "value": "Value",
+    "tags": "Tags",
+    "source": "Source",
+    "hourly": "Hourly",
+    "piecework": "Piecework",
+    "manual": "Manual",
+    "automation": "Automation",
+    "sortBy": "Sort by: {column}",
+    "expandRow": "Show details of the entry from {date}",
+    "collapseRow": "Hide details of the entry from {date}",
+    "pageStatus": "Page {page} of {pages}",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "rowCount": "{count, plural, one {# entry} other {# entries}}",
+    "empty": "No entries in the selected range"
+  },
+  "export": {
+    "trigger": "Export",
+    "menuLabel": "Download report",
+    "csv": "CSV",
+    "json": "JSON",
+    "pdf": "PDF",
+    "fileName": "report",
+    "generating": "Generating PDF…",
+    "successCsv": "CSV export ready",
+    "successJson": "JSON export ready",
+    "successPdf": "PDF report ready",
+    "errorCsv": "Could not generate the CSV",
+    "errorJson": "Could not generate the JSON",
+    "errorPdf": "Could not generate the PDF",
+    "yes": "yes",
+    "no": "no",
+    "pdfTitle": "Work report",
+    "pdfRange": "Range",
+    "pdfGeneratedAt": "Generated",
+    "pdfFilters": "Active filters",
+    "pdfNoFilters": "No filters",
+    "pdfKpis": "Summary",
+    "pdfTopClients": "Clients",
+    "pdfTopProjects": "Projects",
+    "pdfShare": "Share",
+    "pdfNote": "Work value comes from work entries, not from issued invoices."
+  },
+  "states": {
+    "noEntriesTitle": "Nothing to report yet",
+    "noEntriesDescription": "Add your first work entries in the calendar and the report will build itself.",
+    "noMatchTitle": "No data for these filters",
+    "noMatchDescription": "Change the range or the breakdown to see results.",
+    "thinDataNote": "Very little data in this range — averages and trends may mislead.",
+    "errorTitle": "Could not load the report",
+    "errorDescription": "Please try again in a moment.",
+    "retry": "Try again"
   }
 }

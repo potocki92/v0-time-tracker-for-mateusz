@@ -1,9 +1,8 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+import { Download, FileJson, FileSpreadsheet, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { LINEAR } from '@/components/ui/tokens'
-import { cn } from '@/lib/utils'
-import { Download, FileJson, FileSpreadsheet } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,24 +11,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { LINEAR } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 
 type Props = {
-  onExportCsv:  () => void
+  onExportCsv: () => void
   onExportJson: () => void
+  onExportPdf: () => void
+  disabled: boolean
 }
 
-export function ReportsExportMenu({ onExportCsv, onExportJson }: Props) {
+export function ReportsExportMenu({ onExportCsv, onExportJson, onExportPdf, disabled }: Props) {
+  const t = useTranslations('reports')
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
           size="sm"
-          aria-label="Eksportuj raport"
+          disabled={disabled}
+          aria-label={t('export.menuLabel')}
           className={cn('rounded-xl text-zinc-200', LINEAR.border, LINEAR.surface, LINEAR.surfaceHover)}
         >
           <Download aria-hidden className="size-4" />
-          <span className="hidden sm:inline">Eksport</span>
+          <span className="hidden sm:inline">{t('export.trigger')}</span>
         </Button>
       </DropdownMenuTrigger>
 
@@ -38,15 +44,19 @@ export function ReportsExportMenu({ onExportCsv, onExportJson }: Props) {
         sideOffset={8}
         className={cn('w-44 rounded-xl text-zinc-200', LINEAR.border, LINEAR.surface)}
       >
-        <DropdownMenuLabel className={LINEAR.eyebrow}>Pobierz dane</DropdownMenuLabel>
+        <DropdownMenuLabel className={LINEAR.eyebrow}>{t('export.menuLabel')}</DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-hairline" />
         <DropdownMenuItem onSelect={onExportCsv} className="gap-2">
           <FileSpreadsheet aria-hidden className="size-4 text-brand-400" />
-          CSV
+          {t('export.csv')}
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onExportJson} className="gap-2">
           <FileJson aria-hidden className="size-4 text-info-400" />
-          JSON
+          {t('export.json')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={onExportPdf} className="gap-2">
+          <FileText aria-hidden className="size-4 text-zinc-300" />
+          {t('export.pdf')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

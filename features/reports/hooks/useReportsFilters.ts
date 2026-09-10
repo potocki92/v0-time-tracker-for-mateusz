@@ -1,92 +1,116 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { offsetDateKey, type DateKey } from '../lib/date-keys'
-import { todayKey } from '../lib/analytics'
-import type { PeriodPreset, ReportsFilters } from '../lib/types'
-
-const DEFAULT_PRESET: PeriodPreset = '30d'
-
-const EMPTY_FILTERS: ReportsFilters = {
-  preset:    DEFAULT_PRESET,
-  from:      '',
-  to:        '',
-  clientId:  'all',
-  projectId: 'all',
-  tag:       'all',
-  compare:   false,
-}
-
-export type UseReportsFiltersReturn = {
-  filters:        ReportsFilters
-  today:          DateKey | null
-  setPreset:      (p: PeriodPreset) => void
-  setFrom:        (d: DateKey) => void
-  setTo:          (d: DateKey) => void
-  setClientId:    (id: string) => void
-  setProjectId:   (id: string) => void
-  setTag:         (tag: string) => void
-  toggleCompare:  () => void
-  resetFilters:   () => void
-}
+import { useCallback, useMemo } from 'react'
+import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
+import {
+  ALL,
+  DEFAULT_PERIOD_PRESET,
+  REPORT_PERIOD_PRESETS,
+  type DateKey,
+  type ReportFilters,
+  type ReportPeriodPreset,
+} from '../domain'
 
 /**
- * Stan filtrów raportu. SSR-safe — `today` jest `null` aż do efektu w kliencie,
- * dzięki czemu render serwera i pierwszy render klienta są identyczne.
+ * Stan filtrow raportu trzymany w QUERY PARAMS.
+ *
+ * Dzieki temu raport jest adresowalny: odswiezenie strony, zakladka i link
+ * wyslany sobie na drugi ekran odtwarzaja dokladnie ten sam widok. Wartosci
+ * domyslne znikaja z adresu (`clearOnDefault`), wiec czysty `/reports` zostaje
+ * czysty, a historia przegladarki nie puchnie od kazdego klikniecia w filtr
+ * (`history: 'replace'`).
  */
+const parsers = {
+  preset: parseAsStringLiteral(REPORT_PERIOD_PRESETS).withDefault(DEFAULT_PERIOD_PRESET),
+  from: parseAsString.withDefault(''),
+  to: parseAsString.withDefault(''),
+  client: parseAsString.withDefault(ALL),
+  project: parseAsString.withDefault(ALL),
+  tag: parseAsString.withDefault(ALL),
+  compare: parseAsBoolean.withDefault(false),
+}
+
+const options = { history: 'replace', clearOnDefault: true, shallow: true } as const
+
+export type UseReportsFiltersReturn = {
+  filters: ReportFilters
+  /** Ile filtrow odbiega od stanu domyslnego — licznik na przycisku „Filtry". */
+  activeCount: number
+  setPreset: (preset: ReportPeriodPreset) => void
+  setCustomRange: (from: DateKey, to: DateKey) => void
+  /**
+   * Klient i projekt zmieniaja sie RAZEM: kaskade liczy `projectAfterClientChange`,
+   * zeby w adresie nie zostal projekt innego klienta.
+   */
+  setClient: (clientId: string, projectId: string) => void
+  setProjectId: (projectId: string) => void
+  setTag: (tag: string) => void
+  toggleCompare: () => void
+  reset: () => void
+}
+
 export function useReportsFilters(): UseReportsFiltersReturn {
-  const [today,    setToday]    = useState<DateKey | null>(null)
-  const [filters,  setFilters]  = useState<ReportsFilters>(EMPTY_FILTERS)
+  const [query, setQuery] = useQueryStates(parsers, options)
 
-  useEffect(() => {
-    const t = todayKey()
-    setToday(t)
-    setFilters((prev) => ({
-      ...prev,
-      from: offsetDateKey(t, -29),
-      to:   t,
-    }))
-  }, [])
+  const filters = useMemo<ReportFilters>(
+    () => ({
+      preset: query.preset,
+      from: query.from,
+      to: query.to,
+      clientId: query.client,
+      projectId: query.project,
+      tag: query.tag,
+      compare: query.compare,
+    }),
+    [query],
+  )
 
-  const setPreset = useCallback((preset: PeriodPreset) => {
-    setFilters((prev) => ({ ...prev, preset }))
-  }, [])
+  const setPreset = useCallback(
+    (preset: ReportPeriodPreset) => {
+      // Wyjscie z zakresu wlasnego czysci daty — inaczej zostalyby w adresie
+      // jako martwe parametry mylace przy nastepnym udostepnieniu linku.
+      setQuery(preset === 'custom' ? { preset } : { preset, from: null, to: null })
+    },
+    [setQuery],
+  )
 
-  const setFrom = useCallback((from: DateKey) => {
-    setFilters((prev) => ({ ...prev, from, preset: 'custom' }))
-  }, [])
+  const setCustomRange = useCallback(
+    (from: DateKey, to: DateKey) => setQuery({ preset: 'custom', from, to }),
+    [setQuery],
+  )
 
-  const setTo = useCallback((to: DateKey) => {
-    setFilters((prev) => ({ ...prev, to, preset: 'custom' }))
-  }, [])
+  const setClient = useCallback(
+    (client: string, project: string) => setQuery({ client, project }),
+    [setQuery],
+  )
 
-  const setClientId  = useCallback((clientId:  string) => setFilters((p) => ({ ...p, clientId  })), [])
-  const setProjectId = useCallback((projectId: string) => setFilters((p) => ({ ...p, projectId })), [])
-  const setTag       = useCallback((tag:       string) => setFilters((p) => ({ ...p, tag       })), [])
+  const setProjectId = useCallback((project: string) => setQuery({ project }), [setQuery])
+  const setTag = useCallback((tag: string) => setQuery({ tag }), [setQuery])
+  const toggleCompare = useCallback(
+    () => setQuery((prev) => ({ compare: !prev.compare })),
+    [setQuery],
+  )
 
-  const toggleCompare = useCallback(() => {
-    setFilters((p) => ({ ...p, compare: !p.compare }))
-  }, [])
+  const reset = useCallback(
+    () => setQuery({ preset: null, from: null, to: null, client: null, project: null, tag: null }),
+    [setQuery],
+  )
 
-  const resetFilters = useCallback(() => {
-    if (!today) return
-    setFilters({
-      ...EMPTY_FILTERS,
-      from: offsetDateKey(today, -29),
-      to:   today,
-    })
-  }, [today])
+  const activeCount =
+    (filters.preset === DEFAULT_PERIOD_PRESET ? 0 : 1) +
+    (filters.clientId === ALL ? 0 : 1) +
+    (filters.projectId === ALL ? 0 : 1) +
+    (filters.tag === ALL ? 0 : 1)
 
   return {
     filters,
-    today,
+    activeCount,
     setPreset,
-    setFrom,
-    setTo,
-    setClientId,
+    setCustomRange,
+    setClient,
     setProjectId,
     setTag,
     toggleCompare,
-    resetFilters,
+    reset,
   }
 }
