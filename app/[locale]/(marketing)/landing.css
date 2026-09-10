@@ -308,6 +308,173 @@
   pointer-events: none;
 }
 
+/* ================================================================
+ * Karty mozliwosci (sekcja `#capabilities`)
+ *
+ * Ruch tych kart prowadzi scroll (`_landing/motion/capability.ts`). TUTAJ
+ * stoi wylacznie to, czego scroll nie dotyka: powierzchnia, hover i stale
+ * geometrie wizualizacji. Podzial jest scisly — kazda wlasciwosc, ktora
+ * zmienia sie w klatce przewijania, jedzie z Motion jako `opacity` albo
+ * gotowy `transform`, i nigdy odwrotnie.
+ * ================================================================ */
+
+/*
+ * Powierzchnia karty. `height: 100%` wyrownuje karty w wierszu bento —
+ * rodzic jest elementem sterowanym scrollem, wiec sam nie moze rozciagac
+ * sie flexem bez mieszania sie do transformu.
+ *
+ * Kolumna flex, bo wizualizacja siada na DOLE karty (`margin-top: auto` w
+ * `CapabilityCard`). Bez tego karta wyzsza od swojej tresci — a w wierszu
+ * bento zawsze jakas taka jest — konczyla sie pustym pasem pod wykresem.
+ */
+.lp .lp-capability {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+  background: var(--lp-s2);
+  border: 1px solid var(--lp-hair-2);
+  border-radius: 16px;
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+/*
+ * Hover siedzi na WNETRZU karty, nie na elemencie sterowanym scrollem:
+ * `transform` istnieje na wezle raz, wiec styl inline dopisywany przez
+ * Motion skasowalby skale z CSS. Rozdzielenie znaczy tez, ze hover nie
+ * kosztuje ani jednej wartosci JavaScriptu.
+ *
+ * `(hover: hover) and (pointer: fine)` odcina dotyk, gdzie `:hover` zostaje
+ * przyklejony po tapnieciu i karta zostawalaby powiekszona.
+ *
+ * 1,008 — tyle, ile widac katem oka na krawedzi. Scroll jest tu glowna osia
+ * ruchu; hover ma byc potwierdzeniem, ze karta zyje, a nie drugim gestem.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .lp .lp-capability:hover {
+    border-color: color-mix(in oklab, var(--lp-accent) 28%, var(--lp-hair-2));
+    transform: scale(1.008);
+  }
+}
+
+/*
+ * Nadtytul karty. `--lp-ink-2` (0,62 alfy), a NIE `--lp-ink-3` (0,50) jak
+ * `lp-eyebrow`: karta po swoim takcie przygasa do `opacity: 0.9`, wiec
+ * najsciemniejszy tekst schodzi w niej do 0,558 alfy. Przy 0,50 wyszloby
+ * 0,45 — ponizej progu WCAG AA dla 11-pikselowego tekstu na czerni.
+ */
+.lp .lp-cap-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lp-ink-2);
+}
+
+/* Poswiata karty trackera. Lezy pod trescia i nie lapie zdarzen. */
+.lp .lp-cap-orb {
+  position: absolute;
+  top: -90px;
+  right: -90px;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--lp-accent) 20%, transparent) 0%,
+    transparent 70%
+  );
+}
+
+/* Panel licznika — ta sama para kolorow, co tracker w sidebarze aplikacji. */
+.lp .lp-cap-timer {
+  position: relative;
+  padding: 16px;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--lp-accent) 6%, transparent);
+  border: 1px solid color-mix(in oklab, var(--lp-accent) 20%, transparent);
+}
+
+/*
+ * Zegar licznika. Rozmiar stoi TUTAJ, a nie jako `text-[40px]` w JSX — landing
+ * ma zamknieta skale typografii (`lp-t7`..`lp-d1`) i ani jednej arbitralnej
+ * wartosci w komponentach; pilnuje tego `__test__/config/design-tokens.test.ts`.
+ */
+.lp .lp-cap-clock {
+  font-size: clamp(30px, 6vw, 40px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--lp-accent);
+}
+
+.lp .lp-cap-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.lp .lp-cap-dot-live {
+  background: var(--lp-accent);
+  animation: lp-cap-pulse 2.4s ease-in-out infinite;
+}
+@keyframes lp-cap-pulse {
+  0%,
+  100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.lp .lp-cap-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--lp-ink-2);
+  border: 1px solid var(--lp-hair-2);
+  background: rgba(255, 255, 255, 0.04);
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.lp .lp-cap-btn:hover {
+  color: var(--lp-ink-1);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Komorka kafelki miesiaca. Trzy poziomy — tyle, ile zna miesiac demo. */
+.lp .lp-heat {
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid var(--lp-hair);
+  background: rgba(255, 255, 255, 0.03);
+}
+.lp .lp-heat[data-level='1'] {
+  background: color-mix(in oklab, var(--lp-accent) 11%, transparent);
+  border-color: color-mix(in oklab, var(--lp-accent) 24%, transparent);
+}
+.lp .lp-heat[data-level='2'] {
+  background: color-mix(in oklab, var(--lp-accent) 24%, transparent);
+  border-color: color-mix(in oklab, var(--lp-accent) 38%, transparent);
+}
+
+/*
+ * Slupek raportu.
+ *
+ * Wysokosc jest STALA i przychodzi jako `--lp-bar` — ustawiana raz, przy
+ * renderze, nigdy w klatce przewijania. Wzrost robi wylacznie `scaleY`
+ * zaczepiony przy podstawie, czyli transformacja kompozytora. Animowanie
+ * `height`, jak robilo to stare bento, kazaloby przegladarce przeliczac
+ * uklad calego wiersza w kazdej klatce (zasada 1 z `docs/landing-motion.md`).
+ */
+.lp .lp-cap-bar {
+  height: var(--lp-bar, 0%);
+  min-height: 2px;
+  border-radius: 2px;
+  transform-origin: bottom;
+  background: rgba(255, 255, 255, 0.14);
+}
+.lp .lp-cap-bar-accent { background: var(--lp-accent); }
+
 /* ─── Wykres slupkowy ─── */
 .lp .lp-bar {
   background: rgba(255, 255, 255, 0.1);
@@ -356,4 +523,19 @@
     visibility: visible !important;
     transform: none !important;
   }
+
+  /*
+   * Karty mozliwosci. `lp-motion` wyzej odblokowuje ramke i tresc; tutaj
+   * gasna dwa ruchy, ktore NIE ida z Motion, wiec tamta regula ich nie
+   * dosiega: mikroskala hovera i pulsowanie kropki „tracking".
+   *
+   * Slupki raportu nie potrzebuja wlasnej reguly — ich `scaleY` jest
+   * transformem z Motion, wiec `transform: none !important` przywraca im
+   * pelna, docelowa wysokosc (`--lp-bar` stoi w CSS i nigdy nie animuje).
+   */
+  .lp .lp-capability {
+    transform: none !important;
+    transition: none !important;
+  }
+  .lp .lp-cap-dot-live { animation: none !important; }
 }

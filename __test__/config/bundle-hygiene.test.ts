@@ -18,10 +18,17 @@ const sources = ['app', 'features', 'components', 'hooks', 'lib'].flatMap((d) =>
   walk(resolve(ROOT, d)),
 )
 
+/**
+ * Skan patrzy wylacznie na KOD. Bez tego kazde odwolanie do
+ * `docs/landing-motion.md` w komentarzu wygladalo jak uzycie proxy `motion.*`.
+ */
+const stripComments = (source: string) =>
+  source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+
 describe('bundle hygiene — motion', () => {
   it('uses the lightweight m.* namespace, never the full motion.* proxy', () => {
     const offenders = sources
-      .filter((f) => /\bmotion\.[a-zA-Z]/.test(read(relative(ROOT, f))))
+      .filter((f) => /\bmotion\.[a-zA-Z]/.test(stripComments(read(relative(ROOT, f)))))
       .map((f) => relative(ROOT, f))
 
     expect(
