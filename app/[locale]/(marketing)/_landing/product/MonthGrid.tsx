@@ -1,11 +1,13 @@
 'use client'
 
-import { m, type MotionValue } from 'framer-motion'
+import type { ReactNode } from 'react'
+import { m, useTransform, type MotionValue } from 'framer-motion'
 
 import { toMinor } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 
-import { useScrollMap } from '../motion/scene'
+import { useMotionProfile } from '../motion/profile'
+import { useScrollTransform } from '../motion/scene'
 
 import {
   DEMO_MONTH,
@@ -22,14 +24,34 @@ import {
  * godziny nad kwota, pasek koloru klienta na dole komorki, podswietlenie
  * dnia dzisiejszego.
  *
- * `progress` steruje pojawianiem sie wpisow (sekcja automatu). Kazda komorka
- * czyta go wlasnym `useTransform`, wiec wypelnianie miesiaca nie wywoluje
- * ani jednego rerenderu Reacta.
+ * ── Trzy tryby wypelniania ──
+ *
+ * BEZ `progress` siatka jest gotowa i nie tworzy ani jednej wartosci
+ * sterowanej scrollem. Tak uzywa jej ekran Kalendarza, ktory pokazuje miesiac
+ * juz uzupelniony — wczesniej placil za to szescdziesiecioma `useTransform`
+ * przypietymi do stalej jedynki.
+ *
+ * DESKTOP (`progress` + profil desktop) wypelnia miesiac DZIEN PO DNIU: kazda
+ * komorka ma wlasne okno postepu i wlasna krzywa. Trzydziesci komorek to
+ * szescdziesiat wartosci — na duzym ekranie ten detal widac i jest wart
+ * swojej ceny.
+ *
+ * TELEFON (`progress` + profil mobile) wypelnia miesiac TYGODNIAMI. Piec
+ * wierszy dzieli PIEC wartosci zamiast szescdziesieciu; komorki jednego
+ * tygodnia pojawiaja sie razem. Na czterocalowej siatce i tak nie da sie
+ * odczytac, ze dzien 12 wszedl kilkanascie milisekund przed dniem 13 —
+ * zostaje ten sam komunikat („automat sam wypelnia kalendarz") za jedna
+ * dwunasta pracy. Odpada tez `scale` komorki: sam `opacity` wystarcza, a
+ * mniej animowanych wlasciwosci to mniej warstw kompozycji.
  */
 
 interface MonthGridProps {
   days: readonly DemoDay[]
-  progress: MotionValue<number>
+  /**
+   * Postep sceny automatu. Pominiety — siatka jest od razu wypelniona i
+   * calkowicie statyczna.
+   */
+  progress?: MotionValue<number>
   /** Zakres postepu, w ktorym wpisy pojawiaja sie po kolei. */
   fillRange?: [number, number]
   clientColor: string
@@ -40,7 +62,52 @@ interface MonthGridProps {
   fill?: boolean
 }
 
+/** Dlugosc okna pojawiania sie pojedynczego wpisu, w ulamku toru sceny. */
 const CELL_SPAN = 0.16
+
+/** Komorka pusta na poczatku miesiaca (dopelnienie do poniedzialku). */
+type Cell = DemoDay | null
+
+/** Podzial miesiaca na wiersze siatki — dokladnie tak, jak leza na ekranie. */
+function toWeeks(days: readonly DemoDay[], offset: number): Cell[][] {
+  const cells: Cell[] = [...Array.from<Cell>({ length: offset }).fill(null), ...days]
+  const weeks: Cell[][] = []
+  for (let index = 0; index < cells.length; index += 7) {
+    weeks.push(cells.slice(index, index + 7))
+  }
+  return weeks
+}
+
+/**
+ * Okno postepu, w ktorym pojawia sie wpis o podanej kolejnosci (0 = pierwszy
+ * zapisany dzien miesiaca, 1 = ostatni). Okna sasiednich dni zachodza na
+ * siebie, wiec miesiac wypelnia sie plynnie, a nie skokami.
+ */
+function entryWindow(order: number, [lo, hi]: [number, number]): [number, number] {
+  const start = lo + order * Math.max(0, hi - lo - CELL_SPAN)
+  return [start, start + CELL_SPAN]
+}
+
+/**
+ * Okno tygodnia to suma okien jego zapisanych dni. Tydzien bez ani jednego
+ * wpisu (poczatek miesiaca, pobyt w domu) dostaje okno pierwszego wpisu — nie
+ * ma tam czego pokazywac, a `useTransform` wymaga rosnacego zakresu.
+ */
+function weekWindow(
+  week: Cell[],
+  orderOf: (day: DemoDay) => number,
+  fillRange: [number, number],
+): [number, number] {
+  const orders = week
+    .filter((cell): cell is DemoDay => cell !== null && cell.hours !== null)
+    .map(orderOf)
+
+  if (orders.length === 0) return entryWindow(0, fillRange)
+
+  const [start] = entryWindow(Math.min(...orders), fillRange)
+  const [, end] = entryWindow(Math.max(...orders), fillRange)
+  return [start, end]
+}
 
 export function MonthGrid({
   days,
@@ -52,12 +119,30 @@ export function MonthGrid({
   fill = false,
 }: MonthGridProps) {
   const fmt = useFormat()
+  const profile = useMotionProfile()
+
+  const weeks = toWeeks(days, DEMO_MONTH.firstWeekdayOffset)
   const filled = days.filter((day) => day.hours !== null)
-  const [lo, hi] = fillRange
-  const span = Math.max(0, hi - lo)
+  const orderOf = (day: DemoDay) => filled.indexOf(day) / Math.max(1, filled.length - 1)
+
+  const byWeek = progress !== undefined && profile === 'mobile'
+
+  const cellProps = (day: DemoDay) => ({
+    day,
+    clientColor,
+    isToday: today === day.day,
+    showAmount: showAmounts,
+    fmt,
+  })
 
   return (
-    <div className={fill ? 'flex h-full flex-col' : undefined}>
+    /*
+      `lp-month-fill` zdejmuje z komorek wlasne `min-height`. W tym trybie o
+      wysokosci wiersza decyduje rodzic (`grid-auto-rows: minmax(0, 1fr)`), a
+      dwa zrodla prawdy o wysokosci konczyly sie nachodzacymi na siebie
+      tygodniami. Szczegoly w `landing.css`.
+    */
+    <div className={fill ? 'lp-month-fill flex h-full flex-col' : undefined}>
       <div className="mb-1 grid grid-cols-7 gap-1">
         {DEMO_WEEKDAY_DATES.map((date) => (
           <span key={date} className="text-center lp-t8 uppercase tracking-wide text-zinc-400">
@@ -66,27 +151,45 @@ export function MonthGrid({
         ))}
       </div>
 
+      {/*
+        Wiersze tygodni sa OSOBNYMI elementami takze wtedy, gdy nic nie
+        animuja. Jeden uklad dla wszystkich trzech trybow znaczy, ze zmiana
+        profilu ruchu po hydratacji nie rusza ani jednego piksela: geometria
+        wierszy `grid-cols-7 gap-1` w gridzie o tym samym `gap` jest
+        identyczna z geometria jednej wielkiej siatki.
+      */}
       <div
-        className={`grid grid-cols-7 gap-1 ${fill ? 'min-h-0 flex-1' : ''}`}
+        className={`grid gap-1 ${fill ? 'min-h-0 flex-1' : ''}`}
         style={fill ? { gridAutoRows: 'minmax(0, 1fr)' } : undefined}
       >
-        {Array.from({ length: DEMO_MONTH.firstWeekdayOffset }).map((_, index) => (
-          <span key={`pad-${index}`} aria-hidden />
-        ))}
+        {weeks.map((week, index) => {
+          const cells = week.map((cell, position) =>
+            cell === null ? (
+              <span key={`pad-${position}`} aria-hidden />
+            ) : progress === undefined || byWeek ? (
+              <DayCell key={cell.day} {...cellProps(cell)} />
+            ) : (
+              <DayCellReveal
+                key={cell.day}
+                {...cellProps(cell)}
+                progress={progress}
+                window={entryWindow(orderOf(cell), fillRange)}
+              />
+            ),
+          )
 
-        {days.map((day) => {
-          const order = day.hours === null ? 0 : filled.indexOf(day) / Math.max(1, filled.length - 1)
-          const start = lo + order * Math.max(0, span - CELL_SPAN)
-          return (
-            <DayCell
-              key={day.day}
-              day={day}
+          return byWeek ? (
+            <WeekReveal
+              key={index}
               progress={progress}
-              window={[start, start + CELL_SPAN]}
-              clientColor={clientColor}
-              isToday={today === day.day}
-              showAmount={showAmounts}
-            />
+              window={weekWindow(week, orderOf, fillRange)}
+            >
+              {cells}
+            </WeekReveal>
+          ) : (
+            <div key={index} className="grid grid-cols-7 gap-1">
+              {cells}
+            </div>
           )
         })}
       </div>
@@ -94,25 +197,94 @@ export function MonthGrid({
   )
 }
 
-function DayCell({
-  day,
+/* ─────────────────────────── wiersz tygodnia ────────────────────────── */
+
+/**
+ * Jedna wartosc na caly tydzien. Wpisy w srodku sa zwyklymi elementami —
+ * dziedzicza przezroczystosc po wierszu, wiec siedem komorek kosztuje tyle,
+ * co jedna krzywa.
+ */
+function WeekReveal({
   progress,
   window,
-  clientColor,
-  isToday,
-  showAmount,
+  children,
 }: {
-  day: DemoDay
   progress: MotionValue<number>
   window: [number, number]
+  children: ReactNode
+}) {
+  const opacity = useTransform(progress, window, [0, 1])
+
+  return (
+    <m.div className="grid grid-cols-7 gap-1" style={{ opacity }}>
+      {children}
+    </m.div>
+  )
+}
+
+/* ─────────────────────────────── komorka ────────────────────────────── */
+
+interface CellProps {
+  day: DemoDay
   clientColor: string
   isToday: boolean
   showAmount: boolean
-}) {
-  const fmt = useFormat()
-  const opacity = useScrollMap(progress, window, [0, 1])
-  const scale = useScrollMap(progress, window, [0.86, 1])
+  fmt: ReturnType<typeof useFormat>
+}
 
+function DayCell({ day, clientColor, isToday, showAmount, fmt }: CellProps) {
+  const worked = day.hours !== null
+
+  return (
+    <CellShell day={day}>
+      {worked && <span aria-hidden className="lp-day-fill" />}
+      <DayNumber day={day.day} isToday={isToday} />
+      {worked && (
+        <span className="relative mt-auto block min-w-0">
+          <Entry day={day} clientColor={clientColor} showAmount={showAmount} fmt={fmt} />
+        </span>
+      )}
+    </CellShell>
+  )
+}
+
+/** Wariant desktopowy: wpis ma wlasne okno postepu i wlasna krzywa. */
+function DayCellReveal({
+  day,
+  clientColor,
+  isToday,
+  showAmount,
+  fmt,
+  progress,
+  window,
+}: CellProps & { progress: MotionValue<number>; window: [number, number] }) {
+  const opacity = useTransform(progress, window, [0, 1])
+  const transform = useScrollTransform(progress, window, ['scale(0.86)', 'scale(1)'])
+
+  const worked = day.hours !== null
+
+  return (
+    <CellShell day={day}>
+      {/* Skorka wpisu jest osobna warstwa sterowana tym samym postepem, co
+          godziny — inaczej miesiac wygladalby na wypelniony, zanim automat
+          cokolwiek dopisze. */}
+      {worked && <m.span aria-hidden className="lp-day-fill" style={{ opacity }} />}
+      <DayNumber day={day.day} isToday={isToday} />
+      {worked && (
+        <m.span className="relative mt-auto block min-w-0" style={{ opacity, transform }}>
+          <Entry day={day} clientColor={clientColor} showAmount={showAmount} fmt={fmt} />
+        </m.span>
+      )}
+    </CellShell>
+  )
+}
+
+/**
+ * Szkielet komorki jest ZAWSZE widoczny — obramowanie, tlo i numer dnia stoja
+ * na miejscu od pierwszej klatki. Pojawia sie wylacznie wpis, bo to on jest
+ * dzielem automatu.
+ */
+function CellShell({ day, children }: { day: DemoDay; children: ReactNode }) {
   const worked = day.hours !== null
   const weekend = day.weekday >= 5
 
@@ -126,41 +298,41 @@ function DayCell({
         .filter(Boolean)
         .join(' ')}
     >
-      {/* Skorka wpisu jest osobna warstwa sterowana tym samym postepem, co
-          godziny — inaczej miesiac wygladalby na wypelniony, zanim automat
-          cokolwiek dopisze. */}
-      {worked && <m.span aria-hidden className="lp-day-fill" style={{ opacity }} />}
-
-      <span
-        className={
-          isToday
-            ? 'relative flex size-3.5 items-center justify-center rounded-full bg-[var(--lp-accent)] lp-t8 font-semibold text-black'
-            : 'relative lp-t8 font-semibold leading-none text-zinc-400'
-        }
-      >
-        {day.day}
-      </span>
-
-      {worked && (
-        <m.span
-          className="relative mt-auto block min-w-0"
-          style={{ opacity, scale }}
-        >
-          <span className="block truncate lp-t9 font-bold leading-tight text-white">
-            {fmt.hours(day.hours)}
-          </span>
-          {showAmount && (
-            <span className="hidden truncate lp-t8 leading-tight text-zinc-400 sm:block">
-              {fmt.money(toMinor((day.hours ?? 0) * DEMO_RATE_EUR), 'EUR')}
-            </span>
-          )}
-          <span
-            aria-hidden
-            className="absolute inset-x-[-4px] bottom-[-4px] h-[2px] opacity-80"
-            style={{ background: clientColor }}
-          />
-        </m.span>
-      )}
+      {children}
     </div>
+  )
+}
+
+function DayNumber({ day, isToday }: { day: number; isToday: boolean }) {
+  return (
+    <span
+      className={
+        isToday
+          ? 'relative flex size-3.5 items-center justify-center rounded-full bg-[var(--lp-accent)] lp-t8 font-semibold text-black'
+          : 'relative lp-t8 font-semibold leading-none text-zinc-400'
+      }
+    >
+      {day}
+    </span>
+  )
+}
+
+function Entry({ day, clientColor, showAmount, fmt }: Omit<CellProps, 'isToday'>) {
+  return (
+    <>
+      <span className="block truncate lp-t9 font-bold leading-tight text-white">
+        {fmt.hours(day.hours)}
+      </span>
+      {showAmount && (
+        <span className="hidden truncate lp-t8 leading-tight text-zinc-400 sm:block">
+          {fmt.money(toMinor((day.hours ?? 0) * DEMO_RATE_EUR), 'EUR')}
+        </span>
+      )}
+      <span
+        aria-hidden
+        className="absolute inset-x-[-4px] bottom-[-4px] h-[2px] opacity-80"
+        style={{ background: clientColor }}
+      />
+    </>
   )
 }

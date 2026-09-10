@@ -36,7 +36,7 @@ type Props = {
  * region o tej samej nazwie tylko dublowalby sie w czytniku ekranu.
  *
  * Rozwijanie animuje CSS (`.collapsible-reveal` + zmienna Radiksa), a nie
- * framer-motion: LazyMotion kosztowal na tej trasie 17 kB gzip, czyli wiecej,
+ * Motion: LazyMotion kosztowal na tej trasie 17 kB gzip, czyli wiecej,
  * niz caly etap oszczedzil na leniwych sekcjach. Przy `prefers-reduced-motion`
  * klasa w ogole nie leci — animacji wysokosci po prostu nie ma.
  */

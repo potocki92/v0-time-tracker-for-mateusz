@@ -73,7 +73,9 @@ export function NumbersStory({ month }: { month: DemoMonth }) {
         {t('heading')}
       </h2>
 
-      <div ref={trackRef} className="lp-track relative h-[300vh] lg:h-[420vh]">
+      {/* `svh`, nie `vh`: na iOS `vh` ignoruje pasek Safari, wiec kazde jego
+          chowanie zmienialoby postep sceny w srodku ruchu palca. */}
+      <div ref={trackRef} className="lp-track relative h-[300svh] lg:h-[420svh]">
         <div className="lp-stage sticky top-0 flex h-[100svh] flex-col items-center justify-center px-5">
           <span className="lp-eyebrow mb-8">{t('eyebrow')}</span>
 
@@ -84,7 +86,7 @@ export function NumbersStory({ month }: { month: DemoMonth }) {
                 className="lp-layer"
                 style={{
                   opacity: step.fade.opacity,
-                  y: step.fade.y,
+                  transform: step.fade.transform,
                   visibility: step.fade.visibility,
                 }}
               >

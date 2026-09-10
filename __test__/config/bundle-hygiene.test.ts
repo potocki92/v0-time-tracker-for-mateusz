@@ -18,7 +18,7 @@ const sources = ['app', 'features', 'components', 'hooks', 'lib'].flatMap((d) =>
   walk(resolve(ROOT, d)),
 )
 
-describe('bundle hygiene — framer-motion', () => {
+describe('bundle hygiene — motion', () => {
   it('uses the lightweight m.* namespace, never the full motion.* proxy', () => {
     const offenders = sources
       .filter((f) => /\bmotion\.[a-zA-Z]/.test(read(relative(ROOT, f))))
@@ -26,7 +26,7 @@ describe('bundle hygiene — framer-motion', () => {
 
     expect(
       offenders,
-      `motion.* wciaga caly framer-motion; uzyj m.* pod <MotionProvider>:\n${offenders.join('\n')}`,
+      `motion.* wciaga caly pakiet Motion; uzyj m.* pod <MotionProvider>:\n${offenders.join('\n')}`,
     ).toEqual([])
   })
 

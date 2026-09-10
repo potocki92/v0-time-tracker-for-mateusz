@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { m } from 'framer-motion'
+import { m, useTransform } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 
 import { useFormat } from '@/lib/format/client'
@@ -16,7 +16,7 @@ import {
   demoClient,
   type DemoMonth,
 } from '../demo/demo-data'
-import { useScrollMap, useTrackProgress } from '../motion/scene'
+import { useTrackProgress } from '../motion/scene'
 import { MonthGrid } from '../product/MonthGrid'
 
 /**
@@ -37,7 +37,7 @@ export function AutomationShowcase({ month }: { month: DemoMonth }) {
   const progress = useTrackProgress(trackRef)
   const client = demoClient(DEMO_AUTOMATION_TARGET.clientId)
   // Podsumowanie miesiaca wchodzi dopiero, gdy siatka jest juz wypelniona.
-  const outcomeOpacity = useScrollMap(progress, [0.86, 0.95], [0, 1])
+  const outcomeOpacity = useTransform(progress, [0.86, 0.95], [0, 1])
 
   const reasons = [
     ...new Set(
@@ -49,7 +49,9 @@ export function AutomationShowcase({ month }: { month: DemoMonth }) {
 
   return (
     <section id="automation" aria-labelledby="automation-heading">
-      <div ref={trackRef} className="lp-track relative h-[260vh] lg:h-[340vh]">
+      {/* `svh`, nie `vh`: na iOS `vh` ignoruje pasek Safari, wiec kazde jego
+          chowanie zmienialoby postep sceny w srodku ruchu palca. */}
+      <div ref={trackRef} className="lp-track relative h-[260svh] lg:h-[340svh]">
         <div className="lp-stage sticky top-0 flex h-[100svh] items-center">
           <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8">
             <span className="lp-eyebrow">{t('eyebrow')}</span>

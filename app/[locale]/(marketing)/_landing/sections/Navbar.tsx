@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { m, useMotionValueEvent, useScroll } from 'framer-motion'
+import { m, useMotionValueEvent, useScroll, useTransform } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 
 import { LocaleSwitcher } from '@/components/i18n/locale-switcher'
 import { Link } from '@/i18n/navigation'
 
-import { useScrollMap } from '../motion/scene'
+import { useMotionProfile } from '../motion/profile'
 
 /** Kotwice w obrebie strony — hash nie ma wersji jezykowej, etykieta ma. */
 const ANCHORS = [
@@ -19,28 +19,50 @@ const ANCHORS = [
 /**
  * Navbar: logo, trzy kotwice, przelacznik jezyka, dwie akcje.
  *
- * Tlo i obrys jada na MotionValue (zero rerenderow), a `backdrop-filter`
- * wchodzi dopiero po przekroczeniu progu — jako klasa, nie jako animowana
- * wlasciwosc. Animowany blur to najdrozsza rzecz, jaka mozna wpisac do
- * przyklejonego paska.
+ * Tlo i obrys jada na MotionValue (zero rerenderow), a rozmycie tla wchodzi
+ * dopiero po przekroczeniu progu — jako klasa, nie jako animowana wlasciwosc.
+ * Animowany blur to najdrozsza rzecz, jaka mozna wpisac do przyklejonego
+ * paska.
+ *
+ * ── Dlaczego telefon nie dostaje `backdrop-filter` ──
+ *
+ * `backdrop-filter` na elemencie `fixed` zmusza przegladarke do pobrania
+ * zawartosci pod paskiem i rozmycia jej PONOWNIE w kazdej klatce
+ * przewijania — tlo przeciez caly czas sie zmienia. Na mobilnym Safari to
+ * jeden z najdrozszych efektow, jakie da sie wlaczyc, i placi za niego
+ * dokladnie ten ruch, ktory ma byc plynny.
+ *
+ * Zamiast tego telefon dostaje mocniejsze, niemal nieprzezroczyste tlo
+ * (0,92 zamiast 0,72). Na czarnej stronie roznica wizualna jest zadna —
+ * rozmycie czerni wyglada jak czern — a koszt spada do zera.
  */
 export function Navbar() {
   const t = useTranslations('marketing.nav')
+  const profile = useMotionProfile()
   const { scrollY } = useScroll()
   const [scrolled, setScrolled] = useState(false)
 
-  const background = useScrollMap(scrollY, [0, 80], ['rgba(0,0,0,0)', 'rgba(0,0,0,0.72)'])
-  const borderColor = useScrollMap(
+  const opaque = profile === 'desktop' ? 'rgba(0,0,0,0.72)' : 'rgba(0,0,0,0.92)'
+  const background = useTransform(scrollY, [0, 80], ['rgba(0,0,0,0)', opaque])
+  const borderColor = useTransform(
     scrollY,
     [0, 80],
     ['rgba(255,255,255,0)', 'rgba(255,255,255,0.10)'],
   )
 
-  useMotionValueEvent(scrollY, 'change', (value) => setScrolled(value > 24))
+  // Warunek na `scrolled` chroni Reacta przed wywolaniem raz na klatke
+  // przewijania: `setState` leci wylacznie przy faktycznym przekroczeniu
+  // progu, czyli dwa razy na cala wizyte.
+  useMotionValueEvent(scrollY, 'change', (value) => {
+    const next = value > 24
+    if (next !== scrolled) setScrolled(next)
+  })
 
   return (
     <m.header
-      className={`fixed inset-x-0 top-0 z-50 border-b ${scrolled ? 'backdrop-blur-md' : ''}`}
+      className={`fixed inset-x-0 top-0 z-50 border-b ${
+        scrolled && profile === 'desktop' ? 'backdrop-blur-md' : ''
+      }`}
       style={{ background, borderColor }}
     >
       <nav

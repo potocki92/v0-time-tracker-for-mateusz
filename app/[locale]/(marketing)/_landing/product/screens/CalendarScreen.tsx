@@ -1,6 +1,5 @@
 'use client'
 
-import { useMotionValue } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 
 import { toMinor } from '@/lib/format'
@@ -32,8 +31,6 @@ const STATUS_LEGEND = [
 export function CalendarScreen({ month }: { month: DemoMonth }) {
   const t = useTranslations('marketing.app.calendar')
   const fmt = useFormat()
-  // Kalendarz pokazuje miesiac GOTOWY — stala jedynka zamiast krzywej scrolla.
-  const done = useMotionValue(1)
   const client = demoClient(DEMO_AUTOMATION_TARGET.clientId)
   const monthLabel = fmt.monthTitle(DEMO_MONTH.iso)
 
@@ -87,13 +84,10 @@ export function CalendarScreen({ month }: { month: DemoMonth }) {
 
       <Card className="flex min-h-0 flex-1 flex-col">
         <div className="min-h-0 flex-1">
-          <MonthGrid
-            days={month.days}
-            progress={done}
-            clientColor={client.color}
-            today={8}
-            fill
-          />
+          {/* Bez `progress`: kalendarz pokazuje miesiac GOTOWY. Wczesniej
+              stala jedynka przechodzila przez szescdziesiat `useTransform`,
+              ktore nigdy nie mialy sie zmienic. */}
+          <MonthGrid days={month.days} clientColor={client.color} today={8} fill />
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 border-t border-[var(--lp-hair)] pt-2">
           <Eyebrow>{t('statusesTitle')}</Eyebrow>

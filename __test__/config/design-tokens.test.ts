@@ -376,7 +376,7 @@ describe('design tokens — motion respects the user', () => {
     expect(css).toMatch(/animation-duration:\s*0\.01ms\s*!important/)
   })
 
-  it('routes framer-motion through MotionConfig reducedMotion="user"', () => {
+  it('routes Motion through MotionConfig reducedMotion="user"', () => {
     const provider = readFileSync(resolve(ROOT, 'components/common/motion-provider.tsx'), 'utf8')
     expect(provider).toContain('MotionConfig')
     expect(provider).toContain('reducedMotion="user"')
