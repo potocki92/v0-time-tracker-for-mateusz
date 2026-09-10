@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import { computeReportSummary, workedEntriesInRange } from '@/features/reports/lib/analytics'
+import { buildReportModel } from '@/features/reports/domain'
+import type { ReportsDataset } from '@/features/reports/domain'
 import { isRealEntry } from '@/lib/finance/realization'
 import type { WorkEntry } from '@/lib/types'
 
@@ -46,6 +47,14 @@ const FILTERS = {
   compare: false,
 }
 
+const dataset = (entries: WorkEntry[]): ReportsDataset => ({
+  window: { start: '2026-09-08', end: '2026-09-08' },
+  entries,
+  clients: [],
+  projects: [],
+  eurRate: 4.3,
+})
+
 describe('isRealEntry', () => {
   it('brak `entry_kind` znaczy `real` — dane sprzed migracji nie znikaja', () => {
     expect(isRealEntry({ entry_kind: undefined })).toBe(true)
@@ -61,14 +70,14 @@ describe('raporty nie naliczaja planu i wykonania dla tej samej daty', () => {
   ]
 
   it('liczy tylko godziny wpisu rzeczywistego', () => {
-    const summary = computeReportSummary(entries, [], [], FILTERS, '2026-09-08')
-    expect(summary.totalHours).toBe(10)
-    expect(summary.workedCount).toBe(1)
+    const model = buildReportModel(dataset(entries), FILTERS, '2026-09-08')
+    expect(model.kpis.totalHours).toBe(10)
+    expect(model.kpis.entryCount).toBe(1)
   })
 
-  it('eksport dni z zakresu tez pomija plan', () => {
-    const worked = workedEntriesInRange(entries, FILTERS, '2026-09-08')
-    expect(worked.map((row) => row.id)).toEqual(['real'])
+  it('zbior rekordow raportu — a wiec i eksporty — tez pomija plan', () => {
+    const model = buildReportModel(dataset(entries), FILTERS, '2026-09-08')
+    expect(model.records.map((record) => record.id)).toEqual(['real'])
   })
 })
 

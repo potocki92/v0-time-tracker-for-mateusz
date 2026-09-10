@@ -1,3 +1,10 @@
+export interface ReportsFilter {
+  from: string       // ISO date — poczatek okna raportu
+  to: string
+  clientId: string   // 'all' albo id
+  projectId: string
+}
+
 export interface WorkEntriesFilter {
   from?: string  // ISO date
   to?: string
@@ -17,6 +24,13 @@ export const QUERY_KEYS = {
   all:         () => ['dashboard-module']                    as const,
   dashboard:   () => [...QUERY_KEYS.all(), 'data']           as const,
   calendar:    () => [...QUERY_KEYS.all(), 'calendar']       as const,
+  /**
+   * Raporty maja WLASNY klucz, niezalezny od dashboardu: ich okno wynika
+   * z wybranego zakresu, a nie z 24-miesiecznej historii dashboardu, wiec
+   * dane jednego nie moga podmienic danych drugiego.
+   */
+  reports:     (filter: ReportsFilter) =>
+    [...QUERY_KEYS.all(), 'reports', filter] as const,
   invoices:    () => [...QUERY_KEYS.all(), 'invoices']       as const,
   workEntries: (filter?: WorkEntriesFilter) =>
     [...QUERY_KEYS.all(), 'work-entries', filter ?? {}] as const,

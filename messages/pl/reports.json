@@ -2,5 +2,194 @@
   "meta": {
     "title": "Raporty",
     "description": "Godziny i przychód w wybranym okresie."
+  },
+  "header": {
+    "eyebrow": "Insights",
+    "title": "Raporty",
+    "customRange": "{from} – {to}"
+  },
+  "period": {
+    "label": "Zakres",
+    "from": "Od",
+    "to": "Do",
+    "last7d": "Ostatnie 7 dni",
+    "last30d": "Ostatnie 30 dni",
+    "last90d": "Ostatnie 90 dni",
+    "thisMonth": "Bieżący miesiąc",
+    "lastMonth": "Poprzedni miesiąc",
+    "thisQuarter": "Bieżący kwartał",
+    "thisYear": "Bieżący rok",
+    "lastYear": "Poprzedni rok",
+    "custom": "Własny zakres"
+  },
+  "filters": {
+    "sectionLabel": "Filtry raportu",
+    "open": "Filtry",
+    "activeCount": "{count, plural, one {# aktywny filtr} few {# aktywne filtry} many {# aktywnych filtrów} other {# aktywnego filtru}}",
+    "sheetTitle": "Filtry raportu",
+    "sheetDescription": "Dopasuj zakres i przekroje danych",
+    "apply": "Zastosuj",
+    "reset": "Resetuj filtry",
+    "clear": "Wyczyść filtry",
+    "client": "Klient",
+    "allClients": "Wszyscy klienci",
+    "project": "Projekt",
+    "allProjects": "Wszystkie projekty",
+    "tag": "Tag",
+    "allTags": "Wszystkie tagi",
+    "compare": "Porównaj z poprzednim okresem",
+    "compareShort": "Porównaj",
+    "refreshing": "Odświeżam dane raportu"
+  },
+  "kpi": {
+    "sectionLabel": "Kluczowe wskaźniki",
+    "totalHours": {
+      "label": "Łącznie godzin",
+      "hint": "{count, plural, one {# wpis} few {# wpisy} many {# wpisów} other {# wpisu}}"
+    },
+    "workValue": {
+      "label": "Wartość pracy",
+      "hint": "Wykonana praca, nie faktury"
+    },
+    "activeDays": {
+      "label": "Dni z pracą",
+      "hint": "z {count, plural, one {# dnia} few {# dni} many {# dni} other {# dnia}} okresu"
+    },
+    "avgPerActiveDay": {
+      "label": "Średnia / dzień",
+      "hint": "W dniach z pracą"
+    },
+    "effectiveRate": {
+      "label": "Stawka efektywna",
+      "hint": "Wartość pracy na godzinę"
+    },
+    "billable": {
+      "label": "Billable",
+      "hint": "Udział godzin rozliczanych"
+    }
+  },
+  "compare": {
+    "previous": "Poprzednio: {value}",
+    "flat": "bez zmian",
+    "new": "nowe",
+    "noData": "brak porównania",
+    "increase": "wzrost o {value}",
+    "decrease": "spadek o {value}",
+    "rangeLabel": "Poprzedni okres: {from} – {to}"
+  },
+  "trend": {
+    "title": "Trend",
+    "sectionLabel": "Trend w czasie",
+    "metricHours": "Godziny",
+    "metricValue": "Wartość pracy",
+    "metricSwitcher": "Metryka wykresu",
+    "unitDay": "dziennie",
+    "unitWeek": "tygodniowo",
+    "unitMonth": "miesięcznie",
+    "currentSeries": "Bieżący okres",
+    "previousSeries": "Poprzedni okres",
+    "summary": "Wykres {metric} {unit} dla zakresu {from} – {to}.",
+    "tableFallback": "Dane wykresu w formie listy",
+    "empty": "Brak danych do pokazania na wykresie"
+  },
+  "breakdown": {
+    "title": "Podział pracy",
+    "sectionLabel": "Podział pracy",
+    "dimensionSwitcher": "Przekrój podziału",
+    "client": "Klienci",
+    "project": "Projekty",
+    "tag": "Tagi",
+    "unassigned": "Bez przypisania",
+    "untagged": "Bez tagu",
+    "tagOverlapNote": "Wpis z kilkoma tagami liczy się w każdym z nich.",
+    "showAll": "Pokaż wszystkie ({count})",
+    "showLess": "Pokaż mniej",
+    "shareOf": "{label}: {share} godzin okresu",
+    "empty": "Brak danych w wybranym zakresie"
+  },
+  "insights": {
+    "title": "Rytm pracy",
+    "sectionLabel": "Rytm pracy",
+    "busiestWeekday": "Najbardziej pracowity dzień",
+    "longestStreak": "Najdłuższa seria",
+    "longestStreakValue": "{count, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
+    "longestDay": "Najdłuższy dzień",
+    "daysWithoutWork": "Dni bez pracy",
+    "daysWithoutWorkValue": "{count, plural, one {# dzień} few {# dni} many {# dni} other {# dnia}}",
+    "weekdayDistribution": "Rozkład tygodnia",
+    "weekdayHours": "{weekday}: {hours}",
+    "empty": "Za mało danych, żeby pokazać rytm pracy"
+  },
+  "heatmap": {
+    "title": "Intensywność",
+    "sectionLabel": "Intensywność pracy dzień po dniu",
+    "legendLess": "mniej",
+    "legendMore": "więcej",
+    "dayLabel": "{date}: {hours}",
+    "noWork": "{date}: brak pracy"
+  },
+  "table": {
+    "title": "Szczegóły",
+    "sectionLabel": "Szczegółowe dane wpisów",
+    "date": "Data",
+    "client": "Klient",
+    "project": "Projekt",
+    "workType": "Rozliczenie",
+    "hours": "Godziny",
+    "quantity": "Ilość",
+    "rate": "Stawka",
+    "currency": "Waluta",
+    "value": "Wartość",
+    "tags": "Tagi",
+    "source": "Źródło",
+    "hourly": "Godzinowe",
+    "piecework": "Akord",
+    "manual": "Ręczny",
+    "automation": "Automat",
+    "sortBy": "Sortuj według: {column}",
+    "expandRow": "Pokaż szczegóły wpisu z {date}",
+    "collapseRow": "Ukryj szczegóły wpisu z {date}",
+    "pageStatus": "Strona {page} z {pages}",
+    "previousPage": "Poprzednia strona",
+    "nextPage": "Następna strona",
+    "rowCount": "{count, plural, one {# wpis} few {# wpisy} many {# wpisów} other {# wpisu}}",
+    "empty": "Brak wpisów w wybranym zakresie"
+  },
+  "export": {
+    "trigger": "Eksport",
+    "menuLabel": "Pobierz raport",
+    "csv": "CSV",
+    "json": "JSON",
+    "pdf": "PDF",
+    "fileName": "raport",
+    "generating": "Generuję PDF…",
+    "successCsv": "Eksport CSV gotowy",
+    "successJson": "Eksport JSON gotowy",
+    "successPdf": "Raport PDF gotowy",
+    "errorCsv": "Nie udało się wygenerować CSV",
+    "errorJson": "Nie udało się wygenerować JSON",
+    "errorPdf": "Nie udało się wygenerować PDF",
+    "yes": "tak",
+    "no": "nie",
+    "pdfTitle": "Raport pracy",
+    "pdfRange": "Zakres",
+    "pdfGeneratedAt": "Wygenerowano",
+    "pdfFilters": "Aktywne filtry",
+    "pdfNoFilters": "Bez filtrów",
+    "pdfKpis": "Podsumowanie",
+    "pdfTopClients": "Klienci",
+    "pdfTopProjects": "Projekty",
+    "pdfShare": "Udział",
+    "pdfNote": "Wartość pracy wynika z wpisów pracy, nie z wystawionych faktur."
+  },
+  "states": {
+    "noEntriesTitle": "Nie ma jeszcze czego raportować",
+    "noEntriesDescription": "Dodaj pierwsze wpisy pracy w kalendarzu, a raport policzy się sam.",
+    "noMatchTitle": "Brak danych dla tych filtrów",
+    "noMatchDescription": "Zmień zakres albo przekrój, żeby zobaczyć wyniki.",
+    "thinDataNote": "Bardzo mało danych w tym zakresie — średnie i trendy mogą być mylące.",
+    "errorTitle": "Nie udało się wczytać raportu",
+    "errorDescription": "Spróbuj ponownie za chwilę.",
+    "retry": "Spróbuj ponownie"
   }
 }
