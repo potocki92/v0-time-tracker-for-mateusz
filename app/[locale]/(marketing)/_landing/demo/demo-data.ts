@@ -5,6 +5,9 @@
  *  - model odwzorowuje `lib/types.ts` (klient, projekt, wpis, faktura),
  *  - klienci, projekty i wystawca faktury sa FIKCYJNI: landing jest publiczny,
  *    wiec nie moze pokazywac zadnych danych z prawdziwego konta,
+ *  - ten plik trzyma STRUKTURE demo (id, stawki, kolory, relacje, liczby),
+ *    a NAZWY siedza w `messages/<locale>/marketing.json` pod `demo.*` i ida
+ *    za jezykiem strony — patrz `useDemoNames`,
  *  - liczby sa SPOJNE: miesiac demonstracyjny liczy sie z grafiku i wyjazdow
  *    (`demo-month.server.ts`), a stawka z `DEMO_RATE_EUR` — dzieki temu
  *    godziny na Pulpicie, kwota na fakturze i sekwencja „od pracy do pieniedzy"
@@ -12,16 +15,24 @@
  *  - to sa dane JEDNEGO demonstracyjnego konta, nie statystyka platformy.
  *
  * I18N: ten plik nie zawiera ANI JEDNEJ etykiety dla uzytkownika. Daty siedza
- * jako `YYYY-MM-DD` i przechodza przez `lib/format`, a statusy i typy jako
- * KLUCZE tlumaczone w komponentach. Dzieki temu niemiecki landing nie moze
- * pokazac polskiego „Zaplanowany" ani polskiego „30 wrz 2026".
+ * jako `YYYY-MM-DD` i przechodza przez `lib/format`, a statusy, typy oraz
+ * nazwy klientow i projektow jako KLUCZE tlumaczone w komponentach. Dzieki
+ * temu niemiecki landing nie moze pokazac polskiego „Zaplanowany", polskiego
+ * „30 wrz 2026" ani polskiego „ul. Przykladowa 51".
  */
 
 export type DemoWorkType = 'hourly' | 'piecework'
 
+/**
+ * Id klienta to ROLA w opowiesci landingu, nie nazwa firmy: `main` jest
+ * klientem, na ktorego pisze automat, `side` drugim godzinowym, `partner`
+ * akordowym. Nazwe dokleja `useDemoNames` z `marketing.demo.clients.<id>`,
+ * wiec id moze zostac neutralne jezykowo.
+ */
+export type DemoClientId = 'main' | 'side' | 'partner'
+
 export interface DemoClient {
-  id: string
-  name: string
+  id: DemoClientId
   workType: DemoWorkType
   /** Stawka w EUR za godzine / sztuke. */
   rate: number
@@ -31,10 +42,12 @@ export interface DemoClient {
 
 export type DemoProjectStatus = 'planned' | 'in_progress' | 'completed'
 
+/** Id projektu, tak jak id klienta, opisuje etap — nie adres budowy. */
+export type DemoProjectId = 'active' | 'upcoming' | 'done'
+
 export interface DemoProject {
-  id: string
-  name: string
-  clientId: string
+  id: DemoProjectId
+  clientId: DemoClientId
   status: DemoProjectStatus
   hours: number
   budgetUtilization: number
@@ -57,34 +70,31 @@ export const DEMO_MONTH = {
 export const DEMO_RATE_EUR = 24
 
 export const DEMO_CLIENTS: readonly DemoClient[] = [
-  { id: 'musterbau',  name: 'Musterbau GmbH',   workType: 'hourly',    rate: 24, color: '#7898C5' },
-  { id: 'beispiel',   name: 'Beispiel Technik', workType: 'hourly',    rate: 22, color: '#8FB89A' },
-  { id: 'mustersohn', name: 'Muster & Sohn',    workType: 'piecework', rate: 32, color: '#C97A8A' },
+  { id: 'main',    workType: 'hourly',    rate: 24, color: '#7898C5' },
+  { id: 'side',    workType: 'hourly',    rate: 22, color: '#8FB89A' },
+  { id: 'partner', workType: 'piecework', rate: 32, color: '#C97A8A' },
 ] as const
 
 export const DEMO_PROJECTS: readonly DemoProject[] = [
   {
-    id: 'musterstrasse',
-    name: 'Musterstraße 51',
-    clientId: 'musterbau',
+    id: 'active',
+    clientId: 'main',
     status: 'in_progress',
     hours: 194,
     budgetUtilization: 62,
     dueDate: '2026-09-30',
   },
   {
-    id: 'beispielweg',
-    name: 'Beispielweg 284',
-    clientId: 'mustersohn',
+    id: 'upcoming',
+    clientId: 'partner',
     status: 'planned',
     hours: 0,
     budgetUtilization: 0,
     dueDate: '2026-10-12',
   },
   {
-    id: 'musterallee',
-    name: 'Musterallee 25–35',
-    clientId: 'beispiel',
+    id: 'done',
+    clientId: 'side',
     status: 'completed',
     hours: 168,
     budgetUtilization: 94,
@@ -94,22 +104,9 @@ export const DEMO_PROJECTS: readonly DemoProject[] = [
 
 /** Projekt i klient, na ktore automat zapisuje godziny w demo. */
 export const DEMO_AUTOMATION_TARGET = {
-  clientId: 'musterbau',
-  projectId: 'musterstrasse',
-} as const
-
-/**
- * Adres budowy, na ktora jedzie automat. Wyprowadzony z projektu, a nie
- * wpisany drugi raz — wyjazdy i tracker w sidebarze nie moga pokazac innego
- * adresu niz pozycja na fakturze.
- */
-export const DEMO_SITE = demoProject(DEMO_AUTOMATION_TARGET.projectId).name
-
-/**
- * Wystawca faktury demonstracyjnej — fikcyjny jednoosobowy wykonawca.
- * Inicjaly stoja obok nazwy, bo sidebar mockupu pokazuje awatar.
- */
-export const DEMO_SELLER = { name: 'Jan Kowalski', initials: 'JK' } as const
+  clientId: 'main',
+  projectId: 'active',
+} as const satisfies { clientId: DemoClientId; projectId: DemoProjectId }
 
 /**
  * Grafik tygodnia — kopia `DEFAULT_WEEK_SCHEDULE` z automatu.
@@ -157,10 +154,15 @@ export const DEMO_PRESENCE = [
   { kind: 'trip', from: '2026-09-21', to: '2026-09-30', days: 10 },
 ] as const satisfies readonly { kind: DemoPresenceKind; from: string; to: string; days: number }[]
 
-/** Wyjazdy i pobyt w domu — dokladnie ten model, ktory czyta automat. */
+/**
+ * Wyjazdy i pobyt w domu — dokladnie ten model, ktory czyta automat.
+ * Bez `destination`: `planDays` bierze z wyjazdu wylacznie zakres dat, a
+ * cel wyjazdu nie pojawia sie na zadnym ekranie landingu. Adres budowy
+ * pokazuje tracker w sidebarze i bierze go z nazwy projektu.
+ */
 export const DEMO_TRIPS = [
-  { id: 'trip-1', startDate: '2026-09-01', endDate: '2026-09-12', destination: DEMO_SITE },
-  { id: 'trip-2', startDate: '2026-09-21', endDate: '2026-09-30', destination: DEMO_SITE },
+  { id: 'trip-1', startDate: '2026-09-01', endDate: '2026-09-12' },
+  { id: 'trip-2', startDate: '2026-09-21', endDate: '2026-09-30' },
 ] as const
 
 /** Okno miedzy wyjazdami — automat nie dopisuje wtedy godzin. */
@@ -187,7 +189,7 @@ export const DEMO_INVOICE = {
   status: 'draft' as DemoInvoiceStatus,
   issueDate: '2026-09-30',
   dueDate: '2026-10-14',
-  clientId: 'musterbau',
+  clientId: 'main' as DemoClientId,
   vatRate: 0,
 } as const
 
@@ -243,13 +245,13 @@ export interface DemoMonth {
   workedDays: number
 }
 
-export function demoClient(id: string): DemoClient {
+export function demoClient(id: DemoClientId): DemoClient {
   const client = DEMO_CLIENTS.find((entry) => entry.id === id)
   if (!client) throw new Error(`Unknown demo client: ${id}`)
   return client
 }
 
-export function demoProject(id: string): DemoProject {
+export function demoProject(id: DemoProjectId): DemoProject {
   const project = DEMO_PROJECTS.find((entry) => entry.id === id)
   if (!project) throw new Error(`Unknown demo project: ${id}`)
   return project

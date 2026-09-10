@@ -181,5 +181,18 @@
       "monthlyHours": "Stunden im Monat",
       "byProject": "Aufteilung nach Projekten"
     }
+  },
+  "demo": {
+    "seller": { "name": "Max Mustermann", "initials": "MM" },
+    "clients": {
+      "main": "Musterbau GmbH",
+      "side": "Beispiel Technik",
+      "partner": "Muster & Sohn"
+    },
+    "projects": {
+      "active": "Musterstraße 51",
+      "upcoming": "Beispielweg 284",
+      "done": "Musterallee 25–35"
+    }
   }
 }

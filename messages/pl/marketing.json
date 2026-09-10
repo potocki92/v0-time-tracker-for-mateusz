@@ -181,5 +181,18 @@
       "monthlyHours": "Godziny w miesiącu",
       "byProject": "Podział na projekty"
     }
+  },
+  "demo": {
+    "seller": { "name": "Jan Kowalski", "initials": "JK" },
+    "clients": {
+      "main": "Przykład-Bud Sp. z o.o.",
+      "side": "Nowak Technika",
+      "partner": "Wiśniewski i Syn"
+    },
+    "projects": {
+      "active": "ul. Przykładowa 51",
+      "upcoming": "ul. Testowa 284",
+      "done": "al. Wzorcowa 25–35"
+    }
   }
 }

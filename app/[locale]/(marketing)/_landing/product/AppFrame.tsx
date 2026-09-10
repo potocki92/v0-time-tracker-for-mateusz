@@ -26,7 +26,8 @@ import { useTranslations } from 'next-intl'
 
 import type { WorkspaceGroup, WorkspaceSegment } from '@/lib/workspace/sections'
 
-import { DEMO_PROJECTS, DEMO_SELLER, DEMO_SITE, demoClient } from '../demo/demo-data'
+import { DEMO_PROJECTS, demoClient } from '../demo/demo-data'
+import { useDemoNames } from '../demo/useDemoNames'
 import { MARKETING_BOTTOM_SEGMENTS, MARKETING_SECTIONS } from './nav'
 
 /**
@@ -147,6 +148,7 @@ function Sidebar({
 }: Pick<AppFrameProps, 'active' | 'activeMotion'>) {
   const t = useTranslations('navigation')
   const marketing = useTranslations('marketing.app')
+  const names = useDemoNames()
 
   return (
     <aside className="hidden w-[164px] shrink-0 flex-col border-r border-[var(--lp-hair)] bg-[var(--lp-s1)] p-2 md:flex">
@@ -198,7 +200,7 @@ function Sidebar({
                 className="size-1.5 shrink-0 rounded-full"
                 style={{ background: demoClient(project.clientId).color }}
               />
-              <span className="truncate">{project.name}</span>
+              <span className="truncate">{names.project(project.id)}</span>
             </div>
           ))}
         </div>
@@ -206,14 +208,14 @@ function Sidebar({
 
       <div className="mt-2 space-y-1.5 border-t border-[var(--lp-hair)] pt-2">
         <div className="lp-card-nested flex items-center justify-between px-1.5 py-1">
-          <span className="truncate lp-t9 text-zinc-400">{DEMO_SITE}</span>
+          <span className="truncate lp-t9 text-zinc-400">{names.site}</span>
           <span className="lp-mono lp-t10 tabular-nums text-white">02:14:08</span>
         </div>
         <div className="flex items-center gap-1.5 px-1">
           <span className="flex size-4 items-center justify-center rounded-full bg-[var(--lp-s3)] lp-t7 font-semibold text-zinc-300">
-            {DEMO_SELLER.initials}
+            {names.seller.initials}
           </span>
-          <span className="truncate lp-t10 text-zinc-300">{DEMO_SELLER.name}</span>
+          <span className="truncate lp-t10 text-zinc-300">{names.seller.name}</span>
         </div>
       </div>
     </aside>

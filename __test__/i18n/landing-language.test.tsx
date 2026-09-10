@@ -108,3 +108,44 @@ describe('landing — kompletna nawigacja mockupu', () => {
     }
   })
 })
+
+/**
+ * Obsada konta demonstracyjnego jest FIKCJA MARKETINGOWA, wiec — inaczej niz
+ * nazwy w panelu, ktore sa danymi i nigdy sie nie tlumacza — idzie za jezykiem
+ * strony. Polski czytelnik ma zobaczyc Kowalskiego przy ul. Przykladowej,
+ * niemiecki Mustermanna przy Musterstrasse.
+ *
+ * Ten test pilnuje obu polowek: ze obsada z danego jezyka faktycznie jest na
+ * ekranie i ze nie przemyka na niego obsada z pozostalych.
+ */
+describe.each(APP_LOCALES)('landing w jezyku %s — obsada demo idzie za jezykiem', (locale) => {
+  const cast = (loc: AppLocale) => {
+    const { demo } = MESSAGES[loc].marketing as {
+      demo: {
+        seller: { name: string }
+        clients: Record<string, string>
+        projects: Record<string, string>
+      }
+    }
+    return [demo.seller.name, ...Object.values(demo.clients), ...Object.values(demo.projects)]
+  }
+
+  it('pokazuje wystawce, klientow i projekty z tego jezyka', () => {
+    const { container } = renderLanding(locale)
+    const text = container.textContent ?? ''
+
+    for (const name of cast(locale)) expect(text, `${locale}: ${name}`).toContain(name)
+  })
+
+  it('nie pokazuje obsady z pozostalych jezykow', () => {
+    const { container } = renderLanding(locale)
+    const text = container.textContent ?? ''
+
+    const foreign = APP_LOCALES.filter((other) => other !== locale)
+      .flatMap(cast)
+      .filter((name) => !cast(locale).includes(name))
+      .filter((name) => text.includes(name))
+
+    expect(foreign, `${locale}: obca obsada na ekranie — ${foreign.join(', ')}`).toEqual([])
+  })
+})

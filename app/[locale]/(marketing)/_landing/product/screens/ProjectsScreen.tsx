@@ -6,6 +6,7 @@ import { toMinor } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 
 import { DEMO_CLIENTS, DEMO_PROJECTS, demoClient } from '../../demo/demo-data'
+import { useDemoNames } from '../../demo/useDemoNames'
 import { Card, Dot, Eyebrow, Meter, Pill, StatTile } from '../ui'
 
 /**
@@ -20,6 +21,7 @@ export function ProjectsScreen() {
   const t = useTranslations('marketing.app.projects')
   const tCommon = useTranslations('common')
   const fmt = useFormat()
+  const names = useDemoNames()
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -58,14 +60,14 @@ export function ProjectsScreen() {
                 />
                 <div className="flex items-center gap-2">
                   <span className="min-w-0 flex-1 truncate lp-t10 font-medium text-white">
-                    {project.name}
+                    {names.project(project.id)}
                   </span>
                   <Pill tone={active ? 'accent' : 'mute'}>{t(`status.${project.status}`)}</Pill>
                 </div>
                 <div className="mt-1 flex items-center gap-2 lp-t9 text-zinc-400">
                   <span className="flex items-center gap-1">
                     <Dot color={client.color} />
-                    {client.name}
+                    {names.client(client.id)}
                   </span>
                   <span className="lp-mono tabular-nums">{fmt.hours(project.hours)}</span>
                   <span className="lp-mono tabular-nums">
@@ -98,7 +100,7 @@ export function ProjectsScreen() {
                 <td className="py-1.5">
                   <span className="flex items-center gap-1.5">
                     <Dot color={client.color} />
-                    {client.name}
+                    {names.client(client.id)}
                   </span>
                 </td>
                 <td className="py-1.5 text-zinc-400">{t(`billing.${client.workType}`)}</td>

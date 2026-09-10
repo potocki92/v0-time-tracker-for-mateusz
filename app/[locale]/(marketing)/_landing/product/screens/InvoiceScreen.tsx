@@ -10,11 +10,11 @@ import {
   DEMO_INVOICE,
   DEMO_MONTH,
   DEMO_RATE_EUR,
-  DEMO_SELLER,
   demoClient,
   demoProject,
   type DemoMonth,
 } from '../../demo/demo-data'
+import { useDemoNames } from '../../demo/useDemoNames'
 import { Card, Eyebrow, Pill } from '../ui'
 
 /**
@@ -29,6 +29,7 @@ import { Card, Eyebrow, Pill } from '../ui'
 export function InvoiceScreen({ month }: { month: DemoMonth }) {
   const t = useTranslations('marketing.app.invoice')
   const fmt = useFormat()
+  const names = useDemoNames()
   const client = demoClient(DEMO_INVOICE.clientId)
   const project = demoProject(DEMO_AUTOMATION_TARGET.projectId)
   const period = fmt.monthTitle(DEMO_MONTH.iso)
@@ -58,11 +59,11 @@ export function InvoiceScreen({ month }: { month: DemoMonth }) {
         <div className="grid grid-cols-2 gap-2 border-b border-[var(--lp-hair)] py-2">
           <div>
             <Eyebrow>{t('seller')}</Eyebrow>
-            <p className="mt-1 lp-t9 text-zinc-300">{DEMO_SELLER.name}</p>
+            <p className="mt-1 lp-t9 text-zinc-300">{names.seller.name}</p>
           </div>
           <div>
             <Eyebrow>{t('buyer')}</Eyebrow>
-            <p className="mt-1 lp-t9 text-zinc-300">{client.name}</p>
+            <p className="mt-1 lp-t9 text-zinc-300">{names.client(client.id)}</p>
           </div>
         </div>
 
@@ -78,7 +79,7 @@ export function InvoiceScreen({ month }: { month: DemoMonth }) {
           <tbody>
             <tr className="lp-t9 text-zinc-200">
               <td className="py-1.5">
-                {project.name}
+                {names.project(project.id)}
                 <span className="block lp-t8 text-zinc-400">{t('lineNote', { period })}</span>
               </td>
               <td className="lp-mono py-1.5 text-right tabular-nums">

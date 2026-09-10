@@ -11,6 +11,7 @@ import {
   demoClient,
   type DemoMonth,
 } from '../../demo/demo-data'
+import { useDemoNames } from '../../demo/useDemoNames'
 import { MonthGrid } from '../MonthGrid'
 import { Card, Eyebrow, StatTile } from '../ui'
 
@@ -31,6 +32,7 @@ const STATUS_LEGEND = [
 export function CalendarScreen({ month }: { month: DemoMonth }) {
   const t = useTranslations('marketing.app.calendar')
   const fmt = useFormat()
+  const names = useDemoNames()
   const client = demoClient(DEMO_AUTOMATION_TARGET.clientId)
   const monthLabel = fmt.monthTitle(DEMO_MONTH.iso)
 
@@ -72,7 +74,7 @@ export function CalendarScreen({ month }: { month: DemoMonth }) {
         <StatTile
           label={t('earnings')}
           value={fmt.money(toMinor(month.earningsEur), 'EUR')}
-          meta={client.name}
+          meta={names.client(client.id)}
           accent
         />
         <StatTile

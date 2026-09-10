@@ -181,5 +181,18 @@
       "monthlyHours": "Hours this month",
       "byProject": "Split by project"
     }
+  },
+  "demo": {
+    "seller": { "name": "John Doe", "initials": "JD" },
+    "clients": {
+      "main": "Sample Build Ltd",
+      "side": "Example Technical",
+      "partner": "Roe & Son"
+    },
+    "projects": {
+      "active": "51 Sample Street",
+      "upcoming": "284 Example Way",
+      "done": "25–35 Model Avenue"
+    }
   }
 }
