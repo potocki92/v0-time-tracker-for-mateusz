@@ -383,6 +383,43 @@ describe('współbieżność: jeden realny wpis na dzień', () => {
     expect(error).toBeNull()
     expect(data?.id).toBeDefined()
   })
+
+  // Kolejnosc odwrotna niz wyzej, i to wlasnie ta, ktora wykonuje automat:
+  // uzytkownik ma plan, automat dopisuje wykonanie. Produkcja miala tu stara
+  // regule UNIQUE (user_id, date) obok wlasciwej, wiec insert konczyl sie
+  // bledem 23505 i dziennik zapisywal `skipped / entry_exists` mimo braku
+  // wpisu rzeczywistego. Test pilnuje SCHEMATU, ktorego atrapa bazy
+  // (`__test__/work-automation/fakeSupabase.ts`) z zalozenia nie odwzoruje.
+  it('wykonanie dopisuje się do dnia, w którym jest już sam plan', async () => {
+    const PLANNED_DATE = '2024-02-28'
+
+    const { error: planError } = await clientA.from('work_entries').insert({
+      user_id: userAId,
+      date: PLANNED_DATE,
+      status: 'worked',
+      entry_kind: 'predicted',
+      hours: 12,
+    })
+    expect(planError).toBeNull()
+
+    const { data, error } = await clientA
+      .from('work_entries')
+      .insert({
+        user_id: userAId,
+        date: PLANNED_DATE,
+        status: 'worked',
+        entry_kind: 'real',
+        source: 'automation',
+        hours: 10,
+      })
+      .select('id')
+      .single()
+
+    expect(error).toBeNull()
+    expect(data?.id).toBeDefined()
+
+    await clientA.from('work_entries').delete().eq('user_id', userAId).eq('date', PLANNED_DATE)
+  })
 })
 
 describe('utrata klienta zatrzymuje automat', () => {
