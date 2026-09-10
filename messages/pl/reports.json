@@ -180,7 +180,17 @@
     "pdfTopClients": "Klienci",
     "pdfTopProjects": "Projekty",
     "pdfShare": "Udział",
-    "pdfNote": "Wartość pracy wynika z wpisów pracy, nie z wystawionych faktur."
+    "pdfNote": "Wartość pracy wynika z wpisów pracy, nie z wystawionych faktur.",
+    "worksiteGroup": "Dla księgowej",
+    "worksitePdf": "Zestawienie miejsc pracy (PDF)",
+    "worksiteCsv": "Zestawienie miejsc pracy (CSV)",
+    "worksiteFileName": "zestawienie-miejsc-pracy",
+    "worksiteTitle": "Zestawienie miejsc i okresów pracy",
+    "worksiteLocation": "Miejsce pracy",
+    "worksiteDays": "Dni pracy",
+    "worksiteTotal": "Razem",
+    "worksiteNoLocation": "Brak adresu projektu",
+    "worksiteNote": "Zestawienie obejmuje wyłącznie zarejestrowane dni pracy w wybranym zakresie. Dni pracy w wierszu „Razem” to liczba różnych dni — ten sam dzień w dwóch projektach liczy się raz."
   },
   "states": {
     "noEntriesTitle": "Nie ma jeszcze czego raportować",

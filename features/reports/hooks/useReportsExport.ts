@@ -4,7 +4,12 @@ import { useCallback, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useFormat } from '@/lib/format/client'
-import { buildReportCsv, buildReportJson, exportFileName } from '../domain/export'
+import {
+  buildReportCsv,
+  buildReportJson,
+  buildWorksiteCsv,
+  exportFileName,
+} from '../domain/export'
 import type { ReportModel } from '../domain'
 
 type Params = {
@@ -17,6 +22,8 @@ export type UseReportsExportReturn = {
   exportCsv: () => void
   exportJson: () => void
   exportPdf: () => Promise<void>
+  exportWorksiteCsv: () => void
+  exportWorksitePdf: () => Promise<void>
   isGeneratingPdf: boolean
 }
 
@@ -30,7 +37,8 @@ function download(blob: Blob, filename: string): void {
 }
 
 /**
- * Trzy eksporty raportu.
+ * Eksporty raportu: pelne dane (CSV/JSON/PDF) i zestawienie miejsc pracy
+ * dla ksiegowej (CSV/PDF).
  *
  * Tresc plikow buduja czyste funkcje z `domain/export`; hook odpowiada tylko
  * za pobranie i komunikat. PDF dochodzi dynamicznym importem — `@react-pdf/renderer`
@@ -88,18 +96,54 @@ export function useReportsExport({ model, filtersSummary }: Params): UseReportsE
     }
   }, [model, t])
 
+  /** Naglowki kolumn zestawienia miejsc pracy — te same w CSV i w PDF. */
+  const worksiteLabels = useCallback(
+    () => ({
+      project: t('table.project'),
+      client: t('table.client'),
+      location: t('export.worksiteLocation'),
+      from: t('period.from'),
+      to: t('period.to'),
+      workedDays: t('export.worksiteDays'),
+      hours: t('table.hours'),
+      total: t('export.worksiteTotal'),
+      unassigned: t('breakdown.unassigned'),
+      noLocation: t('export.worksiteNoLocation'),
+    }),
+    [t],
+  )
+
+  /**
+   * Wspolna obsluga generowania PDF: blokada przycisku, toast „generuje…",
+   * pobranie pliku i jeden komunikat bledu dla obu szablonow.
+   */
+  const runPdfExport = useCallback(
+    async (build: () => Promise<Blob>, filename: string) => {
+      setIsGeneratingPdf(true)
+      const pending = toast.loading(t('export.generating'))
+
+      try {
+        download(await build(), filename)
+        toast.success(t('export.successPdf'), { id: pending })
+      } catch {
+        toast.error(t('export.errorPdf'), { id: pending })
+      } finally {
+        setIsGeneratingPdf(false)
+      }
+    },
+    [t],
+  )
+
   const exportPdf = useCallback(async () => {
     if (!model) return
-    setIsGeneratingPdf(true)
-    const pending = toast.loading(t('export.generating'))
 
-    try {
+    await runPdfExport(async () => {
       const [{ pdf }, { ReportPdfDocument }] = await Promise.all([
         import('@react-pdf/renderer'),
         import('../components/export/ReportPdfDocument'),
       ])
 
-      const blob = await pdf(
+      return pdf(
         ReportPdfDocument({
           model,
           filtersSummary,
@@ -128,15 +172,58 @@ export function useReportsExport({ model, filtersSummary }: Params): UseReportsE
           },
         }),
       ).toBlob()
+    }, exportFileName(t('export.fileName'), model, 'pdf'))
+  }, [model, filtersSummary, fmt, t, runPdfExport])
 
-      download(blob, exportFileName(t('export.fileName'), model, 'pdf'))
-      toast.success(t('export.successPdf'), { id: pending })
+  const exportWorksiteCsv = useCallback(() => {
+    if (!model) return
+    try {
+      const csv = buildWorksiteCsv(model, worksiteLabels())
+      download(
+        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
+        exportFileName(t('export.worksiteFileName'), model, 'csv'),
+      )
+      toast.success(t('export.successCsv'))
     } catch {
-      toast.error(t('export.errorPdf'), { id: pending })
-    } finally {
-      setIsGeneratingPdf(false)
+      toast.error(t('export.errorCsv'))
     }
-  }, [model, filtersSummary, fmt, t])
+  }, [model, t, worksiteLabels])
 
-  return { exportCsv, exportJson, exportPdf, isGeneratingPdf }
+  const exportWorksitePdf = useCallback(async () => {
+    if (!model) return
+
+    await runPdfExport(async () => {
+      const [{ pdf }, { WorksitePdfDocument }] = await Promise.all([
+        import('@react-pdf/renderer'),
+        import('../components/export/WorksitePdfDocument'),
+      ])
+
+      return pdf(
+        WorksitePdfDocument({
+          model,
+          filtersSummary,
+          generatedAt: fmt.date(new Date().toISOString().slice(0, 10), 'long'),
+          fmt,
+          labels: {
+            ...worksiteLabels(),
+            title: t('export.worksiteTitle'),
+            range: t('export.pdfRange'),
+            generatedAt: t('export.pdfGeneratedAt'),
+            filters: t('export.pdfFilters'),
+            noFilters: t('export.pdfNoFilters'),
+            note: t('export.worksiteNote'),
+          },
+        }),
+      ).toBlob()
+    }, exportFileName(t('export.worksiteFileName'), model, 'pdf'))
+  }, [model, filtersSummary, fmt, t, runPdfExport, worksiteLabels])
+
+  return {
+    exportCsv,
+    exportJson,
+    exportPdf,
+    exportWorksiteCsv,
+    exportWorksitePdf,
+    isGeneratingPdf,
+  }
 }

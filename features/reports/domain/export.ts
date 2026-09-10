@@ -1,4 +1,5 @@
 import { toMajorUnits } from './dataset'
+import { buildWorksitePeriods } from './worksites'
 import type { BreakdownItem, ReportModel, ReportRecord } from './types'
 
 /**
@@ -85,6 +86,63 @@ export function buildReportCsv(
   return `﻿${[header, ...model.records.map((record) => row(record, booleans))]
     .map((cells) => cells.map(escapeCsv).join(','))
     .join('\n')}`
+}
+
+export type WorksiteCsvLabels = {
+  project: string
+  client: string
+  location: string
+  from: string
+  to: string
+  workedDays: string
+  hours: string
+  /** Etykieta wiersza sumy. */
+  total: string
+  /** Podstawiane, gdy wpisy nie maja projektu albo klienta. */
+  unassigned: string
+  /** Podstawiane, gdy projekt nie ma zapisanego adresu. */
+  noLocation: string
+}
+
+/**
+ * CSV zestawienia miejsc pracy: jeden wiersz na projekt, na koncu suma.
+ *
+ * Suma bierze godziny i dni z KPI, a nie z dodawania kolumn — dzien
+ * przepracowany w dwoch projektach jest jednym dniem pracy, mimo ze wystepuje
+ * w dwoch wierszach.
+ */
+export function buildWorksiteCsv(model: ReportModel, labels: WorksiteCsvLabels): string {
+  const header = [
+    labels.project,
+    labels.client,
+    labels.location,
+    labels.from,
+    labels.to,
+    labels.workedDays,
+    labels.hours,
+  ]
+
+  const rows = buildWorksitePeriods(model.records).map((period) => [
+    period.projectName ?? labels.unassigned,
+    period.clientName ?? labels.unassigned,
+    period.location ?? labels.noLocation,
+    period.from,
+    period.to,
+    period.workedDays,
+    period.hours,
+  ])
+
+  const total = [
+    labels.total,
+    '',
+    '',
+    model.range.start,
+    model.range.end,
+    model.kpis.activeDays,
+    model.kpis.totalHours,
+  ]
+
+  return `﻿${[header, ...rows, total].map((cells) => cells.map(escapeCsv).join(',')).join('\n')}`
 }
 
 const breakdownToJson = (items: BreakdownItem[]) =>

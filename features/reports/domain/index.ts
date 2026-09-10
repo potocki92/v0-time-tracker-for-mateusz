@@ -31,6 +31,7 @@ export {
   type TrendPoint,
   type WeekdayIndex,
   type WeekdayLoad,
+  type WorksitePeriod,
 } from './types'
 export {
   DEFAULT_PERIOD_PRESET,
@@ -49,4 +50,5 @@ export { computeKpis } from './metrics'
 export { projectAfterClientChange, projectsForClient } from './filters'
 export { axisTickInterval, bucketKeyOf, buildTrend, resolveBucketUnit } from './trend'
 export { buildBreakdown } from './breakdowns'
+export { buildWorksitePeriods } from './worksites'
 export { buildInsights, longestStreak } from './insights'

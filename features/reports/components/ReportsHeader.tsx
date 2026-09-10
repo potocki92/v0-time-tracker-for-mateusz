@@ -12,6 +12,8 @@ type Props = {
   onExportCsv: () => void
   onExportJson: () => void
   onExportPdf: () => void
+  onExportWorksiteCsv: () => void
+  onExportWorksitePdf: () => void
   exportDisabled: boolean
 }
 
@@ -21,6 +23,8 @@ export function ReportsHeader({
   onExportCsv,
   onExportJson,
   onExportPdf,
+  onExportWorksiteCsv,
+  onExportWorksitePdf,
   exportDisabled,
 }: Props) {
   const t = useTranslations('reports')
@@ -32,6 +36,8 @@ export function ReportsHeader({
           onExportCsv={onExportCsv}
           onExportJson={onExportJson}
           onExportPdf={onExportPdf}
+          onExportWorksiteCsv={onExportWorksiteCsv}
+          onExportWorksitePdf={onExportWorksitePdf}
           disabled={exportDisabled}
         />
       </WorkspaceHeaderActions>

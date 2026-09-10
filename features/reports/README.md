@@ -77,6 +77,7 @@ features/reports/
 │   ├── breakdowns.ts        przekroje klient / projekt / tag
 │   ├── insights.ts          rytm pracy i heatmapa
 │   ├── filters.ts           kaskada „klient → jego projekty"
+│   ├── worksites.ts         okresy pracy per projekt (miejsce, od-do, dni)
 │   ├── export.ts            budowanie tresci CSV / JSON
 │   └── report.ts            buildReportModel — jedyny orkiestrator
 ├── services/
@@ -101,7 +102,7 @@ features/reports/
     ├── breakdown/                jeden wiersz dla trzech przekrojow
     ├── insights/                 rytm pracy + heatmapa
     ├── table/                    tabela (desktop) i lista kart (mobile)
-    └── export/                   menu eksportu + szablon PDF (lazy)
+    └── export/                   menu eksportu + szablony PDF (lazy) + ich wspolna oprawa
 ```
 
 ---
@@ -139,6 +140,7 @@ w jedna strone: raport siega po `lib/*`, `components/ui/*`,
 | `ReportComparison` | poprzedni zakres + jego KPI + `MetricDelta` per metryka |
 | `ReportTrend` | jednostka kubelka + punkty szeregu |
 | `BreakdownItem` | pozycja przekroju: godziny, udzial, wartosc, stawka efektywna |
+| `WorksitePeriod` | jeden projekt jako okres pracy: miejsce, od-do, dni z praca, godziny |
 | `ReportModel` | komplet gotowy dla UI |
 
 Konwencje: data kalendarzowa to zawsze `DateKey` (`"YYYY-MM-DD"`), nigdy `Date`.
@@ -287,7 +289,30 @@ na pytanie uzytkownika.
 Nie tworz nowego komponentu wiersza — `BreakdownRow` obsluguje kazdy przekroj
 o tej samej strukturze informacji.
 
-## 14. Jak dodac eksport
+## 14. Eksporty
+
+Raport oddaje dane w dwoch celach:
+
+| Eksport | Zawartosc | Dla kogo |
+| --- | --- | --- |
+| CSV / JSON / PDF | pelne wpisy, KPI, przekroje, kwoty | wlasna analiza |
+| Zestawienie miejsc pracy (PDF / CSV) | jeden wiersz na projekt: miejsce, od-do, dni z praca, godziny | ksiegowa (np. przedluzenie A1) |
+
+Zestawienie miejsc pracy liczy `domain/worksites.ts`:
+
+* grupuje po PROJEKCIE, bo to `projects.address` niesie adres wykonywania pracy;
+* `from`/`to` to skrajne dni Z PRACA w tym projekcie wewnatrz zakresu raportu,
+  a nie granice samego zakresu;
+* `workedDays` liczy ROZNE dni, nie wpisy;
+* wiersz sumy bierze dni i godziny z `ReportKpis`, a NIE z dodania kolumny —
+  ten sam dzien przepracowany w dwoch projektach jest jednym dniem pracy;
+* nie ma tu kwot: wniosek o A1 pyta o czas i miejsce, a pieniadze maja
+  wlasne eksporty.
+
+Projekt bez adresu i wpisy bez projektu nie znikaja — dostaja etykiete
+zastepcza z i18n, zeby godziny sie zgadzaly.
+
+### Jak dodac eksport
 
 1. Zbuduj TRESC czysta funkcja w `domain/export.ts` (etykiety wchodza argumentem).
 2. Dodaj akcje w `hooks/useReportsExport.ts` — ciezkie zaleznosci przez
@@ -365,7 +390,7 @@ npm run test                              # calosc
 | `__test__/reports/range.test.ts` | presety, inclusivity zakresow, poprzedni okres, okno pobrania |
 | `__test__/reports/dataset.test.ts` | real vs predicted, PLN/EUR, akord, fallback stawki, billable, KPI, filtry |
 | `__test__/reports/analytics.test.ts` | porownanie (w tym previous = 0), kubelkowanie, breakdowny, streak, dni tygodnia, heatmapa |
-| `__test__/reports/export.test.ts` | format CSV/JSON, nazwy plikow, kaskada klient → projekt |
+| `__test__/reports/export.test.ts` | format CSV/JSON, zestawienie miejsc pracy, nazwy plikow, kaskada klient → projekt |
 | `__test__/reports/reports-content.test.tsx` | zlozenie strony: filtry z URL → klucz cache → sekcje UI |
 | `__test__/work-automation/billing-integration.test.ts` | invariant `entry_kind` wspolnie z automatem zapisu pracy |
 

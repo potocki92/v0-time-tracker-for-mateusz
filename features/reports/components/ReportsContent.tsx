@@ -106,6 +106,8 @@ export function ReportsContent({ today }: Props) {
           onExportCsv={exports.exportCsv}
           onExportJson={exports.exportJson}
           onExportPdf={exports.exportPdf}
+          onExportWorksiteCsv={exports.exportWorksiteCsv}
+          onExportWorksitePdf={exports.exportWorksitePdf}
           exportDisabled={!hasRows || exports.isGeneratingPdf}
         />
 

@@ -44,12 +44,15 @@ export const PROJECT_A: ReportProjectRef = {
   id: 'project-a',
   name: 'Alpha',
   client_id: CLIENT_HOURLY_PLN.id,
+  address: 'ul. Słoneczna 10, 80-001 Gdańsk',
 }
 
+/** Projekt bez adresu — zestawienie miejsc pracy musi to znosic. */
 export const PROJECT_B: ReportProjectRef = {
   id: 'project-b',
   name: 'Beta',
   client_id: CLIENT_HOURLY_EUR.id,
+  address: null,
 }
 
 export function entry(overrides: Partial<ReportEntryRow> = {}): ReportEntryRow {
