@@ -3,6 +3,22 @@
 import type { RefObject } from 'react'
 import { useScroll, useTransform, type MotionValue } from 'framer-motion'
 
+import {
+  closeTrack,
+  MOTION_CURVE_DECISIVE,
+  MOTION_CURVE_GLIDE,
+  MOTION_SHIFT_COPY,
+  MOTION_STEPS_CAMERA,
+  MOTION_STEPS_DECISIVE,
+  MOTION_STEPS_GLIDE,
+  ramp,
+  round,
+  type Keyframes,
+  type ProgressWindow,
+} from './tokens'
+
+export type { Keyframes, ProgressWindow } from './tokens'
+
 /**
  * Motion landingu — postep scen i warstwy sterowane scrollem.
  *
@@ -82,8 +98,13 @@ export function useExitProgress(ref: RefObject<HTMLElement | null>): MotionValue
  * Przy 0,045 zakresy zachodzily na siebie o 0,02 postepu i w tym oknie jedna
  * warstwa przeswitywala przez druga — kalka, ktora widac bylo w kazdym
  * przewinieciu.
+ *
+ * Wartosc jest EKSPORTOWANA, bo to ona wyznacza minimalny odstep miedzy
+ * oknami sasiadujacych warstw. Sekcje, ktore ustawiaja okna recznie
+ * (`AutomationShowcase`), licza z niej swoje granice, a test pilnuje, ze
+ * zaden etap nie wszedl w gasnacego poprzednika.
  */
-const FADE = 0.035
+export const LAYER_FADE = 0.035
 
 export interface LayerFade {
   opacity: MotionValue<number>
@@ -92,57 +113,88 @@ export interface LayerFade {
 }
 
 /**
- * Okno widocznosci jednej warstwy sceny — przejscie SEKWENCYJNE.
+ * Warstwa sekwencyjna: WCHODZI, STOI, WYCHODZI, ustepuje nastepnej.
  *
- * Uzywa tego `NumbersStory`: piec kolosalnych liczb na czerni. Tam rozdzielone
+ * Uzywaja tego `NumbersStory` (piec kolosalnych liczb na czerni) i
+ * `AutomationShowcase` (naglowki etapow, kolumna tresci). Tam ROZDZIELONE
  * okna sa zaleta, a nie wada — liczba ma zniknac, zanim pojawi sie nastepna,
- * bo dwie cyfry przenikajace przez siebie sa nieczytelne. Miedzy oknami jest
- * wiec punkt, w ktorym obie warstwy maja `opacity` 0, i tak ma byc.
+ * bo dwie cyfry (albo dwa zdania) przenikajace przez siebie sa nieczytelne.
+ * Miedzy oknami jest wiec punkt, w ktorym obie warstwy maja `opacity` 0, i
+ * tak ma byc.
  *
  * Do warstw, ktore NIE MOGA znikac naraz — czyli do nalozonych na siebie
  * replik interfejsu w `ProductJourney` — sluzy `useSceneLayer` nizej.
  *
- * Klatki NIE MOGA wyjsc poza <0, 1>: przy scroll-linked animacji Motion
- * oddaje je Web Animations API, ktore odrzuca ujemne i wieksze od jedynki
- * offsety (`Offsets must be monotonically non-decreasing`). Dlatego pierwsza
- * warstwa nie ma wejscia, a ostatnia wyjscia — co zreszta jest tym, czego
- * chcemy: scena otwierajaca stoi na miejscu od przyklejenia sceny, a
- * zamykajaca zostaje az do jej zwolnienia.
+ * Okna sasiadow musza byc oddalone o co najmniej `2 · LAYER_FADE`, inaczej
+ * wygaszanie poprzednika zachodzi na zapalanie nastepnika i obie warstwy
+ * maluja sie naraz.
+ *
+ * Klatki nie wychodza poza <0, 1>: przy scroll-linked animacji Motion oddaje
+ * je Web Animations API, ktore odrzuca ujemne i wieksze od jedynki offsety
+ * (`Offsets must be monotonically non-decreasing`). Skrajne warstwy nie maja
+ * przez to wejscia (pierwsza) ani wyjscia (ostatnia) — co zreszta jest tym,
+ * czego chcemy: sekwencja zaczyna sie pelnym obrazem i konczy pelnym obrazem.
+ *
+ * ── Domkniecie toru ──
+ *
+ * Tor dostaje klatki na 0 i 1 z TEGO SAMEGO powodu, co w `revealKeyframes`:
+ * Motion podaje zakres wejsciowy przegladarce WPROST jako `offset` klatek
+ * WAAPI, a WAAPI dopisuje klatke neutralna o wartosci WYJSCIOWEJ elementu
+ * wszedzie tam, gdzie skrajna klatka nie stoi na 0 albo 1. Pierwsza warstwa
+ * (`.lp-layer:first-child` ma w CSS `opacity: 1`) rozjasnialaby sie wtedy z
+ * powrotem przez cala reszte toru — nie bylo tego widac wylacznie dlatego, ze
+ * `visibility` liczona w JS zdazyla ja schowac. Po domknieciu jasnosc jest
+ * poprawna SAMA Z SIEBIE, a `visibility` zostaje tym, czym miala byc:
+ * oszczednoscia na malowaniu, a nie warunkiem poprawnosci.
+ *
+ * Funkcja jest CZYSTA, zeby dalo sie przejechac tor punkt po punkcie w tescie.
+ */
+export function layerFadeKeyframes(
+  start: number,
+  end: number,
+  shift = MOTION_SHIFT_COPY,
+): { fade: Keyframes<number>; move: Keyframes<string> } {
+  const fadeIn = start - LAYER_FADE > 0
+  const fadeOut = end + LAYER_FADE < 1
+
+  const stops = [
+    ...(fadeIn ? [start - LAYER_FADE] : []),
+    start,
+    end,
+    ...(fadeOut ? [end + LAYER_FADE] : []),
+  ]
+  const opacities = [...(fadeIn ? [0] : []), 1, 1, ...(fadeOut ? [0] : [])]
+  const offsets = [...(fadeIn ? [shift] : []), 0, 0, ...(fadeOut ? [-shift] : [])]
+
+  const closed = <T>(values: T[]) =>
+    closeTrack([0, ...stops, 1], [values[0], ...values, values[values.length - 1]])
+
+  return {
+    fade: closed(opacities),
+    move: closed(offsets.map((offset) => `translateY(${round(offset, 2)}px)`)),
+  }
+}
+
+/**
+ * Zwiazanie klatek warstwy z postepem toru.
+ *
+ * `visibility` to jedyna wartosc, ktora zostaje w JS — nie jest wlasciwoscia
+ * akcelerowalna. Kosztuje tyle, co jej zmiany, a zmienia sie dwa razy na
+ * warstwe, nie raz na klatke. Bez niej wygaszona warstwa nadal malowalaby sie
+ * pod spodem, a jej tekst nadal czytalby czytnik ekranu.
  */
 export function useLayerFade(
   progress: MotionValue<number>,
   start: number,
   end: number,
-  shift = 14,
+  shift = MOTION_SHIFT_COPY,
 ): LayerFade {
-  const fadeIn = start - FADE > 0
-  const fadeOut = end + FADE < 1
-
-  const keyframes = [
-    ...(fadeIn ? [start - FADE] : []),
-    start,
-    end,
-    ...(fadeOut ? [end + FADE] : []),
-  ]
-  const opacities = [...(fadeIn ? [0] : []), 1, 1, ...(fadeOut ? [0] : [])]
-  const offsets = [...(fadeIn ? [shift] : []), 0, 0, ...(fadeOut ? [-shift] : [])]
-
-  const opacity = useTransform(progress, keyframes, opacities)
+  const { fade, move } = layerFadeKeyframes(start, end, shift)
+  const opacity = useTransform(progress, fade.stops, fade.values)
 
   return {
     opacity,
-    transform: useScrollTransform(
-      progress,
-      keyframes,
-      offsets.map((offset) => `translateY(${offset}px)`),
-    ),
-    // Warstwa wygaszona znika z malowania calkowicie. Samo `opacity: 0`
-    // zostawia ja w drzewie kompozycji — wystarczy blad zaokraglenia albo
-    // subpikselowe przenikanie, zeby przez aktywny ekran przebil poprzedni.
-    //
-    // To JEDYNA wartosc sceny, ktora zostaje w JS: `visibility` nie jest
-    // wlasciwoscia akcelerowalna. Kosztuje tyle, co jej zmiany — a zmienia
-    // sie dwa razy na scene, nie raz na klatke.
+    transform: useScrollTransform(progress, move.stops, move.values),
     visibility: useTransform(opacity, (value) => (value < 0.02 ? 'hidden' : 'visible')),
   }
 }
@@ -201,9 +253,11 @@ export function useLayerFade(
  * czytala sie jak seria zaciec, a nie jak jeden ruch. 0,12 daje 48 procent:
  * przewijanie niemal zawsze cos przesuwa, a scena wciaz ma gdzie osiasc.
  *
- * Na torze 520svh (desktop) to okolo 50svh przewijania na przejscie — dosc,
+ * Na torze 380svh (desktop) to okolo 46svh przewijania na przejscie — dosc,
  * zeby bylo czytelnym ruchem, i za malo, zeby uzytkownik zdazyl sie
- * zastanowic, czy strona sie zacieta.
+ * zastanowic, czy strona sie zacieta. Skrocenie toru z 520 do 380svh nie
+ * ruszylo tej wartosci: `SWAP` jest ULAMKIEM toru, wiec kroci sie razem z nim
+ * i proporcja ruchu do postoju zostaje ta sama.
  *
  * WARUNEK: `SWAP` musi byc mniejszy niz 1/n, inaczej okna sasiadow zachodza
  * na siebie i `useTransform` dostaje niemonotoniczny zakres wejsciowy.
@@ -236,9 +290,6 @@ const SCREEN_IN = 100
  */
 const SCREEN_OUT = 18
 
-/** Przesuniecie pionowe akapitu narracji na wejsciu i na wyjsciu. */
-const COPY_SHIFT = 14
-
 /**
  * Jaka czesc przejscia zajmuje zgaszenie starego tekstu (i, symetrycznie,
  * zapalenie nowego). Dwa razy 0,48 zostawia miedzy nimi 4% przejscia — tyle,
@@ -253,64 +304,9 @@ const COPY_SHIFT = 14
 const COPY_SPAN = 0.48
 
 /*
- * ── Plynnosc: nie krzywa, tylko GESTOSC klatek ──
- *
- * Krzywej nie podajemy Motion jako funkcji `ease`: akceleracja sprzetowa
- * dziala wylacznie na parze TABLIC (patrz naglowek pliku). Miedzy klatkami
- * zostaje wiec ODCINEK PROSTY, a to znaczy, ze predkosc jest stala w obrebie
- * odcinka i zmienia sie SKOKOWO na kazdym zalamaniu. O plynnosci decyduje
- * wielkosc tych skokow, a nie to, jaka krzywa probkujemy.
- *
- * Poprzednia wersja probkowala `smoothstep` w PIECIU punktach. Blad polozenia
- * byl przez to maly (okolo 0,02), ale predkosc ekranu szla 0 → 694 → 1528 →
- * 694 → 0 procent szerokosci na jednostke postepu: trzy twarde skoki na
- * przejscie, w tym kopniecie z postoju od razu na polowe predkosci
- * maksymalnej. Dokladnie to widac jako "szarpanie" — ekran nie rusza z
- * miejsca, tylko strzela.
+ * Krzywe i gestosc ich probkowania stoja w `./tokens` — razem z powodem, dla
+ * ktorego ekran jedzie `MOTION_CURVE_GLIDE`, a tekst `MOTION_CURVE_DECISIVE`.
  */
-
-/** C¹: zerowa pochodna na obu koncach. */
-const smoothstep = (t: number) => t * t * (3 - 2 * t)
-
-/** C²: na obu koncach zeruje sie takze DRUGA pochodna, czyli przyspieszenie. */
-const smootherstep = (t: number) => t * t * t * (t * (t * 6 - 15) + 10)
-
-/**
- * Ekran: `smootherstep` w 24 odcinkach.
- *
- * Ruch ekranu graniczy z odcinkami, na ktorych ekran STOI, wiec licza sie
- * konce: `smoothstep` wchodzi w postoj z zerowa predkoscia, ale z niezerowym
- * przyspieszeniem, i przy rzadkim probkowaniu zostaje z tego kopniecie.
- * `smootherstep` zeruje tam takze przyspieszenie, a 24 odcinki scinaja
- * najwiekszy skok predkosci z 833 do 199 — ponizej progu, na ktorym oko
- * lapie zmiane tempa.
- *
- * Klatki sa darmowe: caly tor idzie do WAAPI raz, jako `KeyframeEffect`.
- * Plynnosci nie da sie tu kupic niczym innym — kompozytor interpoluje
- * liniowo miedzy tym, co dostanie.
- */
-const SCREEN_STEPS = 24
-
-/**
- * Narracja i podswietlenie: `smoothstep` w 4 odcinkach.
- *
- * Tu gesciej byc NIE MOZE, i to nie ze wzgledu na koszt. Plaskie konce
- * `smootherstep` trzymaja `opacity` ponizej progu widocznosci dluzej, wiec
- * przerwa miedzy akapitami rosla z 3 do 9 procent toru (zmierzone na tych
- * samych `SWAP` i `COPY_SPAN`) — tekst gaslby na zauwazalna chwile. Przejscie tekstu ma byc ZDECYDOWANE, nie plynne; skok
- * predkosci w zanikaniu i tak jest niewidoczny, bo nie ma go z czym
- * porownac — akapit nie przesuwa sie przez ekran, tylko gasnie w miejscu.
- */
-const COPY_STEPS = 4
-
-/** Klatki jednej krzywej: punkty na torze i wartosci w tych punktach. */
-export interface Keyframes<T> {
-  stops: number[]
-  values: T[]
-}
-
-/** Zakres postepu `<start, end>`, oba konce w ulamku toru sekcji. */
-export type ProgressWindow = readonly [number, number]
 
 export interface SceneKeyframes {
   /** Ekran w ramce: samo przesuniecie poziome, zero klatek przenikania. */
@@ -330,39 +326,14 @@ function swapWindow(boundary: number, count: number): ProgressWindow {
   return [at - SWAP / 2, at + SWAP / 2]
 }
 
-/** Klatki jednego przejscia: `steps` rownych odcinkow na torze, `curve` w wartosciach. */
-function ramp<T>(
-  [start, end]: ProgressWindow,
-  at: (t: number) => T,
-  curve: (t: number) => number,
-  steps: number,
-): Keyframes<T> {
-  const stops: number[] = []
-  const values: T[] = []
-
-  for (let step = 0; step <= steps; step++) {
-    const position = step / steps
-    stops.push(start + (end - start) * position)
-    values.push(at(curve(position)))
-  }
-
-  return { stops, values }
-}
-
-/** Przejscie ekranu w ramce. */
+/** Przejscie ekranu w ramce — plynne, bo graniczy z bezruchem. */
 function screenRamp<T>(window: ProgressWindow, at: (t: number) => T): Keyframes<T> {
-  return ramp(window, at, smootherstep, SCREEN_STEPS)
+  return ramp(window, at, MOTION_CURVE_GLIDE, MOTION_STEPS_GLIDE)
 }
 
-/** Przejscie narracji, jej przesuniecia i podswietlenia w nawigacji. */
+/** Przejscie narracji, jej przesuniecia i podswietlenia — zdecydowane. */
 function copyRamp<T>(window: ProgressWindow, at: (t: number) => T): Keyframes<T> {
-  return ramp(window, at, smoothstep, COPY_STEPS)
-}
-
-/** Zaokraglenie bez `toFixed` — klatki maja byc stabilnymi stringami. */
-const round = (value: number, places: number) => {
-  const unit = 10 ** places
-  return Math.round(value * unit) / unit
+  return ramp(window, at, MOTION_CURVE_DECISIVE, MOTION_STEPS_DECISIVE)
 }
 
 /**
@@ -372,32 +343,6 @@ const round = (value: number, places: number) => {
  */
 const screenAt = (percent: number) => `translateX(${round(percent, 2)}%)`
 const copyAt = (pixels: number) => `translateY(${round(pixels, 2)}px)`
-
-/**
- * Domyka tor klatkami na 0 i 1, scalajac punkty, ktore wypadly w tym samym
- * miejscu.
- *
- * Domkniecie nie jest kosmetyczne: kiedy Motion odda wartosc przegladarce
- * (`ScrollTimeline` + Web Animations API), lista klatek staje sie zwyklym
- * `KeyframeEffect`, a WAAPI DOPISUJE klatke neutralna o wartosci wyjsciowej
- * elementu, jesli skrajna nie stoi na offsecie 0 albo 1. Warstwa wracalaby
- * wtedy do stanu poczatkowego dokladnie wtedy, gdy uzytkownik na nia patrzy.
- */
-function closeTrack<T>(stops: number[], values: T[]): Keyframes<T> {
-  const outStops: number[] = []
-  const outValues: T[] = []
-
-  stops.forEach((stop, index) => {
-    if (outStops.length > 0 && stop <= outStops[outStops.length - 1]) {
-      outValues[outValues.length - 1] = values[index]
-      return
-    }
-    outStops.push(stop)
-    outValues.push(values[index])
-  })
-
-  return { stops: outStops, values: outValues }
-}
 
 /**
  * Krzywa jednego POJAWIENIA SIE: `from` przed oknem, `to` po nim — domknieta
@@ -439,8 +384,8 @@ export function sceneKeyframes(index: number, count: number): SceneKeyframes {
 
   const fadeIn = copyIn ? copyRamp(copyIn, (t) => t) : null
   const fadeOut = copyOut ? copyRamp(copyOut, (t) => 1 - t) : null
-  const moveIn = copyIn ? copyRamp(copyIn, (t) => copyAt(COPY_SHIFT * (1 - t))) : null
-  const moveOut = copyOut ? copyRamp(copyOut, (t) => copyAt(-COPY_SHIFT * t)) : null
+  const moveIn = copyIn ? copyRamp(copyIn, (t) => copyAt(MOTION_SHIFT_COPY * (1 - t))) : null
+  const moveOut = copyOut ? copyRamp(copyOut, (t) => copyAt(-MOTION_SHIFT_COPY * t)) : null
 
   const spotIn = enter ? copyRamp(enter, (t) => t) : null
   const spotOut = exit ? copyRamp(exit, (t) => 1 - t) : null
@@ -462,10 +407,10 @@ export function sceneKeyframes(index: number, count: number): SceneKeyframes {
     copyMove: closeTrack(
       [0, ...(moveIn?.stops ?? []), ...(moveOut?.stops ?? []), 1],
       [
-        copyAt(enter ? COPY_SHIFT : 0),
+        copyAt(enter ? MOTION_SHIFT_COPY : 0),
         ...(moveIn?.values ?? []),
         ...(moveOut?.values ?? []),
-        copyAt(exit ? -COPY_SHIFT : 0),
+        copyAt(exit ? -MOTION_SHIFT_COPY : 0),
       ],
     ),
     spotlight: closeTrack(
@@ -525,4 +470,102 @@ export function useSceneLayer(
     },
     spotlight: useTransform(progress, frames.spotlight.stops, frames.spotlight.values),
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+ * Kamera sekcji 01-05
+ * ══════════════════════════════════════════════════════════════════════
+ *
+ * Ekrany zmieniaja sie w NIERUCHOMEJ ramce — i to jest sila tej sekcji, bo
+ * czyta sie jak nawigacja w aplikacji. Sama nieruchomosc ma jednak cene: piec
+ * scen pod rzad w identycznym kadrze wyglada jak slider, a nie jak
+ * prezentacja.
+ *
+ * Kamera doklada brakujaca warstwe rezyserii: kadr dojezdza o dwa-trzy procent
+ * blizej tam, gdzie scena chce, zeby oko poszlo w konkretne miejsce
+ * (siatka kalendarza, tabela faktury), i wraca do pelnego planu tam, gdzie
+ * scena pokazuje calosc.
+ *
+ * ── Dlaczego to JEDNA wartosc na cala sekcje ──
+ *
+ * Kamera nie animuje warstw ekranu, tylko RAMKE URZADZENIA — element, ktory
+ * lezy nad nimi wszystkimi. Piec scen dostaje przez to jedna dodatkowa
+ * animacje na kompozytorze zamiast pieciu, a warstwy ekranu zostaja przy
+ * czystym `translateX` (patrz `sceneKeyframes`).
+ *
+ * Zblizenie MUSI byc male. Przy `scale` powyzej 1,05 replika interfejsu
+ * zaczyna wychodzic poza scene, a czcionka 8-pikselowa w srodku widocznie
+ * traci ostrosc — kadr skaluje sie jako rastrowana warstwa, nie jako tekst.
+ */
+
+/** Kadr jednej sceny: zblizenie i pionowe przesuniecie ramki. */
+export interface CameraFrame {
+  /** 1 = pelny plan. Powyzej — zblizenie. */
+  scale: number
+  /** Przesuniecie ramki w pionie (px); ujemne podnosi kadr. */
+  lift: number
+}
+
+/**
+ * Klatki kamery dla calej sekcji — funkcja CZYSTA, wiec tor da sie przejechac
+ * w tescie.
+ *
+ * Kadr STOI przez caly takt sceny i zmienia sie wylacznie w oknie przejscia
+ * (`SWAP`), czyli dokladnie wtedy, gdy zmienia sie ekran. Dzieki temu ruch
+ * kamery nie jest osobnym zdarzeniem — jest ta sama zmiana sceny, widziana z
+ * poziomu kadru.
+ */
+export function cameraKeyframes(frames: readonly CameraFrame[]): Keyframes<string> {
+  const count = frames.length
+  const at = (frame: CameraFrame) =>
+    `translateY(${round(frame.lift, 2)}px) scale(${round(frame.scale, 4)})`
+
+  const stops: number[] = [0]
+  const values: string[] = [at(frames[0])]
+
+  for (let index = 1; index < count; index++) {
+    const window = swapWindow(index, count)
+    const from = frames[index - 1]
+    const to = frames[index]
+    const move = ramp(
+      window,
+      (t) => at({ scale: from.scale + (to.scale - from.scale) * t, lift: from.lift + (to.lift - from.lift) * t }),
+      MOTION_CURVE_GLIDE,
+      MOTION_STEPS_CAMERA,
+    )
+    stops.push(...move.stops)
+    values.push(...move.values)
+  }
+
+  stops.push(1)
+  values.push(at(frames[count - 1]))
+
+  return closeTrack(stops, values)
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+ * Sekwencja pelnoekranowa (NumbersStory)
+ * ══════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Okna widocznosci sekwencji, w ktorej kazdy krok ma tor tylko dla siebie:
+ * wchodzi, STOI, wychodzi, ustepuje nastepnemu.
+ *
+ * Dlugosc postoju bierze sie z podzialu toru przez liczbe krokow, a odstep
+ * miedzy oknami to dokladnie `2 · LAYER_FADE` — czyli tyle, ile trwa
+ * wygaszenie poprzednika i zapalenie nastepnika. Sekwencja jest przez to
+ * SCISLE sekwencyjna i nie da sie jej rozstroic recznie dobranymi liczbami:
+ * dopisanie szostej wartosci przelicza cala piatke.
+ *
+ * Skrajne okna celowo NIE dotykaja 0 i 1 z zapasem — `useLayerFade` pomija
+ * wtedy wejscie pierwszej warstwy i wyjscie ostatniej, wiec sekcja zaczyna sie
+ * pelnym obrazem i konczy pelnym obrazem, zamiast gasnac przy krawedziach toru.
+ */
+export function storyWindows(count: number): ProgressWindow[] {
+  const slot = 1 / count
+
+  return Array.from({ length: count }, (_, index) => [
+    round(index * slot + LAYER_FADE, 6),
+    round((index + 1) * slot - LAYER_FADE, 6),
+  ])
 }

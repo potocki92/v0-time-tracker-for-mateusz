@@ -9,15 +9,26 @@ import { Link } from '@/i18n/navigation'
 
 import { useMotionProfile } from '../motion/profile'
 
-/** Kotwice w obrebie strony — hash nie ma wersji jezykowej, etykieta ma. */
+/**
+ * Kotwice w obrebie strony — hash nie ma wersji jezykowej, etykieta ma.
+ *
+ * DWIE, nie trzy. Pasek ma byc pomocniczy: im mniej w nim pozycji, tym
+ * mocniej dziala hero pod nim. „Jak to dziala" (`#flow`) wskazywalo sekcje,
+ * do ktorej i tak dochodzi sie przewijaniem przez produkt — z nawigacji
+ * znika, sama sekcja zostaje.
+ */
 const ANCHORS = [
   { key: 'product', href: '#product' },
   { key: 'automation', href: '#automation' },
-  { key: 'flow', href: '#flow' },
 ] as const
 
 /**
- * Navbar: logo, trzy kotwice, przelacznik jezyka, dwie akcje.
+ * Navbar: logo, dwie kotwice, przelacznik jezyka, dwie akcje.
+ *
+ * Pasek jest INFRASTRUKTURA, nie trescia: ma pozwolic wyjsc do aplikacji i
+ * przeskoczyc do dwoch najwazniejszych sekcji, i na tym koniec. Przelacznik
+ * jezyka jedzie w wariancie `compact` i dopiero od `lg` — na mniejszych
+ * ekranach zostaje w stopce, gdzie nie konkuruje z naglowkiem.
  *
  * Tlo i obrys jada na MotionValue (zero rerenderow), a rozmycie tla wchodzi
  * dopiero po przekroczeniu progu — jako klasa, nie jako animowana wlasciwosc.
@@ -87,7 +98,9 @@ export function Navbar() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:ml-4">
-          <LocaleSwitcher className="hidden sm:inline-flex" />
+          {/* `border-transparent` zdejmuje obrys: przy przycisku „Otworz
+              aplikacje" druga kapsulka z ramka czytala sie jak drugie CTA. */}
+          <LocaleSwitcher variant="compact" className="hidden border-transparent lg:inline-flex" />
           <Link
             href="/auth/login"
             className="rounded-lg px-3 py-2 lp-t13 text-[var(--lp-ink-2)] transition-colors hover:text-[var(--lp-ink-1)]"

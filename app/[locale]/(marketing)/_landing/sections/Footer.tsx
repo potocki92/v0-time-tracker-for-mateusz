@@ -29,9 +29,10 @@ export function Footer() {
           >
             {t('github')}
           </a>
-          {/* Na telefonie navbar chowa przelacznik — stopka jest wtedy jedynym
-              miejscem, w ktorym da sie zmienic jezyk. */}
-          <LocaleSwitcher className="sm:hidden" />
+          {/* Ponizej `lg` navbar chowa przelacznik (ma byc pomocniczy, nie
+              konkurowac z hero) — stopka jest wtedy JEDYNYM miejscem, w
+              ktorym da sie zmienic jezyk. Oba progi musza sie zgadzac. */}
+          <LocaleSwitcher className="lg:hidden" />
         </nav>
       </div>
     </footer>

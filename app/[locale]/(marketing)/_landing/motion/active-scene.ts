@@ -15,7 +15,7 @@
  *
  * Bez niej wystarczy drgnienie palca dokladnie na granicy scen, zeby indeks
  * skakal 2 → 3 → 2 → 3 i ekran migal. 0,006 toru to na typowym telefonie
- * (tor 400svh, viewport 844 px, czyli 2532 px przewijania) okolo 15 px w
+ * (tor 300svh, viewport 844 px, czyli 1899 px przewijania) okolo 11 px w
  * kazda strone — duzo wiecej niz szum, duzo mniej niz swiadomy ruch.
  *
  * Wartosc jest CELOWO mniejsza niz 0,01: progi sceny leza co 0,2, a ustalone

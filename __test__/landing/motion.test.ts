@@ -29,8 +29,15 @@ const files = sourceFiles(LANDING)
  * Pliki, ktore naprawde czytaja postep przewijania — tylko ich dotycza te
  * reguly. Wejscie do warstwy ruchu jest jedno: `motion/scene` (zrodla postepu,
  * timeline warstw i sklejanie transformu).
+ *
+ * Do tego pliki, ktore DOSTAJA gotowa wartosc sterowana scrollem w propsach
+ * (`MotionValue`). Sekcja automatu jest rozbita na czesci i to wlasnie one
+ * maluja dzis animowane elementy — bez tego warunku wystarczyloby przeniesc
+ * kod o jeden plik nizej, zeby wyjsc spod wszystkich regul ponizej.
  */
-const scrollDriven = files.filter((file) => /from '.*motion\/scene'/.test(read(file)))
+const scrollDriven = files.filter(
+  (file) => /from '.*motion\/scene'/.test(read(file)) || /\bMotionValue\b/.test(read(file)),
+)
 
 describe('landing motion — animujemy tylko to, co potrafi kompozytor', () => {
   it('nie animuje scrollem zadnej wlasciwosci ukladu', () => {
@@ -103,6 +110,32 @@ describe('landing motion — scroll nie dotyka stanu Reacta', () => {
 
 describe('landing motion — telefon dostaje lzejszy profil', () => {
   const journey = read(`${LANDING}/sections/ProductJourney.tsx`)
+  const hero = read(`${LANDING}/sections/HeroScene.tsx`)
+
+  it('nie daje telefonowi rotacji 3D w hero', () => {
+    // `rotateX` na dziecku rodzica z `perspective` zaklada dla calego
+    // poddrzewa kontekst renderowania 3D, a w srodku stoi kompletna replika
+    // pulpitu: kazda klatka przewijania to wtedy rasteryzacja duzej warstwy w
+    // przestrzeni 3D. Na pieciocalowym ekranie perspektywy i tak nie widac.
+    const mobile = hero.slice(hero.indexOf('mobile: {'), hero.indexOf('} as const'))
+    expect(mobile).not.toMatch(/rotate/)
+    expect(mobile).toMatch(/perspective: undefined/)
+  })
+
+  it('trzyma przechylenie desktopu w kilku stopniach, nie w kilkunastu', () => {
+    // Mocny `rotateX` czyta sie jako „zrzut ekranu na podstawce", czyli jako
+    // ILUSTRACJA produktu. Monumentalnosc niesie SKALA, nie perspektywa.
+    const tilts = [...hero.matchAll(/rotateX\((\d+)deg\)/g)].map((match) => Number(match[1]))
+    expect(tilts.length).toBeGreaterThan(0)
+    expect(Math.max(...tilts)).toBeLessThanOrEqual(6)
+  })
+
+  it('daje kamerze sekcji produktu wylacznie profil desktopowy', () => {
+    // Na telefonie ramka jest pionowa i wypelnia prawie cala scene, wiec
+    // kazde zblizenie obcinaloby jej krawedzie zamiast prowadzic wzrok.
+    expect(journey).toMatch(/camera=\{cameraTransform\}/)
+    expect(journey.match(/camera=\{/g) ?? []).toHaveLength(1)
+  })
 
   it('ma osobny renderer mobilny i desktopowy', () => {
     expect(journey).toContain('function JourneyDesktop')

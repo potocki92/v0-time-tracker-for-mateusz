@@ -15,7 +15,8 @@ import {
   type DemoMonth,
 } from '../demo/demo-data'
 import { useDemoNames } from '../demo/useDemoNames'
-import { useLayerFade, useTrackProgress } from '../motion/scene'
+import { storyWindows, useLayerFade, useTrackProgress } from '../motion/scene'
+import { MOTION_SHIFT_LAYER } from '../motion/tokens'
 
 /**
  * „Od pracy do pieniedzy" — piec wartosci, jedna za druga, na pelnym ekranie.
@@ -23,6 +24,18 @@ import { useLayerFade, useTrackProgress } from '../motion/scene'
  * Zero kart, zero bento. Kazda liczba wynika z poprzedniej: dzien → tydzien →
  * miesiac → kwota → faktura. Wartosci ida z tego samego miesiaca, ktory liczy
  * automat, wiec sekwencja nie jest grafika — to arytmetyka produktu.
+ *
+ * ── Rytm ──
+ *
+ * Kazda liczba ma swoj takt: WCHODZI, STOI, WYCHODZI, ustepuje nastepnej.
+ * Okna nie sa dobierane recznie — liczy je `storyWindows`, ktore dzieli tor
+ * przez liczbe krokow i zostawia miedzy nimi dokladnie tyle, ile trwa
+ * wygaszenie poprzednika. Dopisanie szostej wartosci przestraja cala piatke i
+ * nie wymaga ani jednej nowej liczby w tym pliku.
+ *
+ * Zadnego przenikania cyfr: dwie liczby po 50% to nie jest przejscie filmowe,
+ * tylko nieczytelna kalka. Miedzy oknami jest wiec punkt, w ktorym nie ma
+ * zadnej liczby, i tak ma byc — to oddech, ktory nadaje sekwencji takt.
  *
  * Fallback `prefers-reduced-motion` robi CSS: sticky staje sie zwyklym
  * blokiem, a warstwy ustawiaja sie jedna pod druga.
@@ -34,11 +47,14 @@ export function NumbersStory({ month }: { month: DemoMonth }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const progress = useTrackProgress(trackRef)
 
-  const fade0 = useLayerFade(progress, 0.0, 0.15, 32)
-  const fade1 = useLayerFade(progress, 0.22, 0.36, 32)
-  const fade2 = useLayerFade(progress, 0.43, 0.57, 32)
-  const fade3 = useLayerFade(progress, 0.64, 0.78, 32)
-  const fade4 = useLayerFade(progress, 0.85, 1.0, 32)
+  const windows = storyWindows(STEP_COUNT)
+
+  // Piec jawnych wywolan zamiast petli: hooki musza byc bezwarunkowe.
+  const fade0 = useLayerFade(progress, ...windows[0], MOTION_SHIFT_LAYER)
+  const fade1 = useLayerFade(progress, ...windows[1], MOTION_SHIFT_LAYER)
+  const fade2 = useLayerFade(progress, ...windows[2], MOTION_SHIFT_LAYER)
+  const fade3 = useLayerFade(progress, ...windows[3], MOTION_SHIFT_LAYER)
+  const fade4 = useLayerFade(progress, ...windows[4], MOTION_SHIFT_LAYER)
 
   const steps = [
     {
@@ -74,14 +90,12 @@ export function NumbersStory({ month }: { month: DemoMonth }) {
         {t('heading')}
       </h2>
 
-      {/* `svh`, nie `vh`: na iOS `vh` ignoruje pasek Safari, wiec kazde jego
-          chowanie zmienialoby postep sceny w srodku ruchu palca. */}
-      <div ref={trackRef} className="lp-track relative h-[300svh] lg:h-[420svh]">
+      <div ref={trackRef} className="lp-track lp-track-numbers relative">
         <div className="lp-stage sticky top-0 flex h-[100svh] flex-col items-center justify-center px-5">
-          <span className="lp-eyebrow mb-8">{t('eyebrow')}</span>
+          <span className="lp-eyebrow">{t('eyebrow')}</span>
 
-          <div className="lp-layers w-full text-center">
-            {steps.map((step) => (
+          <div className="lp-layers mt-10 w-full text-center sm:mt-14">
+            {steps.map((step, index) => (
               <m.div
                 key={step.caption}
                 className="lp-layer"
@@ -91,12 +105,21 @@ export function NumbersStory({ month }: { month: DemoMonth }) {
                   visibility: step.fade.visibility,
                 }}
               >
+                {/*
+                  Wskaznik postepu jedzie WEWNATRZ warstwy, wiec dziedziczy jej
+                  jasnosc i nie kosztuje ani jednej dodatkowej wartosci
+                  sterowanej scrollem. Ma byc ledwie widoczny — to licznik
+                  sekwencji, nie element kompozycji.
+                */}
+                <p className="lp-mono lp-t11 tabular-nums text-[var(--lp-ink-3)]">
+                  {String(index + 1).padStart(2, '0')} / {String(STEP_COUNT).padStart(2, '0')}
+                </p>
                 <p
-                  className={`lp-colossal lp-mono tabular-nums ${step.small ? 'lp-colossal-sm' : ''}`}
+                  className={`lp-colossal lp-mono mt-5 tabular-nums ${step.small ? 'lp-colossal-sm' : ''}`}
                 >
                   {step.value}
                 </p>
-                <p className="lp-eyebrow mt-6">{step.caption}</p>
+                <p className="lp-eyebrow mt-7">{step.caption}</p>
               </m.div>
             ))}
           </div>
@@ -105,3 +128,6 @@ export function NumbersStory({ month }: { month: DemoMonth }) {
     </section>
   )
 }
+
+/** Piec krokow sekwencji: dzien → tydzien → miesiac → kwota → faktura. */
+const STEP_COUNT = 5

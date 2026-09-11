@@ -3,7 +3,6 @@
     "aria": "Main",
     "product": "Product",
     "automation": "Automation",
-    "flow": "How it works",
     "signIn": "Sign in",
     "openApp": "Open app"
   },
@@ -56,7 +55,8 @@
   "automation": {
     "eyebrow": "Automation",
     "heading": "Your calendar can fill itself.",
-    "lead": "Give TimeTracker your week and your trips. It writes the hours you actually worked — and leaves out the Sundays and the weeks you spent at home.",
+    "stagePresence": "It knows when you are away.",
+    "stageResult": "The month writes itself.",
     "scheduleTitle": "Weekly schedule",
     "dayOff": "off",
     "presenceTitle": "Presence",
@@ -79,6 +79,7 @@
   "everything": {
     "eyebrow": "Everything else",
     "heading": "Built for independent work.",
+    "alsoIncluded": "Also included",
     "items": {
       "dayEntries": { "title": "Day entries", "body": "Hours or piecework quantity, status, notes, tags — one dialog per day." },
       "clientRates": { "title": "Client rates", "body": "Rate history with effective dates; past hours keep the rate they were earned on." },

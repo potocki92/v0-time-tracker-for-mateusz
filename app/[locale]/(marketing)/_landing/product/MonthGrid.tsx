@@ -8,6 +8,7 @@ import { useFormat } from '@/lib/format/client'
 
 import { useMotionProfile } from '../motion/profile'
 import { revealKeyframes, useScrollTransform } from '../motion/scene'
+import type { ProgressWindow } from '../motion/tokens'
 
 import {
   DEMO_MONTH,
@@ -53,7 +54,7 @@ interface MonthGridProps {
    */
   progress?: MotionValue<number>
   /** Zakres postepu, w ktorym wpisy pojawiaja sie po kolei. */
-  fillRange?: [number, number]
+  fillRange?: ProgressWindow
   clientColor: string
   /** Dzien oznaczony jako „dzisiaj". */
   today?: number
@@ -83,7 +84,7 @@ function toWeeks(days: readonly DemoDay[], offset: number): Cell[][] {
  * zapisany dzien miesiaca, 1 = ostatni). Okna sasiednich dni zachodza na
  * siebie, wiec miesiac wypelnia sie plynnie, a nie skokami.
  */
-function entryWindow(order: number, [lo, hi]: [number, number]): [number, number] {
+function entryWindow(order: number, [lo, hi]: ProgressWindow): ProgressWindow {
   const start = lo + order * Math.max(0, hi - lo - CELL_SPAN)
   return [start, start + CELL_SPAN]
 }
@@ -96,8 +97,8 @@ function entryWindow(order: number, [lo, hi]: [number, number]): [number, number
 function weekWindow(
   week: Cell[],
   orderOf: (day: DemoDay) => number,
-  fillRange: [number, number],
-): [number, number] {
+  fillRange: ProgressWindow,
+): ProgressWindow {
   const orders = week
     .filter((cell): cell is DemoDay => cell !== null && cell.hours !== null)
     .map(orderOf)
@@ -210,14 +211,14 @@ function WeekReveal({
   children,
 }: {
   progress: MotionValue<number>
-  window: [number, number]
+  window: ProgressWindow
   children: ReactNode
 }) {
   const fade = revealKeyframes(window, 0, 1)
   const opacity = useTransform(progress, fade.stops, fade.values)
 
   return (
-    <m.div className="grid grid-cols-7 gap-1" style={{ opacity }}>
+    <m.div className="lp-motion grid grid-cols-7 gap-1" style={{ opacity }}>
       {children}
     </m.div>
   )
@@ -258,7 +259,7 @@ function DayCellReveal({
   fmt,
   progress,
   window,
-}: CellProps & { progress: MotionValue<number>; window: [number, number] }) {
+}: CellProps & { progress: MotionValue<number>; window: ProgressWindow }) {
   const fade = revealKeyframes(window, 0, 1)
   const zoom = revealKeyframes(window, 'scale(0.86)', 'scale(1)')
   const opacity = useTransform(progress, fade.stops, fade.values)
@@ -271,10 +272,10 @@ function DayCellReveal({
       {/* Skorka wpisu jest osobna warstwa sterowana tym samym postepem, co
           godziny — inaczej miesiac wygladalby na wypelniony, zanim automat
           cokolwiek dopisze. */}
-      {worked && <m.span aria-hidden className="lp-day-fill" style={{ opacity }} />}
+      {worked && <m.span aria-hidden className="lp-motion lp-day-fill" style={{ opacity }} />}
       <DayNumber day={day.day} isToday={isToday} />
       {worked && (
-        <m.span className="relative mt-auto block min-w-0" style={{ opacity, transform }}>
+        <m.span className="lp-motion relative mt-auto block min-w-0" style={{ opacity, transform }}>
           <Entry day={day} clientColor={clientColor} showAmount={showAmount} fmt={fmt} />
         </m.span>
       )}
