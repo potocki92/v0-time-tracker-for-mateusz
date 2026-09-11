@@ -7,7 +7,7 @@ import { toMinor } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 
 import { useMotionProfile } from '../motion/profile'
-import { useScrollTransform } from '../motion/scene'
+import { revealKeyframes, useScrollTransform } from '../motion/scene'
 
 import {
   DEMO_MONTH,
@@ -213,7 +213,8 @@ function WeekReveal({
   window: [number, number]
   children: ReactNode
 }) {
-  const opacity = useTransform(progress, window, [0, 1])
+  const fade = revealKeyframes(window, 0, 1)
+  const opacity = useTransform(progress, fade.stops, fade.values)
 
   return (
     <m.div className="grid grid-cols-7 gap-1" style={{ opacity }}>
@@ -258,8 +259,10 @@ function DayCellReveal({
   progress,
   window,
 }: CellProps & { progress: MotionValue<number>; window: [number, number] }) {
-  const opacity = useTransform(progress, window, [0, 1])
-  const transform = useScrollTransform(progress, window, ['scale(0.86)', 'scale(1)'])
+  const fade = revealKeyframes(window, 0, 1)
+  const zoom = revealKeyframes(window, 'scale(0.86)', 'scale(1)')
+  const opacity = useTransform(progress, fade.stops, fade.values)
+  const transform = useScrollTransform(progress, zoom.stops, zoom.values)
 
   const worked = day.hours !== null
 

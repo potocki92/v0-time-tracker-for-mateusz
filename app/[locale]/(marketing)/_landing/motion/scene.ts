@@ -329,6 +329,23 @@ function closeTrack<T>(stops: number[], values: T[]): Keyframes<T> {
 }
 
 /**
+ * Krzywa jednego POJAWIENIA SIE: `from` przed oknem, `to` po nim — domknieta
+ * klatkami na 0 i 1, wiec WAAPI nie ma czego dopisywac.
+ *
+ * Samo `useTransform(progress, [start, end], [from, to])` wyglada na to samo i
+ * w JS jest tym samym (zakres jest domyslnie zaciskany na koncach), ale Motion
+ * podaje zakres wejsciowy przegladarce WPROST jako `offset` klatek WAAPI.
+ * Przy oknie <0,16; 0,32> przegladarka widzi tor bez klatek na 0 i 1, dopisuje
+ * je z wartosci wyjsciowej elementu — i element wraca do stanu poczatkowego
+ * przez CALA reszte toru. W JS tego nie widac: tam zakres jest zaciskany na
+ * koncach i wartosc zostaje na `to`. Rozjezdza sie dopiero to, co maluje
+ * kompozytor — czyli jedyne, co widzi uzytkownik.
+ */
+export function revealKeyframes<T>([start, end]: ProgressWindow, from: T, to: T): Keyframes<T> {
+  return closeTrack([0, start, end, 1], [from, from, to, to])
+}
+
+/**
  * Caly timeline jednej sceny — funkcja CZYSTA, zeby dalo sie przejechac tor
  * punkt po punkcie w tescie. Wartosc policzona przez `useTransform`
  * aktualizuje sie dopiero w petli klatek, wiec w tescie nigdy nie jest tym, co
