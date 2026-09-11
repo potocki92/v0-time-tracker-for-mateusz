@@ -195,14 +195,20 @@ export function useLayerFade(
 /**
  * Ulamek toru, na ktorym scena oddaje ekran nastepnej.
  *
- * Przy pieciu scenach na torze 520svh (desktop) to okolo 38svh przewijania,
- * czyli 2-3 klikniecia kolka: dosc, zeby przejscie bylo czytelnym ruchem, i
- * za malo, zeby uzytkownik zdazyl sie zastanowic, czy strona sie zacieta.
+ * Przy pieciu scenach cztery przejscia zajmuja `4 · SWAP` toru, a reszta to
+ * odcinki, na ktorych ekran STOI. Przy 0,09 w ruchu bylo 36 procent toru —
+ * kazda scena parkowala na dluzej, niz trwalo dojscie do niej, i sekcja
+ * czytala sie jak seria zaciec, a nie jak jeden ruch. 0,12 daje 48 procent:
+ * przewijanie niemal zawsze cos przesuwa, a scena wciaz ma gdzie osiasc.
+ *
+ * Na torze 520svh (desktop) to okolo 50svh przewijania na przejscie — dosc,
+ * zeby bylo czytelnym ruchem, i za malo, zeby uzytkownik zdazyl sie
+ * zastanowic, czy strona sie zacieta.
  *
  * WARUNEK: `SWAP` musi byc mniejszy niz 1/n, inaczej okna sasiadow zachodza
  * na siebie i `useTransform` dostaje niemonotoniczny zakres wejsciowy.
  */
-const SWAP = 0.09
+const SWAP = 0.12
 
 /**
  * Skad wjezdza ekran wchodzacy, w procentach WLASNEJ szerokosci.
@@ -235,23 +241,67 @@ const COPY_SHIFT = 14
 
 /**
  * Jaka czesc przejscia zajmuje zgaszenie starego tekstu (i, symetrycznie,
- * zapalenie nowego). Dwa razy 0,45 zostawia miedzy nimi 10% przejscia — na
- * torze desktopu okolo 34 px przewijania, czyli tyle, ile trzeba, zeby oko
- * zarejestrowalo zmiane mysli, a nie zdazylo zauwazyc pustki.
+ * zapalenie nowego). Dwa razy 0,48 zostawia miedzy nimi 4% przejscia — tyle,
+ * zeby oko zarejestrowalo zmiane mysli, a nie zdazylo zauwazyc pustki.
+ *
+ * Wartosc idzie w pare z `SWAP`: liczy sie DLUGOSC przerwy na torze, a nie
+ * jej udzial w przejsciu. Szersze przejscie przy 0,45 rozciagnelo by przerwe
+ * z 5 do 7 procent toru — tekst gaslby na zauwazalna chwile. Przy 0,48 ta
+ * sama przerwa schodzi do 3 procent, czyli jest KROTSZA niz przed zmiana,
+ * mimo ze samo przejscie jest dluzsze.
  */
-const COPY_SPAN = 0.45
+const COPY_SPAN = 0.48
+
+/*
+ * ── Plynnosc: nie krzywa, tylko GESTOSC klatek ──
+ *
+ * Krzywej nie podajemy Motion jako funkcji `ease`: akceleracja sprzetowa
+ * dziala wylacznie na parze TABLIC (patrz naglowek pliku). Miedzy klatkami
+ * zostaje wiec ODCINEK PROSTY, a to znaczy, ze predkosc jest stala w obrebie
+ * odcinka i zmienia sie SKOKOWO na kazdym zalamaniu. O plynnosci decyduje
+ * wielkosc tych skokow, a nie to, jaka krzywa probkujemy.
+ *
+ * Poprzednia wersja probkowala `smoothstep` w PIECIU punktach. Blad polozenia
+ * byl przez to maly (okolo 0,02), ale predkosc ekranu szla 0 → 694 → 1528 →
+ * 694 → 0 procent szerokosci na jednostke postepu: trzy twarde skoki na
+ * przejscie, w tym kopniecie z postoju od razu na polowe predkosci
+ * maksymalnej. Dokladnie to widac jako "szarpanie" — ekran nie rusza z
+ * miejsca, tylko strzela.
+ */
+
+/** C¹: zerowa pochodna na obu koncach. */
+const smoothstep = (t: number) => t * t * (3 - 2 * t)
+
+/** C²: na obu koncach zeruje sie takze DRUGA pochodna, czyli przyspieszenie. */
+const smootherstep = (t: number) => t * t * t * (t * (t * 6 - 15) + 10)
 
 /**
- * `smoothstep` (3t² − 2t³) w pieciu punktach.
+ * Ekran: `smootherstep` w 24 odcinkach.
  *
- * Krzywej nie podajemy jako funkcji `ease`: Motion akceleruje sprzetowo
- * wylacznie pare TABLIC (patrz naglowek pliku), wiec latwiejsze wejscie i
- * wyjscie robimy dodatkowymi klatkami, a nie latwiejsza interpolacja. Piec
- * punktow wystarcza — miedzy nimi zostaje odcinek prosty, a maksymalny blad
- * wzgledem prawdziwego `smoothstep` to okolo 0,02.
+ * Ruch ekranu graniczy z odcinkami, na ktorych ekran STOI, wiec licza sie
+ * konce: `smoothstep` wchodzi w postoj z zerowa predkoscia, ale z niezerowym
+ * przyspieszeniem, i przy rzadkim probkowaniu zostaje z tego kopniecie.
+ * `smootherstep` zeruje tam takze przyspieszenie, a 24 odcinki scinaja
+ * najwiekszy skok predkosci z 833 do 199 — ponizej progu, na ktorym oko
+ * lapie zmiane tempa.
+ *
+ * Klatki sa darmowe: caly tor idzie do WAAPI raz, jako `KeyframeEffect`.
+ * Plynnosci nie da sie tu kupic niczym innym — kompozytor interpoluje
+ * liniowo miedzy tym, co dostanie.
  */
-const SMOOTH_AT = [0, 0.25, 0.5, 0.75, 1] as const
-const SMOOTH_TO = [0, 0.15625, 0.5, 0.84375, 1] as const
+const SCREEN_STEPS = 24
+
+/**
+ * Narracja i podswietlenie: `smoothstep` w 4 odcinkach.
+ *
+ * Tu gesciej byc NIE MOZE, i to nie ze wzgledu na koszt. Plaskie konce
+ * `smootherstep` trzymaja `opacity` ponizej progu widocznosci dluzej, wiec
+ * przerwa miedzy akapitami rosla z 3 do 9 procent toru (zmierzone na tych
+ * samych `SWAP` i `COPY_SPAN`) — tekst gaslby na zauwazalna chwile. Przejscie tekstu ma byc ZDECYDOWANE, nie plynne; skok
+ * predkosci w zanikaniu i tak jest niewidoczny, bo nie ma go z czym
+ * porownac — akapit nie przesuwa sie przez ekran, tylko gasnie w miejscu.
+ */
+const COPY_STEPS = 4
 
 /** Klatki jednej krzywej: punkty na torze i wartosci w tych punktach. */
 export interface Keyframes<T> {
@@ -280,12 +330,33 @@ function swapWindow(boundary: number, count: number): ProgressWindow {
   return [at - SWAP / 2, at + SWAP / 2]
 }
 
-/** Klatki jednego przejscia, rozlozone wedlug `smoothstep`. */
-function ramp<T>([start, end]: ProgressWindow, at: (t: number) => T): Keyframes<T> {
-  return {
-    stops: SMOOTH_AT.map((step) => start + (end - start) * step),
-    values: SMOOTH_TO.map(at),
+/** Klatki jednego przejscia: `steps` rownych odcinkow na torze, `curve` w wartosciach. */
+function ramp<T>(
+  [start, end]: ProgressWindow,
+  at: (t: number) => T,
+  curve: (t: number) => number,
+  steps: number,
+): Keyframes<T> {
+  const stops: number[] = []
+  const values: T[] = []
+
+  for (let step = 0; step <= steps; step++) {
+    const position = step / steps
+    stops.push(start + (end - start) * position)
+    values.push(at(curve(position)))
   }
+
+  return { stops, values }
+}
+
+/** Przejscie ekranu w ramce. */
+function screenRamp<T>(window: ProgressWindow, at: (t: number) => T): Keyframes<T> {
+  return ramp(window, at, smootherstep, SCREEN_STEPS)
+}
+
+/** Przejscie narracji, jej przesuniecia i podswietlenia w nawigacji. */
+function copyRamp<T>(window: ProgressWindow, at: (t: number) => T): Keyframes<T> {
+  return ramp(window, at, smoothstep, COPY_STEPS)
 }
 
 /** Zaokraglenie bez `toFixed` — klatki maja byc stabilnymi stringami. */
@@ -363,16 +434,16 @@ export function sceneKeyframes(index: number, count: number): SceneKeyframes {
   const copyIn = enter ? ([enter[1] - SWAP * COPY_SPAN, enter[1]] as ProgressWindow) : null
   const copyOut = exit ? ([exit[0], exit[0] + SWAP * COPY_SPAN] as ProgressWindow) : null
 
-  const screenIn = enter ? ramp(enter, (t) => screenAt(SCREEN_IN * (1 - t))) : null
-  const screenOut = exit ? ramp(exit, (t) => screenAt(-SCREEN_OUT * t)) : null
+  const screenIn = enter ? screenRamp(enter, (t) => screenAt(SCREEN_IN * (1 - t))) : null
+  const screenOut = exit ? screenRamp(exit, (t) => screenAt(-SCREEN_OUT * t)) : null
 
-  const fadeIn = copyIn ? ramp(copyIn, (t) => t) : null
-  const fadeOut = copyOut ? ramp(copyOut, (t) => 1 - t) : null
-  const moveIn = copyIn ? ramp(copyIn, (t) => copyAt(COPY_SHIFT * (1 - t))) : null
-  const moveOut = copyOut ? ramp(copyOut, (t) => copyAt(-COPY_SHIFT * t)) : null
+  const fadeIn = copyIn ? copyRamp(copyIn, (t) => t) : null
+  const fadeOut = copyOut ? copyRamp(copyOut, (t) => 1 - t) : null
+  const moveIn = copyIn ? copyRamp(copyIn, (t) => copyAt(COPY_SHIFT * (1 - t))) : null
+  const moveOut = copyOut ? copyRamp(copyOut, (t) => copyAt(-COPY_SHIFT * t)) : null
 
-  const spotIn = enter ? ramp(enter, (t) => t) : null
-  const spotOut = exit ? ramp(exit, (t) => 1 - t) : null
+  const spotIn = enter ? copyRamp(enter, (t) => t) : null
+  const spotOut = exit ? copyRamp(exit, (t) => 1 - t) : null
 
   return {
     screen: closeTrack(
