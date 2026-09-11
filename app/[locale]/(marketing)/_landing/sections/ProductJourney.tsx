@@ -43,7 +43,7 @@ import { ReportsScreen } from '../product/screens/ReportsScreen'
  *
  * `JourneyMobile` — ten sam uklad, inna mechanika. Scroll wyznacza tylko
  * INDEKS sceny (`resolveSceneIndex`), w DOM stoi jeden ekran, a przelaczenie
- * to 180 ms przenikania na czystym CSS. Powod jest mierzalny: piec ekranow to
+ * to 260 ms przenikania na czystym CSS. Powod jest mierzalny: piec ekranow to
  * piec drzew utrzymywanych w kompozycji przez cala sekcje — na telefonie sam
  * ich rozmiar zjada budzet klatki.
  *
@@ -99,7 +99,7 @@ const SCENES: readonly Scene[] = [
  * `landing.css` (`.lp-scene-switch`) — tam robi przejscie, tutaj decyduje,
  * jak dlugo poprzednia scena zostaje jeszcze w DOM.
  */
-const SWITCH_MS = 180
+const SWITCH_MS = 260
 
 function screenFor(index: number, month: DemoMonth): ReactNode {
   switch (index) {

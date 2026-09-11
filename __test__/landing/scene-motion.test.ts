@@ -135,6 +135,75 @@ describe('sceny 01-05 — zero klatek z dwoma ekranami naraz', () => {
   })
 })
 
+describe('sceny 01-05 — ekran nie szarpie', () => {
+  /**
+   * Predkosci na kolejnych odcinkach krzywej ekranu, w procentach szerokosci
+   * ramki na jednostke postepu.
+   *
+   * Motion oddaje krzywa przegladarce jako pare TABLIC, wiec miedzy klatkami
+   * kompozytor interpoluje LINIOWO: predkosc jest stala w obrebie odcinka i
+   * zmienia sie skokowo na kazdym zalamaniu. To te skoki widac jako szarpanie,
+   * a nie ksztalt krzywej, ktora probkujemy — i dlatego mierzymy wlasnie je.
+   */
+  function speeds(index: number): number[] {
+    const { stops, values } = LAYERS[index].screen
+    const out: number[] = []
+
+    for (let step = 1; step < stops.length; step++) {
+      const travel = percent(values[step]) - percent(values[step - 1])
+      out.push(Math.abs(travel / (stops[step] - stops[step - 1])))
+    }
+
+    return out
+  }
+
+  it('nie zmienia tempa skokowo w srodku przejscia', () => {
+    // Poprzednia wersja probkowala `smoothstep` w pieciu punktach: predkosc
+    // szla 0 → 694 → 1528 → 694 → 0, czyli najwiekszy skok siegal 55 procent
+    // predkosci szczytowej. Przy 24 odcinkach `smootherstep` schodzi do 13.
+    for (let index = 0; index < COUNT; index++) {
+      const speed = speeds(index)
+      const peak = Math.max(...speed)
+      const jump = Math.max(...speed.slice(1).map((value, step) => Math.abs(value - speed[step])))
+
+      expect(jump / peak, `scena ${index}`).toBeLessThan(0.2)
+    }
+  })
+
+  it('rusza z postoju i dochodzi do postoju, zamiast strzelac', () => {
+    // Ekran stoi przez wiekszosc taktu sceny, wiec KAZDE przejscie zaczyna sie
+    // i konczy na granicy z bezruchem. Tam skok predkosci boli najbardziej:
+    // oko porownuje go z zerem, nie z ruchem obok.
+    for (let index = 0; index < COUNT; index++) {
+      const speed = speeds(index)
+      const peak = Math.max(...speed)
+
+      for (let step = 1; step < speed.length; step++) {
+        const fromRest = speed[step - 1] === 0 && speed[step] > 0
+        const toRest = speed[step - 1] > 0 && speed[step] === 0
+        if (!fromRest && !toRest) continue
+
+        expect(Math.max(speed[step - 1], speed[step]) / peak, `scena ${index} @ ${step}`)
+          .toBeLessThan(0.05)
+      }
+    }
+  })
+
+  it('zostawia w ruchu wiecej niz trzecia czesc toru', () => {
+    // Sekcja ma sie czytac jak jeden ruch, a nie jak seria zaciec: gdy scena
+    // parkuje na dluzej, niz trwa dojscie do niej, przewijanie przestaje
+    // odpowiadac i uzytkownik sprawdza, czy strona sie nie zawiesila.
+    const moving = TRACK.filter((at) =>
+      LAYERS.some((_, index) => {
+        const before = screenAt(index, Math.max(0, at - 0.0025))
+        return Math.abs(screenAt(index, at) - before) > 1e-9
+      }),
+    )
+
+    expect(moving.length / TRACK.length).toBeGreaterThan(0.4)
+  })
+})
+
 describe('sceny 01-05 — jedna krzywa czytana w dwie strony', () => {
   it('prowadzi kazdy ekran monotonicznie z prawej w lewo', () => {
     // Monotonicznosc jest powodem, dla ktorego przewijanie w gore i w dol to

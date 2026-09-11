@@ -191,16 +191,19 @@
  * atrybutem. Cale przejscie robi wiec CSS: przegladarka dostaje wylacznie
  * wlasciwosci kompozytowalne i zaden JavaScript nie liczy tu klatek.
  *
- * 180 ms to ta sama wartosc, co `SWITCH_MS` w `ProductJourney.tsx` — tam
- * decyduje, jak dlugo poprzednia scena zostaje zamontowana.
+ * 260 ms to ta sama wartosc, co `SWITCH_MS` w `ProductJourney.tsx` — tam
+ * decyduje, jak dlugo poprzednia scena zostaje zamontowana. Przy 180 ms pelna
+ * szerokosc ramki przelatywala tak szybko, ze ruch czytalo sie jak ciecie
+ * montazowe; 260 ms z krzywa mocno wytracajaca predkosc na koncu daje ten sam
+ * gest, ktory na desktopie prowadzi scroll — ekran DOJEZDZA, a nie podskakuje.
  *
  * Zasada jest DOKLADNIE ta sama, co w wariancie desktopowym (`useSceneLayer`
  * w `_landing/motion/scene.ts`), tylko silnik inny:
  *
  *   `.lp-scene-slide`  — ekran WJEZDZA na poprzedni, nigdy przez niego nie
  *                        przenika (nieprzezroczyste tlo niesie JSX),
- *   `.lp-scene-switch` — narracja zmienia sie SEKWENCYJNIE: 90 ms na
- *                        zgaszenie starego akapitu, 90 ms na zapalenie
+ *   `.lp-scene-switch` — narracja zmienia sie SEKWENCYJNIE: 130 ms na
+ *                        zgaszenie starego akapitu, 130 ms na zapalenie
  *                        nowego, zero klatek z dwoma tekstami naraz.
  *
  * `data-back` niesie kierunek przewijania — bez niego powrot „wstecz"
@@ -210,7 +213,7 @@
  * warstwy montuja sie rosnaco po indeksie, wiec przy powrocie schodzaca
  * scena lezalaby wyzej.
  *
- * `visibility` schodzi dopiero PO przejsciu (`0s linear 180ms`): warstwa
+ * `visibility` schodzi dopiero PO przejsciu (`0s linear 260ms`): warstwa
  * przestaje istniec dla malowania i czytnika ekranu dokladnie wtedy, gdy
  * przestaje byc widoczna, ani chwili wczesniej.
  */
@@ -230,16 +233,16 @@
   opacity: 0;
   transform: translateY(8px);
   transition:
-    opacity 90ms ease,
-    transform 90ms ease,
-    visibility 0s linear 180ms;
+    opacity 130ms ease,
+    transform 130ms ease,
+    visibility 0s linear 260ms;
 }
 .lp .lp-scene-switch[data-active='true'] {
   opacity: 1;
   transform: none;
   transition:
-    opacity 90ms ease 90ms,
-    transform 90ms ease 90ms,
+    opacity 130ms ease 130ms,
+    transform 130ms ease 130ms,
     visibility 0s;
 }
 
@@ -258,19 +261,25 @@
  * niz schodzaca, bo `@starting-style` potrzebuje jednego przeliczenia stylu.
  * Proba wyrownania tego opoznieniem `16ms` na warstwie schodzacej POGARSZA
  * wynik (zmierzone: 0,983), wiec zostaje tak — nie ma czego wyrownywac.
+ *
+ * Krzywa jest wlasna, a nie `ease`: `ease` (`cubic-bezier(.25,.1,.25,1)`)
+ * trzyma zauwazalna predkosc niemal do konca, wiec ekran zatrzymuje sie nagle
+ * — na pelnej szerokosci ramki widac to jako stukniecie. Ta startuje szybciej
+ * i wytraca predkosc do zera dlugo przed koncem, czyli robi to samo, co
+ * `smootherstep` na desktopie: zeruje na koncu takze PRZYSPIESZENIE.
  */
 .lp .lp-scene-slide {
   opacity: 1;
   transform: translateX(-18%);
   transition:
-    transform 180ms ease,
-    visibility 0s linear 180ms;
+    transform 260ms cubic-bezier(0.32, 0.72, 0, 1),
+    visibility 0s linear 260ms;
 }
 .lp .lp-scene-slide[data-back='true'] { transform: translateX(100%); }
 .lp .lp-scene-slide[data-active='true'] {
   transform: none;
   transition:
-    transform 180ms ease,
+    transform 260ms cubic-bezier(0.32, 0.72, 0, 1),
     visibility 0s;
 }
 
