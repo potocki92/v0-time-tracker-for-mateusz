@@ -17,7 +17,7 @@ import type { WorkspaceSegment } from '@/lib/workspace/sections'
 import type { DemoMonth } from '../demo/demo-data'
 import { resolveSceneIndex } from '../motion/active-scene'
 import { useMotionProfile, usePrefersReducedMotion } from '../motion/profile'
-import { useSceneLayer, useTrackProgress } from '../motion/scene'
+import { cameraKeyframes, useSceneLayer, useScrollTransform, useTrackProgress, type CameraFrame } from '../motion/scene'
 import { AppFrame } from '../product/AppFrame'
 import { MARKETING_SECTIONS } from '../product/nav'
 import { CalendarScreen } from '../product/screens/CalendarScreen'
@@ -84,6 +84,27 @@ interface Scene {
   copyKey: string
 }
 
+/**
+ * Kadr kamery dla kazdej sceny — subtelna rezyseria zamiast slidera.
+ *
+ * Ramka przez cala sekcje stoi w miejscu (i to jest jej sila), ale piec scen
+ * w IDENTYCZNYM kadrze czyta sie jak przelaczanie zakladek. Kamera dojezdza
+ * wiec o dwa-trzy procent tam, gdzie scena chce, zeby oko poszlo w konkretne
+ * miejsce interfejsu, i wraca do pelnego planu tam, gdzie scena pokazuje
+ * calosc. Wiecej niz kilka procent i replika zaczyna wychodzic poza scene, a
+ * osmiopikselowa czcionka w srodku widocznie traci ostrosc.
+ *
+ * Kamera jest JEDNA wartoscia na cala sekcje i jedzie na ramce urzadzenia, a
+ * nie na warstwach ekranu — te zostaja przy czystym `translateX`.
+ */
+const CAMERA: readonly CameraFrame[] = [
+  { scale: 1, lift: 0 },        // 01 Pulpit — pelny plan, punkt odniesienia
+  { scale: 1.028, lift: -8 },   // 02 Kalendarz — kadr schodzi na siatke miesiaca
+  { scale: 1, lift: 0 },        // 03 Projekty — powrot do pelnego planu
+  { scale: 1.022, lift: -6 },   // 04 Faktury — uwaga na dokument
+  { scale: 1, lift: 0 },        // 05 Raporty — spokojne zamkniecie sekwencji
+]
+
 const SCENES: readonly Scene[] = [
   { index: '01', segment: 'dashboard', highlights: ['dashboard'], copyKey: 'dashboard' },
   { index: '02', segment: 'calendar', highlights: ['calendar'], copyKey: 'calendar' },
@@ -143,6 +164,9 @@ function JourneyDesktop({ month }: { month: DemoMonth }) {
   const layer4 = useSceneLayer(progress, 4, SCENES.length)
   const layers = [layer0, layer1, layer2, layer3, layer4]
 
+  const camera = cameraKeyframes(CAMERA)
+  const cameraTransform = useScrollTransform(progress, camera.stops, camera.values)
+
   // Podswietlenie w sidebarze idzie krzywa `spotlight`, a NIE `opacity`
   // warstwy: ta ostatnia zostaje na jedynce po wejsciu sceny, wiec zapalilaby
   // wszystkie sekcje, przez ktore uzytkownik juz przejechal.
@@ -155,6 +179,7 @@ function JourneyDesktop({ month }: { month: DemoMonth }) {
     <JourneyStage
       trackRef={trackRef}
       heading={t('heading')}
+      camera={cameraTransform}
       copy={SCENES.map((scene, index) => (
         <m.div
           key={scene.index}
@@ -350,11 +375,18 @@ function JourneyStage({
   heading,
   copy,
   frame,
+  camera,
 }: {
   trackRef: RefObject<HTMLDivElement | null>
   heading: string
   copy: ReactNode
   frame: ReactNode
+  /**
+   * Kadr sterowany scrollem. Dostaje go WYLACZNIE wariant desktopowy: na
+   * telefonie ramka jest pionowa i wypelnia prawie cala scene, wiec kazde
+   * zblizenie obcinaloby jej krawedzie zamiast prowadzic wzrok.
+   */
+  camera?: MotionValue<string>
 }) {
   return (
     <section id="product" aria-labelledby="product-heading">
@@ -385,9 +417,21 @@ function JourneyStage({
               proporcja, ktora miesci sie w scenie na wszystkich rozmiarach
               iPhone'a (zmierzone: 390x844, 393x852, 430x932) z zapasem.
             */}
-            <div className="aspect-[9/14] max-h-[74svh] min-h-[300px] w-full sm:aspect-[4/3] lg:max-h-[70svh]">
-              {frame}
-            </div>
+            {camera ? (
+              /* Kadr jedzie na TYM elemencie, a nie na ramce w srodku: ramka
+                 przycina ekrany (`overflow-clip`), wiec skalowanie jej samej
+                 skalowaloby takze pole przyciecia. */
+              <m.div
+                className="aspect-[9/14] max-h-[74svh] min-h-[300px] w-full sm:aspect-[4/3] lg:max-h-[70svh] lp-motion"
+                style={{ transform: camera }}
+              >
+                {frame}
+              </m.div>
+            ) : (
+              <div className="aspect-[9/14] max-h-[74svh] min-h-[300px] w-full sm:aspect-[4/3] lg:max-h-[70svh]">
+                {frame}
+              </div>
+            )}
           </div>
         </div>
       </div>

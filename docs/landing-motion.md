@@ -6,6 +6,18 @@ sekcje reaguja na przewijanie, w tym trzy przyklejone (`ProductJourney`,
 Ten dokument opisuje, na czym ten ruch stoi i dlaczego telefon dostaje inny
 profil niz desktop.
 
+Rytm calej strony:
+
+```
+Hero  →  produkt przejmuje viewport
+      →  Product Journey (5 scen, jedna ramka, kamera)
+      →  oddech
+      →  wielkie liczby (5 wartosci, jedna po drugiej)
+      →  Automation (3 etapy: zasady → obecnosc → kalendarz pisze sam)
+      →  spokojniejsze funkcje
+      →  monumentalny, nieruchomy final
+```
+
 Jesli szukasz konkretnego uzasadnienia liczbowego — stoi w komentarzu przy kodzie.
 Tutaj jest mapa.
 
@@ -19,6 +31,7 @@ Tutaj jest mapa.
 | Wejscie | `import { m, useScroll, useTransform } from 'framer-motion'` |
 | Shell | `components/common/motion-provider.tsx` — `LazyMotion strict` + `MotionConfig reducedMotion="user"` |
 | Zasieg | wylacznie poddrzewo landingu i formularzy; **nigdy** root layout |
+| Tokeny | `_landing/motion/tokens.ts` — krzywe, gestosc probkowania, przesuniecia |
 
 ### Dlaczego nie `motion/react`
 
@@ -133,8 +146,9 @@ przesuwa ani jednego piksela.
 
 | sekcja | desktop | telefon |
 |---|---|---|
-| `HeroScene` | `rotateX 12°→0°`, `scale 0.94→1.06`, `y 0→-70`, `perspective: 1600px` | bez `rotateX` i bez `perspective`; `scale 0.98→1.02`, `y 0→-24` |
-| `ProductJourney` | 5 ekranow na sobie, scroll prowadzi `transform` kazdej warstwy (`opacity` tylko narracji) | scroll wyznacza **indeks sceny**; w DOM 1 ekran (2 na czas przejscia), wjazd 180 ms na CSS |
+| `HeroScene` | `rotateX 4°→0°` (konczy sie na 0,55 toru), `scale 0.965→1.03`, `y 0→-44`, `perspective: 2200px` | bez `rotateX` i bez `perspective`; `scale 0.985→1.02`, `y 0→-18` |
+| kamera `ProductJourney` | jedna wartosc na sekcje, `scale 1→1.028` na ramce urzadzenia | **brak** — ramka jest pionowa i wypelnia scene, zblizenie obcinaloby krawedzie |
+| `ProductJourney` | 5 ekranow na sobie, scroll prowadzi `transform` kazdej warstwy (`opacity` tylko narracji) | scroll wyznacza **indeks sceny**; w DOM 1 ekran (2 na czas przejscia), wjazd 260 ms na CSS |
 | `MonthGrid` | wypelnianie **dzien po dniu** — 60 wartosci | wypelnianie **tygodniami** — 5 wartosci |
 | `Navbar` | `backdrop-blur-md` po przewinieciu | bez `backdrop-filter`; mocniejsze tlo `rgba(0,0,0,0.92)` |
 | `lp-device` | `box-shadow` 120 px | bez cienia |
@@ -295,9 +309,34 @@ scena nie wymaga przestrajania pozostalych pieciu.
 | ekran | `translateX` 100% → 0 (wchodzacy), 0 → −18% (schodzacy) |
 | narracja | `opacity` 0 → 1 i `translateY` 14 px → 0, w 45% przejscia |
 
-Na torze 520svh (desktop) `SWAP` to okolo 38svh przewijania — 2-3 klikniecia
+Na torze 380svh (desktop) `SWAP` to okolo 46svh przewijania — 2-3 klikniecia
 kolka. Warunek na wartosc: `SWAP < 1/n`, inaczej okna sasiadow zachodza na
 siebie i `useTransform` dostaje niemonotoniczny zakres wejsciowy.
+
+### Kamera
+
+Nieruchoma ramka jest sila tej sekcji (czyta sie jak nawigacja w aplikacji), ale
+piec scen w IDENTYCZNYM kadrze czyta sie jak slider. Kamera (`cameraKeyframes`)
+dojezdza o dwa-trzy procent tam, gdzie scena chce, zeby oko poszlo w konkretne
+miejsce interfejsu, i wraca do pelnego planu tam, gdzie scena pokazuje calosc:
+
+| scena | `scale` | po co |
+|---|---|---|
+| 01 Pulpit | 1,000 | pelny plan — punkt odniesienia |
+| 02 Kalendarz | 1,028 | kadr schodzi na siatke miesiaca |
+| 03 Projekty | 1,000 | powrot do pelnego planu |
+| 04 Faktury | 1,022 | uwaga na dokument |
+| 05 Raporty | 1,000 | spokojne zamkniecie |
+
+Kadr STOI przez caly takt sceny i zmienia sie wylacznie w oknie `SWAP`, czyli
+dokladnie wtedy, gdy zmienia sie ekran — ruch kamery nie jest osobnym
+zdarzeniem, tylko ta sama zmiana sceny widziana z poziomu kadru.
+
+Kamera jedzie na RAMCE URZADZENIA, nie na warstwach ekranu: jedna dodatkowa
+animacja na kompozytorze zamiast pieciu, a warstwy zostaja przy czystym
+`translateX`. Powyzej `scale` 1,05 replika zaczyna wychodzic poza scene, a
+osmiopikselowa czcionka w srodku widocznie traci ostrosc — kadr skaluje sie
+jako warstwa rastrowa, nie jako tekst.
 
 **Krzywej nie podajemy jako `ease`.** Motion akceleruje sprzetowo wylacznie pare
 tablic (sekcja 2), wiec latwiejsze wejscie i wyjscie robimy dodatkowymi
@@ -383,3 +422,107 @@ z wlasnym interfejsem. Drugi bezpiecznik stoi w CSS — `.lp-layer`,
 `width`, `height`, `top`, `margin`, `padding` — patrz sekcja 5. Nie wolno tez
 animowac `opacity` EKRANU (to natychmiast wraca kalka dwoch interfejsow) ani
 zdejmowac warstwie nieprzezroczystego tla.
+
+
+---
+
+## 8. `AutomationShowcase` — trzy etapy jednej historii
+
+Sekcja `#automation` odpowiada na jedno pytanie („skad aplikacja wie, co
+wpisac?") i odpowiada na nie PO KOLEI.
+
+Poprzednia wersja pokazywala wszystko naraz: grafik, os obecnosci, kalendarz,
+wynik i legende pominiec staly w jednym kadrze, kazde we wlasnej karcie. Sekcja
+byla przez to poprawna i zupelnie nieczytelna — nic nie bylo wazne, bo wazne
+bylo wszystko, a uzytkownik musial sam zlozyc z tego zdanie.
+
+| etap | co widac | okno toru |
+|---|---|---|
+| 1. zasady | sam grafik tygodnia, duzy, na czerni | `rulesCopy` 0–0,18 |
+| 2. obecnosc | grafik podjezdza, wchodzi os wyjazdow | `presenceCopy` 0,25–0,38 |
+| 3. wynik | kalendarz przejmuje ekran i wypelnia sie dzien po dniu | `resultCopy` 0,45–1 |
+
+Wszystkie okna stoja w `_landing/motion/automation-timeline.ts` — osobno, bo sa
+arytmetyka, a nie stylem. Przesuniecie jednej granicy potrafi cicho nasunac dwie
+warstwy na siebie (dwa naglowki naraz) albo zostawic miedzy nimi pusty kadr;
+jedno i drugie widac dopiero na zywej stronie, w polowie przewijania. Test
+`__test__/landing/automation-timeline.test.ts` przejezdza ten tor punkt po
+punkcie.
+
+### Regula, ktorej te liczby pilnuja
+
+Warstwy lezace NA SOBIE musza byc rozdzielone o co najmniej `2 · LAYER_FADE`
+(0,07) — tyle trwa zgaszenie poprzednika plus zapalenie nastepnika. Ponizej tej
+wartosci `useLayerFade` zaczyna malowac obie naraz.
+
+### Podzial na komponenty
+
+| plik | odpowiedzialnosc |
+|---|---|
+| `sections/AutomationShowcase.tsx` | timeline etapow, warstwy, nic poza tym |
+| `sections/automation/WeekRules.tsx` | grafik tygodnia jako jeden wiersz typografii |
+| `sections/automation/PresenceBand.tsx` | os obecnosci, odcinki proporcjonalne do liczby dni |
+| `sections/automation/AutomationCalendar.tsx` | siatka miesiaca i wynik |
+
+Wynik (`194 h · 20 days`) NIE jest wpisany z reki — liczy go `planDays`, ta sama
+czysta funkcja, ktora prowadzi automat w aplikacji.
+
+---
+
+## 9. `NumbersStory` — sekwencja bez recznych okien
+
+Piec wartosci, kazda z wlasnym taktem: WCHODZI, STOI, WYCHODZI, ustepuje
+nastepnej. Okien nie dobiera sie recznie — liczy je `storyWindows(count)`, ktore
+dzieli tor przez liczbe krokow i zostawia miedzy oknami dokladnie `2 ·
+LAYER_FADE`. Dopisanie szostej wartosci przestraja cala piatke i nie wymaga ani
+jednej nowej liczby w komponencie.
+
+Wskaznik `01 / 05` jedzie WEWNATRZ warstwy, wiec dziedziczy jej jasnosc i nie
+kosztuje ani jednej dodatkowej wartosci sterowanej scrollem.
+
+### Domkniecie toru w `useLayerFade`
+
+Klatki warstwy siegaja 0 i 1 z tego samego powodu, co w `revealKeyframes`
+(sekcja 7): WAAPI dopisuje klatke neutralna o wartosci WYJSCIOWEJ elementu
+wszedzie tam, gdzie skrajna klatka nie stoi na 0 albo 1. Pierwsza warstwa
+(`.lp-layer:first-child` ma w CSS `opacity: 1`) rozjasnialaby sie wtedy z
+powrotem przez cala reszte toru — nie bylo tego widac wylacznie dlatego, ze
+`visibility` liczona w JS zdazyla ja schowac. Po domknieciu jasnosc jest poprawna
+sama z siebie, a `visibility` zostaje tym, czym miala byc: oszczednoscia na
+malowaniu, a nie warunkiem poprawnosci.
+
+---
+
+## 10. Tory przewijania
+
+| tor | telefon | desktop | bylo (desktop) |
+|---|---|---|---|
+| `lp-track-journey` | 300svh | 380svh | 520svh |
+| `lp-track-numbers` | 240svh | 300svh | 420svh |
+| `lp-track-automation` | 240svh | 300svh | 340svh |
+
+Skrocenie NIE zmienia ani jednej krzywej: wszystkie okna sa ulamkami toru, wiec
+kroci sie zarowno postoj, jak i ruch, a proporcja miedzy nimi zostaje ta sama.
+Powod jest rytmiczny — przy poprzednich wysokosciach scena parkowala na dluzej,
+niz trwalo dojscie do niej, i uzytkownik zaczynal sprawdzac, czy strona sie nie
+zaciela.
+
+`lp-track-automation` skrocono najmniej, bo sekcja dostala trzy etapy zamiast
+jednego kadru: przy tym samym torze pokazuje wiecej.
+
+### Zmierzone (Chromium, `/en`, pelne przewiniecie strony)
+
+| | desktop przed | desktop po | telefon przed | telefon po |
+|---|---|---|---|---|
+| wysokosc strony | 14 129 px | **11 922 px** | 10 936 px | **9 680 px** |
+| zapisy stylu na cale przewiniecie | 34 | 40 | 10 | 16 |
+| elementy zmieniajace styl | 21 | 26 | 6 | 11 |
+| animacje poza main threadem | 104 | **118** | 19 | **32** |
+| ekrany w DOM (`#product`) | 5 | 5 | 1 | 1 |
+| wezly DOM | 1 414 | 1 420 | 941 | 944 |
+| First Load JS (gzip) | 180,8 kB | 181,7 kB | — | — |
+
+Szesc dodatkowych zapisow stylu to `visibility` pieciu nowych warstw automatu —
+dwa razy na warstwe na wizyte, nie raz na klatke. Cala reszta ruchu, ktory
+doszedl (kamera, etapy automatu), zeszla na kompozytor: stad +14 i +13 animacji
+poza main threadem.

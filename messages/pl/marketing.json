@@ -3,7 +3,6 @@
     "aria": "Główna",
     "product": "Produkt",
     "automation": "Automatyzacja",
-    "flow": "Jak to działa",
     "signIn": "Zaloguj się",
     "openApp": "Otwórz aplikację"
   },
@@ -56,7 +55,8 @@
   "automation": {
     "eyebrow": "Automatyzacja",
     "heading": "Kalendarz może wypełnić się sam.",
-    "lead": "Podaj TimeTrackerowi swój tydzień i wyjazdy. Zapisze godziny, które naprawdę przepracowałeś — i pominie niedziele oraz tygodnie spędzone w domu.",
+    "stagePresence": "Wie, kiedy jesteś na wyjeździe.",
+    "stageResult": "Miesiąc zapisuje się sam.",
     "scheduleTitle": "Grafik tygodnia",
     "dayOff": "wolne",
     "presenceTitle": "Obecność",
@@ -79,6 +79,7 @@
   "everything": {
     "eyebrow": "Cała reszta",
     "heading": "Zbudowane pod pracę na swoim.",
+    "alsoIncluded": "W zestawie również",
     "items": {
       "dayEntries": { "title": "Wpisy dzienne", "body": "Godziny albo ilość akordowa, status, notatki, tagi — jeden dialog na dzień." },
       "clientRates": { "title": "Stawki klientów", "body": "Historia stawek z datami obowiązywania; przeszłe godziny zachowują stawkę, na której zostały zarobione." },

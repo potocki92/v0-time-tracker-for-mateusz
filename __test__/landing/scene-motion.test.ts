@@ -2,7 +2,16 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { revealKeyframes, sceneKeyframes } from '@/app/[locale]/(marketing)/_landing/motion/scene'
+import { AUTOMATION } from '@/app/[locale]/(marketing)/_landing/motion/automation-timeline'
+import {
+  cameraKeyframes,
+  LAYER_FADE,
+  layerFadeKeyframes,
+  revealKeyframes,
+  sceneKeyframes,
+  storyWindows,
+  type CameraFrame,
+} from '@/app/[locale]/(marketing)/_landing/motion/scene'
 
 /**
  * Timeline scen 01-05 (`ProductJourney`) przejechany punkt po punkcie.
@@ -313,12 +322,23 @@ describe('sceny 01-05 — klatki, ktore przegladarka potrafi interpolowac', () =
 })
 
 describe('automat — wypelniony miesiac zostaje wypelniony', () => {
-  /** Okna wpisow w `MonthGrid` przy `fillRange` sekcji automatu. */
-  const windows: [number, number][] = [
-    [0.16, 0.32],
-    [0.45, 0.61],
-    [0.74, 0.9],
-  ]
+  /**
+   * Okna wpisow w `MonthGrid` przy `fillRange` sekcji automatu — liczone z
+   * PRAWDZIWEGO zakresu, a nie przepisane z reki. Wczesniej stala tu kopia
+   * trzech par liczb; po przestrojeniu sekcji test nadal przechodzil, tylko
+   * sprawdzal juz okna, ktorych nie ma na stronie.
+   *
+   * `CELL_SPAN` jest prywatny dla `MonthGrid` — powtarzamy go tutaj, bo test
+   * ma pilnowac WYNIKU (pierwszy, srodkowy i ostatni wpis), a nie wewnetrznej
+   * arytmetyki siatki.
+   */
+  const CELL_SPAN = 0.16
+  const entryWindow = (order: number): [number, number] => {
+    const [lo, hi] = AUTOMATION.fill
+    const start = lo + order * Math.max(0, hi - lo - CELL_SPAN)
+    return [start, start + CELL_SPAN]
+  }
+  const windows: [number, number][] = [entryWindow(0), entryWindow(0.5), entryWindow(1)]
 
   it('domyka kazda krzywa wpisu klatkami na 0 i 1', () => {
     // Bez tego Motion podaje WAAPI `offset: [0.16, 0.32]`, przegladarka
@@ -369,6 +389,8 @@ describe('automat — wypelniony miesiac zostaje wypelniony', () => {
     for (const file of [
       'app/[locale]/(marketing)/_landing/product/MonthGrid.tsx',
       'app/[locale]/(marketing)/_landing/sections/AutomationShowcase.tsx',
+      'app/[locale]/(marketing)/_landing/sections/automation/AutomationCalendar.tsx',
+      'app/[locale]/(marketing)/_landing/sections/NumbersStory.tsx',
     ]) {
       for (const call of read(file).matchAll(/use(?:Scroll)?Transform\(\s*progress,\s*([^,]+),/g)) {
         expect(call[1].trim(), `${file}: ${call[0]}`).toMatch(/\.stops$/)
@@ -430,5 +452,103 @@ describe('sceny 01-05 — telefon robi to samo, tylko innym silnikiem', () => {
     // tylko przez niego przeswituje — i wracaja dwa interfejsy naraz.
     expect(journey.match(/lp-layer[^"\n]*bg-\[var\(--lp-s1\)\]/g) ?? []).toHaveLength(1)
     expect(journey.match(/lp-scene-slide[^"\n]*bg-\[var\(--lp-s1\)\]/g) ?? []).toHaveLength(1)
+  })
+})
+
+describe('sceny 01-05 — kamera prowadzi kadr, zamiast go szarpac', () => {
+  /**
+   * Kadr kamery z `ProductJourney`. Kopia, nie import: test ma pilnowac
+   * WLASNOSCI toru (gdzie kamera stoi, jak duzo sie rusza), a nie tego, ze
+   * ktos przepisal te sama tablice w dwa miejsca — zmiana kadru sceny jest
+   * decyzja projektowa i nie powinna zapalac testu.
+   */
+  const CAMERA: readonly CameraFrame[] = [
+    { scale: 1, lift: 0 },
+    { scale: 1.028, lift: -8 },
+    { scale: 1, lift: 0 },
+    { scale: 1.022, lift: -6 },
+    { scale: 1, lift: 0 },
+  ]
+  const camera = cameraKeyframes(CAMERA)
+  const scaleOf = (value: string) => Number(value.slice(value.indexOf('scale(') + 6, -1))
+  const scaleAt = (at: number) => sample(camera.stops, camera.values.map(scaleOf), at)
+
+  it('domyka tor klatkami na 0 i 1', () => {
+    expect(camera.stops[0]).toBe(0)
+    expect(camera.stops[camera.stops.length - 1]).toBe(1)
+  })
+
+  it('trzyma zakres wejsciowy scisle rosnacy', () => {
+    for (let step = 1; step < camera.stops.length; step++) {
+      expect(camera.stops[step]).toBeGreaterThan(camera.stops[step - 1])
+    }
+  })
+
+  it('daje kazdej klatce transformu identyczna strukture', () => {
+    // Rozna struktura = przegladarka nie ma czego interpolowac i animacja
+    // spada z kompozytora na main thread.
+    for (const value of camera.values) {
+      expect(value).toMatch(/^translateY\(-?\d+(\.\d+)?px\) scale\(\d+(\.\d+)?\)$/)
+    }
+  })
+
+  it('stoi na zadanym kadrze przez caly takt kazdej sceny', () => {
+    // Kamera ma byc rezyseria, a nie ciaglym dryfem: rusza sie wylacznie
+    // wtedy, gdy zmienia sie ekran.
+    for (let index = 0; index < CAMERA.length; index++) {
+      expect(scaleAt((index + 0.5) / CAMERA.length), `scena ${index}`).toBeCloseTo(
+        CAMERA[index].scale,
+        6,
+      )
+    }
+  })
+
+  it('nie zbliza sie na tyle, zeby replika wyszla poza scene', () => {
+    // Powyzej kilku procent osmiopikselowa czcionka w srodku widocznie traci
+    // ostrosc — kadr skaluje sie jako warstwa rastrowa, nie jako tekst.
+    for (const value of camera.values) {
+      expect(scaleOf(value)).toBeLessThanOrEqual(1.05)
+      expect(scaleOf(value)).toBeGreaterThanOrEqual(1)
+    }
+  })
+})
+
+describe('sekwencja pelnoekranowa — kazda wartosc ma swoj takt', () => {
+  const COUNT = 5
+  const windows = storyWindows(COUNT)
+
+  it('dzieli tor po rowno miedzy wszystkie kroki', () => {
+    expect(windows).toHaveLength(COUNT)
+    const spans = windows.map(([start, end]) => end - start)
+    for (const span of spans) expect(span).toBeCloseTo(spans[0], 6)
+  })
+
+  it('nie pokazuje dwoch wartosci naraz na zadnym punkcie toru', () => {
+    const lit = (window: readonly [number, number], at: number) => {
+      const { fade } = layerFadeKeyframes(window[0], window[1])
+      return sample(fade.stops, fade.values, at)
+    }
+
+    for (const at of [...TRACK, ...BEYOND]) {
+      expect(windows.filter((window) => lit(window, at) > 0.02).length, `postep ${at}`)
+        .toBeLessThanOrEqual(1)
+    }
+  })
+
+  it('zaczyna pelnym obrazem i konczy pelnym obrazem', () => {
+    // Pierwsza warstwa nie ma wejscia, ostatnia wyjscia — sekcja nie moze
+    // zaczynac sie ani konczyc pusta czernia.
+    expect(windows[0][0] - LAYER_FADE).toBeCloseTo(0, 6)
+    expect(windows[COUNT - 1][1] + LAYER_FADE).toBeCloseTo(1, 6)
+  })
+
+  it('przestraja cala sekwencje, gdy dojdzie szosta wartosc', () => {
+    // Zero recznie dobranych okien: dopisanie kroku nie wymaga ani jednej
+    // nowej liczby w komponencie.
+    const six = storyWindows(6)
+    expect(six).toHaveLength(6)
+    for (let index = 1; index < six.length; index++) {
+      expect(six[index][0] - six[index - 1][1]).toBeCloseTo(2 * LAYER_FADE, 6)
+    }
   })
 })

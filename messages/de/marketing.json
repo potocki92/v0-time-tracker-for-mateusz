@@ -3,7 +3,6 @@
     "aria": "Hauptnavigation",
     "product": "Produkt",
     "automation": "Automatisierung",
-    "flow": "So funktioniert es",
     "signIn": "Anmelden",
     "openApp": "App öffnen"
   },
@@ -56,7 +55,8 @@
   "automation": {
     "eyebrow": "Automatisierung",
     "heading": "Ihr Kalender kann sich selbst füllen.",
-    "lead": "Geben Sie TimeTracker Ihre Woche und Ihre Einsätze. Er trägt die Stunden ein, die Sie wirklich gearbeitet haben — und lässt Sonntage und Wochen zu Hause aus.",
+    "stagePresence": "Er weiß, wann Sie unterwegs sind.",
+    "stageResult": "Der Monat schreibt sich selbst.",
     "scheduleTitle": "Wochenplan",
     "dayOff": "frei",
     "presenceTitle": "Anwesenheit",
@@ -79,6 +79,7 @@
   "everything": {
     "eyebrow": "Alles Weitere",
     "heading": "Gebaut für selbstständiges Arbeiten.",
+    "alsoIncluded": "Ebenfalls dabei",
     "items": {
       "dayEntries": { "title": "Tageseinträge", "body": "Stunden oder Stückzahl, Status, Notizen, Tags — ein Dialog pro Tag." },
       "clientRates": { "title": "Kundensätze", "body": "Satzhistorie mit Gültigkeitsdatum; vergangene Stunden behalten den Satz, zu dem sie verdient wurden." },

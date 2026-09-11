@@ -30,6 +30,21 @@
    * i gorzej na ekranie. */
   --lp-ink-3: rgba(255, 255, 255, 0.5);
 
+  /* ── jezyk ruchu ──
+   * Odpowiednik `MOTION_CURVE_GLIDE` z `_landing/motion/tokens.ts` dla
+   * przejsc CSS: startuje szybciej i wytraca predkosc do zera dlugo przed
+   * koncem, czyli zeruje na koncu takze PRZYSPIESZENIE. `ease`
+   * (`cubic-bezier(.25,.1,.25,1)`) trzyma zauwazalna predkosc niemal do
+   * konca, wiec ekran zatrzymuje sie nagle — na pelnej szerokosci ramki
+   * widac to jako stukniecie.
+   *
+   * Dwa czasy i ani jednego wiecej: `scene` to zmiana kadru, `copy` to
+   * zmiana mysli. Mysl ma byc szybsza od kadru, zeby tekst nie zostawal w
+   * tyle za obrazem. */
+  --lp-ease-glide: cubic-bezier(0.32, 0.72, 0, 1);
+  --lp-dur-scene: 260ms;
+  --lp-dur-copy: 130ms;
+
   background: var(--lp-s0);
   color: var(--lp-ink-1);
   min-height: 100svh;
@@ -41,16 +56,26 @@
   overflow-x: clip;
 }
 
-/* ─── Typografia ─── */
+/* ─── Typografia ───
+ *
+ * PIEC stopni na cala strone i ani jednego wiecej: `display` (hero, final),
+ * `section headline`, `sub`, `body` (Tailwind `text-sm`/`text-base`) i
+ * `eyebrow`/`micro`. Kazdy dodatkowy rozmiar to kolejny element walczacy o
+ * uwage w sekcji, ktora ma miec JEDEN komunikat.
+ *
+ * Skala jest wyrazniej rozstrzelona niz wczesniej (124 → 150 px w szczycie
+ * `d1`, 68 → 84 w `d2`): przy poprzednich wartosciach naglowek sekcji i
+ * naglowek sceny roznily sie na duzym ekranie o kilkanascie procent, czyli o
+ * tyle, ze oko czytalo je jako ten sam poziom. */
 .lp .lp-display {
   font-weight: 600;
   letter-spacing: -0.045em;
   line-height: 0.94;
   text-wrap: balance;
 }
-.lp .lp-d1 { font-size: clamp(44px, 8.4vw, 124px); }
-.lp .lp-d2 { font-size: clamp(32px, 5vw, 68px); }
-.lp .lp-d3 { font-size: clamp(24px, 3vw, 40px); }
+.lp .lp-d1 { font-size: clamp(46px, 9vw, 150px); }
+.lp .lp-d2 { font-size: clamp(34px, 5.6vw, 84px); }
+.lp .lp-d3 { font-size: clamp(25px, 3vw, 42px); }
 
 /* Kolosalna liczba w sekwencji „from work to money". Jednolita biel zamiast
  * gradientu do czerni: gradient gubil dolna trzecia cyfry na czarnym tle. */
@@ -233,16 +258,16 @@
   opacity: 0;
   transform: translateY(8px);
   transition:
-    opacity 130ms ease,
-    transform 130ms ease,
-    visibility 0s linear 260ms;
+    opacity var(--lp-dur-copy) ease,
+    transform var(--lp-dur-copy) ease,
+    visibility 0s linear var(--lp-dur-scene);
 }
 .lp .lp-scene-switch[data-active='true'] {
   opacity: 1;
   transform: none;
   transition:
-    opacity 130ms ease 130ms,
-    transform 130ms ease 130ms,
+    opacity var(--lp-dur-copy) ease var(--lp-dur-copy),
+    transform var(--lp-dur-copy) ease var(--lp-dur-copy),
     visibility 0s;
 }
 
@@ -272,14 +297,14 @@
   opacity: 1;
   transform: translateX(-18%);
   transition:
-    transform 260ms cubic-bezier(0.32, 0.72, 0, 1),
-    visibility 0s linear 260ms;
+    transform var(--lp-dur-scene) var(--lp-ease-glide),
+    visibility 0s linear var(--lp-dur-scene);
 }
 .lp .lp-scene-slide[data-back='true'] { transform: translateX(100%); }
 .lp .lp-scene-slide[data-active='true'] {
   transform: none;
   transition:
-    transform 260ms cubic-bezier(0.32, 0.72, 0, 1),
+    transform var(--lp-dur-scene) var(--lp-ease-glide),
     visibility 0s;
 }
 
@@ -313,13 +338,30 @@
  * wiec gdyby od niego zalezala wysokosc toru, desktop przesuwalby cala strone
  * w chwili hydratacji.
  *
+ * ── Dlaczego tory sa KROTSZE niz byly ──
+ *
+ * Poprzednie wysokosci (520 / 420 / 340svh na desktopie) dawaly rytm, w
+ * ktorym scena parkowala na dluzej, niz trwalo dojscie do niej: uzytkownik
+ * przewijal kilka obrotow kolka, zanim historia zrobila nastepny krok, i
+ * zaczynal sprawdzac, czy strona sie nie zaciela. Skrocenie o okolo jedna
+ * czwarta nie zmienia ANI JEDNEJ krzywej — wszystkie okna sa ulamkami toru,
+ * wiec kroci sie zarowno postoj, jak i ruch, a proporcja miedzy nimi zostaje
+ * ta sama. Efekt: scroll → ruch → stabilizacja → nastepna scena.
+ *
+ * `lp-track-automation` jest wyjatkiem od redukcji: sekcja dostala trzy etapy
+ * zamiast jednego kadru, wiec przy tym samym torze pokazuje wiecej.
+ *
  * Jednostka to `svh`, nie `vh`. Na iOS `vh` odnosi sie do viewportu BEZ
  * paska Safari, wiec tor jest wyzszy niz ekran i kazde chowanie/pokazywanie
  * paska zmienia postep sceny w srodku ruchu palca. `svh` jest stale.
  */
-.lp .lp-track-journey { height: 400svh; }
+.lp .lp-track-journey { height: 300svh; }
+.lp .lp-track-numbers { height: 240svh; }
+.lp .lp-track-automation { height: 240svh; }
 @media (min-width: 1024px) {
-  .lp .lp-track-journey { height: 520svh; }
+  .lp .lp-track-journey { height: 380svh; }
+  .lp .lp-track-numbers { height: 300svh; }
+  .lp .lp-track-automation { height: 300svh; }
 }
 
 /* ─── Siatka kalendarza (replika DayCell z aplikacji) ─── */
