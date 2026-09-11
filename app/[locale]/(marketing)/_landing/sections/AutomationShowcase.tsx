@@ -16,7 +16,7 @@ import {
   demoClient,
   type DemoMonth,
 } from '../demo/demo-data'
-import { useTrackProgress } from '../motion/scene'
+import { revealKeyframes, useTrackProgress } from '../motion/scene'
 import { MonthGrid } from '../product/MonthGrid'
 
 /**
@@ -36,8 +36,10 @@ export function AutomationShowcase({ month }: { month: DemoMonth }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const progress = useTrackProgress(trackRef)
   const client = demoClient(DEMO_AUTOMATION_TARGET.clientId)
-  // Podsumowanie miesiaca wchodzi dopiero, gdy siatka jest juz wypelniona.
-  const outcomeOpacity = useTransform(progress, [0.86, 0.95], [0, 1])
+  // Podsumowanie miesiaca wchodzi dopiero, gdy siatka jest juz wypelniona —
+  // i ZOSTAJE do konca toru, stad domkniete klatki (`revealKeyframes`).
+  const outcome = revealKeyframes([0.86, 0.95], 0, 1)
+  const outcomeOpacity = useTransform(progress, outcome.stops, outcome.values)
 
   const reasons = [
     ...new Set(

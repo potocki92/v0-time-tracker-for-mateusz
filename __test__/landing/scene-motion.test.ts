@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { sceneKeyframes } from '@/app/[locale]/(marketing)/_landing/motion/scene'
+import { revealKeyframes, sceneKeyframes } from '@/app/[locale]/(marketing)/_landing/motion/scene'
 
 /**
  * Timeline scen 01-05 (`ProductJourney`) przejechany punkt po punkcie.
@@ -238,6 +238,71 @@ describe('sceny 01-05 — klatki, ktore przegladarka potrafi interpolowac', () =
     for (const layer of LAYERS) {
       for (const value of layer.screen.values) {
         expect(value).toMatch(/^translateX\(-?\d+(\.\d+)?%\)$/)
+      }
+    }
+  })
+})
+
+describe('automat — wypelniony miesiac zostaje wypelniony', () => {
+  /** Okna wpisow w `MonthGrid` przy `fillRange` sekcji automatu. */
+  const windows: [number, number][] = [
+    [0.16, 0.32],
+    [0.45, 0.61],
+    [0.74, 0.9],
+  ]
+
+  it('domyka kazda krzywa wpisu klatkami na 0 i 1', () => {
+    // Bez tego Motion podaje WAAPI `offset: [0.16, 0.32]`, przegladarka
+    // dopisuje klatki neutralne z wartosci wyjsciowej elementu (`opacity: 0`,
+    // `scale(0.86)`) — i kazdy dopisany dzien gasnie przez reszte toru.
+    // Kalendarz wypelnial sie na oczach uzytkownika i zaraz pustoszal.
+    for (const window of windows) {
+      for (const curve of [revealKeyframes(window, 0, 1), revealKeyframes(window, 'a', 'b')]) {
+        expect(curve.stops[0], `okno ${window}`).toBe(0)
+        expect(curve.stops[curve.stops.length - 1], `okno ${window}`).toBe(1)
+      }
+    }
+  })
+
+  it('trzyma wpis na docelowej wartosci az do konca toru', () => {
+    for (const window of windows) {
+      const curve = revealKeyframes(window, 0, 1)
+      for (const at of TRACK.filter((point) => point >= window[1])) {
+        expect(sample(curve.stops, curve.values, at), `okno ${window} @ ${at}`).toBe(1)
+      }
+    }
+  })
+
+  it('nie pokazuje wpisu, zanim automat do niego dojdzie', () => {
+    for (const window of windows) {
+      const curve = revealKeyframes(window, 0, 1)
+      for (const at of TRACK.filter((point) => point <= window[0])) {
+        expect(sample(curve.stops, curve.values, at), `okno ${window} @ ${at}`).toBe(0)
+      }
+    }
+  })
+
+  it('scala klatki, gdy okno dotyka konca toru', () => {
+    // `useTransform` wymaga zakresu SCISLE rosnacego — zdublowany 0 albo 1
+    // wywrocilby interpolacje.
+    for (const window of [[0, 0.5], [0.5, 1], [0, 1]] as [number, number][]) {
+      const curve = revealKeyframes(window, 0, 1)
+      for (let step = 1; step < curve.stops.length; step++) {
+        expect(curve.stops[step], `okno ${window}`).toBeGreaterThan(curve.stops[step - 1])
+      }
+      expect(sample(curve.stops, curve.values, window[0])).toBe(0)
+      expect(sample(curve.stops, curve.values, 1)).toBe(1)
+    }
+  })
+
+  it('nie zostawia w sekcji automatu ani jednego surowego okna', () => {
+    // Regresja wraca jedna linijka: `useTransform(progress, window, [0, 1])`.
+    for (const file of [
+      'app/[locale]/(marketing)/_landing/product/MonthGrid.tsx',
+      'app/[locale]/(marketing)/_landing/sections/AutomationShowcase.tsx',
+    ]) {
+      for (const call of read(file).matchAll(/use(?:Scroll)?Transform\(\s*progress,\s*([^,]+),/g)) {
+        expect(call[1].trim(), `${file}: ${call[0]}`).toMatch(/\.stops$/)
       }
     }
   })
