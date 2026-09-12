@@ -53,6 +53,14 @@ export const MAX_AUTOMATION_USERS = 200
 /** Ile dni pokazuje podglad w ustawieniach. */
 export const PREVIEW_DAYS = 7
 
+/**
+ * Opis schedulera w ustawieniach. Wartosc jest STATYCZNA i wynika z architektury
+ * (job pg_cron `work-automation-minute-tick`, `* * * * *`) — klient celowo nie
+ * czyta stanu `cron.job`, bo to tabela systemowa i nikt nie dostaje do niej
+ * uprawnien tylko po to, zeby wyswietlic jedna linijke tekstu.
+ */
+export const SCHEDULER_LABEL = 'Supabase Cron · co minutę'
+
 export const SKIP_REASON_LABELS: Record<SkipReason, string> = {
   before_start: 'Przed datą uruchomienia automatu',
   home_stay: 'Pobyt w domu',

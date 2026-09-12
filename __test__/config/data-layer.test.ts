@@ -81,13 +81,38 @@ describe('data layer — migrations', () => {
     }
   })
 
-  it('pins search_path and invoker rights on every function it defines', () => {
+  /**
+   * Komentarze w migracjach opisuja te reguly dokladnie tymi slowami, ktore
+   * test wyszukuje („`security definer` byloby tu bledem…"). Skan patrzy
+   * wiec wylacznie na kod.
+   */
+  const stripComments = (sql: string) =>
+    sql.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
+
+  it('pins search_path and explicit rights on every function it defines', () => {
     for (const file of files) {
       if (isLegacy(file)) continue
-      const sql = read(join('supabase/migrations', file))
+      const sql = stripComments(read(join('supabase/migrations', file)))
       if (!/create\s+(or\s+replace\s+)?function/i.test(sql)) continue
+
       expect(sql, `${file}: brak \`set search_path\``).toMatch(/set\s+search_path\s*=/i)
-      expect(sql, `${file}: brak \`security invoker\``).toMatch(/security\s+invoker/i)
+
+      // Tryb uprawnien musi byc JAWNY — milczenie znaczy „nikt nie zdecydowal".
+      expect(sql, `${file}: brak \`security invoker\` / \`security definer\``).toMatch(
+        /security\s+(invoker|definer)/i,
+      )
+
+      // `security definer` jest dopuszczalne tylko tam, gdzie funkcja naprawde
+      // potrzebuje praw wlasciciela (scheduler automatu pracy czyta sekret
+      // z Vault, czego wolajacy nie odszyfruje) — i wtedy MUSI miec odebrane
+      // `execute` dla `public`. Inaczej kazda sesja, takze `anon`, wykonuje ja
+      // z tymi prawami.
+      if (/security\s+definer/i.test(sql)) {
+        expect(
+          sql,
+          `${file}: \`security definer\` bez \`revoke ... on function ... from public\``,
+        ).toMatch(/revoke\s+(all|execute)[^;]*?on\s+function[^;]*?from\s+public/i)
+      }
     }
   })
 

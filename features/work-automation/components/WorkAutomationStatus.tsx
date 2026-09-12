@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import {
   ERROR_REASON_LABELS,
   PRESENCE_LABELS,
+  SCHEDULER_LABEL,
   SKIP_REASON_LABELS,
   type AutomationOverview,
   type ErrorReason,
@@ -64,8 +65,9 @@ export function WorkAutomationStatus({ overview, isResuming, onResume }: Props) 
       </dl>
 
       <p className="text-xs text-muted-foreground">
-        Sprawdzanie odbywa się co godzinę, więc zapis następuje w pierwszym przebiegu po
-        ustawionej godzinie — nigdy przed nią. Opóźnienie do ok. 60 minut jest normalne.
+        Automat zapisuje pracę przy pierwszym sprawdzeniu po wskazanej godzinie — nigdy przed
+        nią. Scheduler sprawdza automat co minutę, więc zwykle mieści się w granicach minuty od
+        ustawionej godziny. Scheduler: {SCHEDULER_LABEL}.
       </p>
 
       {presence?.at === 'home' && (

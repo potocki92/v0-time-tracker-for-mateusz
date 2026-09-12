@@ -1,27 +1,31 @@
 # .github/workflows/work-automation.yml
 #
-# Automatyczne zapisywanie przepracowanych dni.
+# Primary scheduler: Supabase Cron.
+# GitHub workflow is manual fallback only.
 #
-# Harmonogram jest CO GODZINE, nie co minute: zadanie samo wybiera daty, dla
-# ktorych ustawiona godzina zostala osiagnieta lub przekroczona, a decyzji
-# jeszcze nie ma. Realne opoznienie wzgledem ustawionej godziny to wiec do
-# ~60 minut plus opoznienie samego GitHub Actions (harmonogramy w godzinach
-# szczytu potrafia spoznic sie o kilkanascie minut). Interfejs mowi o tym
-# wprost — nie obiecujemy dokladnosci co do minuty.
+# Harmonogram automatu pracy zyje w bazie: job pg_cron
+# `work-automation-minute-tick` (migracja
+# supabase/migrations/20260912140000_work_automation_supabase_cron.sql) wola ten
+# sam endpoint CO MINUTE. GitHub Actions nie gwarantowal godziny uruchomienia
+# („0 * * * *" potrafilo wystartowac kilkanascie minut pozniej), wiec swiadomie
+# NIE MA tu juz klucza `schedule:` — dwa schedulery biegnace rownolegle tylko
+# mnozylyby zapytania.
+#
+# Ten workflow zostaje wylacznie jako RECZNE narzedzie diagnostyczne dla
+# administratora: „czy endpoint i sekrety w ogole odpowiadaja?". Uruchomienie
+# recznie jest bezpieczne nawet w tej samej sekundzie, co tick z bazy — o braku
+# duplikatow decyduja klucze w bazie (`work_automation_runs` PK na
+# (user_id, local_date) i UNIQUE na work_entries (user_id, date, entry_kind)),
+# nie odstep miedzy przebiegami.
 #
 # Sekrety repozytorium:
 #   APP_URL     — adres wdrozenia, np. https://time-tracker-mateusz.vercel.app
 #   CRON_SECRET — ten sam sekret, co w zmiennych srodowiskowych aplikacji
 
-name: Work Automation
+name: Work Automation (manual fallback)
 
 on:
-  schedule:
-    # O pelnej godzinie, przez cala dobe — strefa uzytkownika (IANA) jest
-    # rozstrzygana w aplikacji, wiec cron nie musi znac przesuniec ani DST.
-    - cron: '0 * * * *'
-  # Reczne uruchomienie z GitHub UI. Powtorka nie zdubluje wpisow — decyduje
-  # dziennik `work_automation_runs` i UNIQUE (user_id, date, entry_kind).
+  # Bez `schedule:` — patrz komentarz wyzej. Harmonogram jest w Supabase Cron.
   workflow_dispatch:
 
 jobs:
