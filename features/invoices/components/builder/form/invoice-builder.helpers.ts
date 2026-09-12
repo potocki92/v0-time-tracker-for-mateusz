@@ -119,6 +119,10 @@ export function createDefaultInvoiceBuilderValues(
     issue_date: today,
     sale_date: today,
     due_date: due,
+    // Nowa faktura nie zna jeszcze okresu wykonania — wypelnia go uzytkownik
+    // albo „Wczytaj z tygodni". Data wystawienia nie jest jego namiastka.
+    period_start: '',
+    period_end: '',
     currency,
     exchange_rate: undefined,
     exchange_rate_date: undefined,

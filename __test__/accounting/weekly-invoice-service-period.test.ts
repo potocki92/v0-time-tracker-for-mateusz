@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { buildStatementModel } from '@/features/accounting/domain'
-import { builderValuesToFormValues } from '@/features/invoices/components/builder/form/invoice-builder.adapters'
+import {
+  builderValuesToFormValues,
+  invoiceToBuilderValues,
+} from '@/features/invoices/components/builder/form/invoice-builder.adapters'
 import type {
   AccountingDataset,
   StatementInvoiceRow,
 } from '@/features/accounting/domain'
+import { invoiceBuilderSchema } from '@/lib/schemas/invoice-builder.schema'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
 import type { InvoiceSettings } from '@/features/invoices/domain'
+import type { Invoice } from '@/lib/types'
 
 /**
  * Regresja: faktura tygodniowa gubila okres uslugi.
@@ -22,6 +27,12 @@ import type { InvoiceSettings } from '@/features/invoices/domain'
  *
  * Test domyka petle w obie strony: z okresem miejsce pracy sie pojawia, bez
  * okresu odtwarza sie zgloszony blad.
+ *
+ * Druga odslona tego samego bledu: kreator faktur — glowna sciezka wystawiania
+ * — w ogole NIE MIAL pola okresu uslugi, wiec kazda faktura z niego ladowala
+ * z pustymi kolumnami. Backfill nie mial czego odzyskac, bo etykieta niosla
+ * tylko kwartal ("Q2 2026") policzony z daty wystawienia. Dlatego ten plik
+ * pilnuje takze kreatora: pola, walidacji zakresu i round-tripu przy edycji.
  */
 
 const TODAY = '2026-09-12'
@@ -118,24 +129,108 @@ describe('wykaz — faktura tygodniowa niesie okres uslugi', () => {
   })
 })
 
-describe('kreator faktur — nie zgaduje okresu uslugi', () => {
+describe('kreator faktur — niesie okres uslugi we wlasnym polu', () => {
   const settings = { defaultTemplate: 'classic' } as InvoiceSettings
 
-  const builderValues = {
-    invoice_number: 'FR 7/09/2026',
-    issue_date: '2026-09-12',
-    currency: 'PLN',
-    buyer: { name: 'SPAW-MONT Czernicki Łukasz' },
-    items: [],
-    notes: '',
-  } as unknown as InvoiceBuilderValues
+  const builderValues = (
+    over: Partial<InvoiceBuilderValues> = {},
+  ): InvoiceBuilderValues =>
+    ({
+      invoice_number: 'FR 7/09/2026',
+      issue_date: '2026-09-12',
+      period_start: '',
+      period_end: '',
+      currency: 'PLN',
+      buyer: { name: 'SPAW-MONT Czernicki Łukasz' },
+      items: [],
+      notes: '',
+      ...over,
+    }) as unknown as InvoiceBuilderValues
 
-  it('zostawia `null`, bo data wystawienia nie jest okresem wykonania', () => {
-    const values = builderValuesToFormValues(builderValues, { settings })
+  it('przepisuje wypelniony okres do kolumn zapisu', () => {
+    const values = builderValuesToFormValues(
+      builderValues({ period_start: '2026-08-24', period_end: '2026-08-30' }),
+      { settings },
+    )
+
+    expect(values.period_start).toBe('2026-08-24')
+    expect(values.period_end).toBe('2026-08-30')
+    // Etykieta kwartalu to nadal tylko opis na dokumencie.
+    expect(values.billing_period).toBe('Q3 2026')
+  })
+
+  it('pusty okres zostaje `null` — data wystawienia nim nie jest', () => {
+    const values = builderValuesToFormValues(builderValues(), { settings })
 
     expect(values.period_start).toBeNull()
     expect(values.period_end).toBeNull()
-    // Etykieta kwartalu to nadal tylko opis na dokumencie.
-    expect(values.billing_period).toBe('Q3 2026')
+  })
+
+  it('edycja faktury nie gubi okresu zapisanego w kolumnach', () => {
+    const hydrated = invoiceToBuilderValues({
+      id: 'fr-6-08-2026',
+      invoice_number: 'FR 6/08/2026',
+      invoice_date: '2026-08-28',
+      period_start: '2026-08-24',
+      period_end: '2026-08-30',
+      currency: 'EUR',
+      amount: 4800,
+      net_amount: 4800,
+      is_paid: true,
+      billing_period: 'TYGODNIE 2026-08-24 - 2026-08-30',
+      file_url: null,
+      notes: null,
+      created_at: '2026-08-28T00:00:00.000Z',
+    } as unknown as Invoice)
+
+    expect(hydrated.period_start).toBe('2026-08-24')
+    expect(hydrated.period_end).toBe('2026-08-30')
+
+    const values = builderValuesToFormValues(hydrated, { settings })
+    expect(values.period_start).toBe('2026-08-24')
+    expect(values.period_end).toBe('2026-08-30')
+  })
+})
+
+describe('kreator faktur — walidacja okresu uslugi', () => {
+  const parse = (over: Record<string, unknown>) =>
+    invoiceBuilderSchema.safeParse({
+      invoice_number: 'FR 7/09/2026',
+      issue_date: '2026-09-12',
+      sale_date: '2026-09-12',
+      due_date: '2026-09-26',
+      currency: 'PLN',
+      buyer: { name: 'SPAW-MONT Czernicki Łukasz', country_code: 'PL' },
+      items: [
+        {
+          id: 'li-1',
+          description: 'Praca',
+          unit: 'h',
+          quantity: 1,
+          unit_price_net: 100,
+          vat_mode: 'standard',
+          vat_rate: 23,
+        },
+      ],
+      payment: { method: 'bank_transfer' },
+      notes: '',
+      ...over,
+    })
+
+  it('przepuszcza komplet granic', () => {
+    expect(parse({ period_start: '2026-08-24', period_end: '2026-08-30' }).success).toBe(true)
+  })
+
+  it('przepuszcza brak okresu — nie kazda faktura jest za okres', () => {
+    expect(parse({}).success).toBe(true)
+  })
+
+  it('odrzuca jedna granice — zakres bez konca nic nie znaczy', () => {
+    expect(parse({ period_start: '2026-08-24' }).success).toBe(false)
+    expect(parse({ period_end: '2026-08-30' }).success).toBe(false)
+  })
+
+  it('odrzuca odwrocona kolejnosc', () => {
+    expect(parse({ period_start: '2026-08-30', period_end: '2026-08-24' }).success).toBe(false)
   })
 })

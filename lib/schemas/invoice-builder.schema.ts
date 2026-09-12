@@ -32,6 +32,12 @@ const isoDate = z
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'Niepoprawna data (YYYY-MM-DD)')
 
 /**
+ * Data, ktorej moze nie byc. Pusty string, a nie `null`, bo tyle wlasnie
+ * oddaje pusty `<input>` — zamiana na `null` nalezy do adaptera zapisu.
+ */
+const optionalIsoDate = isoDate.or(z.literal('')).default('')
+
+/**
  * VAT IDs vary dramatically across jurisdictions. We enforce a coarse shape
  * here (letters/digits/space/dash/slash/dot only, 4-30 chars) and leave country-specific
  * checksum validation to a future library (`vat-number-validator`, etc).
@@ -112,6 +118,18 @@ export const invoiceBuilderSchema = z
     /** Payment due date. */
     due_date: isoDate,
 
+    /**
+     * Okres uslugi (Leistungszeitraum) — granice FAKTYCZNEGO wykonania pracy,
+     * osobne od dat dokumentu. Trafiaja do kolumn `invoices.period_start` /
+     * `period_end`, z ktorych „Wykaz dla ksiegowej" odczytuje okres, miejsce
+     * pracy i godziny. Bez nich wykaz nie ma czym dopasowac wpisow pracy.
+     *
+     * Puste, gdy okresu naprawde nie da sie wskazac — data wystawienia nim
+     * NIE jest, wiec luke lepiej pokazac niz zasypac.
+     */
+    period_start: optionalIsoDate,
+    period_end:   optionalIsoDate,
+
     currency: z.enum(INVOICE_BUILDER_CURRENCIES),
     /**
      * FX rate to the accounting currency (PLN). Optional; when omitted and
@@ -145,6 +163,22 @@ export const invoiceBuilderSchema = z
         code: z.ZodIssueCode.custom,
         path: ['sale_date'],
         message: 'Data sprzedaży nie może być późniejsza niż termin płatności',
+      })
+    }
+    // Okres to zakres, nie pojedyncza data: jedna granica bez drugiej nie
+    // niesie zadnej informacji, a `servicePeriodOf` i tak ja odrzuci.
+    if (Boolean(data.period_start) !== Boolean(data.period_end)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [data.period_start ? 'period_end' : 'period_start'],
+        message: 'Podaj obie granice okresu usługi albo zostaw oba pola puste',
+      })
+    }
+    if (data.period_start && data.period_end && data.period_end < data.period_start) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['period_end'],
+        message: 'Koniec okresu usługi nie może być wcześniejszy niż początek',
       })
     }
     if (data.currency !== 'PLN' && data.exchange_rate !== undefined && data.exchange_rate <= 0) {

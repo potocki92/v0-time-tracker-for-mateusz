@@ -134,6 +134,27 @@ export function InvoiceBuilderFields({
           />
         </div>
 
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormInput<InvoiceBuilderValues>
+            name="period_start"
+            type="text"
+            label="Okres usługi — od"
+            placeholder="YYYY-MM-DD"
+          />
+          <FormInput<InvoiceBuilderValues>
+            name="period_end"
+            type="text"
+            label="Okres usługi — do"
+            placeholder="YYYY-MM-DD"
+          />
+        </div>
+
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          Okres usługi to daty faktycznego wykonania pracy — nie data wystawienia.
+          Bez nich „Wykaz dla księgowej” nie pokaże ani miejsca pracy, ani godzin.
+          Przycisk <strong>„Wczytaj z tygodni”</strong> w pozycjach wypełnia je sam.
+        </p>
+
         <p className="text-xs leading-relaxed text-muted-foreground">
           Wskazówka: pola dat akceptują format <code className="rounded bg-muted px-1 py-0.5 font-mono text-2xs">YYYY-MM-DD</code>.
           Mobilne klawiatury otwierają natywny picker, gdy
