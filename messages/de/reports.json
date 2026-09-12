@@ -190,7 +190,8 @@
     "worksiteDays": "Arbeitstage",
     "worksiteTotal": "Gesamt",
     "worksiteNoLocation": "Keine Projektadresse",
-    "worksiteNote": "Erfasst nur eingetragene Arbeitstage im gewählten Zeitraum. Die Zeile „Gesamt” zählt verschiedene Tage — derselbe Tag in zwei Projekten zählt einmal."
+    "worksiteNote": "Erfasst nur eingetragene Arbeitstage im gewählten Zeitraum. Die Zeile „Gesamt” zählt verschiedene Tage — derselbe Tag in zwei Projekten zählt einmal.",
+    "invoiceStatement": "Rechnungsaufstellung für die Buchhaltung →"
   },
   "states": {
     "noEntriesTitle": "Noch nichts zu berichten",

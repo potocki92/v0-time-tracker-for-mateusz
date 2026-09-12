@@ -18,7 +18,8 @@
     "automations": "Automations"
   },
   "nested": {
-    "invoices/analytics": "Analytics"
+    "invoices/analytics": "Analytics",
+    "reports/accounting": "Accountant statement"
   },
   "badges": {
     "beta": "Beta",

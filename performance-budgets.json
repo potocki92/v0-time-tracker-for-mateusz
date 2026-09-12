@@ -5,6 +5,7 @@
   "/[locale]/(app)/invoices/analytics/page": 335,
   "/[locale]/(app)/invoices/page": 356,
   "/[locale]/(app)/projects/page": 265,
+  "/[locale]/(app)/reports/accounting/page": 275,
   "/[locale]/(app)/reports/page": 270,
   "/[locale]/(marketing)/page": 187,
   "/_not-found/page": 125,

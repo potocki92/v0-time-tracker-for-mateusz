@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Download, FileJson, FileSpreadsheet, FileText, MapPin } from 'lucide-react'
+import { ArrowUpRight, Download, FileJson, FileSpreadsheet, FileText, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { LINEAR } from '@/components/ui/tokens'
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -77,6 +78,16 @@ export function ReportsExportMenu({
         <DropdownMenuItem onSelect={onExportWorksiteCsv} className="gap-2">
           <FileSpreadsheet aria-hidden className="size-4 text-zinc-300" />
           {t('export.worksiteCsv')}
+        </DropdownMenuItem>
+
+        {/* Wykaz faktur mieszka w osobnym module (`features/accounting`) —
+            raport nie analizuje faktur. Stad odnosnik, a nie kolejny eksport:
+            to jedyna zaleznosc miedzy tymi ekranami i jest nia adres URL. */}
+        <DropdownMenuItem asChild className="gap-2">
+          <Link href="/reports/accounting">
+            <ArrowUpRight aria-hidden className="size-4 text-zinc-300" />
+            {t('export.invoiceStatement')}
+          </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

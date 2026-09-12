@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "title": "Accountant statement",
+    "description": "Invoices with service period, buyer and place of work."
+  },
+  "header": {
+    "eyebrow": "Filing",
+    "title": "Accountant statement",
+    "backToReports": "Back to reports"
+  },
+  "period": {
+    "label": "Filing period",
+    "from": "From",
+    "to": "To",
+    "thisYear": "This year",
+    "lastYear": "Last year",
+    "thisQuarter": "This quarter",
+    "lastQuarter": "Last quarter",
+    "custom": "Custom range"
+  },
+  "filters": {
+    "sectionLabel": "Statement filters",
+    "client": "Client",
+    "allClients": "All clients",
+    "documentLocale": "Document language",
+    "documentLocaleHint": "Language of the PDF and CSV file. It does not change the app language.",
+    "reset": "Reset",
+    "refreshing": "Refreshing the statement"
+  },
+  "summary": {
+    "sectionLabel": "Period summary",
+    "title": "Summary",
+    "invoiceCount": "{count, plural, one {# invoice} other {# invoices}}",
+    "net": "Net",
+    "vat": "VAT",
+    "gross": "Gross",
+    "paid": "Paid",
+    "unpaid": "Outstanding",
+    "currenciesNote": "Currencies are totalled separately — no exchange rate is applied."
+  },
+  "quarters": {
+    "title": "Quarterly view",
+    "sectionLabel": "Quarterly totals",
+    "label": "{year} · Q{quarter}",
+    "empty": "No invoices issued within this range"
+  },
+  "table": {
+    "title": "Invoice register",
+    "sectionLabel": "Detailed invoice register",
+    "invoiceNumber": "Number",
+    "issueDate": "Issued",
+    "period": "Service period",
+    "buyer": "Buyer",
+    "location": "Place of work",
+    "hours": "Hours",
+    "net": "Net",
+    "vat": "VAT",
+    "gross": "Gross",
+    "workedDays": "{count, plural, one {# working day} other {# working days}}",
+    "noPeriod": "No service period on the invoice",
+    "noLocation": "No work recorded in this period",
+    "noAddress": "No project address",
+    "noValue": "—",
+    "rowCount": "{count, plural, one {# invoice} other {# invoices}}",
+    "pageStatus": "Page {page} of {pages}",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "empty": "No invoices in the selected range"
+  },
+  "warnings": {
+    "title": "To complete before sending",
+    "missingPeriod": "{count, plural, one {# invoice has no service period recorded} other {# invoices have no service period recorded}}",
+    "missingLocation": "{count, plural, one {# invoice has no recorded work, so it has no place of work} other {# invoices have no recorded work, so they have no place of work}}",
+    "drafts": "{count, plural, one {# draft skipped — the statement covers numbered invoices only} other {# drafts skipped — the statement covers numbered invoices only}}"
+  },
+  "export": {
+    "trigger": "Export",
+    "menuLabel": "Download statement",
+    "pdf": "Statement (PDF)",
+    "csv": "Statement (CSV)",
+    "generating": "Generating PDF…",
+    "successPdf": "PDF statement ready",
+    "successCsv": "CSV statement ready",
+    "errorPdf": "Could not generate the PDF",
+    "errorCsv": "Could not generate the CSV"
+  },
+  "states": {
+    "noInvoicesTitle": "No invoices in this period",
+    "noInvoicesDescription": "Pick another range or issue your first invoice — the statement is built from invoices, not from work entries.",
+    "errorTitle": "Could not load the statement",
+    "errorDescription": "Try again. If the error persists, reload the page.",
+    "retry": "Try again"
+  },
+  "document": {
+    "title": "Sales invoice register",
+    "subtitle": "Service period, buyer and place of work",
+    "range": "Period",
+    "generatedAt": "Generated",
+    "client": "Client",
+    "allClients": "All clients",
+    "sections": {
+      "register": "Invoice register",
+      "locations": "Places of work",
+      "totals": "Summary",
+      "quarters": "Quarterly view"
+    },
+    "columns": {
+      "invoiceNumber": "Invoice number",
+      "issueDate": "Issue date",
+      "servicePeriod": "Service period",
+      "from": "From",
+      "to": "To",
+      "buyer": "Buyer",
+      "buyerAddress": "Buyer address",
+      "taxId": "VAT ID",
+      "description": "Service description",
+      "location": "Place of work",
+      "project": "Project",
+      "workedDays": "Working days",
+      "hours": "Hours",
+      "net": "Net",
+      "vat": "VAT",
+      "gross": "Gross",
+      "currency": "Currency",
+      "status": "Status",
+      "paidDate": "Paid on",
+      "invoiceCount": "Invoice count",
+      "quarter": "Quarter"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "SENT": "Issued",
+      "PAID": "Paid",
+      "OVERDUE": "Overdue",
+      "CANCELLED": "Cancelled"
+    },
+    "placeholders": {
+      "noPeriod": "No service period on the invoice",
+      "noLocation": "No project address",
+      "noProject": "No project",
+      "noValue": "—"
+    },
+    "totals": {
+      "row": "Total",
+      "paid": "Paid",
+      "unpaid": "Outstanding"
+    },
+    "notes": {
+      "method": "The statement covers invoices issued within the given period. Amounts come from the invoices; net and VAT add up to the gross amount even for documents without a separate tax breakdown.",
+      "locations": "The place of work comes from the project address and the work recorded for this buyer within the invoice service period. Working days on an invoice row count distinct days — the same day across two projects counts once.",
+      "currencies": "Each currency is totalled separately. Amounts are not converted.",
+      "missingPeriod": "Invoices without a recorded service period",
+      "missingLocation": "Invoices without recorded work in the service period",
+      "drafts": "Skipped drafts without a number"
+    },
+    "fileName": "invoice-statement"
+  }
+}
