@@ -76,6 +76,8 @@ const INITIAL_VALUES: InvoiceFormValues = {
   billing_period: '',
   billing_quarter: 'Q1',
   billing_year: CURRENT_YEAR,
+  period_start: null,
+  period_end: null,
   invoice_date: new Date().toISOString().slice(0, 10),
   amount: 0,
   currency: 'PLN',

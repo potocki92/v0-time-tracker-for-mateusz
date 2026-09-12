@@ -302,10 +302,12 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
   let previousFileUrl: string | null = null
   let previousStatus: InvoiceLifecycleStatus | null = null
   let previousInvoiceNumber: string | null = null
+  let previousPeriodStart: string | null = null
+  let previousPeriodEnd: string | null = null
   if (invoiceId) {
     const { data: existing, error: fetchError } = await supabase
       .from('invoices')
-      .select('file_url, status, invoice_number')
+      .select('file_url, status, invoice_number, period_start, period_end')
       .eq('id', invoiceId)
       .eq('user_id', userId)
       .maybeSingle()
@@ -314,6 +316,8 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     previousFileUrl = existing.file_url ?? null
     previousStatus = (existing.status as InvoiceLifecycleStatus | null) ?? null
     previousInvoiceNumber = existing.invoice_number ?? null
+    previousPeriodStart = (existing.period_start as string | null) ?? null
+    previousPeriodEnd = (existing.period_end as string | null) ?? null
   }
 
   const buyerPatch = buyerToClientPatch(values.buyer)
@@ -386,6 +390,16 @@ export async function saveInvoiceAction({ invoiceId, values }: SaveInvoiceInput)
     invoice_number: resolvedInvoiceNumber,
     recipient: (values.recipient || values.new_client_name || '').trim() || null,
     billing_period: values.billing_period.trim() || `${values.billing_quarter} ${values.billing_year}`,
+    // Okres uslugi trafia do WLASNYCH kolumn, a nie tylko w tekst
+    // `billing_period`. Wykaz dla ksiegowej czyta wylacznie te kolumny — bez
+    // nich nie zna ani miejsca pracy, ani godzin (patrz `features/accounting`).
+    //
+    // `null` z formularza znaczy „nie wiem", a nie „wyczysc": builder nie ma
+    // jeszcze pola okresu, wiec zapis z niego nie moze skasowac granic, ktore
+    // ustawila faktura tygodniowa albo autofakturowanie. Tak samo zachowuje
+    // sie tu `status` i `invoice_number`.
+    period_start: values.period_start ?? previousPeriodStart,
+    period_end: values.period_end ?? previousPeriodEnd,
     issue_date: values.invoice_date,
     invoice_date: values.invoice_date,
     amount: values.amount,
