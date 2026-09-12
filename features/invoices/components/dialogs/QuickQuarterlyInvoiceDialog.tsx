@@ -122,6 +122,10 @@ export function QuickQuarterlyInvoiceDialog({
       billing_period:  `${selectedQuarter.quarter} ${selectedQuarter.year}`,
       billing_quarter: selectedQuarter.quarter,
       billing_year:    selectedQuarter.year,
+      // Patrz QuickWeeklyInvoiceDialog — etykieta kwartalu nie wystarczy,
+      // wykaz dla ksiegowej czyta `period_start`/`period_end`.
+      period_start:    selectedQuarter.start,
+      period_end:      selectedQuarter.end,
       invoice_date:    todayIso,
       amount:          grossTotal,
       currency:        (selectedClient.currency ?? selectedQuarter.currency ?? 'PLN') as InvoiceFormValues['currency'],

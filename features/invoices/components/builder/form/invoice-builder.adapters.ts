@@ -182,6 +182,12 @@ export function builderValuesToFormValues(
     billing_period:  `${billingQuarter} ${billingYear}`,
     billing_quarter: billingQuarter,
     billing_year:    billingYear,
+    // Builder nie ma jeszcze pola okresu uslugi, a data wystawienia nim NIE
+    // jest — podstawienie jej wygladaloby jak dane, a byloby zgadywaniem.
+    // `null` znaczy „nie ruszaj": przy edycji `saveInvoiceAction` zachowa
+    // okres zapisany wczesniej (np. przez fakture tygodniowa).
+    period_start:    null,
+    period_end:      null,
     invoice_date:    values.issue_date,
     amount:          Math.round(grossTotal * 100) / 100,
     currency:        clampToLegacyCurrency(values.currency),

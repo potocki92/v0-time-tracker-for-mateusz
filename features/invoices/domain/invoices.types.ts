@@ -69,6 +69,19 @@ export interface InvoiceFormValues {
   billing_period: string
   billing_quarter: BillingQuarter
   billing_year: number
+  /**
+   * Okres uslugi (Leistungszeitraum) — granice FAKTYCZNEGO wykonania.
+   *
+   * Oddzielny od `billing_period`, ktory jest wolnym tekstem na dokumencie
+   * ("TYGODNIE 2026-08-24 - 2026-08-30", "Q3 2026"). Wykaz dla ksiegowej
+   * czyta WYLACZNIE te dwie kolumny — bez nich nie potrafi wskazac ani
+   * miejsca pracy, ani godzin (patrz `features/accounting/domain/dataset.ts`).
+   *
+   * `null` tylko wtedy, gdy okresu naprawde nie da sie ustalic — pole jest
+   * wymagane, zeby kazda sciezka tworzenia faktury musiala sie o nim wypowiedziec.
+   */
+  period_start: string | null
+  period_end: string | null
   invoice_date: string
   amount: number
   currency: CURRENCY

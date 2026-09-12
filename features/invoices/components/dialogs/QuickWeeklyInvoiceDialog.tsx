@@ -171,6 +171,11 @@ export function QuickWeeklyInvoiceDialog({
       billing_period:  `TYGODNIE ${periodStart} - ${periodEnd}`,
       billing_quarter: billingQuarter,
       billing_year:    billingYear,
+      // Te same granice ida do KOLUMN, nie tylko w tekst `billing_period` —
+      // inaczej wykaz dla ksiegowej nie zna okresu uslugi, wiec nie potrafi
+      // dopasowac wpisow pracy ani pokazac miejsca wykonania.
+      period_start:    periodStart,
+      period_end:      periodEnd,
       invoice_date:    issueDate,
       amount:          grossTotal,
       currency:        (selectedClient.currency ?? 'PLN') as InvoiceFormValues['currency'],
