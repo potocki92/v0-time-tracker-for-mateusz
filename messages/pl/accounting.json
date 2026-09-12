@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "title": "Wykaz dla księgowej",
+    "description": "Faktury z okresem usługi, nabywcą i miejscem wykonania pracy."
+  },
+  "header": {
+    "eyebrow": "Rozliczenie",
+    "title": "Wykaz dla księgowej",
+    "backToReports": "Wróć do raportów"
+  },
+  "period": {
+    "label": "Okres rozliczenia",
+    "from": "Od",
+    "to": "Do",
+    "thisYear": "Bieżący rok",
+    "lastYear": "Poprzedni rok",
+    "thisQuarter": "Bieżący kwartał",
+    "lastQuarter": "Poprzedni kwartał",
+    "custom": "Własny zakres"
+  },
+  "filters": {
+    "sectionLabel": "Filtry wykazu",
+    "client": "Klient",
+    "allClients": "Wszyscy klienci",
+    "documentLocale": "Język dokumentu",
+    "documentLocaleHint": "Język pliku PDF i CSV. Nie zmienia języka aplikacji.",
+    "reset": "Resetuj",
+    "refreshing": "Odświeżam wykaz"
+  },
+  "summary": {
+    "sectionLabel": "Podsumowanie okresu",
+    "title": "Podsumowanie",
+    "invoiceCount": "{count, plural, one {# faktura} few {# faktury} many {# faktur} other {# faktury}}",
+    "net": "Netto",
+    "vat": "VAT",
+    "gross": "Brutto",
+    "paid": "Zapłacone",
+    "unpaid": "Niezapłacone",
+    "currenciesNote": "Waluty sumują się osobno — kurs nie jest tu stosowany."
+  },
+  "quarters": {
+    "title": "Ujęcie kwartalne",
+    "sectionLabel": "Sumy kwartalne",
+    "label": "{year} · Q{quarter}",
+    "empty": "Brak faktur z datą wystawienia w tym zakresie"
+  },
+  "table": {
+    "title": "Rejestr faktur",
+    "sectionLabel": "Szczegółowy rejestr faktur",
+    "invoiceNumber": "Numer",
+    "issueDate": "Wystawiono",
+    "period": "Okres usługi",
+    "buyer": "Nabywca",
+    "location": "Miejsce pracy",
+    "hours": "Godziny",
+    "net": "Netto",
+    "vat": "VAT",
+    "gross": "Brutto",
+    "workedDays": "{count, plural, one {# dzień pracy} few {# dni pracy} many {# dni pracy} other {# dnia pracy}}",
+    "noPeriod": "Brak okresu na fakturze",
+    "noLocation": "Brak zarejestrowanej pracy w tym okresie",
+    "noAddress": "Brak adresu projektu",
+    "noValue": "—",
+    "rowCount": "{count, plural, one {# faktura} few {# faktury} many {# faktur} other {# faktury}}",
+    "pageStatus": "Strona {page} z {pages}",
+    "previousPage": "Poprzednia strona",
+    "nextPage": "Następna strona",
+    "empty": "Brak faktur w wybranym zakresie"
+  },
+  "warnings": {
+    "title": "Do uzupełnienia przed wysłaniem",
+    "missingPeriod": "{count, plural, one {# faktura nie ma zapisanego okresu usługi} few {# faktury nie mają zapisanego okresu usługi} many {# faktur nie ma zapisanego okresu usługi} other {# faktury nie ma zapisanego okresu usługi}}",
+    "missingLocation": "{count, plural, one {# faktura nie ma zarejestrowanej pracy, więc nie zna miejsca wykonania} few {# faktury nie mają zarejestrowanej pracy, więc nie znają miejsca wykonania} many {# faktur nie ma zarejestrowanej pracy, więc nie zna miejsca wykonania} other {# faktury nie ma zarejestrowanej pracy, więc nie zna miejsca wykonania}}",
+    "drafts": "{count, plural, one {# szkic pominięto — wykaz obejmuje tylko faktury z numerem} few {# szkice pominięto — wykaz obejmuje tylko faktury z numerem} many {# szkiców pominięto — wykaz obejmuje tylko faktury z numerem} other {# szkicu pominięto — wykaz obejmuje tylko faktury z numerem}}"
+  },
+  "export": {
+    "trigger": "Eksport",
+    "menuLabel": "Pobierz wykaz",
+    "pdf": "Wykaz (PDF)",
+    "csv": "Wykaz (CSV)",
+    "generating": "Generuję PDF…",
+    "successPdf": "Wykaz PDF gotowy",
+    "successCsv": "Wykaz CSV gotowy",
+    "errorPdf": "Nie udało się wygenerować PDF",
+    "errorCsv": "Nie udało się wygenerować CSV"
+  },
+  "states": {
+    "noInvoicesTitle": "Brak faktur w tym okresie",
+    "noInvoicesDescription": "Wybierz inny zakres albo wystaw pierwszą fakturę — wykaz powstaje z faktur, nie z wpisów pracy.",
+    "errorTitle": "Nie udało się wczytać wykazu",
+    "errorDescription": "Spróbuj ponownie. Jeśli błąd wraca, odśwież stronę.",
+    "retry": "Spróbuj ponownie"
+  },
+  "document": {
+    "title": "Wykaz faktur sprzedaży",
+    "subtitle": "Okres usługi, nabywca i miejsce wykonania pracy",
+    "range": "Okres",
+    "generatedAt": "Wygenerowano",
+    "client": "Klient",
+    "allClients": "Wszyscy klienci",
+    "sections": {
+      "register": "Rejestr faktur",
+      "locations": "Miejsca wykonania pracy",
+      "totals": "Podsumowanie",
+      "quarters": "Ujęcie kwartalne"
+    },
+    "columns": {
+      "invoiceNumber": "Numer faktury",
+      "issueDate": "Data wystawienia",
+      "servicePeriod": "Okres usługi",
+      "from": "Od",
+      "to": "Do",
+      "buyer": "Nabywca",
+      "buyerAddress": "Adres nabywcy",
+      "taxId": "NIP / USt-IdNr.",
+      "description": "Opis usługi",
+      "location": "Miejsce wykonania",
+      "project": "Projekt",
+      "workedDays": "Dni pracy",
+      "hours": "Godziny",
+      "net": "Netto",
+      "vat": "VAT",
+      "gross": "Brutto",
+      "currency": "Waluta",
+      "status": "Status",
+      "paidDate": "Data zapłaty",
+      "invoiceCount": "Liczba faktur",
+      "quarter": "Kwartał"
+    },
+    "status": {
+      "DRAFT": "Szkic",
+      "SENT": "Wystawiona",
+      "PAID": "Opłacona",
+      "OVERDUE": "Zaległa",
+      "CANCELLED": "Anulowana"
+    },
+    "placeholders": {
+      "noPeriod": "Brak okresu na fakturze",
+      "noLocation": "Brak adresu projektu",
+      "noProject": "Bez projektu",
+      "noValue": "—"
+    },
+    "totals": {
+      "row": "Razem",
+      "paid": "Zapłacone",
+      "unpaid": "Niezapłacone"
+    },
+    "notes": {
+      "method": "Zestawienie obejmuje faktury o dacie wystawienia w podanym okresie. Kwoty pochodzą z faktur; netto i VAT sumują się do brutty także dla dokumentów bez osobnego rozbicia podatku.",
+      "locations": "Miejsce wykonania pochodzi z adresu projektu i zarejestrowanych dni pracy u tego nabywcy w okresie usługi z faktury. Dni pracy w wierszu faktury to liczba różnych dni — ten sam dzień w dwóch projektach liczy się raz.",
+      "currencies": "Każda waluta sumuje się osobno. Kwoty nie są przeliczane kursem.",
+      "missingPeriod": "Faktury bez zapisanego okresu usługi",
+      "missingLocation": "Faktury bez zarejestrowanej pracy w okresie usługi",
+      "drafts": "Pominięte szkice bez numeru"
+    },
+    "fileName": "wykaz-faktur"
+  }
+}

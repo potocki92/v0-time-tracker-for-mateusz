@@ -146,3 +146,19 @@ export function fromDb(value: number | string | null | undefined, currency: CURR
 export function toDb(m: Money): number {
   return toMajor(m)
 }
+
+/**
+ * Machine-readable amount: "1234.56" — dot decimal, no thousands separator,
+ * no currency symbol.
+ *
+ * This is NOT presentation: `lib/format` owns every amount a human reads.
+ * This one is for files another program parses (CSV imports for accounting
+ * software), where a locale-aware "1 234,56 zl" would be read as text.
+ * Built from the bigint minor unit, so it never goes through a float.
+ */
+export function toDecimalString(m: Money): string {
+  const negative = m.amountMinor < ZERO
+  const absolute = negative ? -m.amountMinor : m.amountMinor
+  const fraction = absolute % MINOR_UNIT_FACTOR
+  return `${negative ? '-' : ''}${absolute / MINOR_UNIT_FACTOR}.${String(fraction).padStart(2, '0')}`
+}

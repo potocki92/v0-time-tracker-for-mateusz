@@ -53,6 +53,11 @@ export const QUERY_CONFIG = {
   reports: {
     ...QUERY_PROFILES.cold,
   },
+  // Wykaz dla ksiegowej jest dokumentem za ZAMKNIETY okres — dane sprzed roku
+  // nie zmienia sie w trakcie sesji, a kazda zmiana zakresu to nowy klucz.
+  accounting: {
+    ...QUERY_PROFILES.cold,
+  },
   invoices: {
     ...QUERY_PROFILES.hot,
   },

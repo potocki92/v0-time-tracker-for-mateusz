@@ -190,7 +190,8 @@
     "worksiteDays": "Dni pracy",
     "worksiteTotal": "Razem",
     "worksiteNoLocation": "Brak adresu projektu",
-    "worksiteNote": "Zestawienie obejmuje wyłącznie zarejestrowane dni pracy w wybranym zakresie. Dni pracy w wierszu „Razem” to liczba różnych dni — ten sam dzień w dwóch projektach liczy się raz."
+    "worksiteNote": "Zestawienie obejmuje wyłącznie zarejestrowane dni pracy w wybranym zakresie. Dni pracy w wierszu „Razem” to liczba różnych dni — ten sam dzień w dwóch projektach liczy się raz.",
+    "invoiceStatement": "Wykaz faktur dla księgowej →"
   },
   "states": {
     "noEntriesTitle": "Nie ma jeszcze czego raportować",

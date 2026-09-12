@@ -5,6 +5,12 @@ export interface ReportsFilter {
   projectId: string
 }
 
+export interface AccountingFilter {
+  from: string       // ISO date — poczatek zakresu wykazu
+  to: string
+  clientId: string   // 'all' albo id
+}
+
 export interface WorkEntriesFilter {
   from?: string  // ISO date
   to?: string
@@ -31,6 +37,13 @@ export const QUERY_KEYS = {
    */
   reports:     (filter: ReportsFilter) =>
     [...QUERY_KEYS.all(), 'reports', filter] as const,
+  /**
+   * Wykaz dla ksiegowej laczy faktury z wpisami pracy, wiec nie moze dzielic
+   * klucza ani z jednym, ani z drugim modulem: jego okno wynika z zakresu
+   * rozliczenia, a nie z listy faktur czy z zakresu raportu.
+   */
+  accounting:  (filter: AccountingFilter) =>
+    [...QUERY_KEYS.all(), 'accounting', filter] as const,
   invoices:    () => [...QUERY_KEYS.all(), 'invoices']       as const,
   workEntries: (filter?: WorkEntriesFilter) =>
     [...QUERY_KEYS.all(), 'work-entries', filter ?? {}] as const,

@@ -70,7 +70,7 @@ export const WORKSPACE_SECTIONS: readonly WorkspaceSection[] = [
  * surowy segment z URL-a bylby zla etykieta breadcrumba. Wartosc jest
  * KLUCZEM `navigation.nested.<key>`.
  */
-const NESTED_LABEL_KEYS = ['invoices/analytics'] as const
+const NESTED_LABEL_KEYS = ['invoices/analytics', 'reports/accounting'] as const
 
 const pathSegments = (pathname: string) =>
   pathname.split(/[?#]/)[0].split('/').filter(Boolean)

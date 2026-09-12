@@ -45,6 +45,7 @@ export default async function AppLayout({
     'clients',
     'invoices',
     'reports',
+    'accounting',
   ])
 
   return (

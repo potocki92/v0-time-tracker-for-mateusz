@@ -298,6 +298,11 @@ Raport oddaje dane w dwoch celach:
 | CSV / JSON / PDF | pelne wpisy, KPI, przekroje, kwoty | wlasna analiza |
 | Zestawienie miejsc pracy (PDF / CSV) | jeden wiersz na projekt: miejsce, od-do, dni z praca, godziny | ksiegowa (np. przedluzenie A1) |
 
+Menu eksportu ma jeszcze jedna pozycje, ktora **nie jest eksportem raportu**:
+odnosnik do `/reports/accounting`, czyli wykazu FAKTUR dla ksiegowej
+(`features/accounting`). Raport nie analizuje faktur — sekcja 1 — wiec wykaz
+mieszka w osobnym module, a jedyna zaleznosc miedzy nimi jest adres URL.
+
 Zestawienie miejsc pracy liczy `domain/worksites.ts`:
 
 * grupuje po PROJEKCIE, bo to `projects.address` niesie adres wykonywania pracy;

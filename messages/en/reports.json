@@ -190,7 +190,8 @@
     "worksiteDays": "Days worked",
     "worksiteTotal": "Total",
     "worksiteNoLocation": "No project address",
-    "worksiteNote": "Covers only recorded working days within the selected range. The “Total” row counts distinct days — the same day on two projects counts once."
+    "worksiteNote": "Covers only recorded working days within the selected range. The “Total” row counts distinct days — the same day on two projects counts once.",
+    "invoiceStatement": "Invoice statement for the accountant →"
   },
   "states": {
     "noEntriesTitle": "Nothing to report yet",

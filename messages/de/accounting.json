@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "title": "Aufstellung für die Buchhaltung",
+    "description": "Rechnungen mit Leistungszeitraum, Leistungsempfänger und Leistungsort."
+  },
+  "header": {
+    "eyebrow": "Abrechnung",
+    "title": "Aufstellung für die Buchhaltung",
+    "backToReports": "Zurück zu den Berichten"
+  },
+  "period": {
+    "label": "Abrechnungszeitraum",
+    "from": "Von",
+    "to": "Bis",
+    "thisYear": "Laufendes Jahr",
+    "lastYear": "Vorjahr",
+    "thisQuarter": "Laufendes Quartal",
+    "lastQuarter": "Vorquartal",
+    "custom": "Eigener Zeitraum"
+  },
+  "filters": {
+    "sectionLabel": "Filter der Aufstellung",
+    "client": "Kunde",
+    "allClients": "Alle Kunden",
+    "documentLocale": "Sprache des Dokuments",
+    "documentLocaleHint": "Sprache der PDF- und CSV-Datei. Ändert nicht die Sprache der App.",
+    "reset": "Zurücksetzen",
+    "refreshing": "Aufstellung wird aktualisiert"
+  },
+  "summary": {
+    "sectionLabel": "Zusammenfassung des Zeitraums",
+    "title": "Zusammenfassung",
+    "invoiceCount": "{count, plural, one {# Rechnung} other {# Rechnungen}}",
+    "net": "Netto",
+    "vat": "USt.",
+    "gross": "Brutto",
+    "paid": "Bezahlt",
+    "unpaid": "Offen",
+    "currenciesNote": "Währungen werden getrennt summiert — es wird kein Kurs angewendet."
+  },
+  "quarters": {
+    "title": "Quartalsübersicht",
+    "sectionLabel": "Quartalssummen",
+    "label": "{year} · Q{quarter}",
+    "empty": "Keine Rechnungen mit Rechnungsdatum in diesem Zeitraum"
+  },
+  "table": {
+    "title": "Rechnungsausgangsbuch",
+    "sectionLabel": "Detaillierte Rechnungsaufstellung",
+    "invoiceNumber": "Nummer",
+    "issueDate": "Rechnungsdatum",
+    "period": "Leistungszeitraum",
+    "buyer": "Leistungsempfänger",
+    "location": "Leistungsort",
+    "hours": "Stunden",
+    "net": "Netto",
+    "vat": "USt.",
+    "gross": "Brutto",
+    "workedDays": "{count, plural, one {# Arbeitstag} other {# Arbeitstage}}",
+    "noPeriod": "Kein Leistungszeitraum auf der Rechnung",
+    "noLocation": "Keine erfassten Arbeitstage in diesem Zeitraum",
+    "noAddress": "Keine Projektadresse",
+    "noValue": "—",
+    "rowCount": "{count, plural, one {# Rechnung} other {# Rechnungen}}",
+    "pageStatus": "Seite {page} von {pages}",
+    "previousPage": "Vorherige Seite",
+    "nextPage": "Nächste Seite",
+    "empty": "Keine Rechnungen im gewählten Zeitraum"
+  },
+  "warnings": {
+    "title": "Vor dem Versand zu ergänzen",
+    "missingPeriod": "{count, plural, one {# Rechnung hat keinen hinterlegten Leistungszeitraum} other {# Rechnungen haben keinen hinterlegten Leistungszeitraum}}",
+    "missingLocation": "{count, plural, one {# Rechnung hat keine erfassten Arbeitstage und damit keinen Leistungsort} other {# Rechnungen haben keine erfassten Arbeitstage und damit keinen Leistungsort}}",
+    "drafts": "{count, plural, one {# Entwurf übersprungen — die Aufstellung enthält nur nummerierte Rechnungen} other {# Entwürfe übersprungen — die Aufstellung enthält nur nummerierte Rechnungen}}"
+  },
+  "export": {
+    "trigger": "Export",
+    "menuLabel": "Aufstellung herunterladen",
+    "pdf": "Aufstellung (PDF)",
+    "csv": "Aufstellung (CSV)",
+    "generating": "PDF wird erstellt…",
+    "successPdf": "PDF-Aufstellung fertig",
+    "successCsv": "CSV-Aufstellung fertig",
+    "errorPdf": "PDF konnte nicht erstellt werden",
+    "errorCsv": "CSV konnte nicht erstellt werden"
+  },
+  "states": {
+    "noInvoicesTitle": "Keine Rechnungen in diesem Zeitraum",
+    "noInvoicesDescription": "Wähle einen anderen Zeitraum oder stelle die erste Rechnung aus — die Aufstellung entsteht aus Rechnungen, nicht aus Arbeitseinträgen.",
+    "errorTitle": "Aufstellung konnte nicht geladen werden",
+    "errorDescription": "Versuche es erneut. Wenn der Fehler bleibt, lade die Seite neu.",
+    "retry": "Erneut versuchen"
+  },
+  "document": {
+    "title": "Rechnungsausgangsbuch",
+    "subtitle": "Leistungszeitraum, Leistungsempfänger und Leistungsort",
+    "range": "Zeitraum",
+    "generatedAt": "Erstellt am",
+    "client": "Kunde",
+    "allClients": "Alle Kunden",
+    "sections": {
+      "register": "Rechnungsaufstellung",
+      "locations": "Leistungsorte",
+      "totals": "Zusammenfassung",
+      "quarters": "Quartalsübersicht"
+    },
+    "columns": {
+      "invoiceNumber": "Rechnungsnummer",
+      "issueDate": "Rechnungsdatum",
+      "servicePeriod": "Leistungszeitraum",
+      "from": "Von",
+      "to": "Bis",
+      "buyer": "Leistungsempfänger",
+      "buyerAddress": "Anschrift des Leistungsempfängers",
+      "taxId": "USt-IdNr. / Steuernummer",
+      "description": "Leistungsbeschreibung",
+      "location": "Leistungsort",
+      "project": "Projekt",
+      "workedDays": "Arbeitstage",
+      "hours": "Stunden",
+      "net": "Netto",
+      "vat": "USt.",
+      "gross": "Brutto",
+      "currency": "Währung",
+      "status": "Status",
+      "paidDate": "Bezahlt am",
+      "invoiceCount": "Anzahl Rechnungen",
+      "quarter": "Quartal"
+    },
+    "status": {
+      "DRAFT": "Entwurf",
+      "SENT": "Ausgestellt",
+      "PAID": "Bezahlt",
+      "OVERDUE": "Überfällig",
+      "CANCELLED": "Storniert"
+    },
+    "placeholders": {
+      "noPeriod": "Kein Leistungszeitraum auf der Rechnung",
+      "noLocation": "Keine Projektadresse",
+      "noProject": "Ohne Projekt",
+      "noValue": "—"
+    },
+    "totals": {
+      "row": "Summe",
+      "paid": "Bezahlt",
+      "unpaid": "Offen"
+    },
+    "notes": {
+      "method": "Die Aufstellung enthält Rechnungen mit Rechnungsdatum im angegebenen Zeitraum. Die Beträge stammen aus den Rechnungen; Netto und USt. ergeben auch bei Dokumenten ohne getrennten Steuerausweis zusammen den Bruttobetrag.",
+      "locations": "Der Leistungsort ergibt sich aus der Projektadresse und den erfassten Arbeitstagen bei diesem Leistungsempfänger im Leistungszeitraum der Rechnung. Die Arbeitstage in der Rechnungszeile zählen unterschiedliche Tage — derselbe Tag in zwei Projekten zählt einmal.",
+      "currencies": "Jede Währung wird getrennt summiert. Beträge werden nicht umgerechnet.",
+      "missingPeriod": "Rechnungen ohne hinterlegten Leistungszeitraum",
+      "missingLocation": "Rechnungen ohne erfasste Arbeitstage im Leistungszeitraum",
+      "drafts": "Übersprungene Entwürfe ohne Nummer"
+    },
+    "fileName": "rechnungsaufstellung"
+  }
+}
