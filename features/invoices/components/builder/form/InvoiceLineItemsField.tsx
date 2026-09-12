@@ -121,6 +121,18 @@ export function InvoiceLineItemsField({ clientId }: InvoiceLineItemsFieldProps) 
 
       const next = isOnlyBlank ? newItems : [...current, ...newItems]
       setValue('items', next, { shouldDirty: true, shouldValidate: true })
+
+      // Te same tygodnie niosa okres uslugi, a bez niego „Wykaz dla ksiegowej"
+      // nie dopasuje wpisow pracy — pokaze „Brak okresu na fakturze" i 0 h.
+      // Bierzemy skrajne granice zaznaczenia, tak samo jak szybka faktura
+      // tygodniowa. Nie nadpisujemy tego, co uzytkownik wpisal sam.
+      if (weeks.length > 0 && !getValues('period_start') && !getValues('period_end')) {
+        const starts = weeks.map((week) => week.start).sort()
+        const ends = weeks.map((week) => week.end).sort()
+        setValue('period_start', starts[0], { shouldDirty: true, shouldValidate: true })
+        setValue('period_end', ends[ends.length - 1], { shouldDirty: true, shouldValidate: true })
+      }
+
       setPickerOpen(false)
     },
     [fmt, getValues, setValue],
