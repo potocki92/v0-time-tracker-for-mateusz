@@ -104,8 +104,9 @@ przelicza dni już zapisanych — te są faktem, nie prognozą.
 | `features/work-automation/services/workAutomation.overview.server.ts` | Dane sekcji ustawień (podgląd, stan, historia). |
 | `features/work-automation/actions.ts` | Server Actions: odczyt, zapis konfiguracji, wznowienie pracy. |
 | `features/work-automation/components/*` | Sekcja ustawień: stan, grafik, formularz. |
-| `app/api/cron/work-automation/route.ts` | Punkt wejścia harmonogramu. |
-| `.github/workflows/work-automation.yml` | Harmonogram (co godzinę). |
+| `app/api/cron/work-automation/route.ts` | Punkt wejścia harmonogramu (Bearer `CRON_SECRET`). |
+| `supabase/migrations/20260912140000_work_automation_supabase_cron.sql` | **Harmonogram**: job pg_cron `work-automation-minute-tick` (co minutę) + funkcja wyzwalacza. |
+| `.github/workflows/work-automation.yml` | Ręczny fallback diagnostyczny (`workflow_dispatch`, **bez** harmonogramu). |
 | `lib/date/timezone.ts` | Strefy IANA: data i godzina lokalna, czas ścienny → chwila UTC. |
 | `supabase/migrations/20260908093000_work_automation.sql` | Migracja: tabele, RLS, triggery, kolumna `work_entries.source`. |
 
@@ -122,15 +123,16 @@ Ustawienia (SettingsDrawer → WorkAutomationSection)
   └─ updateWorkAutomationSettingsAction   walidacja Zod + sprawdzenie klienta/projektu
        └─ work_automation_settings        (trigger → work_automation_setting_versions)
 
-GitHub Actions (co godzinę)
-  └─ POST /api/cron/work-automation       Authorization: Bearer CRON_SECRET
-       └─ runWorkAutomation               klient service-role, pętla po włączonych kontach
-            └─ runAutomationForUser
-                 1. świeży odczyt konfiguracji (wyłączenie w międzyczasie = koniec)
-                 2. data i godzina lokalna użytkownika (strefa IANA)
-                 3. daty wymagalne: od start_date, maks. MAX_CATCHUP_DAYS wstecz
-                 4. odjęcie dat już rozstrzygniętych w dzienniku
-                 5. dla każdej daty: wersja reguł → decideDay → insert → dziennik
+Supabase Cron — job `work-automation-minute-tick`, `* * * * *` (co minutę)
+  └─ public.work_automation_cron_tick()   adres i sekret z Vault, POST przez pg_net
+       └─ POST /api/cron/work-automation  Authorization: Bearer CRON_SECRET
+            └─ runWorkAutomation          klient service-role, pętla po włączonych kontach
+                 └─ runAutomationForUser
+                      1. świeży odczyt konfiguracji (wyłączenie w międzyczasie = koniec)
+                      2. data i godzina lokalna użytkownika (strefa IANA)
+                      3. daty wymagalne: od start_date, maks. MAX_CATCHUP_DAYS wstecz
+                      4. odjęcie dat już rozstrzygniętych w dzienniku
+                      5. dla każdej daty: wersja reguł → decideDay → insert → dziennik
 ```
 
 ---
@@ -209,7 +211,9 @@ dodawania jednej czy dwóch godzin do UTC.
 
 - Zadanie **nie musi trafić w konkretną minutę**: samo wybiera daty, dla których
   termin został osiągnięty lub przekroczony, a decyzji jeszcze nie ma. Zapis
-  nigdy nie następuje **przed** ustawioną godziną.
+  nigdy nie następuje **przed** ustawioną godziną. Scheduler woła je co minutę
+  (sekcja 8), więc **zdecydowana większość przebiegów nie robi nic** — i tak ma
+  być: pusty przebieg to dwa zapytania po indeksach na włączone konto.
 - Włączenie funkcji dziś po godzinie zapisu pozwala wykonać dzisiejszy zapis
   przy najbliższym przebiegu (dla dzisiejszej daty obowiązuje bieżąca wersja
   reguł — koniec dzisiejszej doby jest jeszcze w przyszłości).
@@ -244,37 +248,257 @@ dodawania jednej czy dwóch godzin do UTC.
 
 ---
 
-## 8. Harmonogram: konfiguracja i uruchomienie
+## 8. Harmonogram: Supabase Cron
 
-Wybraliśmy ten sam mechanizm, którym działa cotygodniowy skrót
-(`.github/workflows/weekly-summary.yml`): GitHub Actions woła endpoint aplikacji.
-Vercel Hobby daje tylko jedno uruchomienie crona na dobę, a Supabase Free nie ma
-`pg_cron` — GitHub Actions jest tu jedyną opcją zgodną z obecną infrastrukturą.
+### 8.1 Architektura i dlaczego tak
 
-1. **Migracja bazy**
+```
+Supabase Cron (pg_cron, job `work-automation-minute-tick`, `* * * * *`)
+  └─ public.work_automation_cron_tick()      adres + sekret z Vault
+       └─ net.http_post (pg_net, w tle)      POST, Bearer CRON_SECRET
+            └─ /api/cron/work-automation     runWorkAutomation → runAutomationForUser
+```
+
+**Dlaczego nie GitHub Actions.** Poprzednio harmonogram stał w
+`.github/workflows/work-automation.yml` z `cron: '0 * * * *'`. Dawało to dwa
+niezależne opóźnienia naraz: krok godzinowy (do ~60 minut od ustawionej godziny)
+oraz kolejkę GitHub Actions, która w godzinach szczytu potrafi spóźnić
+uruchomienie o kilkanaście minut albo pominąć przebieg. Dla użytkownika z
+`run_time = 17:00` realny zapis mógł wypaść o 18:20 — albo o 16:25 „za
+poprzednią godzinę”, a potem cisza. pg_cron chodzi wewnątrz bazy i trzyma się
+minuty.
+
+**Dlaczego co minutę, a nie o godzinie użytkownika.** `run_time` jest
+własnością **każdego konta osobno** i żyje w strefie IANA tego konta — z DST.
+Harmonogram „pod użytkownika” oznaczałby job na konto, przeliczanie przesunięć
+strefy w SQL i przebudowę jobów po każdej zmianie ustawień. Zamiast tego jest
+**jeden globalny tick** i cała decyzja zostaje w TypeScripcie (`isDue`).
+Dzięki temu 17:00, 17:15, 18:42 i 23:59 w dowolnych strefach obsługuje ta sama,
+jedna linijka harmonogramu.
+
+**Dlaczego to nie tworzy duplikatów.** Tick jest wyłącznie wyzwalaczem HTTP —
+nie zna żadnej reguły biznesowej. Pojedynczość pilnują dwie rzeczy w bazie:
+
+| Mechanizm | Co gwarantuje |
+|---|---|
+| `work_automation_runs` — `PRIMARY KEY (user_id, local_date)` | Dzień raz rozstrzygnięty (wynik inny niż `error`) nie wraca do rozpatrzenia. Kolejne ticki tej samej doby nic nie robią. |
+| `work_entries` — `UNIQUE (user_id, date, entry_kind)` | Najwyżej jeden wpis rzeczywisty na dzień, **nawet gdy dwa przebiegi wstawiają go w tej samej sekundzie**. Przegrany dostaje `23505` i zapisuje `skipped / entry_exists`, nigdy nie nadpisuje. |
+
+`insertAutomationEntry` **nie** robi `if (!exists) insert()` — wstawia od razu
+i traktuje konflikt jako pominięcie. To istotne: sprawdzenie przed zapisem
+zostawiałoby okno, w które zmieściłby się drugi przebieg.
+
+Dziennik decyzji jest dodatkowo chroniony od strony zapisu: `upsertRunRecord`
+robi INSERT, a przy konflikcie UPDATE **zawężony do wiersza z `outcome = 'error'`**.
+Bez tego zawężenia przegrany przebieg nadpisywał wynik zwycięzcy
+(`created` → `skipped / entry_exists`) i dziennik kłamał o tym, co się stało.
+Jedyne dozwolone przejście to `error` → cokolwiek, bo błąd jest ponawialny.
+
+### 8.2 Sekrety w Supabase Vault
+
+Tick potrzebuje dwóch wartości. **Żadna z nich nie jest w repozytorium, migracji
+ani w SQL trzymanym w Git** — migracja zawiera tylko ich nazwy:
+
+| Nazwa sekretu | Wartość |
+|---|---|
+| `work_automation_app_url` | Adres wdrożenia **bez** końcowego `/`, np. `https://time-tracker-mateusz.vercel.app` |
+| `work_automation_cron_secret` | Ta sama wartość, co `CRON_SECRET` w zmiennych środowiskowych aplikacji |
+
+Dodaj je **raz**, w SQL Editorze Supabase (Dashboard → SQL Editor). Komenda nie
+trafia do Git, a wartość jest w bazie zaszyfrowana:
+
+```sql
+select vault.create_secret(
+  'https://TWOJ-ADRES.vercel.app',   -- bez końcowego slasha
+  'work_automation_app_url',
+  'Work Automation: adres aplikacji dla schedulera'
+);
+
+select vault.create_secret(
+  'TWOJ_CRON_SECRET',                -- dokładnie to, co CRON_SECRET w aplikacji
+  'work_automation_cron_secret',
+  'Work Automation: sekret endpointu crona'
+);
+```
+
+Zmiana wartości później (rotacja sekretu, nowa domena):
+
+```sql
+select vault.update_secret(
+  (select id from vault.secrets where name = 'work_automation_cron_secret'),
+  'NOWA_WARTOSC'
+);
+```
+
+Nazwy sekretów można bezpiecznie wypisać; **wartości nigdy**. `vault.secrets`
+pokazuje tylko szyfrogram, a odszyfrowanie (`vault.decrypted_secrets`) jest
+dostępne wyłącznie dla roli uprzywilejowanej — dlatego funkcja ticku jest
+`SECURITY DEFINER` z odebranym `EXECUTE` dla `PUBLIC`. Komenda jobu w
+`cron.job` zawiera samo wywołanie funkcji, więc sekret nie leży w żadnej
+tabeli w postaci jawnej.
+
+### 8.3 Wdrożenie od zera
+
+1. **Zmienne środowiskowe aplikacji** (Vercel → Project Settings → Environment Variables):
+   - `CRON_SECRET` — długi losowy ciąg,
+   - `SUPABASE_SERVICE_ROLE_KEY` — klucz service-role.
+2. **Sekrety Vault** — sekcja 8.2 powyżej.
+3. **Migracje**
    ```bash
-   supabase db push        # albo: supabase migration up
+   supabase db push          # albo: supabase migration up
    ```
-2. **Zmienne środowiskowe aplikacji** (Vercel → Project Settings → Environment Variables):
-   - `CRON_SECRET` — dowolny długi losowy ciąg,
-   - `SUPABASE_SERVICE_ROLE_KEY` — klucz service-role (już używany przez skrót tygodnia).
-3. **Sekrety repozytorium** (GitHub → Settings → Secrets and variables → Actions):
-   - `APP_URL` — adres wdrożenia, np. `https://time-tracker-mateusz.vercel.app`,
-   - `CRON_SECRET` — **ta sama** wartość, co w aplikacji.
-4. **Włączenie harmonogramu**: workflow `Work Automation` uruchamia się sam po
-   wejściu na `main`. Ręczny test: GitHub → Actions → *Work Automation* → *Run workflow*.
-   Odpowiedź to `Processed / Created / Skipped / Failed`.
+   Migracja `20260912140000_work_automation_supabase_cron.sql` włącza `pg_cron`,
+   `pg_net` i `supabase_vault`, tworzy funkcję wyzwalacza i planuje job.
+   Jeśli sekretów jeszcze nie ma, migracja **przejdzie** i wypisze `NOTICE` z ich
+   nazwami — do czasu dodania wartości każdy tick kończy się błędem widocznym
+   w `cron.job_run_details`.
+4. **Sekrety repozytorium** (GitHub → Settings → Secrets and variables → Actions) —
+   tylko dla ręcznego fallbacku: `APP_URL`, `CRON_SECRET`.
 5. **Konfiguracja użytkownika**: Ustawienia konta → „Automatyczne zapisywanie
    pracy" → grafik, klient, godzina → *Zapisz* → przełącznik *Zapisuj automatycznie*.
 
-### Rzeczywista częstotliwość i opóźnienie
+### 8.4 Weryfikacja
 
-Sprawdzanie odbywa się **co godzinę**, o pełnej godzinie UTC. Realne opóźnienie
-względem ustawionej godziny to więc do ~60 minut, plus opóźnienie samego GitHub
-Actions (harmonogramy w godzinach szczytu potrafią spóźnić się o kilkanaście
-minut). Interfejs mówi o tym wprost i **nie obiecuje** dokładności co do minuty.
-Chcąc zawęzić okno, wystarczy zmienić `cron` w workflow na `'*/30 * * * *'` —
-logika zadania nie wymaga żadnej zmiany, bo sama wybiera daty wymagalne.
+**Czy rozszerzenia są włączone:**
+
+```sql
+select extname, extversion from pg_extension
+ where extname in ('pg_cron', 'pg_net', 'supabase_vault');
+```
+
+**Czy job istnieje i jest aktywny** (powinien być dokładnie jeden wiersz):
+
+```sql
+select jobid, jobname, schedule, active, command
+  from cron.job
+ where jobname = 'work-automation-minute-tick';
+```
+
+**Ostatnie przebiegi schedulera** (`status = 'succeeded'` znaczy „POST został
+zakolejkowany”, nie „aplikacja odpowiedziała 200”):
+
+```sql
+select d.start_time, d.status, d.return_message
+  from cron.job_run_details d
+  join cron.job j using (jobid)
+ where j.jobname = 'work-automation-minute-tick'
+ order by d.start_time desc
+ limit 20;
+```
+
+**Odpowiedzi HTTP z aplikacji** — to tu widać `{processed, created, skipped,
+failed}` oraz ewentualne 401:
+
+```sql
+select created, status_code, content
+  from net._http_response
+ order by created desc
+ limit 20;
+```
+
+**Ręczne wywołanie ticku** (pomija harmonogram, reszta drogi identyczna):
+
+```sql
+select public.work_automation_cron_tick();
+```
+
+**Ręczne wywołanie endpointu z terminala** — sekret podaj ze zmiennej
+środowiskowej, nie wklejaj go do historii powłoki:
+
+```bash
+curl -i -X POST "$APP_URL/api/cron/work-automation" \
+  -H "Authorization: Bearer $CRON_SECRET" \
+  -H 'Content-Type: application/json' \
+  --data '{}'
+```
+
+**Czy GitHub Actions nie odpala się już samo:**
+- `.github/workflows/work-automation.yml` nie ma klucza `schedule:` —
+  `grep -n 'schedule' .github/workflows/work-automation.yml` nie zwraca nic;
+- GitHub → Actions → *Work Automation (manual fallback)* — widoczny jest tylko
+  przycisk *Run workflow*, a lista biegów przestaje rosnąć sama.
+
+### 8.5 Rzeczywista częstotliwość i opóźnienie
+
+Scheduler sprawdza automat **co minutę**, więc zapis wypada przy pierwszym ticku
+po ustawionej godzinie — zwykle w granicach minuty. Nigdy **przed** nią.
+Interfejs mówi o tym wprost i **nie obiecuje** dokładności co do sekundy: tick
+może się opóźnić (restart bazy, chwilowa niedostępność aplikacji), a wtedy zapis
+po prostu wykona się przy kolejnym.
+
+**Koszt po stronie bazy.** Pusty przebieg to dwa zapytania po indeksach na
+**włączone** konto (`fetchSettings` + `fetchRunRecords`); ciężka czwórka zapytań
+(wyjazdy, wznowienia, wpisy, wersje reguł) odpala się tylko wtedy, gdy jakaś data
+jest naprawdę nierozstrzygnięta. Konta z wyłączonym automatem nie są w ogóle
+czytane — listę bierze zapytanie po indeksie częściowym
+`idx_work_automation_settings_enabled`.
+
+**Co rośnie.** Tick co minutę dopisuje ~1440 wierszy na dobę do
+`cron.job_run_details` (pg_cron nie czyści go sam; odpowiedzi w
+`net._http_response` pg_net kasuje po kilku godzinach). Zalecane sprzątanie —
+jednorazowo, raz na dobę:
+
+```sql
+select cron.schedule(
+  'cron-job-run-details-cleanup',
+  '17 3 * * *',
+  $$delete from cron.job_run_details where end_time < now() - interval '7 days';$$
+);
+```
+
+Zmiana częstotliwości nie wymaga tknięcia logiki — wystarczy przeplanować job:
+
+```sql
+select cron.alter_job(
+  (select jobid from cron.job where jobname = 'work-automation-minute-tick'),
+  schedule := '*/5 * * * *'
+);
+```
+
+### 8.6 Rollback
+
+**Sam scheduler** (automat przestaje cokolwiek zapisywać, dane zostają):
+
+```sql
+select cron.unschedule('work-automation-minute-tick');
+```
+
+Włączenie z powrotem:
+
+```sql
+select cron.schedule(
+  'work-automation-minute-tick',
+  '* * * * *',
+  $$select public.work_automation_cron_tick();$$
+);
+```
+
+**Pełne wycofanie migracji** (gdy trzeba usunąć też funkcję):
+
+```sql
+select cron.unschedule('work-automation-minute-tick');
+drop function if exists public.work_automation_cron_tick();
+-- Sekrety w Vault mogą zostać; jeśli mają zniknąć:
+-- delete from vault.secrets
+--  where name in ('work_automation_app_url', 'work_automation_cron_secret');
+```
+
+Rozszerzeń `pg_cron` / `pg_net` **nie wyłączamy** — korzystać z nich mogą inne
+joby.
+
+**Powrót do GitHub Actions** (domyślnie tego nie robimy — to był właśnie
+problem): w `.github/workflows/work-automation.yml` dodać z powrotem
+
+```yaml
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+```
+
+i **najpierw** wyłączyć job pg_cron, żeby dwa schedulery nie wołały tego samego
+endpointu równolegle. Duplikatów by to nie wywołało (pilnują tego klucze w
+bazie), ale podwajałoby zapytania bez żadnego zysku.
 
 ### Odświeżanie otwartych widoków
 
@@ -292,9 +516,18 @@ Idź po kolei — pierwsza odpowiedź „nie" kończy poszukiwania:
 
 1. **Czy automat jest włączony i czy data ≥ `start_date`?**
    Ustawienia → nagłówek sekcji i pole *Data rozpoczęcia*.
-2. **Czy minęła godzina zapisu i czy przebieg się odbył?**
-   GitHub → Actions → *Work Automation* → ostatni bieg. Brak biegów oznacza brak
-   sekretów `APP_URL` / `CRON_SECRET` albo wyłączony workflow.
+2. **Czy minęła godzina zapisu i czy scheduler w ogóle chodzi?**
+   Zapytania z sekcji 8.4 — po kolei: czy job istnieje i jest `active`, co mówią
+   ostatnie wiersze `cron.job_run_details`, co wróciło w `net._http_response`.
+   Typowe wyniki:
+   - brak wiersza w `cron.job` → migracja nie weszła,
+   - `status = 'failed'` z komunikatem o sekrecie Vault → brak wartości
+     z sekcji 8.2,
+   - `net._http_response` ze `status_code = 401` → `work_automation_cron_secret`
+     w Vault różni się od `CRON_SECRET` w aplikacji,
+   - brak wiersza w `net._http_response` przy `succeeded` w `job_run_details` →
+     aplikacja nie odpowiedziała w limicie (błędny adres w
+     `work_automation_app_url`, wdrożenie nie odpowiada).
 3. **Co mówi dziennik decyzji?**
    Ustawienia → *Ostatnie wykonania*, albo bezpośrednio:
    ```sql
@@ -327,6 +560,9 @@ Idź po kolei — pierwsza odpowiedź „nie" kończy poszukiwania:
 | Wymagalność terminu, najbliższy zapis | `domain/workAutomation.decide.ts` (`isDue`, `nextRunInstant`) | `__test__/work-automation/decide.test.ts` |
 | Strefy IANA, zmiana czasu | `lib/date/timezone.ts` | `__test__/work-automation/timezone.test.ts` |
 | Dobór wersji reguł, limit nadrabiania, dziennik | `services/workAutomation.runner.server.ts` | `__test__/work-automation/runner.test.ts` |
+| Zachowanie przy ticku co minutę, strefy, DST, dwa przebiegi naraz | `services/workAutomation.runner.server.ts`, `services/workAutomation.repository.server.ts` | `__test__/work-automation/scheduler.test.ts` |
+| Autoryzacja endpointu harmonogramu | `app/api/cron/work-automation/route.ts` | `__test__/work-automation/cron-endpoint.test.ts` |
+| Harmonogram (częstotliwość, wyzwalacz, sekrety) | `supabase/migrations/20260912140000_work_automation_supabase_cron.sql` | weryfikacja ręczna — sekcja 8.4 |
 | Uprawnienia, współbieżność, trigger wyłączenia | `supabase/migrations/20260908093000_work_automation.sql` | `__test__/rls.test.ts` (suite `test:rls`, wymaga lokalnego Supabase) |
 | Rozdział planu i wykonania w raportach i fakturach | `lib/finance/realization.ts`, `features/reports/lib/analytics.ts`, `features/invoices/services/server/*` | `__test__/work-automation/billing-integration.test.ts` |
 

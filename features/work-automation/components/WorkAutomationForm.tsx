@@ -106,7 +106,8 @@ export function WorkAutomationForm({ settings, clients, projects, isSaving, onSa
                   <Input type="time" {...field} />
                 </FormControl>
                 <FormDescription className="text-xs">
-                  Moment dopisania godzin za dany dzień — nie godzina rozpoczęcia pracy.
+                  Moment dopisania godzin za dany dzień — nie godzina rozpoczęcia pracy. Automat
+                  zapisuje pracę przy pierwszym sprawdzeniu po wskazanej godzinie.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

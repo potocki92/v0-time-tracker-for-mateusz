@@ -1,14 +1,36 @@
 /**
  * Minimalna atrapa klienta Supabase — dokladnie te operacje, ktorych uzywa
- * repozytorium automatu. Trzyma wiersze w pamieci i egzekwuje UNIQUE na
- * `work_entries (user_id, date, entry_kind)`, zeby test rownoleglych przebiegow
- * sprawdzal to samo, co robi baza.
+ * repozytorium automatu. Trzyma wiersze w pamieci i egzekwuje te same klucze,
+ * co baza, zeby testy rownoleglych przebiegow sprawdzaly prawdziwa gwarancje,
+ * a nie zycznie atrapy.
  *
  * Uprawnienia i wspolbieznosc na PRAWDZIWEJ bazie sprawdza suite RLS
  * (`__test__/rls.test.ts`); tutaj chodzi o zachowanie logiki przebiegu.
  */
 
 export type Row = Record<string, unknown>
+
+/**
+ * Klucze pilnowane przy INSERT — odpowiednik ograniczen z migracji:
+ * `UNIQUE (user_id, date, entry_kind)` na wpisach i
+ * `PRIMARY KEY (user_id, local_date)` na dzienniku decyzji.
+ */
+const UNIQUE_KEYS: Record<string, string[]> = {
+  work_entries: ['user_id', 'date', 'entry_kind'],
+  work_automation_runs: ['user_id', 'local_date'],
+}
+
+/** Brak `entry_kind` znaczy w bazie `real` (DEFAULT kolumny). */
+function keyValue(row: Row, column: string): unknown {
+  if (column === 'entry_kind') return row[column] ?? 'real'
+  return row[column]
+}
+
+function violatesUnique(rows: Row[], table: string, payload: Row): boolean {
+  const keys = UNIQUE_KEYS[table]
+  if (!keys) return false
+  return rows.some((row) => keys.every((key) => keyValue(row, key) === keyValue(payload, key)))
+}
 
 interface Filter {
   column: string
@@ -38,8 +60,18 @@ export interface FakeSupabase {
 
 interface FakeTable {
   select(columns?: string): FakeQuery
-  insert(payload: Row): { select(columns?: string): { single(): Promise<Result<Row>> } }
+  insert(payload: Row): FakeInsert
+  update(payload: Row): FakeUpdate
   upsert(payload: Row, options?: { onConflict?: string }): Promise<Result<null>>
+}
+
+/** `insert` bywa czekany wprost (dziennik) albo przez `.select().single()` (wpisy). */
+interface FakeInsert extends PromiseLike<Result<null>> {
+  select(columns?: string): { single(): Promise<Result<Row>> }
+}
+
+interface FakeUpdate extends PromiseLike<Result<null>> {
+  eq(column: string, value: unknown): FakeUpdate
 }
 
 type Result<T> = { data: T | null; error: { message: string; code?: string } | null }
@@ -134,31 +166,42 @@ export function createFakeSupabase(
     from(name: string): FakeTable {
       return {
         select: () => query(name),
-        insert(payload) {
-          return {
-            select: () => ({
-              async single(): Promise<Result<Row>> {
-                if (name === 'work_entries') {
-                  const duplicate = table(name).some(
-                    (row) =>
-                      row.user_id === payload.user_id &&
-                      row.date === payload.date &&
-                      (row.entry_kind ?? 'real') === (payload.entry_kind ?? 'real'),
-                  )
-                  if (duplicate) {
-                    return {
-                      data: null,
-                      error: { message: 'duplicate key', code: UNIQUE_VIOLATION },
-                    }
-                  }
-                }
+        insert(payload): FakeInsert {
+          const run = (): Result<Row> => {
+            if (violatesUnique(table(name), name, payload)) {
+              return { data: null, error: { message: 'duplicate key', code: UNIQUE_VIOLATION } }
+            }
 
-                const row = { id: `${name}-${table(name).length + 1}`, ...payload }
-                table(name).push(row)
-                return { data: { ...row }, error: null }
-              },
-            }),
+            const row = { id: `${name}-${table(name).length + 1}`, ...payload }
+            table(name).push(row)
+            return { data: { ...row }, error: null }
           }
+
+          return {
+            select: () => ({ single: async () => run() }),
+            then(onFulfilled, onRejected) {
+              const { error } = run()
+              return Promise.resolve({ data: null, error }).then(onFulfilled, onRejected)
+            },
+          }
+        },
+        update(payload): FakeUpdate {
+          const filters: Filter[] = []
+
+          const builder: FakeUpdate = {
+            eq(column, value) {
+              filters.push({ column, op: 'eq', value })
+              return builder
+            },
+            then(onFulfilled, onRejected) {
+              for (const row of table(name).filter((candidate) => matches(candidate, filters))) {
+                Object.assign(row, payload)
+              }
+              return Promise.resolve({ data: null, error: null }).then(onFulfilled, onRejected)
+            },
+          }
+
+          return builder
         },
         async upsert(payload, options): Promise<Result<null>> {
           const keys = conflictKeys(options?.onConflict)

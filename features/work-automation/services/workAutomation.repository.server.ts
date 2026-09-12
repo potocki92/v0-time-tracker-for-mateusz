@@ -378,27 +378,48 @@ export async function insertAutomationEntry(
 }
 
 /**
- * Jeden wiersz na (uzytkownik, data lokalna). Ponowione wykonanie nadpisuje
- * wlasny wynik zamiast mnozyc identyczne rekordy historii.
+ * Jeden wiersz na (uzytkownik, data lokalna) — `PRIMARY KEY (user_id, local_date)`.
+ *
+ * Zapis jest CELOWO dwuetapowy, a nie jednym `upsert`: raz podjeta decyzja inna
+ * niz blad jest ostateczna i nie wolno jej nadpisac. Bezwarunkowe
+ * `ON CONFLICT DO UPDATE` pozwalalo dwom rownoleglym przebiegom zepsuc dziennik
+ * — zwyciezca zapisywal `created`, a przegrany (ten z konfliktem na
+ * `work_entries`) nadpisywal go `skipped / entry_exists`, gubiac `entry_id`
+ * i liczbe godzin. Przy schedulerze chodzacym co minute to realny scenariusz.
+ *
+ * Stad: najpierw INSERT, a przy konflikcie UPDATE zawezony do wiersza z bledem.
+ * Oba zdania sa atomowe, wiec jedyne dozwolone przejscie to `error` →
+ * cokolwiek (blad jest ponawialny), a wynik rownoleglego przebiegu zostaje
+ * nietkniety.
  */
 export async function upsertRunRecord(
   supabase: SupabaseClient,
   userId: string,
   record: RunDecisionRecord,
 ): Promise<void> {
-  const { error } = await supabase.from(RUNS_TABLE).upsert(
-    {
-      user_id: userId,
-      local_date: record.localDate,
-      outcome: record.outcome,
-      reason: record.reason,
-      hours: record.hours,
-      entry_id: record.entryId,
-      config_version_id: record.configVersionId,
-      decided_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id,local_date' },
-  )
+  const row = {
+    user_id: userId,
+    local_date: record.localDate,
+    outcome: record.outcome,
+    reason: record.reason,
+    hours: record.hours,
+    entry_id: record.entryId,
+    config_version_id: record.configVersionId,
+    decided_at: new Date().toISOString(),
+  }
 
-  if (error) throw new Error(`upsertRunRecord: ${error.message}`)
+  const { error: insertError } = await supabase.from(RUNS_TABLE).insert(row)
+  if (!insertError) return
+  if (insertError.code !== UNIQUE_VIOLATION) {
+    throw new Error(`upsertRunRecord: ${insertError.message}`)
+  }
+
+  const { error: updateError } = await supabase
+    .from(RUNS_TABLE)
+    .update(row)
+    .eq('user_id', userId)
+    .eq('local_date', record.localDate)
+    .eq('outcome', 'error')
+
+  if (updateError) throw new Error(`upsertRunRecord: ${updateError.message}`)
 }
