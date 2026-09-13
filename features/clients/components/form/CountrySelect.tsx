@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { WORKSPACE_FIELD } from '@/components/workspace'
 
 import { COUNTRIES } from '../../domain/clientForm.i18n'
 
@@ -57,8 +58,7 @@ export function CountrySelect({
           aria-required={required}
           aria-describedby={[descId, error ? errorId : undefined].filter(Boolean).join(' ') || undefined}
           className={cn(
-            'h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm',
-            'focus-visible:border-primary/70 focus-visible:ring-primary/25',
+            WORKSPACE_FIELD,
             error && 'border-destructive/55 ring-destructive/10',
           )}
         >

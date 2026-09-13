@@ -63,8 +63,8 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
 
       <div
         className={cn(
-          'flex items-stretch gap-0 rounded-xl border border-input-border bg-background shadow-sm transition',
-          'focus-within:border-primary/70 focus-within:ring-2 focus-within:ring-primary/25',
+          'flex items-stretch gap-0 rounded-xl border border-hairline-strong bg-surface-2 transition',
+          'focus-within:ring-2 focus-within:ring-zinc-500/60',
           error && 'border-destructive/55 ring-destructive/10',
         )}
       >
@@ -81,7 +81,7 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
           <SelectTrigger
             aria-label="Numer kierunkowy kraju"
             className={cn(
-              'h-12 w-[6.5rem] shrink-0 rounded-r-none border-0 border-r border-border/60 bg-transparent',
+              'h-11 w-[6.5rem] shrink-0 rounded-r-none border-0 border-r border-hairline-strong bg-transparent',
               'shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
             )}
           >
@@ -109,7 +109,7 @@ export function PhoneField({ label = 'Telefon' }: PhoneFieldProps) {
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            'h-12 flex-1 rounded-l-none border-0 bg-transparent px-3 text-sm shadow-none',
+            'h-11 flex-1 rounded-l-none border-0 bg-transparent px-3 text-sm shadow-none',
             'focus-visible:ring-0 focus-visible:ring-offset-0',
           )}
           {...register('phone_number')}
