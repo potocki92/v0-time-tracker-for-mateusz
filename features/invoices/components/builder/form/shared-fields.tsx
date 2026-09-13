@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
-import { DIALOG_DARK_SURFACE } from '../../dialog-theme'
 
 /**
  * Bridge helpers that follow the same visual language as `<FormInput>` from
@@ -329,7 +328,9 @@ export function EnumSelectField<
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className={DIALOG_DARK_SURFACE}>
+        {/* Portal renderuje sie poza drzewem powloki, wiec skore panelu
+            trzeba przypiac tutaj — patrz `.workspace-surface` w globals.css. */}
+        <SelectContent className="workspace-surface">
           {options.map((opt) => (
             <SelectItem key={opt.value} value={opt.value}>
               {opt.description ? (

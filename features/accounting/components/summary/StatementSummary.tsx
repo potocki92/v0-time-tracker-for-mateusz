@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl'
 import { useFormat } from '@/lib/format/client'
 import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
+import { WorkspaceCard } from '@/components/workspace'
 import type { StatementModel } from '../../domain'
-import { StatementCard } from '../shared/StatementCard'
 
 type Props = {
   model: StatementModel
@@ -39,7 +39,7 @@ export function StatementSummary({ model }: Props) {
   const fmt = useFormat()
 
   return (
-    <StatementCard
+    <WorkspaceCard
       title={t('summary.title')}
       ariaLabel={t('summary.sectionLabel')}
       action={
@@ -68,7 +68,7 @@ export function StatementSummary({ model }: Props) {
       </div>
 
       <p className="mt-3 text-2xs text-zinc-400">{t('summary.currenciesNote')}</p>
-    </StatementCard>
+    </WorkspaceCard>
   )
 }
 
@@ -78,7 +78,7 @@ export function StatementQuarters({ model }: Props) {
   const fmt = useFormat()
 
   return (
-    <StatementCard title={t('quarters.title')} ariaLabel={t('quarters.sectionLabel')}>
+    <WorkspaceCard title={t('quarters.title')} ariaLabel={t('quarters.sectionLabel')}>
       {model.quarters.length === 0 ? (
         <p className="mt-4 text-xs text-zinc-400">{t('quarters.empty')}</p>
       ) : (
@@ -99,6 +99,6 @@ export function StatementQuarters({ model }: Props) {
           ))}
         </ul>
       )}
-    </StatementCard>
+    </WorkspaceCard>
   )
 }

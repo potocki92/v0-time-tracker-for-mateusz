@@ -103,6 +103,9 @@ export function WorkspaceOverlay({
           // wskazywałby na element, którego nie ma — stąd jawne wycięcie.
           {...(describedBy ? {} : { 'aria-describedby': undefined })}
           className={cn(
+            // `workspace-surface` — overlay portaluje się do <body>, więc nie
+            // dziedziczy skóry panelu po powłoce. Patrz `app/globals.css`.
+            'workspace-surface',
             // Wspólne: kolumna flex, żeby przewijało się WYŁĄCZNIE body.
             'fixed flex flex-col overflow-hidden border border-hairline bg-surface-1 text-zinc-200',
             // Mobile: arkusz przyklejony do dołu ekranu.
@@ -164,9 +167,6 @@ export function WorkspaceOverlay({
 /**
  * Przewijana treść overlaya. Jedyny element ze scrollem — nagłówek i stopka
  * zostają widoczne niezależnie od długości formularza.
- *
- * `asChild` istnieje dla formularzy: `<form>` musi obejmować i pola, i stopkę
- * z przyciskiem `submit`, więc bywa TYM elementem, a nie jego dzieckiem.
  */
 export function WorkspaceOverlayBody({
   children,

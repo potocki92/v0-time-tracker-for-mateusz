@@ -2,19 +2,15 @@
 
 import * as React from 'react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { SubmitButton, UniversalForm } from '@/components/common/form'
+import {
+  WorkspaceOverlay,
+  WorkspaceOverlayBody,
+  WorkspaceOverlayFooter,
+} from '@/components/workspace'
 import type { InvoiceBuilderValues } from '@/lib/schemas/invoice-builder.schema'
 import type { Client } from '@/lib/types'
-
-import { DIALOG_DARK_SURFACE } from '../dialog-theme'
 
 import {
   ClientPickerField,
@@ -38,16 +34,14 @@ interface InvoiceBuilderDialogProps {
 }
 
 /**
- * Mobile-first dialog for the redesigned Invoice Builder.
+ * Builder faktury.
  *
- * Visually identical to `<ClientFormDialog>` so the two flows feel like the
- * same application:
- *  - Mobile: 100dvh sheet, no rounding, body scrolls between sticky header
- *    and footer (so the primary action stays reachable above the keyboard).
- *  - Desktop: centred 3xl modal with rounded corners and 90vh max-height.
+ * Najszerszy ekran panelu (`size="xl"`) — siatka pozycji potrzebuje miejsca
+ * w poziomie. Poza szerokością nie różni się niczym od formularza klienta czy
+ * projektu: ten sam `WorkspaceOverlay`, ten sam nagłówek, ta sama stopka.
  *
- * Form state is owned by `<UniversalForm>` (RHF + Zod). The dialog itself
- * holds zero invoice state — it's a pure container.
+ * Stan formularza należy do `<UniversalForm>` (RHF + Zod); overlay nie trzyma
+ * żadnego stanu faktury.
  */
 export function InvoiceBuilderDialog({
   open,
@@ -66,65 +60,50 @@ export function InvoiceBuilderDialog({
   })
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
-      <DialogContent
-        className={[
-          DIALOG_DARK_SURFACE,
-          // Mobile: full-screen sheet.
-          'inset-0 flex h-[100dvh] w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0',
-          // Desktop: centred modal — wider than the client form because the
-          // line items grid needs the extra horizontal real estate.
-          'sm:inset-auto sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[90vh] sm:w-[calc(100%-2rem)] sm:max-w-3xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:border',
-        ].join(' ')}
+    <WorkspaceOverlay
+      open={open}
+      onOpenChange={(value) => !value && onClose()}
+      title={title}
+      srDescription={`Formularz ${isEditMode ? 'edycji' : 'wystawiania'} faktury z metadanymi, danymi nabywcy, pozycjami, podsumowaniem oraz informacjami o płatności.`}
+      size="xl"
+    >
+      <UniversalForm
+        id="invoice-builder-form"
+        ariaLabel={isEditMode ? 'Formularz edycji faktury' : 'Formularz nowej faktury'}
+        resolver={resolver}
+        defaultValues={defaultValues}
+        onSubmit={(values) => onSubmit(values)}
+        className="flex min-h-0 flex-1 flex-col gap-0 space-y-0"
       >
-        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6">
-          <DialogTitle className="text-lg font-semibold tracking-tight">
-            {title}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            Formularz {isEditMode ? 'edycji' : 'wystawiania'} faktury z metadanymi,
-            danymi nabywcy, pozycjami, podsumowaniem oraz informacjami o płatności.
-          </DialogDescription>
-        </DialogHeader>
-
-        <UniversalForm
-          id="invoice-builder-form"
-          ariaLabel={isEditMode ? 'Formularz edycji faktury' : 'Formularz nowej faktury'}
-          resolver={resolver}
-          defaultValues={defaultValues}
-          onSubmit={(values) => onSubmit(values)}
-          className="flex min-h-0 flex-1 flex-col gap-0 space-y-0"
-        >
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
-            <div className="mb-5">
-              <ClientPickerField
-                clients={clients}
-                selectedClientId={selectedClientId}
-                onSelectedClientIdChange={onSelectedClientIdChange}
-              />
-            </div>
-            <InvoiceBuilderFields isEditMode={isEditMode} clientId={selectedClientId} />
+        <WorkspaceOverlayBody>
+          <div className="mb-5">
+            <ClientPickerField
+              clients={clients}
+              selectedClientId={selectedClientId}
+              onSelectedClientIdChange={onSelectedClientIdChange}
+            />
           </div>
+          <InvoiceBuilderFields isEditMode={isEditMode} clientId={selectedClientId} />
+        </WorkspaceOverlayBody>
 
-          <footer className="sticky bottom-0 z-10 flex flex-col-reverse gap-2 border-t bg-background/95 px-5 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:flex-row sm:justify-end sm:px-6 sm:py-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={isSaving}
-              className="h-12 sm:h-10"
-            >
-              Anuluj
-            </Button>
-            <SubmitButton
-              pendingLabel="Zapisywanie..."
-              className="mt-0 sm:h-10 sm:w-auto sm:px-6"
-            >
-              {isEditMode ? 'Zapisz zmiany' : 'Wystaw fakturę'}
-            </SubmitButton>
-          </footer>
-        </UniversalForm>
-      </DialogContent>
-    </Dialog>
+        <WorkspaceOverlayFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSaving}
+            className="h-11 sm:h-9"
+          >
+            Anuluj
+          </Button>
+          <SubmitButton
+            pendingLabel="Zapisywanie..."
+            className="mt-0 h-11 w-full rounded-xl bg-brand-500 text-brand-foreground shadow-none hover:bg-brand-400 hover:shadow-none sm:h-9 sm:w-auto sm:px-6"
+          >
+            {isEditMode ? 'Zapisz zmiany' : 'Wystaw fakturę'}
+          </SubmitButton>
+        </WorkspaceOverlayFooter>
+      </UniversalForm>
+    </WorkspaceOverlay>
   )
 }

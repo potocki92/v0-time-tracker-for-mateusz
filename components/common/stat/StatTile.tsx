@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { LINEAR, SURFACE } from '@/components/ui/tokens'
@@ -21,6 +22,8 @@ type StatTileProps = {
   accent?: StatTileAccent
   /** Wartość tekstowa (np. nazwa klienta) — mniejszy stopień, żeby się mieściła. */
   compact?: boolean
+  /** Znacznik zmiany względem poprzedniego okresu — stoi po prawej stronie `meta`. */
+  trend?: ReactNode
 }
 
 const TONE_BADGE: Record<StatTileTone, string> = {
@@ -40,9 +43,18 @@ const ACCENT_BAR: Record<StatTileAccent, string> = {
 }
 
 /**
- * Kafelek KPI sekcji. Zastępuje trzy implementacje tego samego pudełka:
- * `KpiTile` w Projektach, lokalny `KpiTile` w `ClientsStats` i `InvoiceStatCard`
- * w Fakturach — patrz `docs/ui-audit.md`.
+ * Kafelek KPI sekcji — jeden dla całego panelu.
+ *
+ * Zastępuje `KpiTile` w Projektach, lokalny `KpiTile` w `ClientsStats`,
+ * `InvoiceStatCard` w Fakturach (patrz `docs/ui-audit.md`) oraz
+ * `ReportKpiCard` w Raportach. Ten ostatni różnił się WYŁĄCZNIE slotem na
+ * znacznik zmiany — stąd `trend`, a nie czwarta implementacja pudełka.
+ *
+ * Skala wartości i traktowanie ikony idą z Raportów, bo to one są wzorcem
+ * wizualnym panelu: mniejsza liczba mniej się ucina w dwukolumnowej siatce
+ * na 390 px, a ikona bez ramki nie konkuruje z danymi. Padding `p-4 sm:p-5`
+ * jest wspólny z `WorkspaceCard`, więc kafelek KPI i karta sekcji stojące
+ * obok siebie mają ten sam rytm.
  */
 export function StatTile({
   label,
@@ -55,24 +67,15 @@ export function StatTile({
   progress,
   accent = 'brand',
   compact,
+  trend,
 }: StatTileProps) {
   return (
-    <div data-slot="stat-tile" className={cn(SURFACE.card, 'p-3.5 sm:p-4')}>
+    <div data-slot="stat-tile" className={cn(SURFACE.card, 'p-4 sm:p-5')}>
       <div className="flex items-start justify-between gap-2">
         {/* min-h na dwie linie — inaczej kafelek z zawiniętą etykietą jest
             wyższy od sąsiadów i siatka się rozjeżdża. */}
         <SectionEyebrow className="min-h-[2.4em] leading-[1.2]">{label}</SectionEyebrow>
-        {Icon && (
-          <span
-            className={cn(
-              'shrink-0 rounded-md border p-1 text-zinc-300',
-              LINEAR.border,
-              LINEAR.surfaceElevated,
-            )}
-          >
-            <Icon className="h-3.5 w-3.5" aria-hidden />
-          </span>
-        )}
+        {Icon && <Icon aria-hidden className="size-4 shrink-0 text-zinc-400" />}
         {badge && (
           <span
             className={cn(
@@ -85,12 +88,10 @@ export function StatTile({
         )}
       </div>
 
-      {/* Stały rozmiar zamiast płynnego `text-2xl` (clamp do 3rem w globals.css),
-          przez który kwoty ucinały się w dwukolumnowej siatce na telefonie. */}
       <p
         className={cn(
           'mt-2 truncate font-semibold leading-none tracking-tight text-white',
-          compact ? 'text-base leading-snug sm:text-lg' : 'text-3xl tabular-nums sm:text-4xl',
+          compact ? 'text-base leading-snug sm:text-lg' : 'text-2xl tabular-nums sm:text-3xl',
         )}
       >
         {value}
@@ -112,7 +113,12 @@ export function StatTile({
         </div>
       )}
 
-      {meta && <p className="mt-2 truncate text-2xs text-zinc-400 sm:text-xs">{meta}</p>}
+      {(meta || trend) && (
+        <div className="mt-2 flex items-center justify-between gap-2 text-2xs text-zinc-400 sm:text-xs">
+          <span className="min-w-0 truncate">{meta ?? ' '}</span>
+          {trend}
+        </div>
+      )}
     </div>
   )
 }
