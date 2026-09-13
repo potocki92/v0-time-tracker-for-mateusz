@@ -7,6 +7,7 @@ import { PageContainer } from '@/components/common/section/PageContainer'
 import { LOCALE_LABELS, toAppLocale } from '@/i18n/config'
 import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
+import { WorkspaceEmptyState } from '@/components/workspace'
 import { rangeOf, type DateKey, type StatementClientRef } from '../domain'
 import { useAccountingFilters } from '../hooks/useAccountingFilters'
 import { useAccountingQuery } from '../hooks/useAccountingQuery'
@@ -18,7 +19,6 @@ import { StatementFilters } from './filters/StatementFilters'
 import { StatementQuarters, StatementSummary } from './summary/StatementSummary'
 import { StatementWarnings } from './summary/StatementWarnings'
 import { StatementTable } from './table/StatementTable'
-import { StatementEmptyState } from './shared/StatementEmptyState'
 
 type Props = {
   /**
@@ -107,7 +107,7 @@ export function StatementContent({ today }: Props) {
           </span>
 
           {model.rows.length === 0 ? (
-            <StatementEmptyState
+            <WorkspaceEmptyState
               icon={FileX}
               title={t('states.noInvoicesTitle')}
               description={t('states.noInvoicesDescription')}

@@ -3,15 +3,12 @@
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight, Copy, Printer } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import {
+  WorkspaceOverlay,
+  WorkspaceOverlayBody,
+  WorkspaceOverlayFooter,
+} from '@/components/workspace'
 import type {
   ContractorBlock,
   WeeklySummary,
@@ -96,31 +93,30 @@ export function WeeklySummaryModal({
   }, [fmt, summary])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader>
-          <div className="flex items-center justify-between gap-2 print:hidden">
-            <Button variant="ghost" size="icon-sm" onClick={onPrevWeek} aria-label="Poprzedni tydzień">
-              <ChevronLeft />
-            </Button>
-            <DialogTitle className="text-center">
-              KW {summary.weekNumber}/{summary.weekYear}
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={onNextWeek}
-              disabled={!canGoNext}
-              aria-label="Następny tydzień"
-            >
-              <ChevronRight />
-            </Button>
-          </div>
-          <DialogDescription className="text-center print:hidden">
-            Skrót przepracowanego tygodnia ({summary.rangeLabel}) — dla księgowej
-          </DialogDescription>
-        </DialogHeader>
-
+    <WorkspaceOverlay
+      open={open}
+      onOpenChange={onOpenChange}
+      title={`KW ${summary.weekNumber}/${summary.weekYear}`}
+      description={`Skrót przepracowanego tygodnia (${summary.rangeLabel}) — dla księgowej`}
+      size="lg"
+      headerAction={
+        <div className="flex shrink-0 items-center gap-1 print:hidden">
+          <Button variant="ghost" size="icon-sm" onClick={onPrevWeek} aria-label="Poprzedni tydzień">
+            <ChevronLeft />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onNextWeek}
+            disabled={!canGoNext}
+            aria-label="Następny tydzień"
+          >
+            <ChevronRight />
+          </Button>
+        </div>
+      }
+    >
+      <WorkspaceOverlayBody>
         <div data-print-area className="space-y-3">
           <div className="hidden print:block">
             <h2 className="text-base font-semibold">
@@ -139,17 +135,24 @@ export function WeeklySummaryModal({
             ))
           )}
         </div>
+      </WorkspaceOverlayBody>
 
-        <DialogFooter className="print:hidden">
-          <Button variant="outline" onClick={handleCopy} disabled={summary.isEmpty}>
-            <Copy /> Kopiuj
-          </Button>
-          <Button variant="outline" onClick={() => window.print()} disabled={summary.isEmpty}>
-            <Printer /> Drukuj / PDF
-          </Button>
-          <Button onClick={() => onOpenChange(false)}>Zamknij</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <WorkspaceOverlayFooter className="print:hidden">
+        <Button variant="outline" onClick={handleCopy} disabled={summary.isEmpty} className="h-11 sm:h-9">
+          <Copy /> Kopiuj
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => window.print()}
+          disabled={summary.isEmpty}
+          className="h-11 sm:h-9"
+        >
+          <Printer /> Drukuj / PDF
+        </Button>
+        <Button variant="accent" onClick={() => onOpenChange(false)} className="h-11 sm:h-9">
+          Zamknij
+        </Button>
+      </WorkspaceOverlayFooter>
+    </WorkspaceOverlay>
   )
 }

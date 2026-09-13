@@ -844,6 +844,48 @@
 }
 
 @layer components {
+  /*
+   * Strefa panelu — jedna skora dla prymitywow shadcn.
+   *
+   * Panel jest CIEMNY niezaleznie od wybranego schematu (skala --surface-*
+   * ma te same wartosci w bloku light i dark), ale shadcnowe `Button`,
+   * `Input`, `Select` czy `Table` czytaja `--background`, `--card`,
+   * `--popover`, `--border`. W jasnym motywie wypadaly wiec jasno na ciemnym
+   * tle sekcji. Faktury obchodzily to lokalnym `DIALOG_DARK_SURFACE`, ktory
+   * przypinal zahardkodowane hexy — razem z zielenia, wiec modal faktury
+   * ignorowal wybrany motyw kolorystyczny.
+   *
+   * Tutaj przepinamy WYLACZNIE powierzchnie i kontury na skale panelu.
+   * `--primary`, `--ring`, `--brand-*` i `--chart-*` dziedzicza sie z <html>,
+   * wiec motyw kolorystyczny uzytkownika dziala dalej.
+   *
+   * Klase nosi powloka panelu (`AppShell`) oraz `WorkspaceOverlay`, bo
+   * overlaye portaluja sie do <body>, poza drzewo powloki.
+   */
+  .workspace-surface {
+    color-scheme: dark;
+    --background: var(--surface-1);
+    --foreground: oklch(0.985 0 0);
+    --card: var(--surface-2);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: var(--surface-2);
+    --popover-foreground: oklch(0.985 0 0);
+    --muted: var(--surface-2);
+    --muted-foreground: oklch(0.708 0 0);
+    --secondary: var(--surface-3);
+    --secondary-foreground: oklch(0.985 0 0);
+    --accent: var(--surface-3);
+    --accent-foreground: oklch(0.985 0 0);
+    --border: var(--hairline);
+    --input: var(--hairline-strong);
+    --input-border: var(--hairline-strong);
+    --sidebar: var(--surface-1);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-accent: var(--surface-3);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: var(--hairline);
+  }
+
   .avatar-ring {
     background-color: color-mix(in oklab, var(--background) 35%, transparent);
     backdrop-filter: blur(8px);

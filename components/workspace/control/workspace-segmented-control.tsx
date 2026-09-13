@@ -6,33 +6,43 @@ import { cn } from '@/lib/utils'
 type Option<T extends string> = { value: T; label: string }
 
 type Props<T extends string> = {
-  /** Etykieta grupy dla czytnika ekranu — grupa nie ma widocznego naglowka. */
-  ariaLabel: string
   value: T
   options: Array<Option<T>>
   onChange: (value: T) => void
+  /** Etykieta grupy dla czytnika ekranu — gdy grupa nie ma widocznego nagłówka. */
+  ariaLabel?: string
+  /** Alternatywa dla `ariaLabel`, gdy widoczny nagłówek grupy już istnieje. */
+  ariaLabelledBy?: string
   className?: string
 }
 
 /**
- * Przelacznik metryki / przekroju.
+ * Przełącznik przekroju / metryki. Uogólniony `SegmentedControl` z Raportów.
  *
- * Jeden komponent dla wykresu i breakdownow: te same stany, ta sama obsluga
- * klawiatury i to samo `aria-pressed`. Pigulki celowo NIE sa `role="tab"` —
- * nie przelaczaja paneli, tylko zawartosc tej samej sekcji.
+ * Pigułki celowo NIE są `role="tab"` — nie przełączają paneli, tylko zawartość
+ * tej samej sekcji. Aktywna pigułka jest biała na czarnym tekście: to jedyne
+ * miejsce w panelu, w którym biel pełni rolę wypełnienia, a nie tekstu, więc
+ * stan aktywny czyta się bez użycia koloru akcentu.
  */
-export function SegmentedControl<T extends string>({
-  ariaLabel,
+export function WorkspaceSegmentedControl<T extends string>({
   value,
   options,
   onChange,
+  ariaLabel,
+  ariaLabelledBy,
   className,
 }: Props<T>) {
   return (
     <div
       role="group"
       aria-label={ariaLabel}
-      className={cn('inline-flex gap-1 rounded-xl border p-1', LINEAR.border, LINEAR.surface, className)}
+      aria-labelledby={ariaLabelledBy}
+      className={cn(
+        'inline-flex gap-1 rounded-xl border p-1',
+        LINEAR.border,
+        LINEAR.surface,
+        className,
+      )}
     >
       {options.map((option) => {
         const active = option.value === value

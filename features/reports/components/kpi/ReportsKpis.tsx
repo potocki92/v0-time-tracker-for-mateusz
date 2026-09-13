@@ -2,10 +2,10 @@
 
 import { useTranslations } from 'next-intl'
 import { CalendarCheck, Clock4, Coins, Gauge, Percent, Sigma } from 'lucide-react'
+import { StatTile } from '@/components/common/stat/StatTile'
 import { NO_DATA } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 import type { ComparableMetric, ReportModel } from '../../domain'
-import { ReportKpiCard } from './ReportKpiCard'
 import { TrendBadge } from './TrendBadge'
 
 type Props = {
@@ -37,11 +37,11 @@ export function ReportsKpis({ model }: Props) {
       aria-label={t('kpi.sectionLabel')}
       className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3"
     >
-      <ReportKpiCard
+      <StatTile
         icon={Sigma}
         label={t('kpi.totalHours.label')}
         value={fmt.hours(kpis.totalHours)}
-        hint={
+        meta={
           comparison
             ? previousHint(fmt.hours(comparison.previousKpis.totalHours))
             : t('kpi.totalHours.hint', { count: kpis.entryCount })
@@ -49,11 +49,11 @@ export function ReportsKpis({ model }: Props) {
         trend={trendOf('totalHours')}
       />
 
-      <ReportKpiCard
+      <StatTile
         icon={Coins}
         label={t('kpi.workValue.label')}
         value={fmt.money(kpis.workValueMinor, model.currency)}
-        hint={
+        meta={
           comparison
             ? previousHint(fmt.moneyCompact(comparison.previousKpis.workValueMinor, model.currency))
             : t('kpi.workValue.hint')
@@ -61,11 +61,11 @@ export function ReportsKpis({ model }: Props) {
         trend={trendOf('workValue')}
       />
 
-      <ReportKpiCard
+      <StatTile
         icon={CalendarCheck}
         label={t('kpi.activeDays.label')}
         value={fmt.number(kpis.activeDays)}
-        hint={
+        meta={
           comparison
             ? previousHint(fmt.number(comparison.previousKpis.activeDays))
             : t('kpi.activeDays.hint', { count: model.spanDays })
@@ -73,11 +73,11 @@ export function ReportsKpis({ model }: Props) {
         trend={trendOf('activeDays')}
       />
 
-      <ReportKpiCard
+      <StatTile
         icon={Clock4}
         label={t('kpi.avgPerActiveDay.label')}
         value={fmt.hours(kpis.avgHoursPerActiveDay, { decimals: 1 })}
-        hint={
+        meta={
           comparison
             ? previousHint(fmt.hours(comparison.previousKpis.avgHoursPerActiveDay, { decimals: 1 }))
             : t('kpi.avgPerActiveDay.hint')
@@ -85,11 +85,11 @@ export function ReportsKpis({ model }: Props) {
         trend={trendOf('avgHoursPerActiveDay')}
       />
 
-      <ReportKpiCard
+      <StatTile
         icon={Gauge}
         label={t('kpi.effectiveRate.label')}
         value={fmt.rate(kpis.effectiveHourlyRateMinor, model.currency)}
-        hint={
+        meta={
           comparison
             ? previousHint(
                 fmt.rate(comparison.previousKpis.effectiveHourlyRateMinor, model.currency),
@@ -99,11 +99,11 @@ export function ReportsKpis({ model }: Props) {
         trend={trendOf('effectiveHourlyRate')}
       />
 
-      <ReportKpiCard
+      <StatTile
         icon={Percent}
         label={t('kpi.billable.label')}
         value={kpis.billableRatio === null ? NO_DATA : fmt.percent(kpis.billableRatio)}
-        hint={
+        meta={
           comparison
             ? previousHint(
                 comparison.previousKpis.billableRatio === null

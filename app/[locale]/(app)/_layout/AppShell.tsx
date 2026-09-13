@@ -53,7 +53,9 @@ export function AppShell({ user, badges, children }: AppShellProps) {
   }, [queryClient, locale])
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    // `workspace-surface` przepina powierzchnie shadcn na skale panelu dla
+    // calej powloki — patrz komentarz przy klasie w `app/globals.css`.
+    <SidebarProvider defaultOpen={true} className="workspace-surface">
       <a href="#main-content" className="skip-link">
         {t('skipToContent')}
       </a>

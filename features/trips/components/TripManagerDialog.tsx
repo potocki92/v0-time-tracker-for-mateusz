@@ -5,15 +5,17 @@ import { useFormat } from '@/lib/format/client'
 import { ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { SURFACE } from '@/components/ui/tokens'
+import {
+  WORKSPACE_FIELD,
+  WORKSPACE_FIELD_LABEL,
+  WorkspaceOverlay,
+  WorkspaceOverlayBody,
+  WorkspaceOverlayFooter,
+} from '@/components/workspace'
+import { cn } from '@/lib/utils'
 
 import { formatPlLongDate, todayIsoUtc, type Trip } from '../domain'
 import type { UseTripsResult } from '../hooks'
@@ -79,22 +81,23 @@ export function TripManagerDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] gap-3 overflow-x-hidden overflow-y-auto p-4 sm:max-w-lg sm:gap-4 sm:p-6">
-        <DialogHeader>
-          <DialogTitle>Wyjazdy do pracy</DialogTitle>
-        </DialogHeader>
-
+    <WorkspaceOverlay
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Wyjazdy do pracy"
+      size="md"
+    >
+      <WorkspaceOverlayBody className="overflow-x-hidden">
         <div className="min-w-0 space-y-5">
-          <section className="space-y-3 rounded-xl border border-border/60 bg-muted/20 p-3">
-            <p className="text-sm font-medium">Nowy wyjazd</p>
-            <p className="text-xs text-muted-foreground">
+          <section className={cn(SURFACE.cardNested, 'space-y-3 p-3')}>
+            <p className="text-sm font-medium text-white">Nowy wyjazd</p>
+            <p className="text-xs text-zinc-400">
               „Powrót do domu” to dzień, w którym wracasz po pracy — licznik
               pokaże 0, gdy nadejdzie ten dzień.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="grid gap-1.5">
-                <Label htmlFor="trip-start">Wyjazd (pierwszy dzień pracy)</Label>
+                <Label htmlFor="trip-start" className={WORKSPACE_FIELD_LABEL}>Wyjazd (pierwszy dzień pracy)</Label>
                 <Input
                   id="trip-start"
                   type="date"
@@ -102,10 +105,11 @@ export function TripManagerDialog({
                   onChange={(event) =>
                     setDraft((prev) => ({ ...prev, startDate: event.target.value }))
                   }
+                  className={WORKSPACE_FIELD}
                 />
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="trip-end">Powrót do domu (ostatni dzień)</Label>
+                <Label htmlFor="trip-end" className={WORKSPACE_FIELD_LABEL}>Powrót do domu (ostatni dzień)</Label>
                 <Input
                   id="trip-end"
                   type="date"
@@ -113,11 +117,12 @@ export function TripManagerDialog({
                   onChange={(event) =>
                     setDraft((prev) => ({ ...prev, endDate: event.target.value }))
                   }
+                  className={WORKSPACE_FIELD}
                 />
               </div>
             </div>
             <div className="grid gap-1.5">
-              <Label htmlFor="trip-destination">Miejsce (opcjonalne)</Label>
+              <Label htmlFor="trip-destination" className={WORKSPACE_FIELD_LABEL}>Miejsce (opcjonalne)</Label>
               <Input
                 id="trip-destination"
                 placeholder="np. Niemcy — Berlin"
@@ -125,6 +130,7 @@ export function TripManagerDialog({
                 onChange={(event) =>
                   setDraft((prev) => ({ ...prev, destination: event.target.value }))
                 }
+                className={WORKSPACE_FIELD}
               />
             </div>
             {error ? (
@@ -141,13 +147,13 @@ export function TripManagerDialog({
           <section className="min-w-0 space-y-2">
             <p className="text-sm font-medium">Zapisane wyjazdy</p>
             {sortedTrips.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border/60 px-3 py-4 text-center text-xs text-muted-foreground">
+              <p className="rounded-xl border border-dashed border-hairline px-3 py-4 text-center text-xs text-zinc-400">
                 Lista jest pusta — dodaj swój pierwszy wyjazd powyżej.
               </p>
             ) : (
               <ul
                 role="list"
-                className="divide-y divide-border/50 overflow-hidden rounded-xl border border-border/60 bg-background/40"
+                className={cn(SURFACE.cardNested, 'divide-y divide-hairline-strong overflow-hidden')}
               >
                 {sortedTrips.map((trip) => {
                   const isEditing = editingTripId === trip.id
@@ -162,14 +168,14 @@ export function TripManagerDialog({
                           className="flex min-w-0 flex-1 items-center gap-2 text-left"
                         >
                           <ChevronDown
-                            className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${isEditing ? 'rotate-180' : ''}`}
+                            className={`h-3.5 w-3.5 shrink-0 text-zinc-400 transition-transform ${isEditing ? 'rotate-180' : ''}`}
                             aria-hidden
                           />
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-medium">
                               {trip.destination?.trim() || 'Wyjazd'}
                             </p>
-                            <p className="truncate text-2xs text-muted-foreground">
+                            <p className="truncate text-2xs text-zinc-400">
                               {formatPlLongDate(fmt, trip.startDate)} → {formatPlLongDate(fmt, trip.endDate)}
                             </p>
                           </div>
@@ -180,7 +186,7 @@ export function TripManagerDialog({
                           size="icon"
                           aria-label={isEditing ? 'Zamknij edycję' : 'Edytuj wyjazd'}
                           onClick={() => setEditingTripId(isEditing ? null : trip.id)}
-                          className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+                          className="size-8 shrink-0 text-zinc-400 hover:text-white"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
@@ -190,7 +196,7 @@ export function TripManagerDialog({
                           size="icon"
                           aria-label="Usuń wyjazd"
                           onClick={() => api.removeTrip(trip.id)}
-                          className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
+                          className="size-8 shrink-0 text-zinc-400 hover:text-destructive"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -199,10 +205,10 @@ export function TripManagerDialog({
                       {isEditing ? (
                         <div
                           id={`trip-edit-${trip.id}`}
-                          className="grid gap-2 border-t border-border/50 bg-muted/20 px-3 py-3 sm:grid-cols-2"
+                          className="grid gap-2 border-t border-hairline-strong bg-surface-2 px-3 py-3 sm:grid-cols-2"
                         >
                           <div className="grid gap-1">
-                            <Label htmlFor={`start-${trip.id}`} className="text-2xs uppercase tracking-wide text-muted-foreground">
+                            <Label htmlFor={`start-${trip.id}`} className="text-2xs uppercase tracking-wide text-zinc-400">
                               Wyjazd
                             </Label>
                             <Input
@@ -212,10 +218,11 @@ export function TripManagerDialog({
                               onChange={(event) =>
                                 api.updateTrip(trip.id, { startDate: event.target.value })
                               }
+                              className={WORKSPACE_FIELD}
                             />
                           </div>
                           <div className="grid gap-1">
-                            <Label htmlFor={`end-${trip.id}`} className="text-2xs uppercase tracking-wide text-muted-foreground">
+                            <Label htmlFor={`end-${trip.id}`} className="text-2xs uppercase tracking-wide text-zinc-400">
                               Powrót
                             </Label>
                             <Input
@@ -225,10 +232,11 @@ export function TripManagerDialog({
                               onChange={(event) =>
                                 api.updateTrip(trip.id, { endDate: event.target.value })
                               }
+                              className={WORKSPACE_FIELD}
                             />
                           </div>
                           <div className="grid gap-1 sm:col-span-2">
-                            <Label htmlFor={`destination-${trip.id}`} className="text-2xs uppercase tracking-wide text-muted-foreground">
+                            <Label htmlFor={`destination-${trip.id}`} className="text-2xs uppercase tracking-wide text-zinc-400">
                               Miejsce
                             </Label>
                             <Input
@@ -240,6 +248,7 @@ export function TripManagerDialog({
                                   destination: event.target.value || undefined,
                                 })
                               }
+                              className={WORKSPACE_FIELD}
                             />
                           </div>
                         </div>
@@ -251,13 +260,13 @@ export function TripManagerDialog({
             )}
           </section>
         </div>
+      </WorkspaceOverlayBody>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Zamknij
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <WorkspaceOverlayFooter>
+        <Button variant="outline" onClick={() => onOpenChange(false)} className="h-11 sm:h-9">
+          Zamknij
+        </Button>
+      </WorkspaceOverlayFooter>
+    </WorkspaceOverlay>
   )
 }

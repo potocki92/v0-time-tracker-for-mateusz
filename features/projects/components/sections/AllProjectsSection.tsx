@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { Search, X } from 'lucide-react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { WorkspaceOverlay, WorkspaceOverlayBody } from '@/components/workspace'
 import type { Project } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import {
@@ -151,37 +151,27 @@ export function AllProjectsSection({
       )}
 
       {/* Renderuje się przez portal, więc miejsce w drzewie nie ma znaczenia. */}
-      <Sheet
+      <WorkspaceOverlay
         open={Boolean(selectedRow)}
         onOpenChange={(open) => {
           if (!open) setSelectedProjectId(null)
         }}
+        title={selectedRow?.project.name ?? 'Szczegóły projektu'}
+        size="lg"
       >
-        <SheetContent
-          side="bottom"
-          className={cn(
-            'max-h-[90dvh] overflow-y-auto rounded-t-2xl border p-0',
-            LINEAR.border,
-            LINEAR.surface,
-          )}
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Szczegóły projektu</SheetTitle>
-          </SheetHeader>
+        <WorkspaceOverlayBody className="px-2 sm:px-2">
+          {/* Panel zostaje otwarty pod spodem — formularz i potwierdzenie
+              usunięcia wychodzą jako druga warstwa nad nim (`layer="stacked"`).
+              Po usunięciu projekt wypada z `rows`, więc panel zamyka się sam. */}
           {selectedRow && (
-            <div className="px-2 pb-[max(env(safe-area-inset-bottom),1rem)] pt-2">
-              {/* Panel zostaje otwarty pod spodem — formularz i potwierdzenie
-                  usunięcia wychodzą jako druga warstwa nad nim. Po usunięciu
-                  projekt wypada z `rows`, więc panel zamyka się sam. */}
-              <ProjectDetailsPanel
-                row={selectedRow}
-                onEdit={() => onEditProject?.(selectedRow.project)}
-                onDelete={() => onDeleteProject?.(selectedRow.project)}
-              />
-            </div>
+            <ProjectDetailsPanel
+              row={selectedRow}
+              onEdit={() => onEditProject?.(selectedRow.project)}
+              onDelete={() => onDeleteProject?.(selectedRow.project)}
+            />
           )}
-        </SheetContent>
-      </Sheet>
+        </WorkspaceOverlayBody>
+      </WorkspaceOverlay>
     </LinearCard>
   )
 }

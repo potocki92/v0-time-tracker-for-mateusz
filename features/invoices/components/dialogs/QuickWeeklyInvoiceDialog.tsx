@@ -7,14 +7,6 @@ import { useFormat } from '@/lib/format/client'
 import { useQuery } from '@tanstack/react-query'
 import { CalendarRange, Loader2 } from 'lucide-react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
@@ -26,12 +18,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { SURFACE } from '@/components/ui/tokens'
+import {
+  WORKSPACE_FIELD,
+  WORKSPACE_FIELD_LABEL,
+  WorkspaceEmptyState,
+  WorkspaceOverlay,
+  WorkspaceOverlayBody,
+  WorkspaceOverlayFooter,
+} from '@/components/workspace'
 import { cn } from '@/lib/utils'
 import { fetchWorkedWeeksAction } from '../../services/actions/worked-weeks.actions'
 import type { Client } from '@/lib/types'
 import type { InvoiceFormValues, InvoiceSettings } from '../../domain'
-import { DIALOG_DARK_SURFACE } from '../dialog-theme'
 
 interface QuickWeeklyInvoiceDialogProps {
   open: boolean
@@ -205,36 +204,27 @@ export function QuickWeeklyInvoiceDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && !isSaving && onClose()}>
-      <DialogContent
-        className={cn(
-          DIALOG_DARK_SURFACE,
-          'inset-0 flex h-[100dvh] w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0',
-          'sm:inset-auto sm:top-[50%] sm:left-[50%] sm:h-auto sm:max-h-[90vh] sm:w-[calc(100%-2rem)] sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-2xl sm:border',
-        )}
-      >
-        <DialogHeader className="sticky top-0 z-10 border-b bg-background/95 px-5 py-4 text-left backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6">
-          <DialogTitle>Wystaw fakturę z przepracowanych tygodni</DialogTitle>
-          <DialogDescription>
-            Wybierz klienta z listy i zaznacz tygodnie do zafakturowania. Faktura
-            wypełni się danymi z karty klienta i wpisami z kalendarza.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
+    <WorkspaceOverlay
+      open={open}
+      onOpenChange={(next) => !next && !isSaving && onClose()}
+      title="Wystaw fakturę z przepracowanych tygodni"
+      description="Wybierz klienta z listy i zaznacz tygodnie do zafakturowania. Faktura wypełni się danymi z karty klienta i wpisami z kalendarza."
+      size="lg"
+    >
+      <WorkspaceOverlayBody className="space-y-4">
           <div className="grid gap-3">
             <div className="grid gap-1.5">
-              <Label>Klient</Label>
+              <Label className={WORKSPACE_FIELD_LABEL}>Klient</Label>
               {clients.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-zinc-400">
                   Najpierw dodaj klienta w sekcji „Klienci”, aby wystawić mu fakturę.
                 </p>
               ) : (
                 <Select value={clientId} onValueChange={setClientId}>
-                  <SelectTrigger>
+                  <SelectTrigger className={WORKSPACE_FIELD}>
                     <SelectValue placeholder="Wybierz klienta" />
                   </SelectTrigger>
-                  <SelectContent className={DIALOG_DARK_SURFACE}>
+                  <SelectContent>
                     {clients.map((client) => (
                       <SelectItem key={client.id} value={client.id}>
                         {client.name}
@@ -247,30 +237,36 @@ export function QuickWeeklyInvoiceDialog({
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="grid gap-1.5">
-                <Label htmlFor="quick-from">Od</Label>
+                <Label htmlFor="quick-from" className={WORKSPACE_FIELD_LABEL}>
+                  Od
+                </Label>
                 <Input
                   id="quick-from"
                   type="date"
                   value={range.from}
                   max={range.to}
                   onChange={(e) => setRange((prev) => ({ ...prev, from: e.target.value }))}
+                  className={WORKSPACE_FIELD}
                 />
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="quick-to">Do</Label>
+                <Label htmlFor="quick-to" className={WORKSPACE_FIELD_LABEL}>
+                  Do
+                </Label>
                 <Input
                   id="quick-to"
                   type="date"
                   value={range.to}
                   min={range.from}
                   onChange={(e) => setRange((prev) => ({ ...prev, to: e.target.value }))}
+                  className={WORKSPACE_FIELD}
                 />
               </div>
             </div>
           </div>
 
           {error ? (
-            <div className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+            <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               Nie udało się pobrać tygodni: {error instanceof Error ? error.message : 'błąd serwera'}.{' '}
               <button type="button" className="underline" onClick={() => void refetch()}>
                 Spróbuj ponownie
@@ -278,30 +274,24 @@ export function QuickWeeklyInvoiceDialog({
             </div>
           ) : null}
 
-          <div className="overflow-hidden rounded-md border">
+          <div className={cn(SURFACE.cardNested, 'overflow-hidden')}>
             {!clientId ? (
-              <p className="px-4 py-10 text-center text-sm text-muted-foreground">
+              <p className="px-4 py-10 text-center text-sm text-zinc-400">
                 Wybierz klienta, aby zobaczyć przepracowane tygodnie.
               </p>
             ) : isBusy ? (
-              <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-muted-foreground">
+              <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-zinc-400">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Ładowanie tygodni...
               </div>
             ) : weeks.length === 0 ? (
-              <Empty className="py-8">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <CalendarRange className="size-5" />
-                  </EmptyMedia>
-                  <EmptyTitle>Brak przepracowanych tygodni</EmptyTitle>
-                  <EmptyDescription>
-                    Rozszerz zakres dat lub dodaj wpisy w kalendarzu — pokażemy tylko
-                    tygodnie z dniami oznaczonymi jako „pracowałem”.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
+              <WorkspaceEmptyState
+                icon={CalendarRange}
+                title="Brak przepracowanych tygodni"
+                description="Rozszerz zakres dat lub dodaj wpisy w kalendarzu — pokażemy tylko tygodnie z dniami oznaczonymi jako „pracowałem”."
+                className="border-0"
+              />
             ) : (
-              <ul className="divide-y divide-hairline" role="list">
+              <ul className="divide-y divide-hairline-strong" role="list">
                 {weeks.map((week) => {
                   const checked = selected.has(week.id)
                   return (
@@ -319,12 +309,12 @@ export function QuickWeeklyInvoiceDialog({
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-baseline justify-between gap-3">
-                            <p className="font-medium">{week.id}</p>
-                            <p className="text-sm font-semibold">
+                            <p className="font-medium text-white">{week.id}</p>
+                            <p className="text-sm font-semibold tabular-nums text-white">
                               {formatAmount(fmt, week.amount, week.currency)}
                             </p>
                           </div>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-zinc-400">
                             {week.start} – {week.end} · {week.workedDays}{' '}
                             {week.workedDays === 1 ? 'dzień' : 'dni'} · {fmt.hours(week.hours)}
                           </p>
@@ -343,9 +333,9 @@ export function QuickWeeklyInvoiceDialog({
                 Zaznacz ostatni tydzień
               </Button>
               {selectedWeeks.length > 0 ? (
-                <p className="text-muted-foreground">
+                <p className="text-zinc-400">
                   Suma:{' '}
-                  <span className="font-medium text-foreground">
+                  <span className="font-medium text-white">
                     {formatAmount(fmt, totalAmount, totalCurrency)}
                   </span>{' '}
                   ({selectedWeeks.length} {selectedWeeks.length === 1 ? 'tydzień' : 'tygodni'})
@@ -353,21 +343,21 @@ export function QuickWeeklyInvoiceDialog({
               ) : null}
             </div>
           ) : null}
-        </div>
+      </WorkspaceOverlayBody>
 
-        <DialogFooter className="sticky bottom-0 z-10 border-t bg-background/95 px-5 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:px-6 sm:py-4">
-          <Button variant="outline" onClick={onClose} disabled={isSaving} className="h-12 sm:h-10">
-            Anuluj
-          </Button>
-          <Button
-            onClick={() => void handleSubmit()}
-            disabled={isSaving || selectedWeeks.length === 0 || !selectedClient}
-            className="h-12 sm:h-10 sm:px-6"
-          >
-            {isSaving ? 'Zapisywanie...' : 'Wystaw fakturę'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <WorkspaceOverlayFooter>
+        <Button variant="outline" onClick={onClose} disabled={isSaving} className="h-11 sm:h-9">
+          Anuluj
+        </Button>
+        <Button
+          variant="accent"
+          onClick={() => void handleSubmit()}
+          disabled={isSaving || selectedWeeks.length === 0 || !selectedClient}
+          className="h-11 sm:h-9 sm:px-6"
+        >
+          {isSaving ? 'Zapisywanie...' : 'Wystaw fakturę'}
+        </Button>
+      </WorkspaceOverlayFooter>
+    </WorkspaceOverlay>
   )
 }

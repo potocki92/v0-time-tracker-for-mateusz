@@ -4,10 +4,8 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { FolderOpen } from 'lucide-react'
 import { useFormat } from '@/lib/format/client'
+import { WorkspaceCard, WorkspaceEmptyState, WorkspaceSegmentedControl } from '@/components/workspace'
 import type { BreakdownDimension, ReportModel } from '../../domain'
-import { ReportCard } from '../shared/ReportCard'
-import { ReportEmptyState } from '../shared/ReportEmptyState'
-import { SegmentedControl } from '../shared/SegmentedControl'
 import { BreakdownRow } from './BreakdownRow'
 
 type Props = {
@@ -34,11 +32,11 @@ export function ReportsBreakdownSection({ model }: Props) {
   const fallbackLabel = dimension === 'tag' ? t('breakdown.untagged') : t('breakdown.unassigned')
 
   return (
-    <ReportCard
+    <WorkspaceCard
       title={t('breakdown.title')}
       ariaLabel={t('breakdown.sectionLabel')}
       action={
-        <SegmentedControl
+        <WorkspaceSegmentedControl
           ariaLabel={t('breakdown.dimensionSwitcher')}
           value={dimension}
           onChange={(next) => {
@@ -54,7 +52,7 @@ export function ReportsBreakdownSection({ model }: Props) {
       }
     >
       {items.length === 0 ? (
-        <ReportEmptyState
+        <WorkspaceEmptyState
           icon={FolderOpen}
           title={t('breakdown.empty')}
           description={t('states.noMatchDescription')}
@@ -92,6 +90,6 @@ export function ReportsBreakdownSection({ model }: Props) {
           )}
         </>
       )}
-    </ReportCard>
+    </WorkspaceCard>
   )
 }

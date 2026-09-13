@@ -25,6 +25,10 @@ interface WorkspaceHeaderProps {
  *
  * Stala wysokosc `h-14` jest celowa — naglowek nie zmienia wysokosci przy
  * nawigacji ani po starcie licznika, wiec nawigacja nie generuje CLS.
+ *
+ * Powierzchnie i kolory tekstu ida ze skali panelu (`surface-*`, `zinc-*`),
+ * a nie z `bg-background` / `text-foreground`: te ostatnie obsluguja rowniez
+ * strefe publiczna, wiec naglowek panelu potrafil byc jasny nad ciemna trescia.
  */
 export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
   const t = useTranslations('navigation')
@@ -39,7 +43,7 @@ export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
     <header
       aria-label={t('header.aria')}
       data-testid="workspace-header"
-      className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-hairline bg-background/80 px-[var(--header-inline-padding)] backdrop-blur"
+      className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-hairline bg-surface-0/80 px-[var(--header-inline-padding)] backdrop-blur"
     >
       {leading}
 
@@ -53,10 +57,10 @@ export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
             {/* Na telefonie zostaje sama etykieta sekcji — grupa i separator
                 zabieraly polowe paska, nie wnoszac nic ponad to, co widac
                 w sidebarze. */}
-            <span className="hidden shrink-0 text-muted-foreground sm:inline">
+            <span className="hidden shrink-0 text-zinc-400 sm:inline">
               {t(`groups.${section.group}`)}
             </span>
-            <ChevronRight className="hidden size-3.5 shrink-0 text-muted-foreground sm:block" aria-hidden />
+            <ChevronRight className="hidden size-3.5 shrink-0 text-zinc-500 sm:block" aria-hidden />
             <BreadcrumbLeaf
               label={t(`sections.${section.segment}`)}
               current={!nested}
@@ -64,7 +68,7 @@ export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
             />
             {nested && (
               <>
-                <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+                <ChevronRight className="size-3.5 shrink-0 text-zinc-500" aria-hidden />
                 {/* Nazwa encji (projekt, klient, numer faktury) to DANE
                     uzytkownika — wyswietlamy ja doslownie, bez tlumaczenia. */}
                 <BreadcrumbLeaf
@@ -108,7 +112,7 @@ function BreadcrumbLeaf({
     <span
       aria-current={current ? 'page' : undefined}
       className={cn(
-        'font-medium text-foreground',
+        'font-medium text-white',
         truncate ? 'truncate' : 'shrink-0',
       )}
     >
@@ -118,7 +122,7 @@ function BreadcrumbLeaf({
 }
 
 const FOCUS_RING =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background'
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500/60'
 
 /**
  * Powiadomienia nie maja jeszcze zrodla danych — badge z liczba nieprzeczytanych
@@ -133,8 +137,8 @@ function NotificationsButton() {
       type="button"
       aria-label={t('header.notifications')}
       className={cn(
-        'inline-flex size-8 items-center justify-center rounded-md border border-hairline bg-surface-1',
-        'text-muted-foreground transition-colors hover:bg-surface-3 hover:text-foreground',
+        'inline-flex size-8 items-center justify-center rounded-lg border border-hairline bg-surface-2',
+        'text-zinc-400 transition-colors hover:bg-surface-3 hover:text-white',
         FOCUS_RING,
       )}
     >
@@ -159,7 +163,7 @@ function TimerButton() {
   return (
     <div className="flex items-center gap-2">
       {running && (
-        <span className="font-mono text-xs font-medium tabular-nums text-foreground">
+        <span className="font-mono text-xs font-medium tabular-nums text-white">
           {formatMmSs(elapsed)}
         </span>
       )}

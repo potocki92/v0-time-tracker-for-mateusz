@@ -4,7 +4,7 @@ import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Plus, Search } from 'lucide-react'
 import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
 import { Button } from '@/components/ui/button'
-import { LINEAR } from '@/components/ui/tokens'
+import { WORKSPACE_FIELD } from '@/components/workspace'
 import { cn } from '@/lib/utils'
 import type { InvoiceFilterTab } from '../../domain/stats'
 
@@ -102,11 +102,7 @@ export function InvoiceFilterToolbar({
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Szukaj faktury, klienta, projektu..."
             aria-label="Szukaj faktury"
-            className={cn(
-              'h-11 w-full rounded-xl border pl-9 pr-3 text-xs text-zinc-200 placeholder:text-zinc-400 focus:border-brand-500/40 focus:outline-none focus:ring-2 focus:ring-brand-500/20',
-              LINEAR.border,
-              LINEAR.surface,
-            )}
+            className={cn(WORKSPACE_FIELD, 'pl-9 pr-3')}
           />
         </div>
       </div>

@@ -6,9 +6,8 @@ import { useFormat } from '@/lib/format/client'
 import type { AppFormat } from '@/lib/format'
 import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
+import { WorkspaceCard, WorkspaceEmptyState } from '@/components/workspace'
 import { formatPartyAddress, type StatementModel, type StatementRow } from '../../domain'
-import { StatementCard } from '../shared/StatementCard'
-import { StatementEmptyState } from '../shared/StatementEmptyState'
 import { useStatementTable, type StatementTableState } from './useStatementTable'
 
 type Props = {
@@ -28,7 +27,7 @@ export function StatementTable({ model }: Props) {
   const table = useStatementTable(model.rows)
 
   return (
-    <StatementCard
+    <WorkspaceCard
       title={t('table.title')}
       ariaLabel={t('table.sectionLabel')}
       action={
@@ -38,7 +37,7 @@ export function StatementTable({ model }: Props) {
       }
     >
       {model.rows.length === 0 ? (
-        <StatementEmptyState
+        <WorkspaceEmptyState
           icon={ListX}
           title={t('table.empty')}
           description={t('states.noInvoicesDescription')}
@@ -51,7 +50,7 @@ export function StatementTable({ model }: Props) {
           <Pagination table={table} />
         </>
       )}
-    </StatementCard>
+    </WorkspaceCard>
   )
 }
 

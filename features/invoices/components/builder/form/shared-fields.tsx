@@ -18,9 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { WORKSPACE_FIELD } from '@/components/workspace'
 import { cn } from '@/lib/utils'
 
-import { DIALOG_DARK_SURFACE } from '../../dialog-theme'
 
 /**
  * Bridge helpers that follow the same visual language as `<FormInput>` from
@@ -45,11 +45,10 @@ import { DIALOG_DARK_SURFACE } from '../../dialog-theme'
 const SOFT_INVALID_CLASS =
   'aria-invalid:border-destructive/55 aria-invalid:ring-destructive/10 dark:aria-invalid:ring-destructive/20'
 
-const INPUT_BASE_CLASS =
-  'h-12 rounded-xl border-input-border bg-background px-4 text-sm shadow-sm transition focus-visible:border-primary/70 focus-visible:ring-primary/25'
+// Jedna skora pol dla calego panelu — patrz `components/workspace/form/field.ts`.
+const INPUT_BASE_CLASS = WORKSPACE_FIELD
 
-const TRIGGER_BASE_CLASS =
-  'h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm focus-visible:border-primary/70 focus-visible:ring-primary/25'
+const TRIGGER_BASE_CLASS = WORKSPACE_FIELD
 
 // ---------------------------------------------------------------------------
 // FieldShell — reused chrome (label, description, animated error message)
@@ -329,7 +328,9 @@ export function EnumSelectField<
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className={DIALOG_DARK_SURFACE}>
+        {/* Portal renderuje sie poza drzewem powloki, wiec skore panelu
+            trzeba przypiac tutaj — patrz `.workspace-surface` w globals.css. */}
+        <SelectContent className="workspace-surface">
           {options.map((opt) => (
             <SelectItem key={opt.value} value={opt.value}>
               {opt.description ? (

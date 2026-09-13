@@ -17,13 +17,7 @@ import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
+import { WorkspaceOverlay, WorkspaceOverlayBody } from '@/components/workspace'
 import {
   clientInitials,
   clientNameToColor,
@@ -143,24 +137,25 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
           </div>
         </div>
 
-        <Sheet open={actionsOpen} onOpenChange={setActionsOpen}>
-          <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="-mr-2 h-9 w-9 shrink-0 text-zinc-400"
-              aria-label={`Więcej akcji dla ${client.name}`}
-            >
-              <MoreHorizontal className="size-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="bottom"
-            className="rounded-t-2xl px-0 pb-[max(env(safe-area-inset-bottom),1rem)]"
-          >
-            <SheetHeader className="pb-2">
-              <SheetTitle className="text-base">{client.name}</SheetTitle>
-            </SheetHeader>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setActionsOpen(true)}
+          className="-mr-2 h-9 w-9 shrink-0 text-zinc-400"
+          aria-label={`Więcej akcji dla ${client.name}`}
+        >
+          <MoreHorizontal className="size-5" />
+        </Button>
+
+        {/* Lista akcji karty klienta to overlay ekranowy, nie dropdown:
+            na telefonie wjeżdża od dołu jak każdy inny arkusz panelu. */}
+        <WorkspaceOverlay
+          open={actionsOpen}
+          onOpenChange={setActionsOpen}
+          title={client.name}
+          size="sm"
+        >
+          <WorkspaceOverlayBody className="px-0 py-1">
             <div className="flex flex-col">
               <ActionItem
                 icon={<Pencil className="size-4" />}
@@ -187,8 +182,8 @@ export function ClientCard({ client, onEdit, onDelete, onShowHistory }: ClientCa
                 onClick={withClose(() => onDelete(client))}
               />
             </div>
-          </SheetContent>
-        </Sheet>
+          </WorkspaceOverlayBody>
+        </WorkspaceOverlay>
       </header>
 
       {/* Typ / waluta / liczba wpisów to metadane, nie nagłówek — jedna linia
@@ -355,8 +350,8 @@ interface ActionItemProps {
 
 function ActionItem({ icon, label, onClick, href, external, destructive }: ActionItemProps) {
   const className = cn(
-    'flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-muted/60',
-    destructive ? 'text-destructive' : 'text-foreground',
+    'flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-surface-3',
+    destructive ? 'text-destructive' : 'text-zinc-200',
   )
 
   if (href) {
@@ -367,7 +362,7 @@ function ActionItem({ icon, label, onClick, href, external, destructive }: Actio
         rel={external ? 'noopener noreferrer' : undefined}
         className={className}
       >
-        <span className={destructive ? 'text-destructive' : 'text-muted-foreground'}>{icon}</span>
+        <span className={destructive ? 'text-destructive' : 'text-zinc-400'}>{icon}</span>
         {label}
       </a>
     )
@@ -375,7 +370,7 @@ function ActionItem({ icon, label, onClick, href, external, destructive }: Actio
 
   return (
     <button type="button" onClick={onClick} className={className}>
-      <span className={destructive ? 'text-destructive' : 'text-muted-foreground'}>{icon}</span>
+      <span className={destructive ? 'text-destructive' : 'text-zinc-400'}>{icon}</span>
       {label}
     </button>
   )

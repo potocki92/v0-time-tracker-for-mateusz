@@ -5,6 +5,7 @@ import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { describe, expect, it } from 'vitest'
 
 import reports from '@/messages/pl/reports.json'
+import common from '@/messages/pl/common.json'
 import { ReportsContent } from '@/features/reports'
 import {
   fetchWindowOf,
@@ -63,7 +64,7 @@ function renderReports(data: ReportsDataset, searchParams = '') {
   return render(
     <NuqsTestingAdapter searchParams={searchParams}>
       <QueryClientProvider client={seededClient(data)}>
-        <NextIntlClientProvider locale="pl" messages={{ reports }}>
+        <NextIntlClientProvider locale="pl" messages={{ reports, common }}>
           <ReportsContent today={TODAY} />
         </NextIntlClientProvider>
       </QueryClientProvider>
@@ -144,7 +145,7 @@ describe('Reports — zlozenie strony', () => {
             to: '2026-09-20',
           })}
         >
-          <NextIntlClientProvider locale="pl" messages={{ reports }}>
+          <NextIntlClientProvider locale="pl" messages={{ reports, common }}>
             <ReportsContent today={TODAY} />
           </NextIntlClientProvider>
         </QueryClientProvider>

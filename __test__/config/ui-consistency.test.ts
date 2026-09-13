@@ -195,3 +195,176 @@ describe('ui — karty Pulpitu maja jedna powierzchnie', () => {
     ).toEqual([])
   })
 })
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────
+ * Kontrakt wspolnej warstwy panelu (`components/workspace/*`).
+ *
+ * Testujemy ARCHITEKTURE, nie klasy: kto czym wolno sie posluzyc i czy
+ * feature nie odbudowuje u siebie czegos, co juz stoi w warstwie wspolnej.
+ * Inwentarz stanu sprzed ujednolicenia jest w `docs/ui-audit.md`, opis
+ * docelowej warstwy w `docs/workspace-design-system.md`.
+ * ─────────────────────────────────────────────────────────────────────────
+ */
+
+const SHELL = walk(resolve(ROOT, 'app')).filter((f) => f.includes('(app)'))
+const shellSources = new Map(SHELL.map((f) => [f, read(f)]))
+/** Panel = sekcje (`features/**`) + powloka zalogowanego obszaru. */
+const panelSources = new Map([...sources, ...shellSources])
+
+const panelOffenders = (predicate: (source: string) => boolean) =>
+  [...panelSources].filter(([, src]) => predicate(src)).map(([file]) => file)
+
+describe('workspace — jeden system overlayow ekranowych', () => {
+  it('panel nie siega po shadcnowy Dialog ani Sheet', () => {
+    // Formularz, potwierdzenie, panel szczegolow i arkusz filtrow to ten sam
+    // gatunek ekranu. Zanim powstal `WorkspaceOverlay`, kazdy feature wybieral
+    // sobie Dialog albo Sheet — stad cztery rozne prezentacje tej samej akcji.
+    const found = panelOffenders((src) =>
+      /from '@\/components\/ui\/(dialog|sheet)'/.test(src),
+    )
+    expect(
+      found,
+      `overlay ekranowy idzie przez <WorkspaceOverlay>:\n${found.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('nikt poza warstwa wspolna nie owija Radix Dialoga po swojemu', () => {
+    // Wyjatki sa dwa i oba sa prymitywami, nie ekranami: `components/ui/*`
+    // (uzywane takze przez strefe publiczna) i sam `WorkspaceOverlay`.
+    const found = panelOffenders((src) => /@radix-ui\/react-dialog/.test(src))
+    expect(
+      found,
+      `nowy lokalny system overlay — uzyj <WorkspaceOverlay>:\n${found.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('WorkspaceOverlay stoi na jednym prymitywie i jednym drzewie DOM', () => {
+    const overlay = read('components/workspace/overlay/workspace-overlay.tsx')
+    expect(overlay, 'overlay musi stac na Radix Dialogu').toContain(
+      "from '@radix-ui/react-dialog'",
+    )
+    // Galaz po `useIsMobile()` oznaczalaby remount formularza przy obrocie
+    // telefonu i dwa rozne naglowki do utrzymania. Sprawdzamy IMPORT, nie
+    // slowo — o samym wyborze mowi komentarz w pliku.
+    expect(
+      overlay,
+      'mobile i desktop rozniA sie CSS-em, nie osobnym drzewem Reacta',
+    ).not.toMatch(/from '@\/hooks\/use-mobile'/)
+  })
+
+  it('feature nie rozgalezia PREZENTACJI OVERLAYA po breakpoincie w JS', () => {
+    // `useIsMobile` samo w sobie jest w porzadku: `ClientsContent` wybiera nim
+    // miedzy lista kart a tabela danych, czyli miedzy dwoma roznymi widokami
+    // tych samych danych. Zle jest dopiero rozgalezianie TEGO SAMEGO ekranu
+    // na „arkusz albo dialog" — a to poznac po overlayu w tym samym pliku.
+    const found = panelOffenders(
+      (src) => /from '@\/hooks\/use-mobile'/.test(src) && /<WorkspaceOverlay\b/.test(src),
+    )
+    expect(
+      found,
+      `wybor „arkusz czy dialog" nalezy do WorkspaceOverlay, nie do feature'a:\n${found.join('\n')}`,
+    ).toEqual([])
+  })
+})
+
+describe('workspace — warstwowanie z jednego miejsca', () => {
+  it('features nie wpisuja wlasnych z-indeksow z zakresu overlayow', () => {
+    // Zakres >= 40 to warstwa overlayow. Nizsze wartosci (np. `z-[1]` w karcie)
+    // buduja lokalny kontekst i nie maja nic wspolnego z kolejnoscia okien.
+    const found = offenders((src) =>
+      [...src.matchAll(/\bz-\[(\d+)\]/g)].some((m) => Number(m[1]) >= 40),
+    )
+    expect(
+      found,
+      `drabinka warstw stoi w LAYER (components/ui/tokens.ts):\n${found.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('LAYER opisuje wszystkie trzy pietra', () => {
+    const tokens = read('components/ui/tokens.ts')
+    for (const name of ['base', 'stacked', 'stackedPopover']) {
+      expect(tokens, `brak LAYER.${name}`).toMatch(new RegExp(`\\b${name}:\\s*'z-`))
+    }
+  })
+})
+
+describe('workspace — features nie odbudowuja prymitywow warstwy wspolnej', () => {
+  /**
+   * Klucz to nazwa deklaracji, wartosc to wspolny odpowiednik. Lista rosnie
+   * razem z warstwa wspolna — kazdy wpis to komponent, ktory NAPRAWDE juz
+   * istnieje w `components/`, a nie zakaz na wyrost.
+   */
+  const PROMOTED: Record<string, string> = {
+    ReportCard: 'WorkspaceCard',
+    StatementCard: 'WorkspaceCard',
+    ReportEmptyState: 'WorkspaceEmptyState',
+    StatementEmptyState: 'WorkspaceEmptyState',
+    SegmentedControl: 'WorkspaceSegmentedControl',
+    ReportKpiCard: 'StatTile',
+  }
+
+  for (const [local, shared] of Object.entries(PROMOTED)) {
+    it(`${local} nie wraca jako komponent feature'a`, () => {
+      const found = offenders((src) =>
+        new RegExp(`\\bfunction ${local}\\b`).test(src),
+      )
+      expect(
+        found,
+        `${local} zyje teraz jako ${shared} w components/ — kopia w features rozjedzie sie z reszta:\n${found.join(
+          '\n',
+        )}`,
+      ).toEqual([])
+    })
+  }
+
+  it('filtry sekcji ida przez wspolny pasek, nie przez Collapsible', () => {
+    // Klienci mieli filtry w `Collapsible`, Raporty w `Sheet` — ten sam gest
+    // dawal dwa rozne zachowania.
+    const found = offenders(
+      (src) =>
+        /from '@\/components\/ui\/collapsible'/.test(src) &&
+        /activeFilterCount|activeCount|Filtruj|filters\./.test(src),
+    )
+    expect(
+      found,
+      `panel filtrow idzie przez <WorkspaceFilters>:\n${found.join('\n')}`,
+    ).toEqual([])
+  })
+})
+
+describe('workspace — jedna skora powierzchni shadcn', () => {
+  it('nikt nie przypina wlasnego slownika zmiennych motywu', () => {
+    // `DIALOG_DARK_SURFACE` w Fakturach przypinal zahardkodowane hexy razem
+    // z zielenia, wiec modal ignorowal wybrany motyw kolorystyczny.
+    const found = panelOffenders((src) => /\[--(background|card|popover|primary):/.test(src))
+    expect(
+      found,
+      `powierzchnie panelu przepina klasa .workspace-surface (app/globals.css):\n${found.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('.workspace-surface istnieje i nie rusza akcentu motywu', () => {
+    const css = read('app/globals.css')
+    expect(css, 'brak klasy .workspace-surface').toMatch(/\.workspace-surface\s*\{/)
+    const block = css.slice(css.indexOf('.workspace-surface'))
+    const body = block.slice(0, block.indexOf('}'))
+    for (const themed of ['--primary:', '--ring:', '--brand-h:', '--chart-1:']) {
+      expect(
+        body,
+        `.workspace-surface nadpisuje ${themed} — motyw kolorystyczny uzytkownika przestalby dzialac`,
+      ).not.toContain(themed)
+    }
+  })
+
+  it('powloka i overlay deklaruja skore panelu', () => {
+    expect(
+      read('app/[locale]/(app)/_layout/AppShell.tsx'),
+      'powloka panelu musi nosic .workspace-surface',
+    ).toContain('workspace-surface')
+    expect(
+      read('components/workspace/overlay/workspace-overlay.tsx'),
+      'overlay portaluje sie do <body>, wiec nie dziedziczy skory po powloce',
+    ).toContain('workspace-surface')
+  })
+})

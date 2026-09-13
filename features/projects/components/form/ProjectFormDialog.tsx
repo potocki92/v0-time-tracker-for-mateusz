@@ -1,21 +1,6 @@
 'use client'
 
-import { useIsMobile } from '@/hooks/use-mobile'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -26,6 +11,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { LAYER } from '@/components/ui/tokens'
+import {
+  WORKSPACE_FIELD,
+  WORKSPACE_FIELD_LABEL,
+  WORKSPACE_FIELD_MULTILINE,
+  WorkspaceOverlay,
+  WorkspaceOverlayBody,
+  WorkspaceOverlayFooter,
+  WorkspaceOverlayForm,
+} from '@/components/workspace'
 import {
   PRIORITY_LABELS,
   PROJECT_STATUS_LABELS,
@@ -55,16 +50,18 @@ type Props = {
 const TITLE_DESCRIPTION = 'Uzupełnij podstawowe dane, budżet oraz terminy realizacji.'
 
 /**
- * Formularz otwiera się nad panelem szczegółów projektu (drawer w drawerze),
- * więc obie warstwy dostają z-index ponad Sheetem (z-50) i własny, wyraźnie
- * przyciemniony overlay — inaczej druga warstwa zlewałaby się z pierwszą.
+ * Formularz projektu.
+ *
+ * Otwiera się NAD panelem szczegółów projektu (overlay w overlayu), stąd
+ * `layer="stacked"`; listy selectów portalują się do `<body>` z bazowym z-50,
+ * więc bez `LAYER.stackedPopover` chowałyby się pod tym overlayem. Cała
+ * drabinka warstw stoi w `components/ui/tokens.ts`.
+ *
+ * Wcześniej ten plik rozgałęział się przez `useIsMobile()` na `Sheet` i
+ * `Dialog` — dwa drzewa Reacta z osobnymi nagłówkami i osobną geometrią.
+ * `WorkspaceOverlay` robi to samo w CSS, więc obrót telefonu nie remountuje
+ * formularza (i nie gubi wpisanych danych).
  */
-const STACKED_LAYER = 'z-[60]'
-const STACKED_OVERLAY = 'z-[60] bg-surface-0/60 backdrop-blur-sm'
-/** Listy selectów portalują się do body z bazowym z-50, więc bez podbicia
- *  chowają się pod overlayem formularza — kliknięcie trafiało w overlay. */
-const STACKED_POPOVER = 'z-[70]'
-
 export function ProjectFormDialog({
   open,
   isSaving,
@@ -75,21 +72,31 @@ export function ProjectFormDialog({
   onChange,
   onSubmit,
 }: Props) {
-  const isMobile = useIsMobile()
   const title = editing ? 'Edytuj projekt' : 'Nowy projekt'
 
-  const form = (
-        <form
-          className="grid gap-4 py-1"
-          onSubmit={(event) => {
-            event.preventDefault()
-            onSubmit()
-          }}
-        >
+  return (
+    <WorkspaceOverlay
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title}
+      description={TITLE_DESCRIPTION}
+      size="lg"
+      layer="stacked"
+    >
+      <WorkspaceOverlayForm
+        onSubmit={(event) => {
+          event.preventDefault()
+          onSubmit()
+        }}
+      >
+        <WorkspaceOverlayBody className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="project-name">Nazwa projektu *</Label>
+            <Label htmlFor="project-name" className={WORKSPACE_FIELD_LABEL}>
+              Nazwa projektu *
+            </Label>
             <Input
               id="project-name"
+              className={WORKSPACE_FIELD}
               value={formData.name}
               onChange={(event) => onChange({ ...formData, name: event.target.value })}
               placeholder="np. Modernizacja linii produkcyjnej"
@@ -98,9 +105,12 @@ export function ProjectFormDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="project-description">Opis</Label>
+            <Label htmlFor="project-description" className={WORKSPACE_FIELD_LABEL}>
+              Opis
+            </Label>
             <Textarea
               id="project-description"
+              className={WORKSPACE_FIELD_MULTILINE}
               value={formData.description || ''}
               onChange={(event) => onChange({ ...formData, description: event.target.value })}
               placeholder="Zakres, ryzyka, założenia..."
@@ -109,9 +119,12 @@ export function ProjectFormDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="project-address">Adres pracy</Label>
+            <Label htmlFor="project-address" className={WORKSPACE_FIELD_LABEL}>
+              Adres pracy
+            </Label>
             <Input
               id="project-address"
+              className={WORKSPACE_FIELD}
               value={formData.address || ''}
               onChange={(event) => onChange({ ...formData, address: event.target.value })}
               placeholder="np. ul. Słoneczna 10, 80-001 Gdańsk"
@@ -120,17 +133,17 @@ export function ProjectFormDialog({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
-              <Label>Klient</Label>
+              <Label className={WORKSPACE_FIELD_LABEL}>Klient</Label>
               <Select
                 value={formData.client_id || 'none'}
                 onValueChange={(value) =>
                   onChange({ ...formData, client_id: value === 'none' ? '' : value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className={WORKSPACE_FIELD}>
                   <SelectValue placeholder="Wybierz klienta" />
                 </SelectTrigger>
-                <SelectContent className={STACKED_POPOVER}>
+                <SelectContent className={LAYER.stackedPopover}>
                   <SelectItem value="none">Bez klienta</SelectItem>
                   {clients.map((client) => (
                     <SelectItem key={client.id} value={client.id}>
@@ -142,17 +155,17 @@ export function ProjectFormDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label>Status</Label>
+              <Label className={WORKSPACE_FIELD_LABEL}>Status</Label>
               <Select
                 value={formData.status}
                 onValueChange={(value: Project['status']) =>
                   onChange({ ...formData, status: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className={WORKSPACE_FIELD}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className={STACKED_POPOVER}>
+                <SelectContent className={LAYER.stackedPopover}>
                   {PROJECT_STATUS_OPTIONS.map((status) => (
                     <SelectItem key={status} value={status}>
                       {PROJECT_STATUS_LABELS[status]}
@@ -165,17 +178,17 @@ export function ProjectFormDialog({
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="grid gap-2">
-              <Label>Typ budżetu</Label>
+              <Label className={WORKSPACE_FIELD_LABEL}>Typ budżetu</Label>
               <Select
                 value={formData.budget_type}
                 onValueChange={(value: Project['budget_type']) =>
                   onChange({ ...formData, budget_type: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className={WORKSPACE_FIELD}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className={STACKED_POPOVER}>
+                <SelectContent className={LAYER.stackedPopover}>
                   {PROJECT_BUDGET_OPTIONS.map((budgetType) => (
                     <SelectItem key={budgetType} value={budgetType}>
                       {PROJECT_BUDGET_LABELS[budgetType]}
@@ -186,9 +199,12 @@ export function ProjectFormDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="project-budget">Kwota budżetu (PLN)</Label>
+              <Label htmlFor="project-budget" className={WORKSPACE_FIELD_LABEL}>
+                Kwota budżetu (PLN)
+              </Label>
               <Input
                 id="project-budget"
+                className={WORKSPACE_FIELD}
                 type="number"
                 min={0}
                 step="0.01"
@@ -200,17 +216,17 @@ export function ProjectFormDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label>Priorytet</Label>
+              <Label className={WORKSPACE_FIELD_LABEL}>Priorytet</Label>
               <Select
                 value={formData.priority}
                 onValueChange={(value: Project['priority']) =>
                   onChange({ ...formData, priority: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className={WORKSPACE_FIELD}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className={STACKED_POPOVER}>
+                <SelectContent className={LAYER.stackedPopover}>
                   {PROJECT_PRIORITY_OPTIONS.map((priority) => (
                     <SelectItem key={priority} value={priority}>
                       {PRIORITY_LABELS[priority]}
@@ -223,9 +239,12 @@ export function ProjectFormDialog({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="project-target">Docelowa ilość (opcjonalnie)</Label>
+              <Label htmlFor="project-target" className={WORKSPACE_FIELD_LABEL}>
+                Docelowa ilość (opcjonalnie)
+              </Label>
               <Input
                 id="project-target"
+                className={WORKSPACE_FIELD}
                 type="number"
                 min={0}
                 step="0.01"
@@ -237,7 +256,7 @@ export function ProjectFormDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label>Kolor projektu</Label>
+              <Label className={WORKSPACE_FIELD_LABEL}>Kolor projektu</Label>
               <div className="flex flex-wrap gap-2">
                 {PROJECT_COLOR_OPTIONS.map((color) => (
                   <button
@@ -245,9 +264,7 @@ export function ProjectFormDialog({
                     type="button"
                     onClick={() => onChange({ ...formData, color })}
                     className={`h-8 w-8 rounded-full border-2 transition ${
-                      formData.color === color
-                        ? 'scale-105 border-foreground'
-                        : 'border-transparent'
+                      formData.color === color ? 'scale-105 border-white' : 'border-transparent'
                     }`}
                     style={{ backgroundColor: color }}
                     aria-label={`Wybierz kolor ${color}`}
@@ -259,9 +276,12 @@ export function ProjectFormDialog({
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="project-start">Data startu</Label>
+              <Label htmlFor="project-start" className={WORKSPACE_FIELD_LABEL}>
+                Data startu
+              </Label>
               <Input
                 id="project-start"
+                className={WORKSPACE_FIELD}
                 type="date"
                 value={formData.start_date || ''}
                 onChange={(event) => onChange({ ...formData, start_date: event.target.value })}
@@ -269,57 +289,29 @@ export function ProjectFormDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="project-end">Data zakończenia</Label>
+              <Label htmlFor="project-end" className={WORKSPACE_FIELD_LABEL}>
+                Data zakończenia
+              </Label>
               <Input
                 id="project-end"
+                className={WORKSPACE_FIELD}
                 type="date"
                 value={formData.end_date || ''}
                 onChange={(event) => onChange({ ...formData, end_date: event.target.value })}
               />
             </div>
           </div>
+        </WorkspaceOverlayBody>
 
-          <div className="mt-2 flex flex-col-reverse gap-2 md:flex-row md:justify-end">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Anuluj
-            </Button>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving ? 'Zapisywanie...' : editing ? 'Zapisz zmiany' : 'Dodaj projekt'}
-            </Button>
-          </div>
-        </form>
-  )
-
-  if (isMobile) {
-    return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent
-          side="bottom"
-          className={`${STACKED_LAYER} max-h-[92dvh] gap-0 overflow-y-auto rounded-t-2xl px-4 pb-[max(env(safe-area-inset-bottom),1rem)] pt-4`}
-          overlayClassName={STACKED_OVERLAY}
-        >
-          <SheetHeader className="p-0 pb-4">
-            <SheetTitle>{title}</SheetTitle>
-            <SheetDescription>{TITLE_DESCRIPTION}</SheetDescription>
-          </SheetHeader>
-          {form}
-        </SheetContent>
-      </Sheet>
-    )
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className={`${STACKED_LAYER} max-h-[92vh] overflow-y-auto sm:max-w-2xl`}
-        overlayClassName={STACKED_OVERLAY}
-      >
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{TITLE_DESCRIPTION}</DialogDescription>
-        </DialogHeader>
-        {form}
-      </DialogContent>
-    </Dialog>
+        <WorkspaceOverlayFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Anuluj
+          </Button>
+          <Button type="submit" variant="accent" disabled={isSaving}>
+            {isSaving ? 'Zapisywanie...' : editing ? 'Zapisz zmiany' : 'Dodaj projekt'}
+          </Button>
+        </WorkspaceOverlayFooter>
+      </WorkspaceOverlayForm>
+    </WorkspaceOverlay>
   )
 }

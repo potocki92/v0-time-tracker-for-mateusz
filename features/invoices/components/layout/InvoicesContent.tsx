@@ -1,6 +1,7 @@
 'use client'
 
 import { PageContainer } from '@/components/common/section/PageContainer'
+import { WorkspaceOverlay, WorkspaceOverlayBody } from '@/components/workspace'
 import { useFormat } from '@/lib/format/client'
 import { LINEAR, SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
@@ -58,12 +59,6 @@ import {
   useUpdateInvoiceStatus,
 } from '../../hooks'
 import { InvoicesPagination } from './InvoicesPagination'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
 import type { InvoiceFormValues } from '../../domain'
 import type { InvoiceLifecycleStatus } from '@/lib/types'
 
@@ -496,39 +491,33 @@ export function InvoicesContent() {
         </div>
       </div>
 
-      <Sheet
+      <WorkspaceOverlay
         open={mobileDetailsOpen && Boolean(selectedInvoice)}
         onOpenChange={setMobileDetailsOpen}
+        title={selectedInvoice?.name ?? 'Szczegóły faktury'}
+        size="lg"
       >
-        <SheetContent
-          side="bottom"
-          className="max-h-[90dvh] overflow-y-auto rounded-t-2xl border border-hairline bg-surface-1 p-0 lg:hidden"
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Szczegóły faktury</SheetTitle>
-          </SheetHeader>
+        <WorkspaceOverlayBody className="px-2 sm:px-2">
           {selectedInvoice && (
-            <div className="px-2 pb-[max(env(safe-area-inset-bottom),1rem)] pt-2">
-              <InvoiceDetailsPanel
-                invoice={selectedInvoice}
-                client={selectedClient}
-                isTogglingPaid={setPaidStatusMutation.isPending}
-                isChangingStatus={updateStatusMutation.isPending}
-                onTogglePaid={() => handleTogglePaid(selectedInvoice)}
-                onChangeStatus={(status) => handleChangeStatus(selectedInvoice, status)}
-                onEdit={() => {
-                  setMobileDetailsOpen(false)
-                  openEdit(selectedInvoice)
-                }}
-                onDelete={() => {
-                  setMobileDetailsOpen(false)
-                  setDeletingInvoice(selectedInvoice)
-                }}
-              />
-            </div>
+            <InvoiceDetailsPanel
+              invoice={selectedInvoice}
+              client={selectedClient}
+              isTogglingPaid={setPaidStatusMutation.isPending}
+              isChangingStatus={updateStatusMutation.isPending}
+              onTogglePaid={() => handleTogglePaid(selectedInvoice)}
+              onChangeStatus={(status) => handleChangeStatus(selectedInvoice, status)}
+              onEdit={() => {
+                setMobileDetailsOpen(false)
+                openEdit(selectedInvoice)
+              }}
+              onDelete={() => {
+                setMobileDetailsOpen(false)
+                setDeletingInvoice(selectedInvoice)
+              }}
+            />
           )}
-        </SheetContent>
-      </Sheet>
+        </WorkspaceOverlayBody>
+      </WorkspaceOverlay>
 
       <InvoiceBuilderDialog
         // Force a fresh form instance per invoice so RHF picks up the right

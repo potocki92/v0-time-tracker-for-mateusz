@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import { WORKSPACE_FIELD } from '@/components/workspace'
 
 import { CLIENT_COLORS } from '../../domain/clients.constants'
 import {
@@ -207,7 +208,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             >
               <SelectTrigger
                 id="client-work-type"
-                className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm"
+                className={WORKSPACE_FIELD}
               >
                 <SelectValue />
               </SelectTrigger>
@@ -231,7 +232,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             >
               <SelectTrigger
                 id="client-currency"
-                className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm"
+                className={WORKSPACE_FIELD}
               >
                 <SelectValue />
               </SelectTrigger>
@@ -290,7 +291,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             >
               <SelectTrigger
                 id="client-locale"
-                className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm"
+                className={WORKSPACE_FIELD}
               >
                 <SelectValue placeholder="Wybierz język" />
               </SelectTrigger>
@@ -314,7 +315,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
             >
               <SelectTrigger
                 id="client-timezone"
-                className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm"
+                className={WORKSPACE_FIELD}
               >
                 <SelectValue placeholder="Wybierz strefę" />
               </SelectTrigger>
@@ -368,7 +369,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
 
         <label
           htmlFor="client-default"
-          className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-border/60 bg-background px-4 py-3"
+          className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-hairline bg-surface-2 px-4 py-3"
         >
           <span className="space-y-0.5">
             <span className="block text-sm font-medium">Domyślny klient</span>
@@ -416,7 +417,7 @@ export function ClientFormFields({ isEditMode }: ClientFormFieldsProps) {
           >
             <SelectTrigger
               id="client-auto-invoice-freq"
-              className="h-12 w-full rounded-xl border-input-border bg-background px-4 text-sm shadow-sm disabled:opacity-60"
+              className={WORKSPACE_FIELD}
             >
               <SelectValue />
             </SelectTrigger>

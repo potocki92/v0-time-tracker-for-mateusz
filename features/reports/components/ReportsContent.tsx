@@ -6,6 +6,7 @@ import { CalendarRange, SearchX } from 'lucide-react'
 import { PageContainer } from '@/components/common/section/PageContainer'
 import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
+import { WorkspaceEmptyState } from '@/components/workspace'
 import {
   ALL,
   projectAfterClientChange,
@@ -27,7 +28,6 @@ import { ReportsHeatmapSection } from './insights/ReportsHeatmapSection'
 import { ReportsInsightsSection } from './insights/ReportsInsightsSection'
 import { ReportsDetailSection } from './table/ReportsDetailSection'
 import { ReportsTrendSection } from './trend/ReportsTrendSection'
-import { ReportEmptyState } from './shared/ReportEmptyState'
 
 type Props = {
   /**
@@ -147,13 +147,13 @@ export function ReportsContent({ today }: Props) {
           </span>
 
           {model.datasetIsEmpty ? (
-            <ReportEmptyState
+            <WorkspaceEmptyState
               icon={CalendarRange}
               title={t('states.noEntriesTitle')}
               description={t('states.noEntriesDescription')}
             />
           ) : !hasRows ? (
-            <ReportEmptyState
+            <WorkspaceEmptyState
               icon={SearchX}
               title={t('states.noMatchTitle')}
               description={t('states.noMatchDescription')}

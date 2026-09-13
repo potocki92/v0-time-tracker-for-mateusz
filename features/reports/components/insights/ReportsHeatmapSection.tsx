@@ -3,8 +3,8 @@
 import { useTranslations } from 'next-intl'
 import { HEATMAP_LEVELS } from '@/components/ui/tokens'
 import { useFormat } from '@/lib/format/client'
+import { WorkspaceCard } from '@/components/workspace'
 import type { HeatmapDay } from '../../domain'
-import { ReportCard } from '../shared/ReportCard'
 
 type Props = {
   days: HeatmapDay[]
@@ -25,7 +25,7 @@ export function ReportsHeatmapSection({ days }: Props) {
   const fmt = useFormat()
 
   return (
-    <ReportCard
+    <WorkspaceCard
       title={t('heatmap.title')}
       ariaLabel={t('heatmap.sectionLabel')}
       action={
@@ -68,6 +68,6 @@ export function ReportsHeatmapSection({ days }: Props) {
           )
         })}
       </ul>
-    </ReportCard>
+    </WorkspaceCard>
   )
 }

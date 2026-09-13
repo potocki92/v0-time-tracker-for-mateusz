@@ -64,3 +64,25 @@ export const HEATMAP_LEVELS = [
   'color-mix(in oklab, var(--chart-1) 78%, var(--surface-2))',
   'var(--chart-1)',
 ] as const
+
+/**
+ * Warstwy overlayów panelu — JEDNO miejsce, w którym stoją z-indeksy.
+ *
+ * Wcześniej `ProjectFormDialog` i `ProjectDeleteDialog` nosiły wklejone
+ * `z-[60]` / `z-[70]`, bo formularz projektu otwiera się NAD arkuszem listy,
+ * a potwierdzenie usunięcia NAD formularzem. Magiczne liczby rozsiane po
+ * featurach nie dają się uzgodnić — tu widać całą drabinkę naraz.
+ *
+ *   base    50 — overlay pierwszego poziomu (nad nagłówkiem panelu, z-30)
+ *   stacked 60 — overlay otwarty z wnętrza innego overlaya
+ *   popover 70 — listy Selecta/Popovera portalowane do <body> z wnętrza
+ *                overlaya `stacked`; bazowe z-50 wypadłoby POD nim
+ */
+export const LAYER = {
+  base: 'z-50',
+  stacked: 'z-[60]',
+  /** Dla `SelectContent`/`PopoverContent` renderowanych w overlayu `stacked`. */
+  stackedPopover: 'z-[70]',
+} as const
+
+export type WorkspaceLayer = 'base' | 'stacked'

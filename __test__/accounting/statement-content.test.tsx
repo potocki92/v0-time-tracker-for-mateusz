@@ -5,6 +5,7 @@ import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { describe, expect, it } from 'vitest'
 
 import accounting from '@/messages/pl/accounting.json'
+import common from '@/messages/pl/common.json'
 import { StatementContent } from '@/features/accounting'
 import {
   rangeOf,
@@ -122,7 +123,7 @@ function renderStatement(searchParams = '') {
   return render(
     <NuqsTestingAdapter searchParams={searchParams}>
       <QueryClientProvider client={seededClient()}>
-        <NextIntlClientProvider locale="pl" messages={{ accounting }}>
+        <NextIntlClientProvider locale="pl" messages={{ accounting, common }}>
           <StatementContent today={TODAY} />
         </NextIntlClientProvider>
       </QueryClientProvider>

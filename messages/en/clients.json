@@ -2,5 +2,11 @@
   "meta": {
     "title": "Clients",
     "description": "Rates, currencies and client billing."
+  },
+  "filters": {
+    "sectionLabel": "Client list filters",
+    "title": "Client filters",
+    "description": "Narrow the list by status, billing and currency",
+    "sortLabel": "Client list sorting"
   }
 }

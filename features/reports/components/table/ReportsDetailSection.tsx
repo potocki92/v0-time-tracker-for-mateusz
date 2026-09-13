@@ -8,8 +8,7 @@ import { LINEAR } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 import type { ReportModel, ReportRecord } from '../../domain'
 import type { CURRENCY } from '@/lib/types'
-import { ReportCard } from '../shared/ReportCard'
-import { ReportEmptyState } from '../shared/ReportEmptyState'
+import { WorkspaceCard, WorkspaceEmptyState } from '@/components/workspace'
 import { useReportTable, type ReportTableColumn, type ReportTableState } from './useReportTable'
 
 type Props = {
@@ -37,7 +36,7 @@ export function ReportsDetailSection({ model }: Props) {
   const table = useReportTable(model.records)
 
   return (
-    <ReportCard
+    <WorkspaceCard
       title={t('table.title')}
       ariaLabel={t('table.sectionLabel')}
       action={
@@ -47,7 +46,7 @@ export function ReportsDetailSection({ model }: Props) {
       }
     >
       {model.records.length === 0 ? (
-        <ReportEmptyState
+        <WorkspaceEmptyState
           icon={ListX}
           title={t('table.empty')}
           description={t('states.noMatchDescription')}
@@ -60,7 +59,7 @@ export function ReportsDetailSection({ model }: Props) {
           <Pagination table={table} />
         </>
       )}
-    </ReportCard>
+    </WorkspaceCard>
   )
 }
 
