@@ -1,6 +1,20 @@
-import { render, screen, within } from '@testing-library/react'
+import { render as rtlRender, screen, within } from '@testing-library/react'
+import { NextIntlClientProvider } from 'next-intl'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import common from '@/messages/pl/common.json'
 import type { DashboardSectionDef } from '@/features/dashboard/sections/types'
+
+/**
+ * „Dostosuj pulpit" siedzi w stopce sekcji i stoi na `WorkspaceOverlay`,
+ * ktory tlumaczy etykiete zamkniecia — bez providera render wywala sie
+ * na braku kontekstu i18n.
+ */
+const render = (ui: React.ReactElement) =>
+  rtlRender(
+    <NextIntlClientProvider locale="pl" messages={{ common }}>
+      {ui}
+    </NextIntlClientProvider>,
+  )
 
 /**
  * Pulpit renderuje sie z rejestru przepuszczonego przez uklad uzytkownika —

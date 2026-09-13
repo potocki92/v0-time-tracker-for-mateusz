@@ -21,6 +21,10 @@ import { cn } from '@/lib/utils'
  * telefonu (utrata stanu pól) i pierwszy render po stronie klienta bez
  * znanego breakpointu.
  *
+ * Nie ma tu triggera: overlaye panelu otwierają się ze stanu feature'a
+ * (edycja wiersza, akcja z menu, quick action z sidebara), a nie z jednego
+ * przycisku stojącego obok nich w drzewie — `open`/`onOpenChange` wystarczą.
+ *
  * Geometria stoi na `inset-0 + margin:auto` zamiast `translate(-50%,-50%)`,
  * bo animacje wejścia/wyjścia (`zoom-in`, `slide-in`) podmieniają `transform`
  * — centrowanie przez transform gubiłoby pozycję na czas animacji.
@@ -234,10 +238,3 @@ export function WorkspaceOverlayForm({
   )
 }
 
-/**
- * Zamknięcie overlaya z jego wnętrza — bez przekazywania `onOpenChange`
- * w dół. Triggera celowo nie ma: overlaye panelu otwierają się ze stanu
- * feature'a (edycja wiersza, akcja z menu), a nie z jednego przycisku
- * stojącego obok nich w drzewie.
- */
-export const WorkspaceOverlayClose = DialogPrimitive.Close

@@ -1,15 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,6 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  WORKSPACE_FIELD,
+  WORKSPACE_FIELD_LABEL,
+  WorkspaceOverlay,
+  WorkspaceOverlayBody,
+  WorkspaceOverlayFooter,
+  WorkspaceOverlayForm,
+} from '@/components/workspace'
+import { cn } from '@/lib/utils'
 import { useSetGoal } from '../../hooks/usePreferencesStore'
 import { syncPreferencesToSupabase } from '../PreferencesProvider'
 import type { Currency, Goal } from '../../types/dashboard.types'
@@ -67,22 +67,23 @@ export function GoalEditDialog({ open, onOpenChange, initialGoal }: Props) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <DialogHeader>
-            <DialogTitle>Cel miesięczny</DialogTitle>
-            <DialogDescription>
-              Kwota do osiągnięcia w tym miesiącu — postęp liczymy
-              z Twoich zarobków przeliczonych na wybraną walutę.
-            </DialogDescription>
-          </DialogHeader>
-
+    <WorkspaceOverlay
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Cel miesięczny"
+      description="Kwota do osiągnięcia w tym miesiącu — postęp liczymy z Twoich zarobków przeliczonych na wybraną walutę."
+      size="sm"
+    >
+      <WorkspaceOverlayForm onSubmit={handleSubmit}>
+        <WorkspaceOverlayBody>
           <div className="grid grid-cols-[1fr_auto] gap-2">
             <div className="space-y-1.5">
-              <Label htmlFor="goal-amount">Kwota</Label>
+              <Label htmlFor="goal-amount" className={WORKSPACE_FIELD_LABEL}>
+                Kwota
+              </Label>
               <Input
                 id="goal-amount"
+                className={WORKSPACE_FIELD}
                 type="number"
                 inputMode="decimal"
                 min="0"
@@ -95,12 +96,11 @@ export function GoalEditDialog({ open, onOpenChange, initialGoal }: Props) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="goal-currency">Waluta</Label>
-              <Select
-                value={currency}
-                onValueChange={(v) => setCurrency(v as Currency)}
-              >
-                <SelectTrigger id="goal-currency" className="w-[84px]">
+              <Label htmlFor="goal-currency" className={WORKSPACE_FIELD_LABEL}>
+                Waluta
+              </Label>
+              <Select value={currency} onValueChange={(v) => setCurrency(v as Currency)}>
+                <SelectTrigger id="goal-currency" className={cn(WORKSPACE_FIELD, 'w-[92px]')}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -110,22 +110,38 @@ export function GoalEditDialog({ open, onOpenChange, initialGoal }: Props) {
               </Select>
             </div>
           </div>
+        </WorkspaceOverlayBody>
 
-          <DialogFooter className="gap-2 sm:justify-between">
-            {initialGoal?.amount != null && (
-              <Button type="button" variant="ghost" onClick={handleClear}>
-                Usuń cel
-              </Button>
-            )}
-            <div className="flex gap-2 sm:ml-auto">
-              <DialogClose asChild>
-                <Button type="button" variant="outline">Anuluj</Button>
-              </DialogClose>
-              <Button type="submit" disabled={!isValid}>Zapisz</Button>
-            </div>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        {/* „Usuń cel" to akcja o innym ciężarze niż zapis, więc stopka łamie
+            domyślny układ i rozsuwa je na krawędzie — także na telefonie. */}
+        <WorkspaceOverlayFooter className="flex-row items-center justify-between sm:justify-between">
+          {initialGoal?.amount != null ? (
+            <Button type="button" variant="ghost" onClick={handleClear} className="h-11 sm:h-9">
+              Usuń cel
+            </Button>
+          ) : (
+            <span />
+          )}
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="h-11 flex-1 sm:h-9 sm:flex-none"
+            >
+              Anuluj
+            </Button>
+            <Button
+              type="submit"
+              variant="accent"
+              disabled={!isValid}
+              className="h-11 flex-1 sm:h-9 sm:flex-none"
+            >
+              Zapisz
+            </Button>
+          </div>
+        </WorkspaceOverlayFooter>
+      </WorkspaceOverlayForm>
+    </WorkspaceOverlay>
   )
 }

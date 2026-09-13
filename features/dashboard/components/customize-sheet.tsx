@@ -1,16 +1,14 @@
 'use client'
 
+import { useState } from 'react'
 import { ArrowDown, ArrowUp, Settings2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
 import { Switch } from '@/components/ui/switch'
+import {
+  WorkspaceOverlay,
+  WorkspaceOverlayBody,
+  WorkspaceOverlayFooter,
+} from '@/components/workspace'
 import { DASHBOARD_SECTIONS } from '../sections/registry'
 import { useDashboardLayout } from '../hooks/use-dashboard-layout'
 
@@ -29,6 +27,7 @@ import { useDashboardLayout } from '../hooks/use-dashboard-layout'
 const ABOVE_THE_FOLD = 4
 
 export function CustomizeSheet() {
+  const [open, setOpen] = useState(false)
   const sections = useDashboardLayout((state) => state.sections)
   const toggleVisible = useDashboardLayout((state) => state.toggleVisible)
   const moveUp = useDashboardLayout((state) => state.moveUp)
@@ -42,94 +41,96 @@ export function CustomizeSheet() {
   let visibleIndex = -1
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className="min-h-[44px] text-zinc-400">
-          <Settings2 className="size-3.5" aria-hidden />
-          Dostosuj pulpit
-        </Button>
-      </SheetTrigger>
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen(true)}
+        className="min-h-[44px] text-zinc-400"
+      >
+        <Settings2 className="size-3.5" aria-hidden />
+        Dostosuj pulpit
+      </Button>
 
-      <SheetContent side="bottom" className="max-h-[80svh] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Dostosuj pulpit</SheetTitle>
-          <SheetDescription>
-            Pierwsza sekcja jest kartą wiodącą, kolejne trzy stoją nad zagięciem.
-            Reszta czeka zwinięta. Wyłączona sekcja znika z Pulpitu, ale zostaje
-            na tej liście — nic nie jest kasowane.
-          </SheetDescription>
-        </SheetHeader>
+      <WorkspaceOverlay
+        open={open}
+        onOpenChange={setOpen}
+        title="Dostosuj pulpit"
+        description="Pierwsza sekcja jest kartą wiodącą, kolejne trzy stoją nad zagięciem. Reszta czeka zwinięta. Wyłączona sekcja znika z Pulpitu, ale zostaje na tej liście — nic nie jest kasowane."
+        size="md"
+      >
+        <WorkspaceOverlayBody>
+          <ul role="list">
+            {sections.map((state, index) => {
+              const section = byId.get(state.id)
+              if (!section) return null
+              if (state.visible) visibleIndex += 1
 
-        <ul role="list" className="px-4">
-          {sections.map((state, index) => {
-            const section = byId.get(state.id)
-            if (!section) return null
-            if (state.visible) visibleIndex += 1
+              const aboveTheFold = state.visible && visibleIndex < ABOVE_THE_FOLD
+              const isLastVisible = state.visible && visibleCount === 1
+              const foldEndsHere = aboveTheFold && visibleIndex === ABOVE_THE_FOLD - 1
 
-            const aboveTheFold = state.visible && visibleIndex < ABOVE_THE_FOLD
-            const isLastVisible = state.visible && visibleCount === 1
-            const foldEndsHere = aboveTheFold && visibleIndex === ABOVE_THE_FOLD - 1
-
-            return (
-              <li
-                key={state.id}
-                data-section-id={state.id}
-                data-above-the-fold={aboveTheFold}
-                className={
-                  foldEndsHere
-                    ? 'flex items-center gap-3 border-b-2 border-dashed border-hairline-strong py-2'
-                    : 'flex items-center gap-3 border-b border-hairline py-2'
-                }
-              >
-                <Switch
-                  id={`toggle-${state.id}`}
-                  checked={state.visible}
-                  disabled={isLastVisible}
-                  onCheckedChange={() => toggleVisible(state.id)}
-                />
-                <label
-                  htmlFor={`toggle-${state.id}`}
-                  className="min-w-0 flex-1 truncate text-sm text-zinc-200"
+              return (
+                <li
+                  key={state.id}
+                  data-section-id={state.id}
+                  data-above-the-fold={aboveTheFold}
+                  className={
+                    foldEndsHere
+                      ? 'flex items-center gap-3 border-b-2 border-dashed border-hairline-strong py-2'
+                      : 'flex items-center gap-3 border-b border-hairline py-2'
+                  }
                 >
-                  {section.title}
-                  {aboveTheFold && (
-                    <span className="ml-2 text-2xs uppercase tracking-wide text-zinc-500">
-                      {visibleIndex === 0 ? 'karta wiodąca' : 'nad zagięciem'}
-                    </span>
-                  )}
-                </label>
+                  <Switch
+                    id={`toggle-${state.id}`}
+                    checked={state.visible}
+                    disabled={isLastVisible}
+                    onCheckedChange={() => toggleVisible(state.id)}
+                  />
+                  <label
+                    htmlFor={`toggle-${state.id}`}
+                    className="min-w-0 flex-1 truncate text-sm text-zinc-200"
+                  >
+                    {section.title}
+                    {aboveTheFold && (
+                      <span className="ml-2 text-2xs uppercase tracking-wide text-zinc-500">
+                        {visibleIndex === 0 ? 'karta wiodąca' : 'nad zagięciem'}
+                      </span>
+                    )}
+                  </label>
 
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="min-h-[44px] min-w-[44px]"
-                  aria-label={`Przenieś „${section.title}" wyżej`}
-                  disabled={index === 0}
-                  onClick={() => moveUp(state.id)}
-                >
-                  <ArrowUp className="size-4" aria-hidden />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="min-h-[44px] min-w-[44px]"
-                  aria-label={`Przenieś „${section.title}" niżej`}
-                  disabled={index === sections.length - 1}
-                  onClick={() => moveDown(state.id)}
-                >
-                  <ArrowDown className="size-4" aria-hidden />
-                </Button>
-              </li>
-            )
-          })}
-        </ul>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="min-h-[44px] min-w-[44px]"
+                    aria-label={`Przenieś „${section.title}" wyżej`}
+                    disabled={index === 0}
+                    onClick={() => moveUp(state.id)}
+                  >
+                    <ArrowUp className="size-4" aria-hidden />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="min-h-[44px] min-w-[44px]"
+                    aria-label={`Przenieś „${section.title}" niżej`}
+                    disabled={index === sections.length - 1}
+                    onClick={() => moveDown(state.id)}
+                  >
+                    <ArrowDown className="size-4" aria-hidden />
+                  </Button>
+                </li>
+              )
+            })}
+          </ul>
+        </WorkspaceOverlayBody>
 
-        <div className="px-4 pb-4">
-          <Button variant="outline" className="min-h-[44px] w-full" onClick={resetToDefaults}>
+        <WorkspaceOverlayFooter>
+          <Button variant="outline" className="min-h-[44px] w-full sm:w-auto" onClick={resetToDefaults}>
             Przywróć domyślne
           </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </WorkspaceOverlayFooter>
+      </WorkspaceOverlay>
+    </>
   )
 }

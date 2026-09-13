@@ -3,13 +3,7 @@
 import { useTranslations } from 'next-intl'
 
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+import { WorkspaceOverlay, WorkspaceOverlayBody } from '@/components/workspace'
 import { WorkAutomationSection } from '@/features/work-automation'
 import { useCloseModal, useModalState } from '@/hooks/stores/useUiStore'
 import {
@@ -31,7 +25,7 @@ import { WeeklySummaryEmailSettings } from './WeeklySummaryEmailSettings'
 function SettingsSkeleton() {
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border p-4">
+      <div className="rounded-xl border border-hairline-strong p-4">
         <div className="flex items-center gap-4">
           <Skeleton className="h-16 w-16 rounded-full" />
           <div className="space-y-2">
@@ -41,7 +35,7 @@ function SettingsSkeleton() {
         </div>
       </div>
 
-      <div className="space-y-3 rounded-xl border p-4">
+      <div className="space-y-3 rounded-xl border border-hairline-strong p-4">
         <Skeleton className="h-5 w-24" />
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-10 w-full" />
@@ -68,14 +62,14 @@ export function SettingsDrawer() {
   const weeklySummary = weeklySummaryQuery.data
 
   return (
-    <Sheet open={modal.open} onOpenChange={(open) => !open && closeModal('settings')}>
-      <SheetContent side="right" className="w-full overflow-y-auto p-0 sm:max-w-xl">
-        <SheetHeader className="border-b">
-          <SheetTitle>{t('title')}</SheetTitle>
-          <SheetDescription>{t('description')}</SheetDescription>
-        </SheetHeader>
-
-        <div className="space-y-6 p-4">
+    <WorkspaceOverlay
+      open={modal.open}
+      onOpenChange={(open) => !open && closeModal('settings')}
+      title={t('title')}
+      description={t('description')}
+      size="lg"
+    >
+      <WorkspaceOverlayBody className="space-y-6">
           {profileQuery.isLoading && <SettingsSkeleton />}
 
           {profileQuery.isError && (
@@ -132,8 +126,7 @@ export function SettingsDrawer() {
               onSendNow={() => sendWeeklySummary.mutate()}
             />
           )}
-        </div>
-      </SheetContent>
-    </Sheet>
+      </WorkspaceOverlayBody>
+    </WorkspaceOverlay>
   )
 }

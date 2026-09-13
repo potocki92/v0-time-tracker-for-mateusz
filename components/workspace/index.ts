@@ -14,7 +14,6 @@ export { WorkspaceConfirmOverlay } from './overlay/workspace-confirm-overlay'
 export {
   WorkspaceOverlay,
   WorkspaceOverlayBody,
-  WorkspaceOverlayClose,
   WorkspaceOverlayFooter,
   WorkspaceOverlayForm,
 } from './overlay/workspace-overlay'
