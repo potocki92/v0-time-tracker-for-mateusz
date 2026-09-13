@@ -6,9 +6,8 @@ import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import { NO_DATA, type AppFormat } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
+import { WorkspaceCard, WorkspaceEmptyState } from '@/components/workspace'
 import type { ReportModel, WeekdayIndex } from '../../domain'
-import { ReportCard } from '../shared/ReportCard'
-import { ReportEmptyState } from '../shared/ReportEmptyState'
 
 type Props = {
   model: ReportModel
@@ -39,21 +38,21 @@ export function ReportsInsightsSection({ model }: Props) {
 
   if (model.kpis.entryCount === 0) {
     return (
-      <ReportCard title={t('insights.title')} ariaLabel={t('insights.sectionLabel')}>
-        <ReportEmptyState
+      <WorkspaceCard title={t('insights.title')} ariaLabel={t('insights.sectionLabel')}>
+        <WorkspaceEmptyState
           icon={Activity}
           title={t('insights.empty')}
           description={t('states.noMatchDescription')}
           className="mt-4"
         />
-      </ReportCard>
+      </WorkspaceCard>
     )
   }
 
   const peakHours = Math.max(...insights.weekdayLoad.map((slot) => slot.hours), 0)
 
   return (
-    <ReportCard title={t('insights.title')} ariaLabel={t('insights.sectionLabel')}>
+    <WorkspaceCard title={t('insights.title')} ariaLabel={t('insights.sectionLabel')}>
       <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat
           label={t('insights.busiestWeekday')}
@@ -105,7 +104,7 @@ export function ReportsInsightsSection({ model }: Props) {
           })}
         </ul>
       </section>
-    </ReportCard>
+    </WorkspaceCard>
   )
 }
 

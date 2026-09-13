@@ -2,5 +2,11 @@
   "meta": {
     "title": "Klienci",
     "description": "Stawki, waluty i rozliczenia klientów."
+  },
+  "filters": {
+    "sectionLabel": "Filtry listy klientów",
+    "title": "Filtry klientów",
+    "description": "Zawęź listę po statusie, rozliczeniu i walucie",
+    "sortLabel": "Sortowanie listy klientów"
   }
 }

@@ -1,13 +1,6 @@
 'use client'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+import { WorkspaceConfirmOverlay } from '@/components/workspace'
 import type { Client } from '@/lib/types'
 
 type Props = {
@@ -19,25 +12,17 @@ type Props = {
 
 export function DeleteClientDialog({ client, isPending, onConfirm, onClose }: Props) {
   return (
-    <Dialog open={Boolean(client)} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Usunąć klienta?</DialogTitle>
-        </DialogHeader>
-        <p className="text-sm text-muted-foreground">
-          {client
-            ? `"${client.name}" zostanie trwale usunięty. Powiązane projekty zostają odłączone, a wpisy pracy zachowają zapisane stawki historyczne.`
-            : ''}
-        </p>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isPending}>
-            Anuluj
-          </Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={isPending}>
-            {isPending ? 'Usuwanie...' : 'Usuń'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <WorkspaceConfirmOverlay
+      open={Boolean(client)}
+      onOpenChange={(open) => !open && onClose()}
+      title="Usunąć klienta?"
+      confirmLabel="Usuń"
+      pendingLabel="Usuwanie..."
+      isPending={isPending}
+      onConfirm={onConfirm}
+    >
+      <span className="font-medium text-white">{client?.name}</span> zostanie trwale usunięty.
+      Powiązane projekty zostają odłączone, a wpisy pracy zachowają zapisane stawki historyczne.
+    </WorkspaceConfirmOverlay>
   )
 }

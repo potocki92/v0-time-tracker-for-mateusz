@@ -2,5 +2,11 @@
   "meta": {
     "title": "Kunden",
     "description": "Sätze, Währungen und Abrechnung Ihrer Kunden."
+  },
+  "filters": {
+    "sectionLabel": "Filter der Kundenliste",
+    "title": "Kundenfilter",
+    "description": "Liste nach Status, Abrechnung und Währung eingrenzen",
+    "sortLabel": "Sortierung der Kundenliste"
   }
 }

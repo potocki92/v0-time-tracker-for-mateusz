@@ -21,6 +21,13 @@
     "saving": "Saving…",
     "saved": "Saved"
   },
+  "filters": {
+    "open": "Filters",
+    "apply": "Apply",
+    "reset": "Reset filters",
+    "clear": "Clear filters",
+    "activeCount": "{count, plural, one {# active filter} other {# active filters}}"
+  },
   "units": {
     "hoursShort": "h",
     "pieceShort": "pcs"

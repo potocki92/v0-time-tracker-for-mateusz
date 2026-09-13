@@ -6,10 +6,8 @@ import { useTranslations } from 'next-intl'
 import { LineChart } from 'lucide-react'
 import { SkeletonBlock } from '@/components/common/SkeletonBlock'
 import { useFormat } from '@/lib/format/client'
+import { WorkspaceCard, WorkspaceEmptyState, WorkspaceSegmentedControl } from '@/components/workspace'
 import type { ReportModel } from '../../domain'
-import { ReportCard } from '../shared/ReportCard'
-import { ReportEmptyState } from '../shared/ReportEmptyState'
-import { SegmentedControl } from '../shared/SegmentedControl'
 import { formatMetricValue, toChartPoints, type TrendMetric } from './trendView'
 
 /**
@@ -51,11 +49,11 @@ export function ReportsTrendSection({ model }: Props) {
   const hasData = model.kpis.entryCount > 0
 
   return (
-    <ReportCard
+    <WorkspaceCard
       title={t('trend.title')}
       ariaLabel={t('trend.sectionLabel')}
       action={
-        <SegmentedControl
+        <WorkspaceSegmentedControl
           ariaLabel={t('trend.metricSwitcher')}
           value={metric}
           onChange={setMetric}
@@ -100,13 +98,13 @@ export function ReportsTrendSection({ model }: Props) {
           </table>
         </>
       ) : (
-        <ReportEmptyState
+        <WorkspaceEmptyState
           icon={LineChart}
           title={t('trend.empty')}
           description={t('states.noMatchDescription')}
           className="mt-4"
         />
       )}
-    </ReportCard>
+    </WorkspaceCard>
   )
 }

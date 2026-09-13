@@ -1,15 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowDownUp, ChevronDown, SlidersHorizontal } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { ArrowDownUp } from 'lucide-react'
 import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
 import {
   Select,
   SelectContent,
@@ -17,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { LINEAR, SURFACE } from '@/components/ui/tokens'
+import { LINEAR } from '@/components/ui/tokens'
+import { WorkspaceFilters } from '@/components/workspace'
 import { cn } from '@/lib/utils'
 import {
   ACTIVITY_GROUP_LABELS,
@@ -73,15 +69,12 @@ export function ClientsMobileList({
   onDelete,
   onShowHistory,
 }: Props) {
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  const t = useTranslations('clients')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
   }, [clients.length, workTypeFilter, currencyFilter, activityFilter, sortKey])
-
-  const forceOpen = activeFilterCount > 0
-  const open = filtersOpen || forceOpen
 
   const shown = clients.slice(0, visibleCount)
   const hasMore = clients.length > visibleCount
@@ -105,31 +98,14 @@ export function ClientsMobileList({
 
   return (
     <div className="space-y-3">
-      <Collapsible open={open} onOpenChange={setFiltersOpen}>
-        <div className="flex items-center gap-2">
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                'h-11 flex-1 justify-between gap-2 rounded-xl text-sm font-medium text-zinc-300 hover:text-white',
-                LINEAR.border,
-                LINEAR.surface,
-                LINEAR.surfaceHover,
-              )}
-            >
-              <span className="flex items-center gap-2">
-                <SlidersHorizontal className="size-4" />
-                Filtruj
-                {activeFilterCount > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-5 px-2 text-2xs">
-                    {activeFilterCount}
-                  </Badge>
-                )}
-              </span>
-              <ChevronDown className={cn('size-4 transition-transform', open && 'rotate-180')} />
-            </Button>
-          </CollapsibleTrigger>
-
+      <WorkspaceFilters
+        sectionLabel={t('filters.sectionLabel')}
+        title={t('filters.title')}
+        description={t('filters.description')}
+        activeCount={activeFilterCount}
+        onReset={onClearFilters}
+        inlineOnDesktop={false}
+        trailing={
           <Select value={sortKey} onValueChange={(v) => onSortChange(v as ClientsSortKey)}>
             <SelectTrigger
               className={cn(
@@ -137,7 +113,7 @@ export function ClientsMobileList({
                 LINEAR.border,
                 LINEAR.surface,
               )}
-              aria-label="Sortowanie listy klientów"
+              aria-label={t('filters.sortLabel')}
             >
               <ArrowDownUp className="size-4 shrink-0 text-zinc-400" aria-hidden />
               <SelectValue />
@@ -150,43 +126,29 @@ export function ClientsMobileList({
               ))}
             </SelectContent>
           </Select>
+        }
+      >
+        <div className="space-y-3">
+          <FilterChipsRow
+            label="Status"
+            options={STATUS_FILTER_OPTIONS}
+            value={activityFilter}
+            onChange={onActivityFilterChange}
+          />
+          <FilterChipsRow
+            label="Typ rozliczenia"
+            options={WORK_TYPE_FILTER_OPTIONS}
+            value={workTypeFilter}
+            onChange={onWorkTypeFilterChange}
+          />
+          <FilterChipsRow
+            label="Waluta"
+            options={CURRENCY_FILTER_OPTIONS}
+            value={currencyFilter}
+            onChange={onCurrencyFilterChange}
+          />
         </div>
-
-        <CollapsibleContent className="data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
-          <div className={cn('mt-2 space-y-3 p-3', SURFACE.card)}>
-            <FilterChipsRow
-              label="Status"
-              options={STATUS_FILTER_OPTIONS}
-              value={activityFilter}
-              onChange={onActivityFilterChange}
-            />
-            <FilterChipsRow
-              label="Typ rozliczenia"
-              options={WORK_TYPE_FILTER_OPTIONS}
-              value={workTypeFilter}
-              onChange={onWorkTypeFilterChange}
-            />
-            <FilterChipsRow
-              label="Waluta"
-              options={CURRENCY_FILTER_OPTIONS}
-              value={currencyFilter}
-              onChange={onCurrencyFilterChange}
-            />
-            {activeFilterCount > 0 && (
-              <div className="flex justify-end">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onClearFilters}
-                  className="h-9 text-xs text-zinc-400 hover:text-white"
-                >
-                  Wyczyść filtry
-                </Button>
-              </div>
-            )}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+      </WorkspaceFilters>
 
       {grouped ? (
         <div className="space-y-4">

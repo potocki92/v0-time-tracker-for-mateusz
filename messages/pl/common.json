@@ -21,6 +21,13 @@
     "saving": "Zapisywanie…",
     "saved": "Zapisano"
   },
+  "filters": {
+    "open": "Filtry",
+    "apply": "Zastosuj",
+    "reset": "Resetuj filtry",
+    "clear": "Wyczyść filtry",
+    "activeCount": "{count, plural, one {# aktywny filtr} few {# aktywne filtry} many {# aktywnych filtrów} other {# aktywnego filtru}}"
+  },
   "units": {
     "hoursShort": "h",
     "pieceShort": "szt."

@@ -1,8 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { LINEAR } from '@/components/ui/tokens'
-import { cn } from '@/lib/utils'
+import { WORKSPACE_FIELD, WORKSPACE_FIELD_LABEL } from '@/components/workspace'
 import {
   ALL,
   REPORT_PERIOD_PRESETS,
@@ -26,16 +25,9 @@ type Props = {
   onTagChange: (tag: string) => void
 }
 
-const FIELD_CLASSES = cn(
-  'h-11 w-full rounded-xl border px-3 text-sm text-zinc-200',
-  LINEAR.border,
-  LINEAR.surface,
-  'placeholder:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500/60 disabled:opacity-50',
-)
-
 function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className={LINEAR.eyebrow}>
+    <label htmlFor={htmlFor} className={WORKSPACE_FIELD_LABEL}>
       {children}
     </label>
   )
@@ -78,7 +70,7 @@ export function ReportsFilterForm({
           id="reports-preset"
           value={filters.preset}
           onChange={(event) => onPresetChange(event.target.value as ReportPeriodPreset)}
-          className={FIELD_CLASSES}
+          className={WORKSPACE_FIELD}
         >
           {REPORT_PERIOD_PRESETS.map((preset) => (
             <option key={preset} value={preset}>
@@ -98,7 +90,7 @@ export function ReportsFilterForm({
               value={range.start}
               max={range.end}
               onChange={(event) => onCustomRangeChange(event.target.value, range.end)}
-              className={FIELD_CLASSES}
+              className={WORKSPACE_FIELD}
             />
           </div>
           <div className="space-y-2">
@@ -109,7 +101,7 @@ export function ReportsFilterForm({
               value={range.end}
               min={range.start}
               onChange={(event) => onCustomRangeChange(range.start, event.target.value)}
-              className={FIELD_CLASSES}
+              className={WORKSPACE_FIELD}
             />
           </div>
         </div>
@@ -121,7 +113,7 @@ export function ReportsFilterForm({
           id="reports-client"
           value={filters.clientId}
           onChange={(event) => onClientChange(event.target.value)}
-          className={FIELD_CLASSES}
+          className={WORKSPACE_FIELD}
         >
           <option value={ALL}>{t('filters.allClients')}</option>
           {clients.map((client) => (
@@ -138,7 +130,7 @@ export function ReportsFilterForm({
           id="reports-project"
           value={filters.projectId}
           onChange={(event) => onProjectChange(event.target.value)}
-          className={FIELD_CLASSES}
+          className={WORKSPACE_FIELD}
         >
           <option value={ALL}>{t('filters.allProjects')}</option>
           {visibleProjects.map((project) => (
@@ -155,7 +147,7 @@ export function ReportsFilterForm({
           id="reports-tag"
           value={filters.tag}
           onChange={(event) => onTagChange(event.target.value)}
-          className={FIELD_CLASSES}
+          className={WORKSPACE_FIELD}
         >
           <option value={ALL}>{t('filters.allTags')}</option>
           {tags.map((tag) => (

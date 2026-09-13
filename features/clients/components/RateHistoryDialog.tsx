@@ -2,13 +2,6 @@
 
 import { useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,6 +14,15 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { SURFACE } from '@/components/ui/tokens'
+import {
+  WORKSPACE_FIELD,
+  WORKSPACE_FIELD_LABEL,
+  WorkspaceOverlay,
+  WorkspaceOverlayBody,
+  WorkspaceOverlayFooter,
+} from '@/components/workspace'
+import { cn } from '@/lib/utils'
 import { toMinor } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 import type { Client, ClientRateFormData } from '@/lib/types'
@@ -78,20 +80,19 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
   const unitLabel = client.work_type === 'hourly' ? 'h' : (client.unit ?? 'szt')
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Historia stawek — {client.name}</DialogTitle>
-        </DialogHeader>
-
+    <WorkspaceOverlay
+      open={open}
+      onOpenChange={(v) => !v && onClose()}
+      title={`Historia stawek — ${client.name}`}
+      size="md"
+    >
+      <WorkspaceOverlayBody>
         <div className="space-y-4">
           {/* ── Historia ──────────────────────────────────────────────── */}
           <section className="space-y-2">
-            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Stawki w czasie
-            </h3>
+            <h3 className={WORKSPACE_FIELD_LABEL}>Stawki w czasie</h3>
             {isLoading ? (
-              <p className="text-sm text-muted-foreground">Ładowanie historii...</p>
+              <p className="text-sm text-zinc-400">Ładowanie historii...</p>
             ) : isError ? (
               <p className="rounded-md border border-dashed border-warning-500/40 bg-warning-500/10 p-3 text-xs text-warning-700 dark:text-warning-300">
                 Historia niedostępna. Uruchom migrację
@@ -103,16 +104,16 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
             ) : rates.length === 0 ? (
               <CurrentOnly client={client} />
             ) : (
-              <ul className="divide-y rounded-md border">
+              <ul className={cn(SURFACE.cardNested, 'divide-y divide-hairline-strong')}>
                 {rates.map((r) => {
                   const isCurrent = r.effective_to === null
                   return (
                     <li key={r.id} className="flex items-start gap-3 p-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold tabular-nums">
+                          <span className="font-semibold tabular-nums text-white">
                             {fmt.money(toMinor(r.rate), r.currency)}
-                            <span className="text-xs font-normal text-muted-foreground">
+                            <span className="text-xs font-normal text-zinc-400">
                               /{r.work_type === 'hourly' ? 'h' : (r.unit ?? 'szt')}
                             </span>
                           </span>
@@ -120,12 +121,12 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
                             <Badge variant="secondary" className="text-2xs">Aktualna</Badge>
                           )}
                         </div>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
+                        <p className="mt-0.5 text-xs text-zinc-400">
                           Od {r.effective_from}
                           {r.effective_to && ` do ${r.effective_to}`}
                         </p>
                         {r.note && (
-                          <p className="mt-1 text-xs italic text-muted-foreground">{r.note}</p>
+                          <p className="mt-1 text-xs italic text-zinc-400">{r.note}</p>
                         )}
                       </div>
                       <Button
@@ -147,14 +148,12 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
           </section>
 
           {/* ── Nowa stawka ─────────────────────────────────────────── */}
-          <section className="space-y-3 rounded-md border bg-muted/30 p-3">
-            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Dodaj nową stawkę
-            </h3>
+          <section className={cn(SURFACE.cardNested, 'space-y-3 p-3')}>
+            <h3 className={WORKSPACE_FIELD_LABEL}>Dodaj nową stawkę</h3>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Stawka</Label>
+                <Label className={WORKSPACE_FIELD_LABEL}>Stawka</Label>
                 <Input
                   type="number"
                   min={0}
@@ -162,15 +161,16 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
                   value={form.rate || ''}
                   onChange={(e) => setForm({ ...form, rate: Number(e.target.value) })}
                   placeholder={`np. 28.00 ${client.currency}/${unitLabel}`}
+                  className={WORKSPACE_FIELD}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Waluta</Label>
+                <Label className={WORKSPACE_FIELD_LABEL}>Waluta</Label>
                 <Select
                   value={form.currency}
                   onValueChange={(v) => setForm({ ...form, currency: v as 'PLN' | 'EUR' })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={WORKSPACE_FIELD}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -183,14 +183,14 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Typ pracy</Label>
+                <Label className={WORKSPACE_FIELD_LABEL}>Typ pracy</Label>
                 <Select
                   value={form.work_type}
                   onValueChange={(v) =>
                     setForm({ ...form, work_type: v as 'hourly' | 'piecework' })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={WORKSPACE_FIELD}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -200,32 +200,34 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Obowiązuje od</Label>
+                <Label className={WORKSPACE_FIELD_LABEL}>Obowiązuje od</Label>
                 <Input
                   type="date"
                   value={form.effective_from}
                   onChange={(e) =>
                     setForm({ ...form, effective_from: e.target.value })
                   }
+                  className={WORKSPACE_FIELD}
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Notatka (opcjonalnie)</Label>
+              <Label className={WORKSPACE_FIELD_LABEL}>Notatka (opcjonalnie)</Label>
               <Input
                 value={form.note ?? ''}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
                 placeholder="np. podwyżka po rocznej współpracy"
+                className={WORKSPACE_FIELD}
               />
             </div>
 
-            <div className="flex items-center justify-between rounded-md border bg-background p-2">
+            <div className="flex items-center justify-between rounded-xl border border-hairline bg-surface-2 p-2">
               <div className="pr-3">
-                <Label htmlFor="make-current" className="font-normal">
+                <Label htmlFor="make-current" className="text-sm font-normal text-zinc-200">
                   Ustaw jako aktualną
                 </Label>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-zinc-400">
                   Jeśli włączone — aktualizujemy też pole „stawka” klienta. Inaczej wpis
                   służy tylko jako zapis historyczny.
                 </p>
@@ -238,16 +240,23 @@ export function RateHistoryDialog({ client, open, onClose }: Props) {
             </div>
           </section>
         </div>
+      </WorkspaceOverlayBody>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Zamknij</Button>
-          <Button onClick={submit} disabled={addRate.isPending || form.rate <= 0}>
-            <Plus className="mr-2 h-4 w-4" />
-            {addRate.isPending ? 'Dodawanie...' : 'Dodaj stawkę'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <WorkspaceOverlayFooter>
+        <Button variant="outline" onClick={onClose} className="h-11 sm:h-9">
+          Zamknij
+        </Button>
+        <Button
+          variant="accent"
+          onClick={submit}
+          disabled={addRate.isPending || form.rate <= 0}
+          className="h-11 sm:h-9"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          {addRate.isPending ? 'Dodawanie...' : 'Dodaj stawkę'}
+        </Button>
+      </WorkspaceOverlayFooter>
+    </WorkspaceOverlay>
   )
 }
 
@@ -255,15 +264,15 @@ function CurrentOnly({ client }: { client: Client }) {
   const fmt = useFormat()
   const unit = client.work_type === 'hourly' ? 'h' : (client.unit ?? 'szt')
   return (
-    <div className="rounded-md border p-3">
+    <div className={cn(SURFACE.cardNested, 'p-3')}>
       <div className="flex items-center gap-2">
-        <span className="font-semibold tabular-nums">
+        <span className="font-semibold tabular-nums text-white">
           {fmt.money(toMinor(client.rate), client.currency)}
-          <span className="text-xs font-normal text-muted-foreground">/{unit}</span>
+          <span className="text-xs font-normal text-zinc-400">/{unit}</span>
         </span>
         <Badge variant="secondary" className="text-2xs">Aktualna</Badge>
       </div>
-      <p className="mt-0.5 text-xs text-muted-foreground">
+      <p className="mt-0.5 text-xs text-zinc-400">
         Brak wcześniejszej historii. Dodaj nową stawkę poniżej, żeby rozpocząć śledzenie zmian.
       </p>
     </div>

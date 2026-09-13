@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { WorkspaceHeaderActions } from '@/components/workspace/workspace-header-slot'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { useClientsData } from '../hooks/useClientsData'
 import { useClientsFilters } from '../hooks/useClientsFilters'
 import { useClientRatesMap } from '../hooks/useClientRates'
@@ -29,6 +28,8 @@ import { DeleteClientDialog } from './DeleteClientDialog'
 import { RateHistoryDialog } from './RateHistoryDialog'
 import { AppFooter } from '@/components/common/AppFooter'
 import { PageContainer } from '@/components/common/section/PageContainer'
+import { SURFACE } from '@/components/ui/tokens'
+import { cn } from '@/lib/utils'
 import { ClientsStatsBoundary, ClientsTableBoundary } from './errors'
 import type { Client, ClientFormData } from '@/lib/types'
 import type { ClientWithStats } from '../domain/clients.types'
@@ -197,14 +198,14 @@ export function ClientsContent() {
         </ClientsTableBoundary>
       ) : (
         <ClientsTableBoundary>
-          <Card className="overflow-hidden">
+          <div className={cn(SURFACE.card, 'overflow-hidden')}>
             <ClientsTable
               clients={visible}
               onEdit={openEdit}
               onDelete={(c) => setDeleteCandidate(toClient(c))}
               onShowHistory={(c) => setHistoryClient(toClient(c))}
             />
-          </Card>
+          </div>
         </ClientsTableBoundary>
       )}
 

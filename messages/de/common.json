@@ -21,6 +21,13 @@
     "saving": "Wird gespeichert…",
     "saved": "Gespeichert"
   },
+  "filters": {
+    "open": "Filter",
+    "apply": "Anwenden",
+    "reset": "Filter zurücksetzen",
+    "clear": "Filter leeren",
+    "activeCount": "{count, plural, one {# aktiver Filter} other {# aktive Filter}}"
+  },
   "units": {
     "hoursShort": "Std.",
     "pieceShort": "Stk."
