@@ -958,6 +958,47 @@
     animation: collapsible-down 180ms ease-out;
   }
 
+  /*
+   * Glebia Pulpitu — dwie klasy prezentacyjne, nie dwadziescia klas
+   * arbitralnych w JSX.
+   *
+   * `.dashboard-canvas` klada na tlo strony bardzo delikatny chlodny tint
+   * (radialnie, od gory), zeby czarne tlo nie bylo plaska plachta. Tint idzie
+   * przez `color-mix` z `--info-500`, wiec ma STALY, chlodny odcien niezaleznie
+   * od motywu — `--brand-*` zmienialoby go razem z akcentem uzytkownika.
+   *
+   * `.dashboard-card` dokłada wlos wewnetrznego swiatla przy gornej krawedzi
+   * karty. Swiatlo, nie cien: `box-shadow` na ciemnym tle robi szara mgle,
+   * a karta ma odcinac sie kontrastem powierzchni (--surface-1 na --surface-0).
+   *
+   * Obie klasy dotycza WYLACZNIE Pulpitu — powierzchnie pozostalych sekcji
+   * ida przez SURFACE w components/ui/tokens.ts i zostaja nietkniete.
+   */
+  .dashboard-canvas {
+    background-color: var(--surface-0);
+    background-image: radial-gradient(
+      120% 55% at 50% 0%,
+      color-mix(in oklab, var(--info-500) 5%, transparent),
+      transparent 70%
+    );
+  }
+
+  .dashboard-card {
+    box-shadow: inset 0 1px 0 0 color-mix(in oklab, white 4%, transparent);
+  }
+
+  /*
+   * Siatka roczna jedzie w poziomie na waskim ekranie. Pasek przewijania
+   * jest tam czystym szumem — gest jest oczywisty, a pasek zabiera wiersz
+   * w karcie. Sama przewijalnosc zostaje (klawiatura, trackpad, czytnik).
+   */
+  .dashboard-scroll-x {
+    scrollbar-width: none;
+  }
+  .dashboard-scroll-x::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Bazowa animacja skeleton — jedna dla całej strony */
   @keyframes skeleton-shimmer {
     0%, 100% {

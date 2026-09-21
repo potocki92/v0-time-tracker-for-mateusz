@@ -1,8 +1,8 @@
 'use client'
 
-import { SectionEyebrow } from '@/components/common/section/SectionEyebrow'
 import Link from 'next/link'
 import { ArrowUpRight, ChevronRight, CheckCircle2, Clock } from 'lucide-react'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 
 export type ProjectStatus = 'in_progress' | 'completed' | 'planned'
 
@@ -42,25 +42,23 @@ const STATUS_PILL: Record<
 
 export function ProjectsCard({ projects, totalActive }: Props) {
   return (
-    <section
-      aria-label="Projekty"
-      className="rounded-lg border border-hairline bg-surface-1"
-    >
-      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        <div className="flex items-center gap-2">
-          <SectionEyebrow>Projekty</SectionEyebrow>
-          <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
-            {totalActive} aktywne
-          </span>
-        </div>
+    <DashboardSectionCard
+      padded={false}
+      meta={
+        <span className="shrink-0 rounded-full border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
+          {totalActive} aktywne
+        </span>
+      }
+      actions={
         <Link
           href="/projects"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
+          className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
         >
           Zobacz wszystkie
-          <ArrowUpRight className="h-3 w-3" aria-hidden />
+          <ArrowUpRight className="size-3" aria-hidden />
         </Link>
-      </header>
+      }
+    >
 
       {projects.length === 0 ? (
         <div className="px-4 py-6 text-center text-sm text-zinc-400">
@@ -105,6 +103,6 @@ export function ProjectsCard({ projects, totalActive }: Props) {
           })}
         </ul>
       )}
-    </section>
+    </DashboardSectionCard>
   )
 }

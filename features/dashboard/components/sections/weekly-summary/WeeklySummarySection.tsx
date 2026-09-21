@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, FileText } from 'lucide-react'
 import { useDashboardSlice } from '../../../hooks/useDashboardSlice'
 import {
   selectClients,
@@ -10,10 +10,13 @@ import {
 } from '../../../hooks/dashboardSelectors'
 import { buildWeeklySummary, type ContractorBlock } from '../../../lib/weekly-summary'
 import { getWeekStart } from '@/lib/date/week'
+import { DASHBOARD_SURFACE } from '@/components/ui/tokens'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 import { WeeklySummaryModal } from './WeeklySummaryModal'
 import type { AppFormat } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 import { formatDate, formatHours, formatRate, formatTotals } from './presentation'
+import { cn } from '@/lib/utils'
 
 /**
  * Kafel skrótu przepracowanego tygodnia (dla księgowej).
@@ -41,36 +44,47 @@ export function WeeklySummarySection() {
   )
 
   return (
-    <section
-      aria-label="Podsumowanie tygodnia"
-      className="rounded-lg border border-hairline bg-surface-1"
-    >
-      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
+    <DashboardSectionCard padded={false}>
+      <div className="flex items-start justify-between gap-3 px-4 py-3.5">
         <div className="min-w-0">
-          {/* Tytul sekcji niesie <SectionShell>. */}
-          <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
+          <p className="text-lg font-semibold leading-tight tabular-nums text-white">
             KW {summary.weekNumber}/{summary.weekYear}
-          </span>
-          <p className="mt-0.5 truncate text-2xs text-zinc-400">
+          </p>
+          <p className="mt-0.5 truncate text-xs text-zinc-400">
             dla księgowej · {summary.rangeLabel}
           </p>
         </div>
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-hairline bg-surface-2 px-3 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3 hover:text-white"
         >
           Otwórz
-          <ArrowUpRight className="h-3 w-3" aria-hidden />
+          <ArrowUpRight className="size-3.5" aria-hidden />
         </button>
-      </header>
+      </div>
 
       {summary.isEmpty ? (
-        <div className="px-4 py-6 text-center text-sm text-zinc-400">
-          Brak przepracowanych dni w tym tygodniu.
+        // Pusty stan jako zagniezdzony panel, a nie napis na pustej karcie —
+        // inaczej „brak danych" wyglada jak bledny render.
+        <div className="px-4 pb-4">
+          <div
+            className={cn(
+              DASHBOARD_SURFACE.nested,
+              'flex items-center gap-3 px-3 py-3 text-xs text-zinc-400',
+            )}
+          >
+            <span
+              aria-hidden
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-zinc-400"
+            >
+              <FileText className="size-4" />
+            </span>
+            Brak przepracowanych dni w tym tygodniu.
+          </div>
         </div>
       ) : (
-        <ul role="list" className="divide-y divide-hairline">
+        <ul role="list" className="divide-y divide-hairline border-t border-hairline">
           {summary.contractors.map((block) => (
             <ContractorRow fmt={fmt} key={block.clientId ?? '__unassigned__'} block={block} />
           ))}
@@ -85,7 +99,7 @@ export function WeeklySummarySection() {
         onNextWeek={() => setWeekOffset((o) => Math.min(0, o + 1))}
         canGoNext={weekOffset < 0}
       />
-    </section>
+    </DashboardSectionCard>
   )
 }
 

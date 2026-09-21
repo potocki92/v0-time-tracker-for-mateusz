@@ -27,12 +27,12 @@ export function DashboardContent() {
       <DashboardDerivedProvider>
         {/* Nie <main> — AppShell renderuje juz landmark main z id="main-content",
             na ktory celuje skip-link. */}
-        <div className="min-h-screen bg-surface-0 text-white">
+        <div className="dashboard-canvas min-h-screen text-white">
           {/* UWAGA: te klasy sa skopiowane do DashboardSkeleton. Jesli zmieniasz
               je tutaj, zmien je tam w TYM SAMYM commicie — inaczej podmiana
               skeletonu na tresc przesunie strone w poziomie. Pilnuje tego
               __test__/config/dashboard-skeleton.test.ts. */}
-          <div className="mx-auto w-full space-y-4 px-3 pb-24 pt-2 sm:px-4 md:pb-10 md:pt-3 xl:max-w-[1440px] xl:px-8">
+          <div className="mx-auto w-full space-y-4 px-4 pb-24 pt-3 sm:px-5 md:pb-10 md:pt-4 xl:max-w-[1440px] xl:px-8">
             <HeaderSection />
             <DashboardBody />
             <Footer />

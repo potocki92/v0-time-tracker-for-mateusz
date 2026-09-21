@@ -4,6 +4,7 @@ import { ChevronRight, Plus } from 'lucide-react'
 import type { AppFormat } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 import { toDateKey } from '@/lib/date/format'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 
 export type UpcomingCategory = 'vacation' | 'billing' | 'project' | 'finance' | 'event'
 
@@ -43,21 +44,19 @@ function dayLabel(fmt: AppFormat, d: Date): { day: string; month: string } {
 export function UpcomingCard({ items, onAdd }: Props) {
   const fmt = useFormat()
   return (
-    <section
-      aria-label="Nadchodzące"
-      className="rounded-lg border border-hairline bg-surface-1"
-    >
-      {/* Tytul sekcji niesie <SectionShell> — karta go nie powtarza. */}
-      <header className="flex items-center justify-end border-b border-hairline px-4 py-3">
+    <DashboardSectionCard
+      padded={false}
+      actions={
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex items-center gap-1 rounded-md border border-hairline bg-surface-2 px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3"
+          className="inline-flex shrink-0 items-center gap-1 rounded-md border border-hairline bg-surface-2 px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:border-hairline-strong hover:bg-surface-3"
         >
-          <Plus className="h-3 w-3" aria-hidden />
+          <Plus className="size-3" aria-hidden />
           Dodaj
         </button>
-      </header>
+      }
+    >
 
       {items.length === 0 ? (
         <div className="px-4 py-6 text-center text-sm text-zinc-400">
@@ -89,6 +88,6 @@ export function UpcomingCard({ items, onAdd }: Props) {
           })}
         </ul>
       )}
-    </section>
+    </DashboardSectionCard>
   )
 }

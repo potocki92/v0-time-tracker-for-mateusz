@@ -46,6 +46,28 @@ export const SURFACE = {
 } as const
 
 /**
+ * Powierzchnie Pulpitu.
+ *
+ * Pulpit ma wlasna chrome karty — naglowek jest CZESCIA karty, a zwiniete
+ * sekcje skladaja sie na jeden panel — wiec i wlasna, o stopien ciemniejsza
+ * powierzchnie niz `SURFACE.card` (ta obsluguje Projekty, Klientow, Faktury
+ * i Raporty; zmiana jej promienia albo tla przemalowalaby cztery sekcje przy
+ * okazji jednej). Literaly stoja TU, a nie w `features/dashboard/**`, bo
+ * `__test__/config/ui-consistency.test.ts` liczy powierzchnie kart po zrodlach
+ * sekcji — kazda kopia w feature'rze jest tam nowym wariantem.
+ *
+ * Glebia idzie przez `.dashboard-card` / `.dashboard-canvas` z `app/globals.css`:
+ * wlos wewnetrznego swiatla u gory karty i bardzo delikatny chlodny tint tla.
+ * Zaden ciezki `box-shadow` — karta ma sie odcinac kontrastem, nie cieniem.
+ */
+export const DASHBOARD_SURFACE = {
+  /** Karta sekcji Pulpitu i panel sekcji zwinietych. */
+  card: 'rounded-2xl border border-hairline bg-surface-1',
+  /** Wiersz / kafelek WEWNATRZ karty Pulpitu — o stopien jasniejszy. */
+  nested: 'rounded-xl border border-hairline bg-surface-2',
+} as const
+
+/**
  * Skala intensywności heatmapy godzin (karta „Godziny" na Pulpicie).
  *
  * Pięć stopni na akcencie motywu zamiast zahardkodowanej zieleni: panel ma

@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 
 export type ActivityItem = {
   id: string
@@ -78,20 +79,16 @@ export function ActivityCard({
   ]
 
   return (
-    <section
-      aria-label="Aktywność"
-      className="rounded-lg border border-hairline bg-surface-1 p-4"
-    >
-      {/* Tytul sekcji niesie <SectionShell> — karta go nie powtarza. */}
-      <header className="flex items-center justify-end">
-        {/* Akcja sekcji idzie przez <Button>, a nie przez <a> pomalowany na
-            przycisk — patrz docs/ui-audit.md §1. */}
-        <Button asChild variant="outline" size="sm" className="h-7 text-2xs">
+    <DashboardSectionCard
+      actions={
+        // Akcja sekcji idzie przez <Button>, a nie przez <a> pomalowany na
+        // przycisk — patrz docs/ui-audit.md §1.
+        <Button asChild variant="outline" size="sm" className="h-7 shrink-0 text-2xs">
           <Link href="/calendar">Zobacz wszystkie</Link>
         </Button>
-      </header>
-
-      <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
+      }
+    >
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {tiles.map(({ icon: Icon, label, value, hint, accent }) => (
           <div
             key={label}
@@ -142,6 +139,6 @@ export function ActivityCard({
           ))}
         </ul>
       )}
-    </section>
+    </DashboardSectionCard>
   )
 }

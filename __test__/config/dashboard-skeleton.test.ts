@@ -39,28 +39,41 @@ function bodyOf(src: string, name: string): string {
   return next === -1 ? rest : rest.slice(0, next)
 }
 
+/**
+ * Klasy dopelnienia i szerokosci kontenera, w kolejnosci zrodlowej.
+ *
+ * Asercja porownuje LISTY, a nie obecnosc wpisanych tu z palca wartosci:
+ * zmiana `px-3` na `px-4` w tresci ma wymusic te sama zmiane w skeletonie,
+ * a nie poprawke w tescie.
+ */
+function geometryOf(classes: string): string[] {
+  return classes
+    .split(/\s+/)
+    .filter((token) => /^(?:[a-z]+:)?(?:p[xytb]?|max-w)-/.test(token))
+}
+
 describe('dashboard — skeleton odwzorowuje tresc', () => {
-  it('kontener skeletonu ma te same ograniczenia szerokosci co tresc', () => {
+  it('kontener skeletonu ma te sama geometrie co kontener tresci', () => {
+    // Rozjazd o jeden stopien dopelnienia przesuwa cala strone w poziomie
+    // albo w pionie na samej podmianie skeletonu na tresc.
     const contentContainer = classesContaining(content, 'mx-auto w-full')
     const skeletonContainer = classesContaining(skeleton, 'mx-auto w-full')
 
-    for (const token of ['xl:max-w-', 'px-3', 'sm:px-4', 'xl:px-8']) {
-      expect(
-        skeletonContainer,
-        `skeleton nie ma "${token}" — podmiana przesunie strone w poziomie`,
-      ).toContain(token)
-      expect(contentContainer).toContain(token)
-    }
+    expect(
+      geometryOf(skeletonContainer),
+      'skeleton i tresc maja inna geometrie kontenera',
+    ).toEqual(geometryOf(contentContainer))
   })
 
-  it('skeleton ma to samo dopelnienie dolne co tresc', () => {
-    // pb-28 przy tresci z pb-24 md:pb-10 zmienia wysokosc strony na samej
-    // podmianie — pasek przewijania skacze, choc nic sie nie przerysowalo.
+  it('kontener niesie komplet klas geometrii', () => {
+    // Bezpiecznik na wypadek, gdyby OBA pliki zgubily te same klasy naraz:
+    // porownanie list bylo by wtedy zgodne, a strona i tak by sie rozjechala.
     const contentContainer = classesContaining(content, 'mx-auto w-full')
-    const skeletonContainer = classesContaining(skeleton, 'mx-auto w-full')
-    for (const token of ['pb-24', 'md:pb-10']) {
-      expect(skeletonContainer).toContain(token)
-      expect(contentContainer).toContain(token)
+    for (const prefix of ['px-', 'sm:px-', 'xl:px-', 'xl:max-w-', 'pb-', 'md:pb-', 'pt-']) {
+      expect(
+        geometryOf(contentContainer).some((token) => token.startsWith(prefix)),
+        `kontener Pulpitu stracil klase "${prefix}…"`,
+      ).toBe(true)
     }
   })
 
@@ -75,9 +88,26 @@ describe('dashboard — skeleton odwzorowuje tresc', () => {
 
   it('skeleton odwzorowuje uklad warstwowy tresci', () => {
     // Uklad nie jest juz siatka 12-kolumnowa: hero, pas trzech kart,
-    // wiersz „Dostosuj pulpit" i lista zwinietych sekcji.
+    // wiersz „Dostosuj pulpit" i JEDEN panel zwinietych sekcji.
     expect(skeleton, 'brak pasa nad zagieciem').toMatch(/grid-cols-1[^"]*lg:grid-cols-3/)
     expect(skeleton, 'brak karty hero').toContain('<HeroSkeleton')
+  })
+
+  it('zwiniete sekcje sa w skeletonie jednym panelem, tak jak w tresci', () => {
+    // W tresci wiersze dzieli `divide-y` PANELU, a nie ramka kazdego wiersza.
+    // Skeleton z osobnymi kaflami dawalby inna wysokosc i inne krawedzie.
+    for (const source of [skeleton, read('features/dashboard/components/dashboard-sections.tsx')]) {
+      expect(source, 'panel zwinietych sekcji ma dzielic wiersze wlosem').toContain(
+        'divide-y divide-hairline',
+      )
+      expect(source).toContain('DASHBOARD_SURFACE.card')
+    }
+  })
+
+  it('karta w skeletonie ma pasek naglowka, bo tresc go ma', () => {
+    // `DashboardSectionCard` rysuje naglowek NA karcie — bez jego odpowiednika
+    // w skeletonie kazda karta skakalaby o wysokosc tego paska.
+    expect(sections, 'skeleton karty bez paska naglowka').toContain('border-b border-hairline')
   })
 
   it('pas nad zagieciem ma w skeletonie tyle kart, ile rejestr ma primary', () => {
@@ -126,7 +156,7 @@ describe('dashboard — skeleton odwzorowuje tresc', () => {
   })
 
   it('HeaderSkeleton odwzorowuje caly HeroGreeting', () => {
-    // dateline + naglowek + akapit `sm:hidden` + zakladki zakresu = 4 bloczki.
+    // dateline + naglowek + podtytul + zakladki zakresu = 4 bloczki.
     const blocks = bodyOf(sections, 'HeaderSkeleton').match(/<SkeletonBlock/g) ?? []
     expect(
       blocks.length,

@@ -8,6 +8,7 @@ import { useChartMetrics } from './hooks/useChartMetrics'
 import { ChartHeader } from './ChartHeader'
 import { ChartControls } from './ChartControls'
 import { ChartEmptyState } from './ChartEmptyState'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 
 // recharts to najcięższa zależność dashboardu i nie jest potrzebna do
 // pierwszego renderu — nagłówek i kontrolki wykresu pokazują się od razu,
@@ -41,13 +42,10 @@ export function EarningsChart({ workEntries, clients, eurToPlnRate }: Props) {
     workEntries, clients, eurToPlnRate, grouping, dateRange, prevRange
   )
 
-  // Ten sam literał powierzchni, co `HoursCard` i `ActivityCard` — karta
-  // przestaje być jedynym shadcnowym `Card` w kolumnie głównej pulpitu.
+  // Powierzchnia i naglowek ida przez `DashboardSectionCard` — ta karta
+  // przestaje być jedynym elementem Pulpitu z własnym chrome.
   return (
-    <section
-      aria-label="Analiza aktywności"
-      className="rounded-lg border border-hairline bg-surface-1 p-4"
-    >
+    <DashboardSectionCard>
       <ChartHeader
         trend={trend}
         totalHours={totalHours}
@@ -67,6 +65,6 @@ export function EarningsChart({ workEntries, clients, eurToPlnRate }: Props) {
           <ChartBars data={mergedData} avgHours={avgHours} isYearDaily={isYearDaily} />
         )}
       </div>
-    </section>
+    </DashboardSectionCard>
   )
 }

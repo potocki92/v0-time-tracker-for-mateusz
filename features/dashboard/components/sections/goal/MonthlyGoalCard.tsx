@@ -3,6 +3,7 @@
 import { Pencil } from 'lucide-react'
 import { toMinor } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 import type { Currency } from '../../../types/dashboard.types'
 
 type Props = {
@@ -75,22 +76,19 @@ export function MonthlyGoalCard({
   const headline = reached ? 'Cel osiągnięty' : 'Cel w trakcie realizacji'
 
   return (
-    <section
-      aria-label="Cel miesięczny"
-      className="rounded-lg border border-hairline bg-surface-1 p-4"
-    >
-      <header className="flex items-center justify-between">
+    <DashboardSectionCard
+      actions={
         <button
           type="button"
           aria-label="Edytuj cel miesięczny"
           onClick={onEdit}
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-400 transition hover:bg-surface-3 hover:text-white"
+          className="inline-flex size-7 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400 transition hover:bg-surface-3 hover:text-white"
         >
-          <Pencil className="h-3.5 w-3.5" aria-hidden />
+          <Pencil className="size-3.5" aria-hidden />
         </button>
-      </header>
-
-      <div className="mt-3.5 flex items-center gap-4">
+      }
+    >
+      <div className="flex items-center gap-4">
         <CircularProgress value={progress} />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium leading-[1.3] text-white sm:text-sm">{headline}</p>
@@ -124,6 +122,6 @@ export function MonthlyGoalCard({
           </p>
         </div>
       </div>
-    </section>
+    </DashboardSectionCard>
   )
 }

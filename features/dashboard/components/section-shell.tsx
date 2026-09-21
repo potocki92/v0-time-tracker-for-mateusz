@@ -7,8 +7,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import { LINEAR } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
+import { DashboardRangeBadge, DashboardSectionChromeProvider } from '@/components/workspace/card/dashboard-section-card'
 
 type Props = {
   id: string
@@ -23,7 +23,7 @@ type Props = {
 }
 
 /**
- * Wspolna skorupa sekcji Pulpitu.
+ * Wiersz sekcji w panelu sekcji zwinietych.
  *
  * Sedno jest wydajnosciowe, nie kosmetyczne: przy `collapsed` zawartosc NIE
  * JEST MONTOWANA. Ukrycie CSS-em zostawiloby w drzewie komponent, ktory dalej
@@ -31,9 +31,17 @@ type Props = {
  * dla ktorego to zwijanie powstalo. Radix odmontowuje zawartosc sam, wiec
  * `children` przekazujemy jako element, a nie przez `forceMount`.
  *
- * Panel dostaje `aria-labelledby` przycisku, a nie wlasny landmark: prawdziwym
- * landmarkiem jest karta w srodku (`<section aria-label>`), wiec drugi
- * region o tej samej nazwie tylko dublowalby sie w czytniku ekranu.
+ * Skorupa nie ma wlasnej ramki ani promienia: wlos miedzy wierszami rysuje
+ * `divide-y` PANELU w `dashboard-sections.tsx`, wiec kilkanascie sekcji sklada
+ * sie w jedna powierzchnie zamiast w kilkanascie luznych naglowkow na czarnym
+ * tle. Zaden wiersz nie chowa wlasnego obramowania selektorem pozycyjnym —
+ * obramowania po prostu nie ma.
+ *
+ * Rozwinieta sekcja dostaje chrome `inline`: tytul i zakres niesie juz ten
+ * wiersz, wiec karta w srodku nie rysuje drugiego naglowka ani drugiej ramki.
+ * Landmark `<section aria-label>` zostaje w karcie — panel dostaje tylko
+ * `aria-labelledby` przycisku, bo drugi region o tej samej nazwie dublowalby
+ * sie w czytniku ekranu.
  *
  * Rozwijanie animuje CSS (`.collapsible-reveal` + zmienna Radiksa), a nie
  * Motion: LazyMotion kosztowal na tej trasie 17 kB gzip, czyli wiecej,
@@ -60,7 +68,7 @@ export function SectionShell({
       onOpenChange={() => onToggle(id)}
       data-section-id={id}
     >
-      <div className="flex items-center gap-2 px-1">
+      <div className="flex items-center gap-2 pr-4">
         <h2 className="min-w-0 flex-1">
           <CollapsibleTrigger asChild>
             <button
@@ -69,14 +77,14 @@ export function SectionShell({
               // 44 px to minimalny cel dotykowy — naglowek sekcji jest tu
               // najczesciej klikanym elementem na telefonie.
               className={cn(
-                LINEAR.eyebrow,
-                'flex min-h-[44px] w-full items-center gap-2 rounded-md text-left transition hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hairline-strong',
+                'flex min-h-[44px] w-full items-center gap-2.5 px-4 text-left text-sm font-medium text-zinc-200 transition',
+                'hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-hairline-strong',
               )}
             >
               <ChevronDown
                 aria-hidden
                 className={cn(
-                  'h-3.5 w-3.5 shrink-0 transition-transform',
+                  'size-4 shrink-0 text-zinc-500 transition-transform duration-150',
                   collapsed && '-rotate-90',
                 )}
               />
@@ -85,7 +93,7 @@ export function SectionShell({
           </CollapsibleTrigger>
         </h2>
 
-        <RangeBadge label={rangeLabel} />
+        <DashboardRangeBadge label={rangeLabel} />
 
         {actions}
       </div>
@@ -96,7 +104,13 @@ export function SectionShell({
           data-animated={String(animated)}
           className={cn('overflow-hidden', animated && 'collapsible-reveal')}
         >
-          <div className="pt-2">{children}</div>
+          <div className="px-4 pb-4 pt-1">
+            <DashboardSectionChromeProvider
+              value={{ title, rangeLabel, variant: 'inline' }}
+            >
+              {children}
+            </DashboardSectionChromeProvider>
+          </div>
         </div>
       </CollapsibleContent>
     </Collapsible>
@@ -123,18 +137,4 @@ function usePrefersReducedMotion(): boolean {
   }, [])
 
   return reduced
-}
-
-/**
- * Etykieta wlasnego zakresu sekcji. Wspoldzielona ze skorupa sekcji nad
- * zagieciem — obie musza wygladac tak samo, bo sekcja przechodzi miedzy nimi
- * jednym klikiem w „Dostosuj pulpit".
- */
-export function RangeBadge({ label }: { label?: string }) {
-  if (!label) return null
-  return (
-    <span className="shrink-0 rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-400">
-      {label}
-    </span>
-  )
 }

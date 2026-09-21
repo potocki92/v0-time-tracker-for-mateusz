@@ -156,20 +156,26 @@ describe('ui — kanoniczne powierzchnie kart', () => {
   })
 })
 
-describe('ui — karty Pulpitu maja jedna powierzchnie', () => {
+describe('ui — karty Pulpitu maja jedna powierzchnie i jeden naglowek', () => {
   /**
-   * Pulpit ma wlasna siatke i celowo zostal poza ujednoliceniem z Fazy 2
-   * (`SURFACE.card` = `rounded-2xl`/`bg-surface-2`), ale wewnatrz siebie musi
-   * byc spojny: jego karta to `rounded-lg border border-hairline bg-surface-1`.
-   * Karta „Analiza aktywnosci" byla jedynym wyjatkiem — stala na shadcnowym
-   * <Card>, wiec miala inny promien, inne tlo i inny stopien naglowka niz
-   * sasiadki w tej samej kolumnie.
+   * Pulpit ma wlasna powierzchnie karty (o stopien ciemniejsza niz
+   * `SURFACE.card`, ktory obsluguje Projekty, Klientow i Faktury) i wlasne
+   * chrome: naglowek z ikona, tytulem i pigulka zakresu jest CZESCIA karty.
+   *
+   * Przed etapem „mobilny Pulpit" kazda sekcja powtarzala u siebie ten sam
+   * literal powierzchni, a tytul wisial nad karta jako osobny blok. Teraz
+   * literal stoi raz — w `DASHBOARD_SURFACE` — a chrome w jednym komponencie,
+   * wiec kontrakt jest inny: sekcja ma PRZEZ NIEGO isc, a nie odtwarzac go
+   * u siebie. Dzieki temu sekcja przeniesiona nad zagiecie dostaje poprawny
+   * tytul bez zmiany w jej kodzie.
    */
-  const DASHBOARD_SURFACE = 'rounded-lg border border-hairline bg-surface-1'
+  const CARD_COMPONENT = 'components/workspace/card/dashboard-section-card.tsx'
+  const OLD_SURFACE = 'rounded-lg border border-hairline bg-surface-1'
+
   const cards = featureFiles.filter(
     (f) =>
       f.startsWith('features/dashboard/components/') &&
-      /(Card|EarningsChart)\.tsx$/.test(f),
+      /(Card|EarningsChart|hero-today)\.tsx$/.test(f),
   )
 
   it('znajduje karty Pulpitu', () => {
@@ -177,13 +183,54 @@ describe('ui — karty Pulpitu maja jedna powierzchnie', () => {
   })
 
   for (const card of cards) {
-    it(`${card} stoi na powierzchni Pulpitu`, () => {
+    it(`${card} idzie przez <DashboardSectionCard>`, () => {
       expect(
         sources.get(card),
-        `${card} maluje sie inaczej niz sasiadki w tej samej kolumnie`,
-      ).toContain(DASHBOARD_SURFACE)
+        `${card} sklada karte recznie — naglowek oderwie sie od tresci, a powierzchnia rozjedzie z sasiadkami`,
+      ).toContain('<DashboardSectionCard')
     })
   }
+
+  it('sekcja Wyjazdow tez idzie przez wspolna karte', () => {
+    // `features/trips` stoi na Pulpicie jako sekcja — stad karta mieszka
+    // w `components/`, a nie w `features/dashboard`.
+    expect(sources.get('features/trips/components/TripCountdownCard.tsx')).toContain(
+      '<DashboardSectionCard',
+    )
+  })
+
+  it('zadna karta sekcji nie powtarza literalu powierzchni Pulpitu', () => {
+    // Zakres celowo waski: chodzi o KARTY SEKCJI. Ten sam literal w menu,
+    // modalu czy w skeletonie Kalendarza to osobne elementy, nie powierzchnia
+    // karty Pulpitu, i nie naleza do tego kontraktu.
+    const found = [...cards, 'features/trips/components/TripCountdownCard.tsx'].filter(
+      (file) => sources.get(file)?.includes(OLD_SURFACE),
+    )
+    expect(
+      found,
+      `powierzchnia karty Pulpitu stoi w DASHBOARD_SURFACE (components/ui/tokens.ts):\n${found.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it('DASHBOARD_SURFACE wystawia karte i powierzchnie zagniezdzona', () => {
+    const tokens = read('components/ui/tokens.ts')
+    for (const name of ['card', 'nested']) {
+      expect(tokens, `brak DASHBOARD_SURFACE.${name}`).toMatch(
+        new RegExp(`DASHBOARD_SURFACE[\\s\\S]*\\b${name}:\\s*'`),
+      )
+    }
+  })
+
+  it('karta rysuje naglowek z tytulu podanego przez zlozenie, nie z propsa sekcji', () => {
+    // Gdyby tytul byl propsem karty, kazda sekcja niosla by wlasna kopie
+    // nazwy z rejestru — i przeniesienie sekcji nad zagiecie rozjechaloby
+    // naglowek z etykieta landmarku.
+    const component = read(CARD_COMPONENT)
+    expect(component).toContain('aria-label={chrome?.title || undefined}')
+    expect(component, 'chrome ma isc przez context, nie przez propsy').toContain(
+      'DashboardSectionChromeProvider',
+    )
+  })
 
   it('Pulpit nie wraca do shadcnowego <Card>', () => {
     const found = offenders(
@@ -191,7 +238,7 @@ describe('ui — karty Pulpitu maja jedna powierzchnie', () => {
     ).filter((f) => f.startsWith('features/dashboard/'))
     expect(
       found,
-      `sekcja Pulpitu uzywa <Card> zamiast <section> z powierzchnia Pulpitu:\n${found.join('\n')}`,
+      `sekcja Pulpitu uzywa <Card> zamiast <DashboardSectionCard>:\n${found.join('\n')}`,
     ).toEqual([])
   })
 })

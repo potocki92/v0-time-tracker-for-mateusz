@@ -13,7 +13,8 @@ otwórz `features/reports/**` i zrób tak samo.
 | co | gdzie |
 |---|---|
 | overlay, filtry, karta sekcji, pusty stan, segmented control, recipe pól | `components/workspace/**` (barrel: `@/components/workspace`) |
-| tokeny: `LINEAR`, `SURFACE`, `LAYER`, `HEATMAP_LEVELS` | `components/ui/tokens.ts` |
+| karta sekcji **Pulpitu** (`DashboardSectionCard`) | `components/workspace/card/dashboard-section-card.tsx` |
+| tokeny: `LINEAR`, `SURFACE`, `DASHBOARD_SURFACE`, `LAYER`, `HEATMAP_LEVELS` | `components/ui/tokens.ts` |
 | kontener strony, eyebrow, kafelek KPI | `components/common/{section,stat}/**` |
 | skala kolorów, `.workspace-surface` | `app/globals.css` |
 
@@ -44,6 +45,17 @@ Trzy kanoniczne powierzchnie kart (`SURFACE` w `components/ui/tokens.ts`):
 | `SURFACE.card` | `rounded-2xl border border-hairline-strong bg-surface-2` | karta stojąca na tle sekcji |
 | `SURFACE.cardNested` | `rounded-xl border border-hairline-strong bg-surface-3` | panel/wiersz wewnątrz karty |
 | `SURFACE.cardDashed` | `rounded-2xl border border-dashed border-hairline bg-surface-2` | pusty stan |
+
+Pulpit ma własną parę powierzchni (`DASHBOARD_SURFACE`), o stopień ciemniejszą:
+
+| stała | klasy | rola |
+|---|---|---|
+| `DASHBOARD_SURFACE.card` | `rounded-2xl border border-hairline bg-surface-1` | karta sekcji Pulpitu i panel sekcji zwiniętych |
+| `DASHBOARD_SURFACE.nested` | `rounded-xl border border-hairline bg-surface-2` | panel/wiersz wewnątrz karty Pulpitu |
+
+Głębię dokładają dwie klasy prezentacyjne z `app/globals.css`, nie cień:
+`.dashboard-canvas` (bardzo delikatny chłodny tint tła strony) i
+`.dashboard-card` (włos wewnętrznego światła przy górnej krawędzi karty).
 
 Zasady:
 
@@ -261,6 +273,32 @@ jeżeli takie menu ma nosić skórę panelu, dopisz mu `className="workspace-sur
   zmiany (Raporty), `progress` rysuje pasek, `compact` obniża stopień, gdy
   wartością jest tekst, a nie liczba.
 
+### `DashboardSectionCard` — karta sekcji Pulpitu
+
+```tsx
+<DashboardSectionCard padded={false} meta={<CountPill/>} actions={<Link/>}>
+  …
+</DashboardSectionCard>
+```
+
+Nagłówek (ikona, tytuł, pigułka zakresu) jest **częścią karty**, a nie blokiem
+nad nią. Karta nie przyjmuje tytułu propsem: bierze go z contextu, który
+ustawia złożenie Pulpitu (`features/dashboard/components/dashboard-sections.tsx`)
+wprost z rejestru sekcji. Dzięki temu dowolna sekcja przeniesiona w „Dostosuj
+pulpit" nad zagięcie dostaje poprawny nagłówek i poprawną etykietę landmarku
+bez zmiany w swoim kodzie.
+
+Dwa warianty chrome:
+
+| wariant | kiedy | co rysuje karta |
+|---|---|---|
+| `card` | sekcja nad zagięciem | powierzchnia + nagłówek + landmark `<section aria-label>` |
+| `inline` | sekcja rozwinięta w panelu zwiniętych | sam landmark i treść — tytuł niesie wiersz-przełącznik `<SectionShell>` |
+
+Ikony nagłówków stoją w `features/dashboard/sections/presentation.ts`
+(mapa po `id` sekcji) — nie w rejestrze i **nigdy** w zapisanym układzie
+Zustanda: komponent Lucide nie jest wartością serializowalną.
+
 ## 9. Mobile vs desktop
 
 Regułą jest **CSS, nie JS**. Ten sam DOM zmienia pozycję i geometrię przez
@@ -284,7 +322,7 @@ feature dostarcza tylko to, co jest jego — tytuł, opis, etykiety pól.
 | co | dlaczego zostaje |
 |---|---|
 | `LinearCard` (Projekty) | inna anatomia: nagłówek i stopka oddzielone konturem, korpus bez paddingu. Stoi na `SURFACE.card` i `LINEAR.*`, więc mówi tym samym językiem; wciśnięcie go w `WorkspaceCard` wymagałoby pięciu propsów „na wszelki wypadek". |
-| Siatka Pulpitu (`data-dashboard-grid`) i jego powierzchnia `rounded-lg bg-surface-1` | Pulpit ma gęstsze karty i własny układ. Wewnątrz siebie jest spójny — pilnuje tego osobny blok w `ui-consistency.test.ts`. |
+| Układ Pulpitu (`data-dashboard-primary` / `data-dashboard-rest`) i jego powierzchnie `DASHBOARD_SURFACE` | Pulpit ma gęstsze karty, własną hierarchię (karta wiodąca + pas trzech + panel zwiniętych) i nagłówek wewnątrz karty. Wewnątrz siebie jest spójny, bo wszystkie sekcje idą przez `DashboardSectionCard` — pilnuje tego osobny blok w `ui-consistency.test.ts`. |
 | `EarningsKpi` w karcie Zarobki | mikro-statystyka **wewnątrz** karty, nie kafelek sekcji: ikona po lewej, wartość `text-sm`. |
 | `KPICard` (Kalendarz) | kontener na dowolne dzieci, nie kafelek „etykieta + wartość". |
 | Pigułki statusów w Fakturach | pasek zakładek z licznikami (`role="tab"`), nie panel filtrów — nie ma czego wkładać do arkusza. |

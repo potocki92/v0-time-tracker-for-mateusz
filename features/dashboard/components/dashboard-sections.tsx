@@ -2,11 +2,13 @@
 
 import { useEffect } from 'react'
 import { DASHBOARD_SECTIONS } from '../sections/registry'
+import { SECTION_ICONS } from '../sections/presentation'
 import type { DashboardPeriod, DashboardSectionDef } from '../sections/types'
 import { rehydrateDashboardLayout, useDashboardLayout } from '../hooks/use-dashboard-layout'
 import { LazySection } from './lazy-section'
-import { RangeBadge, SectionShell } from './section-shell'
-import { LINEAR } from '@/components/ui/tokens'
+import { DashboardSectionChromeProvider } from '@/components/workspace/card/dashboard-section-card'
+import { SectionShell } from './section-shell'
+import { DASHBOARD_SURFACE } from '@/components/ui/tokens'
 import { cn } from '@/lib/utils'
 import { CustomizeSheet } from './customize-sheet'
 
@@ -18,15 +20,21 @@ import { CustomizeSheet } from './customize-sheet'
  *
  *   pozycja 1     karta wiodaca — pelna szerokosc, zawsze rozwinieta
  *   pozycje 2..4  pas nad zagieciem — trzy karty w rzedzie od lg
- *   reszta        zwijane skorupy, montowane leniwie
+ *   reszta        jeden panel zwijanych wierszy, montowanych leniwie
  *
  * Dzieki temu „Dostosuj pulpit" naprawde zmienia to, co widac bez
  * przewijania: przesuniecie sekcji na gore wprowadza ja nad zagiecie,
- * a sekcja z niej wypchnieta schodzi do listy zwinietych. `tier` z rejestru
+ * a sekcja z niej wypchnieta schodzi do panelu zwinietych. `tier` z rejestru
  * jest juz tylko wartoscia POCZATKOWA tej kolejnosci.
  *
  * Budzet nad zagieciem (1 + 3) jest tu wymuszony strukturalnie — nie da sie
  * go przekroczyc ustawieniami, bo wynika z ciecia listy.
+ *
+ * Naglowek sekcji nie wisi juz nad karta. Sekcja nad zagieciem dostaje chrome
+ * `card` (ikona, tytul, zakres w pasku NA karcie), sekcja w panelu — chrome
+ * `inline`, bo tytul niesie wtedy wiersz-przelacznik. Tytul idzie w obu
+ * przypadkach z rejestru przez context (`dashboard-section-card.tsx`), wiec dowolna
+ * sekcja przeniesiona nad zagiecie ma poprawny naglowek bez zmiany w kodzie.
  */
 const LEAD_SLOTS = 1
 const BAND_SLOTS = 3
@@ -55,49 +63,63 @@ export function DashboardSections({ period }: { period: DashboardPeriod }) {
   const rest = visible.slice(LEAD_SLOTS + BAND_SLOTS)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 md:space-y-4">
       {lead && <PinnedSection section={lead} period={period} />}
 
       {band.length > 0 && (
-        <div data-dashboard-primary className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div
+          data-dashboard-primary
+          className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-3"
+        >
           {band.map((section) => (
             <PinnedSection key={section.def.id} section={section} period={period} />
           ))}
         </div>
       )}
 
-      <div className="flex justify-end">
+      {/* „Dostosuj pulpit" stoi NAD panelem zwinietych sekcji i po lewej —
+          jest tytulem tego, co pod nim, a nie drobnym linkiem przyklejonym
+          do prawej krawedzi. */}
+      <div className="flex pt-1">
         <CustomizeSheet />
       </div>
 
-      <div data-dashboard-rest className="space-y-3">
-        {rest.map(({ def, collapsed }) => (
-          <SectionShell
-            key={def.id}
-            id={def.id}
-            title={def.title}
-            rangeLabel={rangeLabelOf(def)}
-            collapsed={collapsed}
-            onToggle={toggleCollapsed}
-          >
-            {def.loading === 'lazy' ? (
-              <LazySection>
+      {rest.length > 0 && (
+        <div
+          data-dashboard-rest
+          className={cn(
+            DASHBOARD_SURFACE.card,
+            'dashboard-card divide-y divide-hairline overflow-hidden',
+          )}
+        >
+          {rest.map(({ def, collapsed }) => (
+            <SectionShell
+              key={def.id}
+              id={def.id}
+              title={def.title}
+              rangeLabel={rangeLabelOf(def)}
+              collapsed={collapsed}
+              onToggle={toggleCollapsed}
+            >
+              {def.loading === 'lazy' ? (
+                <LazySection>
+                  <def.Component period={period} />
+                </LazySection>
+              ) : (
                 <def.Component period={period} />
-              </LazySection>
-            ) : (
-              <def.Component period={period} />
-            )}
-          </SectionShell>
-        ))}
-      </div>
+              )}
+            </SectionShell>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
 /**
- * Sekcja nad zagieciem: ten sam naglowek co w skorupie, ale bez zwijania.
- * Zwiniecie karty, ktora uzytkownik SAM postawil na gorze, byloby
- * przelacznikiem na nic — od chowania jest lista nizej.
+ * Sekcja nad zagieciem: karta z wlasnym naglowkiem, bez zwijania. Zwiniecie
+ * karty, ktora uzytkownik SAM postawil na gorze, byloby przelacznikiem na nic —
+ * od chowania jest panel nizej.
  *
  * Zawartosc montuje sie od razu, takze gdy rejestr oznaczyl sekcje jako
  * `lazy`: skoro stoi nad zagieciem, to i tak jest w kadrze. Kod nadal
@@ -112,13 +134,16 @@ function PinnedSection({
 }) {
   return (
     <div data-section-id={def.id} className="min-w-0">
-      <div className="flex items-center gap-2 px-1 pb-2">
-        <h2 className={cn(LINEAR.eyebrow, 'min-w-0 flex-1 truncate')}>
-          {def.title}
-        </h2>
-        <RangeBadge label={rangeLabelOf(def)} />
-      </div>
-      <def.Component period={period} />
+      <DashboardSectionChromeProvider
+        value={{
+          title: def.title,
+          icon: SECTION_ICONS[def.id],
+          rangeLabel: rangeLabelOf(def),
+          variant: 'card',
+        }}
+      >
+        <def.Component period={period} />
+      </DashboardSectionChromeProvider>
     </div>
   )
 }

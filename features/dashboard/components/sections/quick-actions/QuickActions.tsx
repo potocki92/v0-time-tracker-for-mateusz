@@ -11,6 +11,7 @@ import {
   Command,
   type LucideIcon,
 } from 'lucide-react'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 
 type Action = {
   href: string
@@ -31,18 +32,14 @@ const ACTIONS: readonly Action[] = [
 
 export function QuickActions() {
   return (
-    <section
-      aria-label="Szybkie akcje"
-      className="rounded-lg border border-hairline bg-surface-1 p-4"
-    >
-      {/* Tytul sekcji niesie <SectionShell> — karta go nie powtarza. */}
-      <header className="flex items-center justify-end">
-        <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-400">
-          <Command className="h-3.5 w-3.5" aria-hidden />
+    <DashboardSectionCard
+      meta={
+        <span className="inline-flex size-6 shrink-0 items-center justify-center rounded-md border border-hairline bg-surface-2 text-zinc-400">
+          <Command className="size-3.5" aria-hidden />
         </span>
-      </header>
-
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
+      }
+    >
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {ACTIONS.map(({ href, label, icon: Icon, shortcut, highlight }) => (
           <Link
             key={href}
@@ -79,6 +76,6 @@ export function QuickActions() {
           </Link>
         ))}
       </div>
-    </section>
+    </DashboardSectionCard>
   )
 }

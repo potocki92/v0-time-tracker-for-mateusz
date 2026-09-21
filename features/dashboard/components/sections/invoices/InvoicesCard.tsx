@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
-  ArrowUpRight,
   Check,
+  ChevronRight,
   Clock,
   FileText,
   Pencil,
@@ -12,6 +12,7 @@ import {
   XCircle,
   type LucideIcon,
 } from 'lucide-react'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 import { NO_DATA, toMinor } from '@/lib/format'
 import type { AppFormat } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
@@ -80,23 +81,23 @@ export function InvoicesCard({ invoices }: Props) {
   const totals = sumInvoicesByCurrency(invoices)
 
   return (
-    <section
-      aria-label="Faktury"
-      className="rounded-lg border border-hairline bg-surface-1"
-    >
-      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        {/* Tytul niesie <SectionShell>, zakres — zakladki. Zostaje licznik. */}
-        <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
+    <DashboardSectionCard
+      padded={false}
+      meta={
+        <span className="inline-flex h-5 shrink-0 items-center rounded-full border border-brand-500/30 bg-brand-500/10 px-2 text-2xs font-semibold tabular-nums leading-none text-brand-300">
           {invoices.length}
         </span>
+      }
+      actions={
         <Link
           href="/invoices"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
+          className="inline-flex shrink-0 items-center gap-0.5 rounded-md py-1 pl-2 text-2xs font-medium text-zinc-300 transition hover:text-white"
         >
           Zobacz wszystkie
-          <ArrowUpRight className="h-3 w-3" aria-hidden />
+          <ChevronRight className="size-3.5" aria-hidden />
         </Link>
-      </header>
+      }
+    >
 
       {visible.length === 0 ? (
         <div className="px-4 py-6 text-center text-sm text-zinc-400">
@@ -113,15 +114,17 @@ export function InvoicesCard({ invoices }: Props) {
               .join(' · ')
             return (
               <li key={inv.id}>
+                {/* Caly wiersz jest celem — pigulka statusu i kwota nie sa
+                    osobnymi klikalnymi wyspami. */}
                 <Link
                   href="/invoices"
-                  className="flex items-center gap-3 px-4 py-3 transition hover:bg-surface-1"
+                  className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-surface-2"
                 >
                   <span
                     aria-hidden
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400"
+                    className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-2 text-zinc-400"
                   >
-                    <FileText className="h-4 w-4" />
+                    <FileText className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -129,7 +132,7 @@ export function InvoicesCard({ invoices }: Props) {
                       <span
                         className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold ${pill.className}`}
                       >
-                        <pill.icon className="h-3 w-3" aria-hidden />
+                        <pill.icon className="size-3" aria-hidden />
                         {pill.label}
                       </span>
                     </div>
@@ -140,6 +143,7 @@ export function InvoicesCard({ invoices }: Props) {
                   <span className="shrink-0 text-xs font-semibold tabular-nums text-white sm:text-sm">
                     {fmt.money(toMinor(inv.amount), inv.currency)}
                   </span>
+                  <ChevronRight className="size-4 shrink-0 text-zinc-500" aria-hidden />
                 </Link>
               </li>
             )
@@ -165,13 +169,15 @@ export function InvoicesCard({ invoices }: Props) {
             ))
           )}
         </p>
-        <Button asChild variant="outline" size="sm">
+        {/* Wystawienie faktury to akcja glowna tej karty — wariant `accent`,
+            ten sam co „Nowa faktura" w sekcji Faktur. */}
+        <Button asChild variant="accent" size="sm" className="min-h-10">
           <Link href="/invoices?action=new">
-            <Plus className="h-3.5 w-3.5" aria-hidden />
+            <Plus className="size-3.5" aria-hidden />
             Nowa
           </Link>
         </Button>
       </footer>
-    </section>
+    </DashboardSectionCard>
   )
 }

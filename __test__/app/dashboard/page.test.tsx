@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import common from '@/messages/pl/common.json'
 import type { DashboardSectionDef } from '@/features/dashboard/sections/types'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 
 /**
  * „Dostosuj pulpit" siedzi w stopce sekcji i stoi na `WorkspaceOverlay`,
@@ -26,6 +27,11 @@ const render = (ui: React.ReactElement) =>
  * a nie `tier` z rejestru. Bez tego strzalki w „Dostosuj pulpit" przestawialy
  * sekcje wylacznie w obrebie zwinietej listy i nie zmienialy tego, co widac
  * bez przewijania.
+ *
+ * Atrapa sekcji stoi na `DashboardSectionCard` — tak samo jak kazda prawdziwa
+ * sekcja Pulpitu (pilnuje tego `__test__/config/ui-consistency.test.ts`). To
+ * ta karta rysuje naglowek z TYTULEM Z REJESTRU, wiec test kolejnosci moze
+ * czytac tytuly wprost z DOM, a nie z propsow.
  */
 const section = (
   id: string,
@@ -38,7 +44,11 @@ const section = (
   loading: 'eager',
   defaultVisible: true,
   defaultCollapsed: false,
-  Component: ({ period }) => <p>{`${id}:${period}`}</p>,
+  Component: ({ period }) => (
+    <DashboardSectionCard>
+      <p>{`${id}:${period}`}</p>
+    </DashboardSectionCard>
+  ),
   ...overrides,
 })
 
@@ -76,6 +86,33 @@ const shellOf = (id: string) => document.querySelector(`[data-section-id="${id}"
 beforeEach(() => {
   localStorage.clear()
   layout().resetToDefaults()
+})
+
+describe('Pulpit — naglowek jest czescia karty', () => {
+  it('tytul sekcji nad zagieciem stoi W SRODKU jej landmarku, nie nad nim', () => {
+    // Regresja, ktora to pilnuje: tytul i pigulka zakresu wisialy nad karta
+    // jako osobny blok, wiec naglowek byl wizualnie oderwany od tresci,
+    // ktora opisuje.
+    render(<DashboardSections period="month" />)
+
+    const card = screen.getByRole('region', { name: 'gamma' })
+    expect(
+      within(card).getByRole('heading', { level: 2 }).textContent,
+      'naglowek karty musi byc w jej landmarku',
+    ).toBe('gamma')
+    expect(within(card).getByText('biezacy tydzien')).toBeDefined()
+  })
+
+  it('sekcja rozwinieta w panelu nie dubluje tytulu', () => {
+    // W panelu tytul niesie wiersz-przelacznik, wiec karta w srodku ma go
+    // NIE powtarzac — inaczej ta sama nazwa czytalaby sie dwa razy.
+    render(<DashboardSections period="month" />)
+
+    const headings = screen
+      .getAllByRole('heading', { level: 2 })
+      .map((heading) => heading.textContent)
+    expect(headings.filter((title) => title === 'delta')).toHaveLength(1)
+  })
 })
 
 describe('Pulpit — render z rejestru', () => {
