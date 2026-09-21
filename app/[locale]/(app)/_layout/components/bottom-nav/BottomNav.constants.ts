@@ -1,7 +1,7 @@
 import {
-  LayoutDashboard,
-  Calendar,
-  FolderKanban,
+  LayoutGrid,
+  CalendarDays,
+  Folder,
   Users,
   FileText,
 } from 'lucide-react'
@@ -10,9 +10,9 @@ import type { BottomNavItem } from './BottomNav.types'
 
 /** Sekcje z dolnego paska — codzienna praca, w kolejnosci z rejestru. */
 const BOTTOM_NAV_ICONS: Partial<Record<WorkspaceSegment, BottomNavItem['icon']>> = {
-  dashboard: LayoutDashboard,
-  calendar:  Calendar,
-  projects:  FolderKanban,
+  dashboard: LayoutGrid,
+  calendar:  CalendarDays,
+  projects:  Folder,
   clients:   Users,
   invoices:  FileText,
 }

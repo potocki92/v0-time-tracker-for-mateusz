@@ -13,6 +13,7 @@ import { computeTodayGlance } from '../lib/today'
 import { useDashboardSlice } from '../hooks/useDashboardSlice'
 import { selectClients, selectWorkEntries } from '../hooks/dashboardSelectors'
 import { useEffectiveEurRate } from '../hooks/usePreferencesStore'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 
 /**
  * Jedyna sekcja nad zagieciem, ktora odpowiada na pytanie „co z dzisiaj".
@@ -39,12 +40,9 @@ export function HeroToday() {
   const toggleTimer = useTimerStore((state) => state.toggle)
 
   return (
-    <section
-      aria-label="Dzisiaj"
-      className="rounded-lg border border-hairline bg-surface-1 p-4 sm:p-5"
-    >
+    <DashboardSectionCard>
       {/* Bez datownika: powitanie nad Pulpitem pokazuje juz „PONIEDZIALEK ·
-          07 WRZ 2026 · KW 37/2026", a tytul sekcji niesie naglowek nad karta. */}
+          07 WRZ 2026 · KW 37/2026", a tytul sekcji niesie naglowek KARTY. */}
       <p className="text-3xl font-semibold leading-[1.15] tabular-nums text-white sm:text-4xl">
         {glance.hours > 0 ? fmt.hours(glance.hours) : 'Brak wpisu na dziś'}
       </p>
@@ -91,6 +89,6 @@ export function HeroToday() {
           {running ? 'Zatrzymaj timer' : 'Uruchom timer'}
         </Button>
       </div>
-    </section>
+    </DashboardSectionCard>
   )
 }

@@ -109,6 +109,7 @@ export function EarningsSection() {
         <EarningsCard
           totalPLN={totals.totalEarningsAllPLN}
           totalEUR={totalEUR}
+          projectedPLN={projectedTotals.totalEarningsAllPLN}
           trend={trend}
           sparklineData={sparklineData}
           prevSparklineData={prevSparklineData}
@@ -124,9 +125,6 @@ export function EarningsSection() {
           onCopyAmount={handleCopyAmount}
         />
       </EarningsCardBoundary>
-      <p className="mt-2 text-sm text-zinc-400">
-        Przewidywane zarobki: <span className="font-medium text-zinc-100">{fmt.money(toMinor(projectedTotals.totalEarningsAllPLN), 'PLN')}</span>
-      </p>
 
       <GoalEditDialog
         open={goalDialogOpen}

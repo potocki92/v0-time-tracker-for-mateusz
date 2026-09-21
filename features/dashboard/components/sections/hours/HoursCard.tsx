@@ -3,6 +3,7 @@
 import { Check, Flame } from 'lucide-react'
 import { NO_DATA } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 type Props = {
   totalHours: number
   /** `null`, gdy nie ma jeszcze zrealizowanego dnia pracy. */
@@ -28,11 +29,8 @@ export function HoursCard({
   const reached = targetHours !== null && goalProgress >= 1
 
   return (
-    <section
-      aria-label="Godziny"
-      className="rounded-lg border border-hairline bg-surface-1 p-4"
-    >
-      <header className="flex items-start justify-between gap-3">
+    <DashboardSectionCard>
+      <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
             {fmt.hours(totalHours)}{' '}
@@ -65,7 +63,7 @@ export function HoursCard({
             </span>
           )}
         </div>
-      </header>
+      </div>
 
       {targetHours !== null && (
         <div className="mt-4">
@@ -87,7 +85,6 @@ export function HoursCard({
           </div>
         </div>
       )}
-
-    </section>
+    </DashboardSectionCard>
   )
 }

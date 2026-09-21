@@ -7,7 +7,10 @@ import { useLocale, useTranslations } from 'next-intl'
 import type { User } from '@supabase/supabase-js'
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
-import { WorkspaceHeader } from '@/components/workspace/workspace-header'
+import {
+  WorkspaceHeader,
+  useWorkspaceHeaderPresentation,
+} from '@/components/workspace/workspace-header'
 import { WorkspaceHeaderSlotProvider } from '@/components/workspace/workspace-header-slot'
 import { toAppLocale } from '@/i18n/config'
 import { performLogout } from '@/lib/auth/logout'
@@ -45,6 +48,12 @@ export function AppShell({ user, badges, children }: AppShellProps) {
   const t = useTranslations('navigation')
   const locale = toAppLocale(useLocale())
   const queryClient = useQueryClient()
+  // Ekran z tytulem (Pulpit) ma na telefonie pasek z referencji: tytul po
+  // lewej, dzwonek / licznik / awatar po prawej. Znika z niego przelacznik
+  // sidebara i osobna ikona motywu — nie sama FUNKCJA: sidebar zostaje na
+  // kazdej innej trasie panelu, a wybor motywu siedzi w menu uzytkownika,
+  // czyli w awatarze obok.
+  const screenTitle = useWorkspaceHeaderPresentation() === 'screenTitle'
 
   // Wylogowanie robi TWARDA nawigacje; adres logowania musi wiec niesc jezyk,
   // inaczej Niemiec wypadalby na polski formularz.
@@ -64,10 +73,12 @@ export function AppShell({ user, badges, children }: AppShellProps) {
       <SidebarInset>
         <WorkspaceHeaderSlotProvider>
           <WorkspaceHeader
-            leading={<SidebarTrigger className="-ml-1 md:hidden" />}
+            leading={
+              screenTitle ? undefined : <SidebarTrigger className="-ml-1 md:hidden" />
+            }
             trailing={
               <div className="flex items-center gap-2 md:hidden">
-                <ThemeToggle />
+                {!screenTitle && <ThemeToggle />}
                 <UserMenu user={user} onLogout={logout} />
               </div>
             }

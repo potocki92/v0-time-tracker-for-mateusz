@@ -12,6 +12,7 @@ import type { AppFormat } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
 import { cn } from '@/lib/utils'
 import type { WorkEntry } from '@/lib/types'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 import { buildHeatmap, HEATMAP_WEEKS } from './heatmap'
 
 type Props = {
@@ -47,16 +48,13 @@ export function YearHeatmapCard({ entries }: Props) {
   }, [])
 
   return (
-    <section
-      aria-label="Rok w godzinach"
-      className="rounded-lg border border-hairline bg-surface-1 p-4"
-    >
+    <DashboardSectionCard>
       <div className="min-w-0">
         {/* Jeden `role="img"` na całą siatkę, nie 364 osobne: czytnik ekranu
             czytał wcześniej każdą komórkę z osobna. Treść dla SR niesie
             tabela `sr-only` niżej — ten sam wzorzec, co w
             `features/calendar/components/insights/HoursPerWeekChart.tsx`. */}
-        <div ref={scrollRef} className="overflow-x-auto pb-1">
+        <div ref={scrollRef} className="dashboard-scroll-x overflow-x-auto pb-1">
           <div
             role="img"
             aria-label={`Aktywność z ostatnich ${HEATMAP_WEEKS} tygodni: ${fmt.count(
@@ -65,9 +63,12 @@ export function YearHeatmapCard({ entries }: Props) {
             )} z wpisami, łącznie ${fmt.hours(heatmap.totalHours)}`}
             className="flex w-fit gap-2"
           >
+            {/* Etykiety dni tygodnia zabieraja na telefonie ~24 px szerokosci
+                siatki, ktora i tak jedzie poziomo. Znikaja WIZUALNIE — tresc
+                dla czytnika ekranu niesie tabela `sr-only` nizej. */}
             <div
               aria-hidden
-              className="flex shrink-0 flex-col gap-[3px] pt-4 text-2xs text-zinc-500"
+              className="hidden shrink-0 flex-col gap-[3px] pt-4 text-2xs text-zinc-500 sm:flex"
             >
               {DAY_LABELS.map((label, i) => (
                 <span key={label} className="flex h-[13px] items-center leading-none">
@@ -141,7 +142,7 @@ export function YearHeatmapCard({ entries }: Props) {
           </tbody>
         </table>
 
-        <div className="mt-2 flex items-center justify-between gap-3 text-2xs text-zinc-400">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-2xs text-zinc-400">
           <span className="tabular-nums">
             {fmt.count(heatmap.activeDays, ['dzień', 'dni', 'dni'])} z wpisami przez
             ostatni rok
@@ -159,6 +160,6 @@ export function YearHeatmapCard({ entries }: Props) {
           </span>
         </div>
       </div>
-    </section>
+    </DashboardSectionCard>
   )
 }

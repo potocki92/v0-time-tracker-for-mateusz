@@ -8,6 +8,7 @@ import { fetchOverallQuartersAction } from '@/features/invoices'
 import type { OverallQuarterSummary } from '@/features/invoices/domain'
 import { toMinor } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 const QUERY_KEY = ['dashboard-module', 'data', 'quarterly-summary'] as const
 
 /**
@@ -24,23 +25,23 @@ export function QuarterlySummaryCard() {
   })
 
   return (
-    <section
-      aria-label="Kwartały"
-      className="rounded-lg border border-hairline bg-surface-1"
-    >
-      <header className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        {/* Tytul niesie <SectionShell>. */}
-        <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
+    <DashboardSectionCard
+      padded={false}
+      meta={
+        <span className="shrink-0 rounded-full border border-hairline bg-surface-2 px-2 py-0.5 text-2xs text-zinc-300">
           ostatnie 4
         </span>
+      }
+      actions={
         <Link
           href="/invoices"
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
+          className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-zinc-300 transition hover:bg-surface-3 hover:text-white"
         >
           Wystaw fakturę
-          <ArrowUpRight className="h-3 w-3" aria-hidden />
+          <ArrowUpRight className="size-3" aria-hidden />
         </Link>
-      </header>
+      }
+    >
 
       {error ? (
         <div className="px-4 py-6 text-center text-sm text-danger-400">
@@ -61,7 +62,7 @@ export function QuarterlySummaryCard() {
           ))}
         </ul>
       )}
-    </section>
+    </DashboardSectionCard>
   )
 }
 

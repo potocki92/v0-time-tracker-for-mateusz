@@ -42,13 +42,14 @@ export function CustomizeSheet() {
 
   return (
     <>
+      {/* Nie drobny link przy prawej krawedzi, tylko tytul tego, co pod nim:
+          panel sekcji zwinietych zaczyna sie zaraz nizej. */}
       <Button
         variant="ghost"
-        size="sm"
         onClick={() => setOpen(true)}
-        className="min-h-[44px] text-zinc-400"
+        className="-ml-2 h-auto min-h-[44px] justify-start gap-2.5 px-2 text-sm font-medium text-zinc-200 hover:text-white"
       >
-        <Settings2 className="size-3.5" aria-hidden />
+        <Settings2 className="size-[18px] text-zinc-400" aria-hidden />
         Dostosuj pulpit
       </Button>
 

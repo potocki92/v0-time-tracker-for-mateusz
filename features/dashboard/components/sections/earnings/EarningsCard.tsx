@@ -20,6 +20,7 @@ import type { EarningsTrendData } from '../../../hooks/useEarningsTrend'
 import type { SparklinePoint } from '../../../hooks/useEarningsSparkline'
 import { EarningsMenu } from './EarningsMenu'
 import { buildSeries } from './series'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 
 // recharts osobnym chunkiem — kwota i KPI nie czekają na wykres.
 const EarningsSparkChart = dynamic(
@@ -32,6 +33,8 @@ const EarningsSparkChart = dynamic(
 type Props = {
   totalPLN: number
   totalEUR: number
+  /** Prognoza na koniec okresu — stopka karty, nie luzny akapit pod nia. */
+  projectedPLN: number
   trend: EarningsTrendData
   sparklineData: SparklinePoint[]
   prevSparklineData?: SparklinePoint[]
@@ -86,6 +89,7 @@ function computeDailyStats(points: SparklinePoint[]): DailyStats {
 export const EarningsCard = memo(function EarningsCard({
   totalPLN,
   totalEUR,
+  projectedPLN,
   trend,
   sparklineData,
   prevSparklineData,
@@ -149,71 +153,8 @@ export const EarningsCard = memo(function EarningsCard({
     : NO_DATA
 
   return (
-    <section
-      aria-label="Zarobki"
-      className="relative overflow-hidden rounded-lg border border-hairline bg-surface-1 p-4"
-    >
-      {/* ─────────────── HEADER ─────────────── */}
-      <header className="relative flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          {/* Tytul niesie naglowek sekcji nad karta — karta moze stac
-              zarowno nad zagieciem, jak i w zwijanej skorupie. */}
-          <div className="flex flex-wrap items-center gap-2">
-            {trend.percent !== null && (
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold ring-1 tabular-nums',
-                  trendBg,
-                  trendColor,
-                )}
-              >
-                <TrendIcon className="h-3 w-3" aria-hidden />
-                {trend.percent > 0 ? '+' : ''}
-                {fmt.number(trend.percent, { decimals: 1 })}%
-              </span>
-            )}
-            {privacyMode && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-surface-3 px-2 py-0.5 text-2xs font-medium uppercase tracking-wide text-zinc-400 ring-1 ring-hairline">
-                <EyeOff className="h-3 w-3" aria-hidden />
-                privacy
-              </span>
-            )}
-          </div>
-
-          <div className="mt-2 flex items-baseline gap-2">
-            <span
-              className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-h1 sm:font-bold sm:leading-tight"
-              aria-label={privacyMode ? 'Kwota ukryta' : undefined}
-            >
-              {totalPLNStr}
-            </span>
-          </div>
-          <p className="mt-1 text-xs leading-[1.4] text-zinc-400 tabular-nums">
-            ≈ {totalEURStr}
-          </p>
-
-          <p className="mt-1 text-2xs leading-[1.4] text-zinc-400 sm:text-xs">
-            {showCompareLine && (
-              <>
-                <span className={isUp ? 'text-positive-400' : 'text-danger-400'}>
-                  {diffSign}
-                  {maskValue(fmt.money(toMinor(diffAbs), 'PLN'), privacyMode)}
-                </span>{' '}
-                {isUp ? 'powyżej' : 'poniżej'} poprzedniego okresu
-              </>
-            )}
-            {forecastValue !== null && (
-              <>
-                {showCompareLine && <span className="mx-1">·</span>}
-                <span>
-                  Prognoza{' '}
-                  {maskValue(fmt.money(toMinor(forecastValue), 'PLN'), privacyMode)}
-                </span>
-              </>
-            )}
-          </p>
-        </div>
-
+    <DashboardSectionCard
+      actions={
         <EarningsMenu
           privacyMode={privacyMode}
           compareMode={compareMode}
@@ -226,7 +167,64 @@ export const EarningsCard = memo(function EarningsCard({
           onCopyAmount={onCopyAmount}
           isExporting={isExporting}
         />
-      </header>
+      }
+    >
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          {trend.percent !== null && (
+            <span
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-semibold ring-1 tabular-nums',
+                trendBg,
+                trendColor,
+              )}
+            >
+              <TrendIcon className="h-3 w-3" aria-hidden />
+              {trend.percent > 0 ? '+' : ''}
+              {fmt.number(trend.percent, { decimals: 1 })}%
+            </span>
+          )}
+          {privacyMode && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-3 px-2 py-0.5 text-2xs font-medium uppercase tracking-wide text-zinc-400 ring-1 ring-hairline">
+              <EyeOff className="h-3 w-3" aria-hidden />
+              privacy
+            </span>
+          )}
+        </div>
+
+        <div className="mt-2 flex items-baseline gap-2">
+          <span
+            className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-h1 sm:font-bold sm:leading-tight"
+            aria-label={privacyMode ? 'Kwota ukryta' : undefined}
+          >
+            {totalPLNStr}
+          </span>
+        </div>
+        <p className="mt-1 text-xs leading-[1.4] text-zinc-400 tabular-nums">
+          ≈ {totalEURStr}
+        </p>
+
+        <p className="mt-1 text-2xs leading-[1.4] text-zinc-400 sm:text-xs">
+          {showCompareLine && (
+            <>
+              <span className={isUp ? 'text-positive-400' : 'text-danger-400'}>
+                {diffSign}
+                {maskValue(fmt.money(toMinor(diffAbs), 'PLN'), privacyMode)}
+              </span>{' '}
+              {isUp ? 'powyżej' : 'poniżej'} poprzedniego okresu
+            </>
+          )}
+          {forecastValue !== null && (
+            <>
+              {showCompareLine && <span className="mx-1">·</span>}
+              <span>
+                Prognoza{' '}
+                {maskValue(fmt.money(toMinor(forecastValue), 'PLN'), privacyMode)}
+              </span>
+            </>
+          )}
+        </p>
+      </div>
 
       {/* ─────────────── KPI strip ─────────────── */}
       <div className="relative mt-3.5 grid grid-cols-3 gap-2">
@@ -277,7 +275,14 @@ export const EarningsCard = memo(function EarningsCard({
           )}
         </div>
       )}
-    </section>
+
+      <p className="mt-3 text-xs text-zinc-400">
+        Przewidywane zarobki:{' '}
+        <span className="font-medium tabular-nums text-zinc-100">
+          {maskValue(fmt.money(toMinor(projectedPLN), 'PLN'), privacyMode)}
+        </span>
+      </p>
+    </DashboardSectionCard>
   )
 })
 

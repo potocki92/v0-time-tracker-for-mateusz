@@ -6,7 +6,11 @@ import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { useElapsedSeconds, useTimerStore } from '@/hooks/stores/useTimerStore'
 import { usePathname } from '@/i18n/navigation'
-import { resolveNestedLabel, resolveSection } from '@/lib/workspace/sections'
+import {
+  resolveNestedLabel,
+  resolveSection,
+  type WorkspaceSegment,
+} from '@/lib/workspace/sections'
 import { useHeaderSlotRef } from './workspace-header-slot'
 
 interface WorkspaceHeaderProps {
@@ -17,11 +21,35 @@ interface WorkspaceHeaderProps {
 }
 
 /**
+ * Sekcje, ktore na telefonie dostaja TYTUL EKRANU zamiast breadcrumba.
+ *
+ * Pulpit jest korzeniem panelu — „Obszar roboczy › Pulpit" nie mowi tam nic,
+ * czego nie mowiloby samo „Pulpit", a zjada polowe paska, ktory na telefonie
+ * ma miescic jeszcze dzwonek, licznik i awatar. Na szerokim ekranie breadcrumb
+ * zostaje: tam miejsce jest, a sciezka nadal orientuje.
+ *
+ * Lista, nie pojedyncza flaga w rejestrze: `lib/workspace/sections.ts` opisuje
+ * STRUKTURE nawigacji, a to jest decyzja czysto prezentacyjna.
+ */
+const SCREEN_TITLE_SEGMENTS = new Set<WorkspaceSegment>(['dashboard'])
+
+/** Wariant prezentacji naglowka dla biezacej trasy. */
+export function useWorkspaceHeaderPresentation(): 'breadcrumb' | 'screenTitle' {
+  const pathname = usePathname() ?? ''
+  const section = resolveSection(pathname)
+  const nested = section ? resolveNestedLabel(pathname) : undefined
+  return section && !nested && SCREEN_TITLE_SEGMENTS.has(section.segment)
+    ? 'screenTitle'
+    : 'breadcrumb'
+}
+
+/**
  * Jeden naglowek dla calego panelu — renderowany raz, w `AppShell`.
  *
  * Lewa strona: breadcrumb `{grupa} › {sekcja}` z rejestru sekcji, na trasie
- * zagniezdzonej z trzecim czlonem. Prawa: slot na akcje strony, powiadomienia
- * i licznik czasu.
+ * zagniezdzonej z trzecim czlonem; na telefonie, na trasach z
+ * `SCREEN_TITLE_SEGMENTS`, sam tytul ekranu. Prawa: slot na akcje strony,
+ * powiadomienia i licznik czasu.
  *
  * Stala wysokosc `h-14` jest celowa — naglowek nie zmienia wysokosci przy
  * nawigacji ani po starcie licznika, wiec nawigacja nie generuje CLS.
@@ -38,6 +66,7 @@ export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
   const section = resolveSection(pathname)
   const nested = section ? resolveNestedLabel(pathname) : undefined
   const slotRef = useHeaderSlotRef()
+  const screenTitle = useWorkspaceHeaderPresentation() === 'screenTitle'
 
   return (
     <header
@@ -65,6 +94,7 @@ export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
               label={t(`sections.${section.segment}`)}
               current={!nested}
               truncate={!nested}
+              screenTitle={screenTitle}
             />
             {nested && (
               <>
@@ -91,8 +121,8 @@ export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
           className="flex items-center gap-2"
         />
 
-        <NotificationsButton />
-        <TimerButton />
+        <NotificationsButton prominent={screenTitle} />
+        <TimerButton prominent={screenTitle} />
         {trailing}
       </div>
     </header>
@@ -103,10 +133,13 @@ function BreadcrumbLeaf({
   label,
   current,
   truncate,
+  screenTitle = false,
 }: {
   label: string
   current: boolean
   truncate: boolean
+  /** Na telefonie ostatni czlon urasta do tytulu ekranu — patrz docblock wyzej. */
+  screenTitle?: boolean
 }) {
   return (
     <span
@@ -114,6 +147,7 @@ function BreadcrumbLeaf({
       className={cn(
         'font-medium text-white',
         truncate ? 'truncate' : 'shrink-0',
+        screenTitle && 'text-xl font-semibold tracking-tight sm:text-xs sm:font-medium',
       )}
     >
       {label}
@@ -129,7 +163,7 @@ const FOCUS_RING =
  * pojawi sie, gdy takie zrodlo powstanie. Do tego czasu sam dzwonek, tak jak
  * w pasku, ktory ten naglowek zastapil.
  */
-function NotificationsButton() {
+function NotificationsButton({ prominent }: { prominent: boolean }) {
   const t = useTranslations('navigation')
 
   return (
@@ -137,8 +171,9 @@ function NotificationsButton() {
       type="button"
       aria-label={t('header.notifications')}
       className={cn(
-        'inline-flex size-8 items-center justify-center rounded-lg border border-hairline bg-surface-2',
-        'text-zinc-400 transition-colors hover:bg-surface-3 hover:text-white',
+        'inline-flex items-center justify-center rounded-xl border border-hairline bg-surface-2',
+        'text-zinc-300 transition-colors hover:bg-surface-3 hover:text-white',
+        prominent ? 'size-10 sm:size-8' : 'size-8',
         FOCUS_RING,
       )}
     >
@@ -154,7 +189,7 @@ const formatMmSs = (total: number) => {
 }
 
 /** Ten sam licznik co widget w sidebarze — wspolny store, nie druga kopia stanu. */
-function TimerButton() {
+function TimerButton({ prominent }: { prominent: boolean }) {
   const t = useTranslations('navigation')
   const running = useTimerStore((state) => state.running)
   const toggle = useTimerStore((state) => state.toggle)
@@ -173,8 +208,13 @@ function TimerButton() {
         aria-pressed={running}
         aria-label={running ? t('header.timerStop') : t('header.timerStart')}
         className={cn(
-          'inline-flex size-8 items-center justify-center rounded-full bg-brand-500 text-brand-foreground',
+          'inline-flex items-center justify-center rounded-full bg-brand-500 text-brand-foreground',
           'transition-colors hover:bg-brand-400',
+          // Bardzo delikatna poswiata, nie neon: licznik jest jedynym
+          // wypelnionym akcentem paska i ma sie od razu znajdowac kciukiem.
+          prominent
+            ? 'size-10 shadow-[0_0_0_4px_color-mix(in_oklab,var(--brand-500)_12%,transparent)] sm:size-8 sm:shadow-none'
+            : 'size-8',
           FOCUS_RING,
         )}
       >

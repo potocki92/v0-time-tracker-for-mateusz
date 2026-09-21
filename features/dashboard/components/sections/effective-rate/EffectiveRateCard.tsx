@@ -2,6 +2,7 @@
 
 import { toMinor } from '@/lib/format'
 import { useFormat } from '@/lib/format/client'
+import { DashboardSectionCard } from '@/components/workspace/card/dashboard-section-card'
 export type ClientRate = {
   clientId: string
   name: string
@@ -27,11 +28,7 @@ export function EffectiveRateCard({
 }: Props) {
   const fmt = useFormat()
   return (
-    <section
-      aria-label="Stawka efektywna"
-      className="rounded-lg border border-hairline bg-surface-1 p-4"
-    >
-      {/* Tytul niesie <SectionShell>, zakres — zakladki nad pasem KPI. */}
+    <DashboardSectionCard>
       <div className="flex items-baseline gap-2">
         <span className="text-3xl font-semibold tabular-nums leading-[1.15] text-white sm:text-4xl sm:font-bold">
           {blendedRate === null ? '—' : fmt.money(toMinor(blendedRate), currency)}
@@ -75,6 +72,6 @@ export function EffectiveRateCard({
           ))}
         </ul>
       )}
-    </section>
+    </DashboardSectionCard>
   )
 }
