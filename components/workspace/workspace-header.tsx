@@ -6,11 +6,7 @@ import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { useElapsedSeconds, useTimerStore } from '@/hooks/stores/useTimerStore'
 import { usePathname } from '@/i18n/navigation'
-import {
-  resolveNestedLabel,
-  resolveSection,
-  type WorkspaceSegment,
-} from '@/lib/workspace/sections'
+import { resolveNestedLabel, resolveSection } from '@/lib/workspace/sections'
 import { useHeaderSlotRef } from './workspace-header-slot'
 
 interface WorkspaceHeaderProps {
@@ -21,35 +17,22 @@ interface WorkspaceHeaderProps {
 }
 
 /**
- * Sekcje, ktore na telefonie dostaja TYTUL EKRANU zamiast breadcrumba.
- *
- * Pulpit jest korzeniem panelu — „Obszar roboczy › Pulpit" nie mowi tam nic,
- * czego nie mowiloby samo „Pulpit", a zjada polowe paska, ktory na telefonie
- * ma miescic jeszcze dzwonek, licznik i awatar. Na szerokim ekranie breadcrumb
- * zostaje: tam miejsce jest, a sciezka nadal orientuje.
- *
- * Lista, nie pojedyncza flaga w rejestrze: `lib/workspace/sections.ts` opisuje
- * STRUKTURE nawigacji, a to jest decyzja czysto prezentacyjna.
- */
-const SCREEN_TITLE_SEGMENTS = new Set<WorkspaceSegment>(['dashboard'])
-
-/** Wariant prezentacji naglowka dla biezacej trasy. */
-export function useWorkspaceHeaderPresentation(): 'breadcrumb' | 'screenTitle' {
-  const pathname = usePathname() ?? ''
-  const section = resolveSection(pathname)
-  const nested = section ? resolveNestedLabel(pathname) : undefined
-  return section && !nested && SCREEN_TITLE_SEGMENTS.has(section.segment)
-    ? 'screenTitle'
-    : 'breadcrumb'
-}
-
-/**
  * Jeden naglowek dla calego panelu — renderowany raz, w `AppShell`.
  *
- * Lewa strona: breadcrumb `{grupa} › {sekcja}` z rejestru sekcji, na trasie
- * zagniezdzonej z trzecim czlonem; na telefonie, na trasach z
- * `SCREEN_TITLE_SEGMENTS`, sam tytul ekranu. Prawa: slot na akcje strony,
- * powiadomienia i licznik czasu.
+ * Lewa strona: przelacznik sidebara (telefon) i sciezka. Na telefonie, na
+ * TRASIE SEKCJI, ostatni czlon urasta do tytulu ekranu — „Obszar roboczy ›
+ * Pulpit" nie mowi tam nic, czego nie mowiloby samo „Pulpit", a zjada polowe
+ * paska, ktory ma zmiescic jeszcze akcje strony, dzwonek, licznik i awatar.
+ * Na szerokim ekranie breadcrumb zostaje w calosci: tam miejsce jest,
+ * a sciezka nadal orientuje.
+ *
+ * Regula jest JEDNA dla calego panelu — zadnej listy uprzywilejowanych tras.
+ * Trasa zagniezdzona (`/projects/[id]`, `/invoices/analytics`) zostaje przy
+ * breadcrumbie, bo ostatnim czlonem jest tam nazwa encji: w stopniu tytulu
+ * ekranu urwalaby sie po dwoch slowach.
+ *
+ * Prawa: slot na akcje strony, powiadomienia, licznik czasu i menu
+ * uzytkownika. Ten sam zestaw i te same rozmiary na kazdej trasie.
  *
  * Stala wysokosc `h-14` jest celowa — naglowek nie zmienia wysokosci przy
  * nawigacji ani po starcie licznika, wiec nawigacja nie generuje CLS.
@@ -66,7 +49,8 @@ export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
   const section = resolveSection(pathname)
   const nested = section ? resolveNestedLabel(pathname) : undefined
   const slotRef = useHeaderSlotRef()
-  const screenTitle = useWorkspaceHeaderPresentation() === 'screenTitle'
+  // Na telefonie tytul ekranu; przy trzecim czlonie sciezki zostaje breadcrumb.
+  const screenTitle = Boolean(section) && !nested
 
   return (
     <header
@@ -121,8 +105,8 @@ export function WorkspaceHeader({ leading, trailing }: WorkspaceHeaderProps) {
           className="flex items-center gap-2"
         />
 
-        <NotificationsButton prominent={screenTitle} />
-        <TimerButton prominent={screenTitle} />
+        <NotificationsButton />
+        <TimerButton />
         {trailing}
       </div>
     </header>
@@ -147,7 +131,11 @@ function BreadcrumbLeaf({
       className={cn(
         'font-medium text-white',
         truncate ? 'truncate' : 'shrink-0',
-        screenTitle && 'text-xl font-semibold tracking-tight sm:text-xs sm:font-medium',
+        // `text-lg`, nie `text-xl`: pasek musi zmiescic tytul RAZEM z akcja
+        // strony („Nowy projekt", „Nowa faktura"). Przy 20 px „Projekty"
+        // urywaly sie na 390 px do „Proje…", a urwany tytul jest gorszy niz
+        // o dwa piksele mniejszy.
+        screenTitle && 'text-lg font-semibold tracking-tight sm:text-xs sm:font-medium',
       )}
     >
       {label}
@@ -163,7 +151,7 @@ const FOCUS_RING =
  * pojawi sie, gdy takie zrodlo powstanie. Do tego czasu sam dzwonek, tak jak
  * w pasku, ktory ten naglowek zastapil.
  */
-function NotificationsButton({ prominent }: { prominent: boolean }) {
+function NotificationsButton() {
   const t = useTranslations('navigation')
 
   return (
@@ -171,9 +159,8 @@ function NotificationsButton({ prominent }: { prominent: boolean }) {
       type="button"
       aria-label={t('header.notifications')}
       className={cn(
-        'inline-flex items-center justify-center rounded-xl border border-hairline bg-surface-2',
+        'inline-flex size-9 items-center justify-center rounded-xl border border-hairline bg-surface-2 sm:size-8',
         'text-zinc-300 transition-colors hover:bg-surface-3 hover:text-white',
-        prominent ? 'size-10 sm:size-8' : 'size-8',
         FOCUS_RING,
       )}
     >
@@ -189,7 +176,7 @@ const formatMmSs = (total: number) => {
 }
 
 /** Ten sam licznik co widget w sidebarze — wspolny store, nie druga kopia stanu. */
-function TimerButton({ prominent }: { prominent: boolean }) {
+function TimerButton() {
   const t = useTranslations('navigation')
   const running = useTimerStore((state) => state.running)
   const toggle = useTimerStore((state) => state.toggle)
@@ -208,13 +195,11 @@ function TimerButton({ prominent }: { prominent: boolean }) {
         aria-pressed={running}
         aria-label={running ? t('header.timerStop') : t('header.timerStart')}
         className={cn(
-          'inline-flex items-center justify-center rounded-full bg-brand-500 text-brand-foreground',
+          'inline-flex size-9 items-center justify-center rounded-full bg-brand-500 text-brand-foreground sm:size-8',
           'transition-colors hover:bg-brand-400',
           // Bardzo delikatna poswiata, nie neon: licznik jest jedynym
           // wypelnionym akcentem paska i ma sie od razu znajdowac kciukiem.
-          prominent
-            ? 'size-10 shadow-[0_0_0_4px_color-mix(in_oklab,var(--brand-500)_12%,transparent)] sm:size-8 sm:shadow-none'
-            : 'size-8',
+          'shadow-[0_0_0_4px_color-mix(in_oklab,var(--brand-500)_12%,transparent)] sm:shadow-none',
           FOCUS_RING,
         )}
       >

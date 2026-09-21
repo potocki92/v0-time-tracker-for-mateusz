@@ -7,15 +7,11 @@ import { useLocale, useTranslations } from 'next-intl'
 import type { User } from '@supabase/supabase-js'
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
-import {
-  WorkspaceHeader,
-  useWorkspaceHeaderPresentation,
-} from '@/components/workspace/workspace-header'
+import { WorkspaceHeader } from '@/components/workspace/workspace-header'
 import { WorkspaceHeaderSlotProvider } from '@/components/workspace/workspace-header-slot'
 import { toAppLocale } from '@/i18n/config'
 import { performLogout } from '@/lib/auth/logout'
 import { AppSidebar } from './components/sidebar/AppSidebar'
-import { ThemeToggle } from './components/theme/ThemeToggle'
 import { UserMenu } from './components/user/UserMenu'
 import { BottomNav } from './components/bottom-nav'
 import { AuthWatcher } from './AuthWatcher'
@@ -40,20 +36,14 @@ interface AppShellProps {
  * od razu, bez czekania na hydrację.
  *
  * `WorkspaceHeader` stoi tu, nad `<main>`, więc każda trasa panelu dostaje
- * dokładnie jeden nagłówek. Chrome mobilny (hamburger, motyw, menu
- * użytkownika) wjeżdża do niego slotami — na desktopie te same funkcje daje
- * sidebar, dlatego znikają razem z nim.
+ * dokładnie jeden nagłówek — i na każdej trasie TEN SAM. Chrome mobilny
+ * (hamburger, menu użytkownika) wjeżdża do niego slotami: na desktopie te
+ * same funkcje daje sidebar, dlatego znikają razem z nim.
  */
 export function AppShell({ user, badges, children }: AppShellProps) {
   const t = useTranslations('navigation')
   const locale = toAppLocale(useLocale())
   const queryClient = useQueryClient()
-  // Ekran z tytulem (Pulpit) ma na telefonie pasek z referencji: tytul po
-  // lewej, dzwonek / licznik / awatar po prawej. Znika z niego przelacznik
-  // sidebara i osobna ikona motywu — nie sama FUNKCJA: sidebar zostaje na
-  // kazdej innej trasie panelu, a wybor motywu siedzi w menu uzytkownika,
-  // czyli w awatarze obok.
-  const screenTitle = useWorkspaceHeaderPresentation() === 'screenTitle'
 
   // Wylogowanie robi TWARDA nawigacje; adres logowania musi wiec niesc jezyk,
   // inaczej Niemiec wypadalby na polski formularz.
@@ -72,13 +62,19 @@ export function AppShell({ user, badges, children }: AppShellProps) {
       {/* SidebarInset: wypycha content gdy sidebar rozwinięty */}
       <SidebarInset>
         <WorkspaceHeaderSlotProvider>
+          {/* Jeden pasek, ten sam na KAZDEJ trasie panelu: przelacznik sidebara
+              po lewej, menu uzytkownika po prawej. Zadna trasa nie chowa
+              nawigacji — sidebar niesie sekcje, ktorych nie ma dolny pasek
+              (Raporty, Automatyzacja), wiec jego brak na jednym ekranie
+              odcinalby do nich droge z tego ekranu.
+
+              Osobnej ikony motywu tu nie ma: wybor motywu stoi w menu
+              uzytkownika (`UserMenuPanel`), czyli w awatarze obok — z pelnym
+              podmenu jasny / ciemny / systemowy i z tlumaczeniami. */}
           <WorkspaceHeader
-            leading={
-              screenTitle ? undefined : <SidebarTrigger className="-ml-1 md:hidden" />
-            }
+            leading={<SidebarTrigger className="-ml-1 md:hidden" />}
             trailing={
               <div className="flex items-center gap-2 md:hidden">
-                {!screenTitle && <ThemeToggle />}
                 <UserMenu user={user} onLogout={logout} />
               </div>
             }
